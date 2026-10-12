@@ -39,3 +39,37 @@ The fixed setup images contain rendered text, not font binaries. Tahoma presence
 | Device rendering | App renderer census matched to a physical-device photograph |
 
 CI and simulated-host tests cannot close these physical evidence rows. A load failure does not by itself prove a signing, security-software or permission cause.
+
+## Current host-condition record
+
+Development host: Mac17,9, Apple M5 Pro, 64 GB, 18 logical CPUs, macOS 27.0.1 build 26A434. App 7.5.0.22885 is universal; the app's selected Node runtime is 24.13.1. The measured connected surface is Virtual Stream Deck, 8 by 4; no physical Elgato USB device was attached. Physical firmware and dial rows therefore remain unexecuted. Runtime paths use the app's NodeJS directory under Application Support; no user name or serial number is included here.
+
+| Row | Condition | Current evidence/status |
+| --- | --- | --- |
+| 1 | Standard user, app running | Actual app/dev Virtual Stream Deck publishes 14 system and 38 SMC readings; physical keys/dials not executed |
+| 2 | App restart | Not executed: original app predates the task; owner session required |
+| 3 | Plugin kill / app quit | Owned plugin SIGKILL recovered in 2.28 s with fresh sources; original-app quit is owner-only |
+| 4 | Sleep/resume at least 2 minutes | Not executed: owner wake required; continuous/awake clock observer prepared |
+| 5 | Clamshell | Not executed: physical lid/wake action |
+| 6 | Fast User Switching | Not executed: owner session |
+| 7 | Screen Sharing | Not executed: owner settings/session |
+| 8 | Sign out/in | Not executed: owner session |
+| 9 | Replacement while loaded | Dev promotion refused; old native hash unchanged |
+| 10 | Replacement after exit | Owned dev unlinked, stopped, replaced by rename and relinked with exact CI hashes |
+| 11 | Browser package route | Safari quarantine retained on download; normal Finder/app install and upgrade; installed hashes verified |
+| 12 | Marketplace DRM route | Not executed: submission and approval are owner-only |
+| 13 | Low Power Mode, battery/AC | Not executed: owner controls; original settings recorded |
+| 14 | Sustained CPU load | Six owned workers raised measured temperatures and both automatic fan readings; no actuator calls. Physical alert-color check remains owner-only |
+| 15 | App hidden for hours | Not executed as a separate host condition |
+| 16 | Second physical deck | Not executed: device attach/detach required |
+| 17 | Detail profiles | Software archive/navigation tests and real-app isolated profile install/switch/restore; physical managed-detail route remains owner-only |
+| 18 | Dial/control gestures | Software traces pass; physical gestures not executed |
+| 19 | Fanless Mac | Not executed: no such host available in this session |
+| 20 | Rosetta | x86_64 Node 20/22/24 live ABI passes on M5 Pro; whole-app Rosetta setting remains owner-only |
+| 21 | Missing Tahoma | Deterministic production-path fallback/recovery tests pass; no system font was removed |
+| 22 | Two-GPU Intel laptop | Not executed: physical Intel inventory is pending |
+| 23 | Energy on battery | External CPU/wakeup metrics recorded on this host; battery-condition comparison not executed |
+| 24 | OS point update during program | Not executed: no update performed during qualification |
+| 25 | Offline notarized first load | Not applicable: Developer ID/notarization was not selected |
+
+The dated 24-hour window is in progress. It must not be reported as a completed soak before its final resource, freshness, log and diagnostic-report review.
