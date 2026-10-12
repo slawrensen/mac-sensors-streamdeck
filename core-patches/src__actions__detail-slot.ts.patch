@@ -1,0 +1,19 @@
+Source: slawrensen/hwinfo-streamdeck/src/actions/detail-slot.ts@11b9645b78395f157493648d873a3066673ba493
+Seam: S1
+Reason: Select the checked platform poller alias while upstream tests keep the original policy.
+Before: c5997b48d9075c31cf12bc3e655cc42cb29665dd2b05b7bc9affe77e24768a7f
+After: 25ae82ace87223d5c4a5d991fe79f36fa217b055adda852818390651ea73d822
+
+diff --git a/src/actions/detail-slot.ts b/src/actions/detail-slot.ts
+index 310aba8..dd85127 100644
+--- a/src/actions/detail-slot.ts
++++ b/src/actions/detail-slot.ts
+@@ -10,7 +10,7 @@
+ import streamDeck, { action, SingletonAction, type KeyDownEvent, type WillAppearEvent, type WillDisappearEvent } from "@elgato/streamdeck";
+ 
+ import type { DetailController } from "../detail/controller";
+-import { poller } from "../poller";
++import { poller } from "#platform/poller";
+ 
+ /** The baked binding shape; parsed strictly by the controller. */
+ type DetailSlotSettings = {

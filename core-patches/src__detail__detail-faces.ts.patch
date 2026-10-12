@@ -1,0 +1,26 @@
+Source: slawrensen/hwinfo-streamdeck/src/detail/detail-faces.ts@11b9645b78395f157493648d873a3066673ba493
+Seam: S1/S2
+Reason: Resolve the poller and platform status copy through checked aliases.
+Before: f6a45cf51cf0f8b31c00ff662ebdfe5480d732dff539b545f7100b543d84dbe3
+After: d40f5fa58d7412ccb73b64bf0a2f683575ed914d9befd8280336b23791a3dc0c
+
+diff --git a/src/detail/detail-faces.ts b/src/detail/detail-faces.ts
+index e353020..6606745 100644
+--- a/src/detail/detail-faces.ts
++++ b/src/detail/detail-faces.ts
+@@ -11,13 +11,13 @@
+  * inherit the opener's thresholds (a temperature limit is meaningless on
+  * a power or clock reading), so they always render at the normal level.
+  */
+-import type { PollerStatus } from "../poller";
++import type { PollerStatus } from "#platform/poller";
+ import type { Reading } from "../hwinfo/types";
+ import { renderDetailBlankKey, renderDetailIdleBackKey, renderDetailIdleKey, renderDetailPagerKey, renderDetailTitleKey, renderDetailVoidKey } from "../ui/detail-renderer";
+ import { alertLevel, convertUnit, parseThreshold, readingStatBadge, sharedStatBadge, statValue } from "../ui/format";
+ import { quadIdentityOf, renderDualKey, renderQuadKey, renderReadingKey, renderStatusKey, renderTripleKey, type DualKeyRow, type QuadKeyCell, type TripleKeyRow } from "../ui/key-renderer";
+ import { formatMeasurement, formatQuadMeasurement, type MeasureOptions } from "../ui/measure";
+-import { keyLabel, missingReadingScreen, statusScreen } from "../ui/state-screens";
++import { keyLabel, missingReadingScreen, statusScreen } from "#platform/status";
+ import { quadIdentityColor, resolveTextColors, type TextSettings } from "../ui/text-colors";
+ import { classifyTypeAccent, resolvePalette, type Palette, type ThemesConfig } from "../ui/themes";
+ import type { DetailPage } from "./detail-group";

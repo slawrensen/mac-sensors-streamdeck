@@ -1,0 +1,28 @@
+Source: slawrensen/hwinfo-streamdeck/src/actions/sensor-reading.ts@11b9645b78395f157493648d873a3066673ba493
+Seam: S1/S2
+Reason: Resolve the poller and platform status copy through checked aliases.
+Before: a9030ca8874f62c853eaabb6bb3ff934e15bcc64ba1f22c3e22720957da48f46
+After: a6104b235d6917383ad642d40264776b612316a77cd33f4adf3dee8773a42e54
+
+diff --git a/src/actions/sensor-reading.ts b/src/actions/sensor-reading.ts
+index 3b11a89..2db4324 100644
+--- a/src/actions/sensor-reading.ts
++++ b/src/actions/sensor-reading.ts
+@@ -13,7 +13,7 @@ import { tickSignature } from "../detail/tick-signature";
+ import type { DetailNavigator, DeviceDetailState } from "../detail/navigation";
+ import { deviceCapabilities } from "../devices";
+ import { buildThemesPayload, forgetPanelFace, handlePiRequest, pushPreviewToPi } from "../pi-protocol";
+-import { poller, type PollerStatus } from "../poller";
++import { poller, type PollerStatus } from "#platform/poller";
+ import { sortedJson } from "../sorted-json";
+ import type { Reading, SensorSnapshot } from "../hwinfo/types";
+ import { alertLevel, convertUnit, isStatMode, nextStatMode, parseThreshold, readingStatBadge, sharedStatBadge, statValue, type AlertLevel, type DecimalsSetting, type StatMode } from "../ui/format";
+@@ -22,7 +22,7 @@ import { formatMeasurement, formatQuadMeasurement, type MeasureOptions } from ".
+ import { QUAD_DEFAULT_COLORS, quadIdentityOf, renderDualKey, renderQuadKey, renderReadingKey, renderStatusKey, renderTripleKey, type DrawnZone, type QuadKeyCell } from "../ui/key-renderer";
+ import { renderDetailIdleBackKey } from "../ui/detail-renderer";
+ import { drawnKeyLayout } from "../ui/key-layout";
+-import { keyLabel, missingReadingScreen, noSelectionScreen, statusScreen } from "../ui/state-screens";
++import { keyLabel, missingReadingScreen, noSelectionScreen, statusScreen } from "#platform/status";
+ import { HEX6, quadIdentityColor, resolveTextColors, type QuadIdentity } from "../ui/text-colors";
+ import { decideLegacyDefault, effectiveTextFor, effectiveThemeFor, measureOptionsFrom, onThemeChange, typeAccentsEnabled } from "../ui/theme-store";
+ import { classifyTypeAccent, loadThemes, resolvePalette, type ThemesConfig, type TypeAccentKey } from "../ui/themes";

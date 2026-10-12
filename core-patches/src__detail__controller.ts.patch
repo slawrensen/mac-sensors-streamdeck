@@ -1,0 +1,19 @@
+Source: slawrensen/hwinfo-streamdeck/src/detail/controller.ts@11b9645b78395f157493648d873a3066673ba493
+Seam: S1
+Reason: Select the checked platform poller alias while upstream tests keep the original policy.
+Before: 31f9f1e41e38ce129e0cf8abcbaa063f8d438463dccc0104aad31b89973edbbd
+After: 91dba10cbce54184e7d2bd1023477464b269d93cece9eaaf41305ce8d9ce0194
+
+diff --git a/src/detail/controller.ts b/src/detail/controller.ts
+index 7e402ff..1b92120 100644
+--- a/src/detail/controller.ts
++++ b/src/detail/controller.ts
+@@ -10,7 +10,7 @@
+  * authorities (theme-store) are only read, so everything above this line
+  * is driven end-to-end by the mock-app e2e harness.
+  */
+-import type { PollerStatus } from "../poller";
++import type { PollerStatus } from "#platform/poller";
+ import type { SensorSnapshot } from "../hwinfo/types";
+ import { effectiveTextFor, getDeckTheme, measureOptionsFrom, typeAccentsEnabled } from "../ui/theme-store";
+ import { loadThemes } from "../ui/themes";

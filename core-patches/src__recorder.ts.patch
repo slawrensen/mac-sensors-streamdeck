@@ -1,0 +1,24 @@
+Source: slawrensen/hwinfo-streamdeck/src/recorder.ts@11b9645b78395f157493648d873a3066673ba493
+Seam: S7
+Reason: Read trace control from the platform environment prefix.
+Before: 9d51db41f47643d3f186a1cc5b61c5574a9841676a4398f8ecb6143fb11d6018
+After: 8f1b37b4da6732306188f98d6d6e8c114aad66466c168056144d97b0195cc3d5
+
+diff --git a/src/recorder.ts b/src/recorder.ts
+index 7374429..f5867a1 100644
+--- a/src/recorder.ts
++++ b/src/recorder.ts
+@@ -1,3 +1,4 @@
++import { environment } from "#platform/runtime";
+ /**
+  * Local hardware event recorder, for development and support diagnostics.
+  *
+@@ -50,7 +51,7 @@ type TraceEvent = {
+ 
+ const RING_SIZE = 24;
+ const ring: TraceEvent[] = [];
+-const enabled = process.env.HWINFO_TRACE_EVENTS === "1";
++const enabled = environment("TRACE_EVENTS") === "1";
+ let tracePath: string | null = null;
+ let writeFailed = false;
+ 

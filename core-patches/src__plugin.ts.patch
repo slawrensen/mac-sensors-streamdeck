@@ -1,0 +1,84 @@
+Source: slawrensen/hwinfo-streamdeck/src/plugin.ts@11b9645b78395f157493648d873a3066673ba493
+Seam: S1/S7
+Reason: Select platform native/poller modules and environment names without changing action wiring or settings delivery.
+Before: 893c44e56b972012b580348dadb2652602599f98c78f6d3102950d3b1e13b2c2
+After: aec0f55ba81abbf70826d1ca30029e302c57719d57b93cab89d58428c2d23984
+
+diff --git a/src/plugin.ts b/src/plugin.ts
+index 4e4b30a..25e5908 100644
+--- a/src/plugin.ts
++++ b/src/plugin.ts
+@@ -1,3 +1,4 @@
++import { environment, runtime } from "#platform/runtime";
+ import type { JsonValue } from "@elgato/utils";
+ import streamDeck, { DeviceType, type Device } from "@elgato/streamdeck";
+ 
+@@ -10,9 +11,9 @@ import { DetailNavigator } from "./detail/navigation";
+ import { deriveCapabilities, deviceCapabilities } from "./devices";
+ import { registerDiagnostics } from "./diagnostics";
+ import { readGlobalSettings } from "./global-settings";
+-import { initHwsm } from "./hwinfo/hwsm-loader";
++import { initHwsm } from "#platform/native";
+ import { classifyProbeError, ParentLiveness, type ParentProbe, probeErrorCode } from "./parent-liveness";
+-import { parsePollInterval, parseSourceMode, poller } from "./poller";
++import { parsePollInterval, parseSourceMode, poller } from "#platform/poller";
+ import { hashId, traceEnabled } from "./recorder";
+ import { applyGlobalThemeSettings, decideLegacyDefault, onThemeChange } from "./ui/theme-store";
+ 
+@@ -41,7 +42,7 @@ type GlobalSettings = {
+ 
+ // Diagnostic knob for support and hardware bring-up; defaults stay quiet.
+ const LOG_LEVELS = ["trace", "debug", "info", "warn", "error"] as const;
+-const requestedLevel = (process.env.HWINFO_LOG_LEVEL ?? "").toLowerCase();
++const requestedLevel = (environment("LOG_LEVEL") ?? "").toLowerCase();
+ const logLevel = LOG_LEVELS.find((l) => l === requestedLevel) ?? "info";
+ streamDeck.logger.setLevel(logLevel);
+ if (streamDeck.logger.level !== logLevel) {
+@@ -51,9 +52,9 @@ if (streamDeck.logger.level !== logLevel) {
+ 	streamDeck.logger.setLevel("debug");
+ }
+ if (streamDeck.logger.level !== logLevel) {
+-	streamDeck.logger.info(`Log level = ${streamDeck.logger.level} (HWINFO_LOG_LEVEL asked for ${logLevel}, which needs a debug launch)`);
++	streamDeck.logger.info(`Log level = ${streamDeck.logger.level} (${runtime.environmentPrefix}LOG_LEVEL asked for ${logLevel}, which needs a debug launch)`);
+ } else if (logLevel !== "info") {
+-	streamDeck.logger.info(`Log level = ${logLevel} (HWINFO_LOG_LEVEL)`);
++	streamDeck.logger.info(`Log level = ${logLevel} (${runtime.environmentPrefix}LOG_LEVEL)`);
+ }
+ 
+ // A monitoring widget should log-and-continue rather than die silently; every
+@@ -83,7 +84,7 @@ initHwsm();
+ // after every launch. The rules now live in parent-liveness.ts, and the app
+ // itself gets the last word before anything exits (see confirmAppIsGone).
+ const parentPid = process.ppid;
+-const PARENT_CHECK_MS = Number(process.env.HWINFO_PARENT_CHECK_MS ?? "") || 30_000;
++const PARENT_CHECK_MS = Number(environment("PARENT_CHECK_MS") ?? "") || 30_000;
+ /** How long the app gets to answer before we accept that it is gone. Generous
+  *  on purpose: a live app that is merely busy (a profile switch, an install
+  *  prompt) must never be mistaken for a dead one, and a genuinely dead socket
+@@ -96,7 +97,7 @@ function probeParent(): ParentProbe {
+ 		return "alive";
+ 	} catch (err) {
+ 		const probe = classifyProbeError(err);
+-		streamDeck.logger.warn(`Parent probe failed [${probeErrorCode(err)}] — treating as ${probe === "gone" ? "gone" : "unanswered"}.`);
++		streamDeck.logger.warn(`Parent probe failed [${probeErrorCode(err)}]; treating as ${probe === "gone" ? "gone" : "unanswered"}.`);
+ 		return probe;
+ 	}
+ }
+@@ -134,7 +135,7 @@ setInterval(() => {
+ 			// The PID says gone, the app says otherwise: the PID signal is
+ 			// wrong on this machine, so stop consulting it entirely.
+ 			parentLiveness.disarm();
+-			streamDeck.logger.warn("Parent PID is gone but the Stream Deck app still answers — watchdog standing down.");
++			streamDeck.logger.warn("Parent PID is gone but the Stream Deck app still answers; watchdog standing down.");
+ 			return;
+ 		}
+ 		streamDeck.logger.info("Parent process gone, and the app did not answer: exiting.");
+@@ -228,7 +229,7 @@ registerDiagnostics("dataSource", () => poller.diagnostics());
+ // never carry a raw device identifier.
+ registerDiagnostics("detailNav", () => detailNavigator.diagnostics().map(({ deviceId, ...rest }) => ({ device: hashId(deviceId), ...rest })));
+ if (traceEnabled()) {
+-	streamDeck.logger.info("Event trace recorder is ON (HWINFO_TRACE_EVENTS=1): redacted input traces in logs/");
++	streamDeck.logger.info(`Event trace recorder is ON (${runtime.environmentPrefix}TRACE_EVENTS=1): redacted input traces in logs/`);
+ }
+ 
+ // Every delivery is applied here, the startup read's reply included.

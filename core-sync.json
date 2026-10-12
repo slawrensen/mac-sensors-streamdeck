@@ -1,0 +1,3002 @@
+{
+  "schema": 1,
+  "upstream": {
+    "repository": "slawrensen/hwinfo-streamdeck",
+    "commit": "11b9645b78395f157493648d873a3066673ba493"
+  },
+  "rewrites": [
+    [
+      "com.lawrensen.hwinfo.sdPlugin",
+      "com.lawrensen.mac.sdPlugin"
+    ],
+    [
+      "\"com.lawrensen.hwinfo.",
+      "\"com.lawrensen.mac."
+    ],
+    [
+      "\"com.lawrensen.hwinfo\"",
+      "\"com.lawrensen.mac\""
+    ]
+  ],
+  "files": [
+    {
+      "source": "com.lawrensen.hwinfo.sdPlugin/imgs/actions/control/icon.svg",
+      "destination": "com.lawrensen.mac.sdPlugin/imgs/actions/control/icon.svg",
+      "sourceSha256": "e43518211fcb624e06306f2d9cbbf9f6c721a086515f3b0cc68257a739b7bef0",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "e43518211fcb624e06306f2d9cbbf9f6c721a086515f3b0cc68257a739b7bef0",
+      "patch": null,
+      "postPatchSha256": "e43518211fcb624e06306f2d9cbbf9f6c721a086515f3b0cc68257a739b7bef0"
+    },
+    {
+      "source": "com.lawrensen.hwinfo.sdPlugin/imgs/actions/control/key.svg",
+      "destination": "com.lawrensen.mac.sdPlugin/imgs/actions/control/key.svg",
+      "sourceSha256": "17f1f3c1cd4274af9220ec13a66d462f7cf0c067c63b7fe1f51d0979a1b9d7c5",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "17f1f3c1cd4274af9220ec13a66d462f7cf0c067c63b7fe1f51d0979a1b9d7c5",
+      "patch": null,
+      "postPatchSha256": "17f1f3c1cd4274af9220ec13a66d462f7cf0c067c63b7fe1f51d0979a1b9d7c5"
+    },
+    {
+      "source": "com.lawrensen.hwinfo.sdPlugin/imgs/actions/dial/dial.svg",
+      "destination": "com.lawrensen.mac.sdPlugin/imgs/actions/dial/dial.svg",
+      "sourceSha256": "4904d9a2e9a8d974c19cdef9df714b328cd6c49d7741d7ca27eb7c08ebd663f3",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "4904d9a2e9a8d974c19cdef9df714b328cd6c49d7741d7ca27eb7c08ebd663f3",
+      "patch": null,
+      "postPatchSha256": "4904d9a2e9a8d974c19cdef9df714b328cd6c49d7741d7ca27eb7c08ebd663f3"
+    },
+    {
+      "source": "com.lawrensen.hwinfo.sdPlugin/imgs/actions/dial/icon.svg",
+      "destination": "com.lawrensen.mac.sdPlugin/imgs/actions/dial/icon.svg",
+      "sourceSha256": "8c9303f569c066b333343eb758c8224ac0dae1b0ce24ca2ae827d016943545d3",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "8c9303f569c066b333343eb758c8224ac0dae1b0ce24ca2ae827d016943545d3",
+      "patch": null,
+      "postPatchSha256": "8c9303f569c066b333343eb758c8224ac0dae1b0ce24ca2ae827d016943545d3"
+    },
+    {
+      "source": "com.lawrensen.hwinfo.sdPlugin/imgs/actions/reading/icon.svg",
+      "destination": "com.lawrensen.mac.sdPlugin/imgs/actions/reading/icon.svg",
+      "sourceSha256": "6f64c992b39ebce135dcf02bf359237fff025461568fcb7985fecdf996095ce5",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "6f64c992b39ebce135dcf02bf359237fff025461568fcb7985fecdf996095ce5",
+      "patch": null,
+      "postPatchSha256": "6f64c992b39ebce135dcf02bf359237fff025461568fcb7985fecdf996095ce5"
+    },
+    {
+      "source": "com.lawrensen.hwinfo.sdPlugin/imgs/actions/reading/key.svg",
+      "destination": "com.lawrensen.mac.sdPlugin/imgs/actions/reading/key.svg",
+      "sourceSha256": "9dcaf136e1aabe7180897bfd987099cfe9b87f3fb9d7f1397198d545f7d0d66f",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "9dcaf136e1aabe7180897bfd987099cfe9b87f3fb9d7f1397198d545f7d0d66f",
+      "patch": null,
+      "postPatchSha256": "9dcaf136e1aabe7180897bfd987099cfe9b87f3fb9d7f1397198d545f7d0d66f"
+    },
+    {
+      "source": "com.lawrensen.hwinfo.sdPlugin/imgs/plugin/category-icon.svg",
+      "destination": "com.lawrensen.mac.sdPlugin/imgs/plugin/category-icon.svg",
+      "sourceSha256": "4c507076800ce953bae9fabab95a7981f3e0d0dae36b9d2e0f759059cdee6c03",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "4c507076800ce953bae9fabab95a7981f3e0d0dae36b9d2e0f759059cdee6c03",
+      "patch": null,
+      "postPatchSha256": "4c507076800ce953bae9fabab95a7981f3e0d0dae36b9d2e0f759059cdee6c03"
+    },
+    {
+      "source": "com.lawrensen.hwinfo.sdPlugin/imgs/plugin/marketplace.png",
+      "destination": "com.lawrensen.mac.sdPlugin/imgs/plugin/marketplace.png",
+      "sourceSha256": "68884f9fa59d085ba1c69d833d96b936af7ea037de1d742910b005751f80fb9d",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "68884f9fa59d085ba1c69d833d96b936af7ea037de1d742910b005751f80fb9d",
+      "patch": null,
+      "postPatchSha256": "68884f9fa59d085ba1c69d833d96b936af7ea037de1d742910b005751f80fb9d"
+    },
+    {
+      "source": "com.lawrensen.hwinfo.sdPlugin/imgs/plugin/marketplace@2x.png",
+      "destination": "com.lawrensen.mac.sdPlugin/imgs/plugin/marketplace@2x.png",
+      "sourceSha256": "feaa2c2fbd7d119347a4b542f096562a3645a2b79b5dfdb0fd0d366eb64de587",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "feaa2c2fbd7d119347a4b542f096562a3645a2b79b5dfdb0fd0d366eb64de587",
+      "patch": null,
+      "postPatchSha256": "feaa2c2fbd7d119347a4b542f096562a3645a2b79b5dfdb0fd0d366eb64de587"
+    },
+    {
+      "source": "com.lawrensen.hwinfo.sdPlugin/layouts/sensor-dial.json",
+      "destination": "com.lawrensen.mac.sdPlugin/layouts/sensor-dial.json",
+      "sourceSha256": "73f1d38ec79c559e601014b8d361ef4bca4ddce55aa78f24a9ea135a8f90930b",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "73f1d38ec79c559e601014b8d361ef4bca4ddce55aa78f24a9ea135a8f90930b",
+      "patch": null,
+      "postPatchSha256": "73f1d38ec79c559e601014b8d361ef4bca4ddce55aa78f24a9ea135a8f90930b"
+    },
+    {
+      "source": "com.lawrensen.hwinfo.sdPlugin/themes.json",
+      "destination": "com.lawrensen.mac.sdPlugin/themes.json",
+      "sourceSha256": "285f79cd463f0fb86610e1ab4803c53e498ca0d74152f1b7383420d57d93f7ff",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "285f79cd463f0fb86610e1ab4803c53e498ca0d74152f1b7383420d57d93f7ff",
+      "patch": null,
+      "postPatchSha256": "285f79cd463f0fb86610e1ab4803c53e498ca0d74152f1b7383420d57d93f7ff"
+    },
+    {
+      "source": "com.lawrensen.hwinfo.sdPlugin/ui/control.html",
+      "destination": "com.lawrensen.mac.sdPlugin/ui/control.html",
+      "sourceSha256": "245bf0cb037286ee253bbd303a70df0dac6fcce87fd888c41b04c12895719047",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "245bf0cb037286ee253bbd303a70df0dac6fcce87fd888c41b04c12895719047",
+      "patch": null,
+      "postPatchSha256": "245bf0cb037286ee253bbd303a70df0dac6fcce87fd888c41b04c12895719047"
+    },
+    {
+      "source": "com.lawrensen.hwinfo.sdPlugin/ui/detail-slot.html",
+      "destination": "com.lawrensen.mac.sdPlugin/ui/detail-slot.html",
+      "sourceSha256": "f50b50a42e1fa89794805fbfd65064c1bf462b7a94240afc3acdf18f6115345a",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "f50b50a42e1fa89794805fbfd65064c1bf462b7a94240afc3acdf18f6115345a",
+      "patch": null,
+      "postPatchSha256": "f50b50a42e1fa89794805fbfd65064c1bf462b7a94240afc3acdf18f6115345a"
+    },
+    {
+      "source": "com.lawrensen.hwinfo.sdPlugin/ui/pi-command.js",
+      "destination": "com.lawrensen.mac.sdPlugin/ui/pi-command.js",
+      "sourceSha256": "98d76a355df544a19debbc1f63ef7cad6ae5f464949c71819ef1dca2a9072174",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "98d76a355df544a19debbc1f63ef7cad6ae5f464949c71819ef1dca2a9072174",
+      "patch": null,
+      "postPatchSha256": "98d76a355df544a19debbc1f63ef7cad6ae5f464949c71819ef1dca2a9072174"
+    },
+    {
+      "source": "com.lawrensen.hwinfo.sdPlugin/ui/pi-common.js",
+      "destination": "com.lawrensen.mac.sdPlugin/ui/pi-common.js",
+      "sourceSha256": "c94e892a18849b8a7acc3a1aac4248cae62fbf6e09fcef35895cf2a5d99324ad",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "c94e892a18849b8a7acc3a1aac4248cae62fbf6e09fcef35895cf2a5d99324ad",
+      "patch": null,
+      "postPatchSha256": "c94e892a18849b8a7acc3a1aac4248cae62fbf6e09fcef35895cf2a5d99324ad"
+    },
+    {
+      "source": "com.lawrensen.hwinfo.sdPlugin/ui/pi-control.js",
+      "destination": "com.lawrensen.mac.sdPlugin/ui/pi-control.js",
+      "sourceSha256": "2a83b53d7c0f4cf6aca9216c5f0fc4001327f05b05e3c2b4282a0ad7083df18a",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "2a83b53d7c0f4cf6aca9216c5f0fc4001327f05b05e3c2b4282a0ad7083df18a",
+      "patch": null,
+      "postPatchSha256": "2a83b53d7c0f4cf6aca9216c5f0fc4001327f05b05e3c2b4282a0ad7083df18a"
+    },
+    {
+      "source": "com.lawrensen.hwinfo.sdPlugin/ui/pi-model.js",
+      "destination": "com.lawrensen.mac.sdPlugin/ui/pi-model.js",
+      "sourceSha256": "ac94d3075a394e16de6142410d63603aab51c3fd4548444551d625b6c0e82156",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "ac94d3075a394e16de6142410d63603aab51c3fd4548444551d625b6c0e82156",
+      "patch": null,
+      "postPatchSha256": "ac94d3075a394e16de6142410d63603aab51c3fd4548444551d625b6c0e82156"
+    },
+    {
+      "source": "com.lawrensen.hwinfo.sdPlugin/ui/pi-shell.js",
+      "destination": "com.lawrensen.mac.sdPlugin/ui/pi-shell.js",
+      "sourceSha256": "1cdbd26576a0ec8f2b677779753f4578106e8f05efb9b962e9184aba51078c50",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "1cdbd26576a0ec8f2b677779753f4578106e8f05efb9b962e9184aba51078c50",
+      "patch": null,
+      "postPatchSha256": "1cdbd26576a0ec8f2b677779753f4578106e8f05efb9b962e9184aba51078c50"
+    },
+    {
+      "source": "com.lawrensen.hwinfo.sdPlugin/ui/pi-slot.js",
+      "destination": "com.lawrensen.mac.sdPlugin/ui/pi-slot.js",
+      "sourceSha256": "c07cd26a8d46a824c5440bb487d731bef0426f14d76ccea034b0669cab931337",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "c07cd26a8d46a824c5440bb487d731bef0426f14d76ccea034b0669cab931337",
+      "patch": null,
+      "postPatchSha256": "c07cd26a8d46a824c5440bb487d731bef0426f14d76ccea034b0669cab931337"
+    },
+    {
+      "source": "com.lawrensen.hwinfo.sdPlugin/ui/pi.css",
+      "destination": "com.lawrensen.mac.sdPlugin/ui/pi.css",
+      "sourceSha256": "2e47df1ec6f8ec8a1bc61f4f118a4bcdd2b25e0754ac155fd6030c5dad3c9246",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "2e47df1ec6f8ec8a1bc61f4f118a4bcdd2b25e0754ac155fd6030c5dad3c9246",
+      "patch": null,
+      "postPatchSha256": "2e47df1ec6f8ec8a1bc61f4f118a4bcdd2b25e0754ac155fd6030c5dad3c9246"
+    },
+    {
+      "source": "com.lawrensen.hwinfo.sdPlugin/ui/sdpi-components.js",
+      "destination": "com.lawrensen.mac.sdPlugin/ui/sdpi-components.js",
+      "sourceSha256": "f6c0dfd2ed68e18084b9952842b86e3850cf837d674704700c2a0718e0a24f6b",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "f6c0dfd2ed68e18084b9952842b86e3850cf837d674704700c2a0718e0a24f6b",
+      "patch": null,
+      "postPatchSha256": "f6c0dfd2ed68e18084b9952842b86e3850cf837d674704700c2a0718e0a24f6b"
+    },
+    {
+      "source": "com.lawrensen.hwinfo.sdPlugin/ui/sensor-dial.html",
+      "destination": "com.lawrensen.mac.sdPlugin/ui/sensor-dial.html",
+      "sourceSha256": "b2f3f85c65c9644a2082da9460c5a5f86275b078ef9250db031e3be5df88878c",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "b2f3f85c65c9644a2082da9460c5a5f86275b078ef9250db031e3be5df88878c",
+      "patch": null,
+      "postPatchSha256": "b2f3f85c65c9644a2082da9460c5a5f86275b078ef9250db031e3be5df88878c"
+    },
+    {
+      "source": "com.lawrensen.hwinfo.sdPlugin/ui/sensor-reading.html",
+      "destination": "com.lawrensen.mac.sdPlugin/ui/sensor-reading.html",
+      "sourceSha256": "273a38b392c650d40320eda849610dcbd38e1c9f69e1ab6521cd95b0d87124c2",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "273a38b392c650d40320eda849610dcbd38e1c9f69e1ab6521cd95b0d87124c2",
+      "patch": null,
+      "postPatchSha256": "273a38b392c650d40320eda849610dcbd38e1c9f69e1ab6521cd95b0d87124c2"
+    },
+    {
+      "source": "scripts/back-face-sheet.ts",
+      "destination": "scripts/back-face-sheet.ts",
+      "sourceSha256": "3e25ec9292c6bb0f532a17c6016e940da8f980425f45b5af5edf28d3754dc02e",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "3e25ec9292c6bb0f532a17c6016e940da8f980425f45b5af5edf28d3754dc02e",
+      "patch": null,
+      "postPatchSha256": "3e25ec9292c6bb0f532a17c6016e940da8f980425f45b5af5edf28d3754dc02e"
+    },
+    {
+      "source": "scripts/lib/dial-gallery.ts",
+      "destination": "scripts/lib/dial-gallery.ts",
+      "sourceSha256": "3367e10d7169cf5ec0d1662ee459cb8cd4d291305bad349628967d7e372b1fcd",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "3367e10d7169cf5ec0d1662ee459cb8cd4d291305bad349628967d7e372b1fcd",
+      "patch": null,
+      "postPatchSha256": "3367e10d7169cf5ec0d1662ee459cb8cd4d291305bad349628967d7e372b1fcd"
+    },
+    {
+      "source": "scripts/lib/load-metrics.mjs",
+      "destination": "scripts/lib/load-metrics.mjs",
+      "sourceSha256": "7d0604705e2ddb00c471c301e3755c6fc036bc0b016d9ebd176be7a2006176b1",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "7d0604705e2ddb00c471c301e3755c6fc036bc0b016d9ebd176be7a2006176b1",
+      "patch": null,
+      "postPatchSha256": "7d0604705e2ddb00c471c301e3755c6fc036bc0b016d9ebd176be7a2006176b1"
+    },
+    {
+      "source": "scripts/lib/pi-fixtures.mjs",
+      "destination": "scripts/lib/pi-fixtures.mjs",
+      "sourceSha256": "9b1ca3411a6520bc828012498d8bee4d3c5d63e235888d185c49d96183fb18d0",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "9b1ca3411a6520bc828012498d8bee4d3c5d63e235888d185c49d96183fb18d0",
+      "patch": null,
+      "postPatchSha256": "9b1ca3411a6520bc828012498d8bee4d3c5d63e235888d185c49d96183fb18d0"
+    },
+    {
+      "source": "scripts/lib/profile-cells.mjs",
+      "destination": "scripts/lib/profile-cells.mjs",
+      "sourceSha256": "01b0a46ccc6e7449a65a145ce380ff0a8574a4471da8fc2fb34660c29b33787d",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "01b0a46ccc6e7449a65a145ce380ff0a8574a4471da8fc2fb34660c29b33787d",
+      "patch": null,
+      "postPatchSha256": "01b0a46ccc6e7449a65a145ce380ff0a8574a4471da8fc2fb34660c29b33787d"
+    },
+    {
+      "source": "scripts/lib/script-failures.mjs",
+      "destination": "scripts/lib/script-failures.mjs",
+      "sourceSha256": "b4ba182c078d7fe48579eda6e1fc76227732af8232a6bb245d1d3ababbba5499",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "b4ba182c078d7fe48579eda6e1fc76227732af8232a6bb245d1d3ababbba5499",
+      "patch": null,
+      "postPatchSha256": "b4ba182c078d7fe48579eda6e1fc76227732af8232a6bb245d1d3ababbba5499"
+    },
+    {
+      "source": "scripts/lib/soak-log-tail.mjs",
+      "destination": "scripts/lib/soak-log-tail.mjs",
+      "sourceSha256": "612a217cf17eaa2af1116645081e993bc4de863ca662c0d2d677861f264c4a02",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "612a217cf17eaa2af1116645081e993bc4de863ca662c0d2d677861f264c4a02",
+      "patch": null,
+      "postPatchSha256": "612a217cf17eaa2af1116645081e993bc4de863ca662c0d2d677861f264c4a02"
+    },
+    {
+      "source": "scripts/lib/zip.mjs",
+      "destination": "scripts/lib/zip.mjs",
+      "sourceSha256": "7405f152687237ab98573774d8249c461087421e599108cd644f0f3dd477caba",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "7405f152687237ab98573774d8249c461087421e599108cd644f0f3dd477caba",
+      "patch": null,
+      "postPatchSha256": "7405f152687237ab98573774d8249c461087421e599108cd644f0f3dd477caba"
+    },
+    {
+      "source": "scripts/tahoma-ink-corrections.json",
+      "destination": "scripts/tahoma-ink-corrections.json",
+      "sourceSha256": "4e476d2dfdf08071db1f8ccd78816c2f342f18913f4576b12a4f26983cd7be5e",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "4e476d2dfdf08071db1f8ccd78816c2f342f18913f4576b12a4f26983cd7be5e",
+      "patch": null,
+      "postPatchSha256": "4e476d2dfdf08071db1f8ccd78816c2f342f18913f4576b12a4f26983cd7be5e"
+    },
+    {
+      "source": "src/actions/detail-slot.ts",
+      "destination": "src/actions/detail-slot.ts",
+      "sourceSha256": "765c65c3773cf266cd4ca7966b27cb58a7da1941fab04fcb43bc418eb1047241",
+      "rewriteCounts": [
+        0,
+        1,
+        0
+      ],
+      "rewrittenSha256": "c5997b48d9075c31cf12bc3e655cc42cb29665dd2b05b7bc9affe77e24768a7f",
+      "patch": {
+        "path": "core-patches/src__actions__detail-slot.ts.patch",
+        "sha256": "a3d859559cf337ba1470414e02c37dff49c3366c618ff07d744efa1c9dfe51a6",
+        "seam": "S1",
+        "reason": "Select the checked platform poller alias while upstream tests keep the original policy."
+      },
+      "postPatchSha256": "25ae82ace87223d5c4a5d991fe79f36fa217b055adda852818390651ea73d822"
+    },
+    {
+      "source": "src/actions/hwinfo-control.ts",
+      "destination": "src/actions/hwinfo-control.ts",
+      "sourceSha256": "aab3268c2f96d9cc18f13fc16586eeed4da77ce03f99006be9366b78c1ed936c",
+      "rewriteCounts": [
+        1,
+        1,
+        0
+      ],
+      "rewrittenSha256": "4c3207599f744e37654e6d4f6191674bf59c647ea079a6c4b3aedf80b563044f",
+      "patch": null,
+      "postPatchSha256": "4c3207599f744e37654e6d4f6191674bf59c647ea079a6c4b3aedf80b563044f"
+    },
+    {
+      "source": "src/actions/sensor-dial.ts",
+      "destination": "src/actions/sensor-dial.ts",
+      "sourceSha256": "14912572318a25a89b7c20075890df254dcd1ae149534450dc4bf1787895a805",
+      "rewriteCounts": [
+        0,
+        1,
+        0
+      ],
+      "rewrittenSha256": "58d73bb0b8485f0e787ccd8e39ba67aa1254439759a5e8275a16f2f54e292d49",
+      "patch": {
+        "path": "core-patches/src__actions__sensor-dial.ts.patch",
+        "sha256": "7d6a082c5510c57018fbe6f9d5f698bdd10eaa5b086c68770c00ee707e7acf48",
+        "seam": "S1/S2/S5",
+        "reason": "Select Mac poller/status copy, empty-dial title and fixed setup pixels."
+      },
+      "postPatchSha256": "adcaa6b1e48c8af43f386d499526984cec0017f72575bbb3666992eeb393ebe6"
+    },
+    {
+      "source": "src/actions/sensor-reading.ts",
+      "destination": "src/actions/sensor-reading.ts",
+      "sourceSha256": "6490a1855f747887032053aa5b3ac339bdb44313ae4b389017133ed7d3565454",
+      "rewriteCounts": [
+        0,
+        1,
+        0
+      ],
+      "rewrittenSha256": "a9030ca8874f62c853eaabb6bb3ff934e15bcc64ba1f22c3e22720957da48f46",
+      "patch": {
+        "path": "core-patches/src__actions__sensor-reading.ts.patch",
+        "sha256": "629ffb3207becbd0ce5aa6e58d4222e54a6cb51343029a784fad3d445e5bc5e3",
+        "seam": "S1/S2",
+        "reason": "Resolve the poller and platform status copy through checked aliases."
+      },
+      "postPatchSha256": "a6104b235d6917383ad642d40264776b612316a77cd33f4adf3dee8773a42e54"
+    },
+    {
+      "source": "src/clock.ts",
+      "destination": "src/clock.ts",
+      "sourceSha256": "14f92cec8d2327fb2a890dc06dc59dd675c361506224846efdeeb1dd25092079",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "14f92cec8d2327fb2a890dc06dc59dd675c361506224846efdeeb1dd25092079",
+      "patch": null,
+      "postPatchSha256": "14f92cec8d2327fb2a890dc06dc59dd675c361506224846efdeeb1dd25092079"
+    },
+    {
+      "source": "src/commands.ts",
+      "destination": "src/commands.ts",
+      "sourceSha256": "785023749287baa3829588ff8530fe3f0ffd668b89659781fdb4aa239bb3e75c",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "785023749287baa3829588ff8530fe3f0ffd668b89659781fdb4aa239bb3e75c",
+      "patch": null,
+      "postPatchSha256": "785023749287baa3829588ff8530fe3f0ffd668b89659781fdb4aa239bb3e75c"
+    },
+    {
+      "source": "src/controls.ts",
+      "destination": "src/controls.ts",
+      "sourceSha256": "29df8f3657efb970261df6273a0fb153b4eccb3d8707713f18b845cce3859f09",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "29df8f3657efb970261df6273a0fb153b4eccb3d8707713f18b845cce3859f09",
+      "patch": null,
+      "postPatchSha256": "29df8f3657efb970261df6273a0fb153b4eccb3d8707713f18b845cce3859f09"
+    },
+    {
+      "source": "src/detail/controller.ts",
+      "destination": "src/detail/controller.ts",
+      "sourceSha256": "31f9f1e41e38ce129e0cf8abcbaa063f8d438463dccc0104aad31b89973edbbd",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "31f9f1e41e38ce129e0cf8abcbaa063f8d438463dccc0104aad31b89973edbbd",
+      "patch": {
+        "path": "core-patches/src__detail__controller.ts.patch",
+        "sha256": "3d827c5ad14b31510e82248ff0923c133b1aa80a8e54a8cc622350604aed4061",
+        "seam": "S1",
+        "reason": "Select the checked platform poller alias while upstream tests keep the original policy."
+      },
+      "postPatchSha256": "91dba10cbce54184e7d2bd1023477464b269d93cece9eaaf41305ce8d9ce0194"
+    },
+    {
+      "source": "src/detail/detail-faces.ts",
+      "destination": "src/detail/detail-faces.ts",
+      "sourceSha256": "f6a45cf51cf0f8b31c00ff662ebdfe5480d732dff539b545f7100b543d84dbe3",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "f6a45cf51cf0f8b31c00ff662ebdfe5480d732dff539b545f7100b543d84dbe3",
+      "patch": {
+        "path": "core-patches/src__detail__detail-faces.ts.patch",
+        "sha256": "60ac92a7873325f0df03b55373c90891f7249f7ff0218b823d994c6619ed39e7",
+        "seam": "S1/S2",
+        "reason": "Resolve the poller and platform status copy through checked aliases."
+      },
+      "postPatchSha256": "d40f5fa58d7412ccb73b64bf0a2f683575ed914d9befd8280336b23791a3dc0c"
+    },
+    {
+      "source": "src/detail/detail-group.ts",
+      "destination": "src/detail/detail-group.ts",
+      "sourceSha256": "b93561138bd5251430c03f70cfa0a5f36545f3a23d91010e9542068f0f0a4fd5",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "b93561138bd5251430c03f70cfa0a5f36545f3a23d91010e9542068f0f0a4fd5",
+      "patch": null,
+      "postPatchSha256": "b93561138bd5251430c03f70cfa0a5f36545f3a23d91010e9542068f0f0a4fd5"
+    },
+    {
+      "source": "src/detail/detail-settings.ts",
+      "destination": "src/detail/detail-settings.ts",
+      "sourceSha256": "3134dae7476161f4826e43d420c9153ffdbff02562813722bcbd5c1e5c126063",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "3134dae7476161f4826e43d420c9153ffdbff02562813722bcbd5c1e5c126063",
+      "patch": null,
+      "postPatchSha256": "3134dae7476161f4826e43d420c9153ffdbff02562813722bcbd5c1e5c126063"
+    },
+    {
+      "source": "src/detail/managed-profiles.ts",
+      "destination": "src/detail/managed-profiles.ts",
+      "sourceSha256": "6acdcb5e08455fdeefe88d9231e521d8aa49821d947c307fb3adcf5ccc193af6",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "6acdcb5e08455fdeefe88d9231e521d8aa49821d947c307fb3adcf5ccc193af6",
+      "patch": null,
+      "postPatchSha256": "6acdcb5e08455fdeefe88d9231e521d8aa49821d947c307fb3adcf5ccc193af6"
+    },
+    {
+      "source": "src/detail/navigation.ts",
+      "destination": "src/detail/navigation.ts",
+      "sourceSha256": "03ebe307ac3effc6d5be228da3db1b327b3d082ab8179d7760207684c8eb91da",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "03ebe307ac3effc6d5be228da3db1b327b3d082ab8179d7760207684c8eb91da",
+      "patch": null,
+      "postPatchSha256": "03ebe307ac3effc6d5be228da3db1b327b3d082ab8179d7760207684c8eb91da"
+    },
+    {
+      "source": "src/detail/press-engine.ts",
+      "destination": "src/detail/press-engine.ts",
+      "sourceSha256": "038647aedaa3867b200d5761fc3d2ac473965f96c23f183afa54f73c36292dbf",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "038647aedaa3867b200d5761fc3d2ac473965f96c23f183afa54f73c36292dbf",
+      "patch": null,
+      "postPatchSha256": "038647aedaa3867b200d5761fc3d2ac473965f96c23f183afa54f73c36292dbf"
+    },
+    {
+      "source": "src/detail/slot-bindings.ts",
+      "destination": "src/detail/slot-bindings.ts",
+      "sourceSha256": "838fd2f80f1ea5bf0981c7180948ff8e3a50cdcc21e56b88afdd79b0bb756566",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "838fd2f80f1ea5bf0981c7180948ff8e3a50cdcc21e56b88afdd79b0bb756566",
+      "patch": null,
+      "postPatchSha256": "838fd2f80f1ea5bf0981c7180948ff8e3a50cdcc21e56b88afdd79b0bb756566"
+    },
+    {
+      "source": "src/detail/tick-signature.ts",
+      "destination": "src/detail/tick-signature.ts",
+      "sourceSha256": "f5deb0e88167801725118115aeaf8af8fdca0de3cba7049a888e632664078fe6",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "f5deb0e88167801725118115aeaf8af8fdca0de3cba7049a888e632664078fe6",
+      "patch": {
+        "path": "core-patches/src__detail__tick-signature.ts.patch",
+        "sha256": "0d3c88308b6f254388421ecf8c0be05c082c36a7ce6a8b502288615faabe90fc",
+        "seam": "S1",
+        "reason": "Select the checked platform poller alias while upstream tests keep the original policy."
+      },
+      "postPatchSha256": "56f5043926cec38d049407133f8031b8b4bd1bcc062e10b1b50f22eda1838719"
+    },
+    {
+      "source": "src/devices.ts",
+      "destination": "src/devices.ts",
+      "sourceSha256": "4a782232dd4464a4bfe6ad2e96a0f7db9a907226a9fa00d3503a2473a1f8fd7f",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "4a782232dd4464a4bfe6ad2e96a0f7db9a907226a9fa00d3503a2473a1f8fd7f",
+      "patch": null,
+      "postPatchSha256": "4a782232dd4464a4bfe6ad2e96a0f7db9a907226a9fa00d3503a2473a1f8fd7f"
+    },
+    {
+      "source": "src/diagnostics.ts",
+      "destination": "src/diagnostics.ts",
+      "sourceSha256": "aad51a4e8872b3b8701e5d00e59598782ec3c6db5828d1dd80f66e8a5bf7484b",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "aad51a4e8872b3b8701e5d00e59598782ec3c6db5828d1dd80f66e8a5bf7484b",
+      "patch": {
+        "path": "core-patches/src__diagnostics.ts.patch",
+        "sha256": "c4a009f180f08eee0e84c9930ab93c10a2bce4c61cabc61d9eb7d8dbb36cf9d8",
+        "seam": "S6",
+        "reason": "Use the platform name and redacted error adapter for support reports."
+      },
+      "postPatchSha256": "7e8f633d495c6e6be191fabe053398bcbf0daac2a111d1a7d7cb859867f7ca77"
+    },
+    {
+      "source": "src/gestures.ts",
+      "destination": "src/gestures.ts",
+      "sourceSha256": "71662bcf583baafddbd659db26381c923f2585fd380078fbcc4fa859043ed891",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "71662bcf583baafddbd659db26381c923f2585fd380078fbcc4fa859043ed891",
+      "patch": null,
+      "postPatchSha256": "71662bcf583baafddbd659db26381c923f2585fd380078fbcc4fa859043ed891"
+    },
+    {
+      "source": "src/global-settings.ts",
+      "destination": "src/global-settings.ts",
+      "sourceSha256": "d70e1396e8df204726bc8f9423654148d571918e9a7736f82b75e80fa05808a6",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "d70e1396e8df204726bc8f9423654148d571918e9a7736f82b75e80fa05808a6",
+      "patch": null,
+      "postPatchSha256": "d70e1396e8df204726bc8f9423654148d571918e9a7736f82b75e80fa05808a6"
+    },
+    {
+      "source": "src/hwinfo/gadget-identity.ts",
+      "destination": "src/hwinfo/gadget-identity.ts",
+      "sourceSha256": "14846d3bd4a0e5d4539fb6b4691a71203acf25d5591f384a37eb42e77e34c588",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "14846d3bd4a0e5d4539fb6b4691a71203acf25d5591f384a37eb42e77e34c588",
+      "patch": null,
+      "postPatchSha256": "14846d3bd4a0e5d4539fb6b4691a71203acf25d5591f384a37eb42e77e34c588"
+    },
+    {
+      "source": "src/hwinfo/gadget-registry.ts",
+      "destination": "src/hwinfo/gadget-registry.ts",
+      "sourceSha256": "c0a592fa5a9f6355deae59f3eb3e8fe0b3c29843ee9c0c2a0455a1a4766530a9",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "c0a592fa5a9f6355deae59f3eb3e8fe0b3c29843ee9c0c2a0455a1a4766530a9",
+      "patch": null,
+      "postPatchSha256": "c0a592fa5a9f6355deae59f3eb3e8fe0b3c29843ee9c0c2a0455a1a4766530a9"
+    },
+    {
+      "source": "src/hwinfo/gadget-value.ts",
+      "destination": "src/hwinfo/gadget-value.ts",
+      "sourceSha256": "210c4f7a2cf6c1c583db872a494caffd4c9c160c8ff8bf10aa8f9886eb807d51",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "210c4f7a2cf6c1c583db872a494caffd4c9c160c8ff8bf10aa8f9886eb807d51",
+      "patch": null,
+      "postPatchSha256": "210c4f7a2cf6c1c583db872a494caffd4c9c160c8ff8bf10aa8f9886eb807d51"
+    },
+    {
+      "source": "src/hwinfo/hwsm-loader.ts",
+      "destination": "src/hwinfo/hwsm-loader.ts",
+      "sourceSha256": "d93556e0a9c650f98ec4bcef75937c58ea5703d7905b0ef7b7408778a7ebb1fb",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "d93556e0a9c650f98ec4bcef75937c58ea5703d7905b0ef7b7408778a7ebb1fb",
+      "patch": null,
+      "postPatchSha256": "d93556e0a9c650f98ec4bcef75937c58ea5703d7905b0ef7b7408778a7ebb1fb"
+    },
+    {
+      "source": "src/hwinfo/layout.ts",
+      "destination": "src/hwinfo/layout.ts",
+      "sourceSha256": "3334afc64c3adb297831cbe8ad1d32fa28da303bf797d8f0c96bb05af5bf635e",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "3334afc64c3adb297831cbe8ad1d32fa28da303bf797d8f0c96bb05af5bf635e",
+      "patch": null,
+      "postPatchSha256": "3334afc64c3adb297831cbe8ad1d32fa28da303bf797d8f0c96bb05af5bf635e"
+    },
+    {
+      "source": "src/hwinfo/provider.ts",
+      "destination": "src/hwinfo/provider.ts",
+      "sourceSha256": "6a07b4242cdd51b7c50cdecbc5af6dcdec434248084280b5b1721a512cc6135f",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "6a07b4242cdd51b7c50cdecbc5af6dcdec434248084280b5b1721a512cc6135f",
+      "patch": {
+        "path": "core-patches/src__hwinfo__provider.ts.patch",
+        "sha256": "559c6d992d6b70e8ca1e1b45912d82903266a01deb9021987cba9b0722f38b8b",
+        "seam": "S1",
+        "reason": "Append the Mac source identity without changing upstream provider behavior."
+      },
+      "postPatchSha256": "b7b39bd08da5e8386970f8531907a0b086dc8157a4f8a0d95a1533c0c543ab8b"
+    },
+    {
+      "source": "src/hwinfo/reader.ts",
+      "destination": "src/hwinfo/reader.ts",
+      "sourceSha256": "33d48ab15d43ab73851d20ae4bf27e96a8ae16da1b12a2a15c489d2315e66da9",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "33d48ab15d43ab73851d20ae4bf27e96a8ae16da1b12a2a15c489d2315e66da9",
+      "patch": null,
+      "postPatchSha256": "33d48ab15d43ab73851d20ae4bf27e96a8ae16da1b12a2a15c489d2315e66da9"
+    },
+    {
+      "source": "src/hwinfo/reading-links.ts",
+      "destination": "src/hwinfo/reading-links.ts",
+      "sourceSha256": "620d34b884a5102dda2f9a4ad40d411cd019b2a2daf874d15445dfb2b821d2bd",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "620d34b884a5102dda2f9a4ad40d411cd019b2a2daf874d15445dfb2b821d2bd",
+      "patch": null,
+      "postPatchSha256": "620d34b884a5102dda2f9a4ad40d411cd019b2a2daf874d15445dfb2b821d2bd"
+    },
+    {
+      "source": "src/hwinfo/shared-memory.ts",
+      "destination": "src/hwinfo/shared-memory.ts",
+      "sourceSha256": "e4c738909a0a05b615da4180679cb25452d741f0e54dbee2e1ec82a7cf171e23",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "e4c738909a0a05b615da4180679cb25452d741f0e54dbee2e1ec82a7cf171e23",
+      "patch": null,
+      "postPatchSha256": "e4c738909a0a05b615da4180679cb25452d741f0e54dbee2e1ec82a7cf171e23"
+    },
+    {
+      "source": "src/hwinfo/types.ts",
+      "destination": "src/hwinfo/types.ts",
+      "sourceSha256": "c41b8ac3d406b88fe65a466c324516331b5e1f762ff633913a079ad7f917f1cb",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "c41b8ac3d406b88fe65a466c324516331b5e1f762ff633913a079ad7f917f1cb",
+      "patch": {
+        "path": "core-patches/src__hwinfo__types.ts.patch",
+        "sha256": "e37b3af3ad79d990c0445e9295e1b5ac461b8425a29f934d108ef5e56facff33",
+        "seam": "S1",
+        "reason": "Append per-reading acquisition evidence and explicit Mac unavailable reasons."
+      },
+      "postPatchSha256": "ad1eb0cc44e1ba71169cbd6d07e6f9529cac7e3dfb76e126c6fb9fe962f03a89"
+    },
+    {
+      "source": "src/panel-folds.ts",
+      "destination": "src/panel-folds.ts",
+      "sourceSha256": "f8f2cf68cbd6ae569565629ee409e4d475b93fc052cde1aee84f406e320979cd",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "f8f2cf68cbd6ae569565629ee409e4d475b93fc052cde1aee84f406e320979cd",
+      "patch": null,
+      "postPatchSha256": "f8f2cf68cbd6ae569565629ee409e4d475b93fc052cde1aee84f406e320979cd"
+    },
+    {
+      "source": "src/parent-liveness.ts",
+      "destination": "src/parent-liveness.ts",
+      "sourceSha256": "a4739267cb1e41c29c076aa83fbe7b4ec32640d3ee56fa39b65d6da62418edf1",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "a4739267cb1e41c29c076aa83fbe7b4ec32640d3ee56fa39b65d6da62418edf1",
+      "patch": null,
+      "postPatchSha256": "a4739267cb1e41c29c076aa83fbe7b4ec32640d3ee56fa39b65d6da62418edf1"
+    },
+    {
+      "source": "src/pi-protocol.ts",
+      "destination": "src/pi-protocol.ts",
+      "sourceSha256": "2f210099484aff9e94a42155aba19f324dffffcf409732f0901c2ce9c5fe9646",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "2f210099484aff9e94a42155aba19f324dffffcf409732f0901c2ce9c5fe9646",
+      "patch": {
+        "path": "core-patches/src__pi-protocol.ts.patch",
+        "sha256": "f6762087cdf757c47bc72d7b5a939cac335db9142e33d0af2a7a1fac292f6b43",
+        "seam": "S1/S2",
+        "reason": "Select platform poller, status and historical-statistics copy while preserving upstream defaults."
+      },
+      "postPatchSha256": "03c40a7f7f3541aa1b7c5350aae74a5e04f1863522a6eb0303e8e69dc756429f"
+    },
+    {
+      "source": "src/plugin.ts",
+      "destination": "src/plugin.ts",
+      "sourceSha256": "893c44e56b972012b580348dadb2652602599f98c78f6d3102950d3b1e13b2c2",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "893c44e56b972012b580348dadb2652602599f98c78f6d3102950d3b1e13b2c2",
+      "patch": {
+        "path": "core-patches/src__plugin.ts.patch",
+        "sha256": "7af5b855170bdc90c5d8f4e7c32de86c547c1d73a5b89177d2a4a65096e7655b",
+        "seam": "S1/S7",
+        "reason": "Select platform native/poller modules and environment names without changing action wiring or settings delivery."
+      },
+      "postPatchSha256": "aec0f55ba81abbf70826d1ca30029e302c57719d57b93cab89d58428c2d23984"
+    },
+    {
+      "source": "src/poller.ts",
+      "destination": "src/poller.ts",
+      "sourceSha256": "e48494d45ab42eaa1a19bf1bb29f957b812e975dd88bc2b322967708c21d222a",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "e48494d45ab42eaa1a19bf1bb29f957b812e975dd88bc2b322967708c21d222a",
+      "patch": null,
+      "postPatchSha256": "e48494d45ab42eaa1a19bf1bb29f957b812e975dd88bc2b322967708c21d222a"
+    },
+    {
+      "source": "src/recorder.ts",
+      "destination": "src/recorder.ts",
+      "sourceSha256": "9d51db41f47643d3f186a1cc5b61c5574a9841676a4398f8ecb6143fb11d6018",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "9d51db41f47643d3f186a1cc5b61c5574a9841676a4398f8ecb6143fb11d6018",
+      "patch": {
+        "path": "core-patches/src__recorder.ts.patch",
+        "sha256": "a063da2aaa715109233c7bd77e9b5fefa89eb3e72e8ec55864e07403cda24afb",
+        "seam": "S7",
+        "reason": "Read trace control from the platform environment prefix."
+      },
+      "postPatchSha256": "8f1b37b4da6732306188f98d6d6e8c114aad66466c168056144d97b0195cc3d5"
+    },
+    {
+      "source": "src/rotation.ts",
+      "destination": "src/rotation.ts",
+      "sourceSha256": "77d1436f203a1ec5e061933a39cedd052610f0ff9aa4d07e2b93d4a0464a97c9",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "77d1436f203a1ec5e061933a39cedd052610f0ff9aa4d07e2b93d4a0464a97c9",
+      "patch": null,
+      "postPatchSha256": "77d1436f203a1ec5e061933a39cedd052610f0ff9aa4d07e2b93d4a0464a97c9"
+    },
+    {
+      "source": "src/series.ts",
+      "destination": "src/series.ts",
+      "sourceSha256": "6752b4fec7d476c7a84286c5a7a8a82acc01c7fc6f20d6f56a97bd1787965a37",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "6752b4fec7d476c7a84286c5a7a8a82acc01c7fc6f20d6f56a97bd1787965a37",
+      "patch": null,
+      "postPatchSha256": "6752b4fec7d476c7a84286c5a7a8a82acc01c7fc6f20d6f56a97bd1787965a37"
+    },
+    {
+      "source": "src/sorted-json.ts",
+      "destination": "src/sorted-json.ts",
+      "sourceSha256": "0c6e3054084915feade512a24675898c7a8a42db67a13f0b2bef5a71c6bb846b",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "0c6e3054084915feade512a24675898c7a8a42db67a13f0b2bef5a71c6bb846b",
+      "patch": null,
+      "postPatchSha256": "0c6e3054084915feade512a24675898c7a8a42db67a13f0b2bef5a71c6bb846b"
+    },
+    {
+      "source": "src/stats.ts",
+      "destination": "src/stats.ts",
+      "sourceSha256": "997007a379f86652386f0f77b6983cec2a7f5940cc6bb63e9cce736e4a6919b4",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "997007a379f86652386f0f77b6983cec2a7f5940cc6bb63e9cce736e4a6919b4",
+      "patch": {
+        "path": "core-patches/src__stats.ts.patch",
+        "sha256": "939f083a5c89e51cad5d329297d12b7141d1e7c8bcc784afab4fe6d289ad5576",
+        "seam": "S1",
+        "reason": "Use row-specific acquisition evidence when present so unrelated source frames do not duplicate history."
+      },
+      "postPatchSha256": "e62807cf4f0693336d9ca1e796c8b5b4020d84d95186ce9900d07b3fb85463a5"
+    },
+    {
+      "source": "src/ui/detail-renderer.ts",
+      "destination": "src/ui/detail-renderer.ts",
+      "sourceSha256": "cc398c9c1a5de7a73d72b57d44b2cb8611ccb5481ce2ab2dd06d68e0141acc55",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "cc398c9c1a5de7a73d72b57d44b2cb8611ccb5481ce2ab2dd06d68e0141acc55",
+      "patch": null,
+      "postPatchSha256": "cc398c9c1a5de7a73d72b57d44b2cb8611ccb5481ce2ab2dd06d68e0141acc55"
+    },
+    {
+      "source": "src/ui/dial-overview.ts",
+      "destination": "src/ui/dial-overview.ts",
+      "sourceSha256": "35165b2e1ea64cc546cbc132243b5ea83a809518aedc72b81e9ac5223703b389",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "35165b2e1ea64cc546cbc132243b5ea83a809518aedc72b81e9ac5223703b389",
+      "patch": null,
+      "postPatchSha256": "35165b2e1ea64cc546cbc132243b5ea83a809518aedc72b81e9ac5223703b389"
+    },
+    {
+      "source": "src/ui/dial-renderer.ts",
+      "destination": "src/ui/dial-renderer.ts",
+      "sourceSha256": "6a722bda2e9514eb444298c6268638bec151b3a668ad4e7f630e839a68dbfda0",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "6a722bda2e9514eb444298c6268638bec151b3a668ad4e7f630e839a68dbfda0",
+      "patch": null,
+      "postPatchSha256": "6a722bda2e9514eb444298c6268638bec151b3a668ad4e7f630e839a68dbfda0"
+    },
+    {
+      "source": "src/ui/face-font.ts",
+      "destination": "src/ui/face-font.ts",
+      "sourceSha256": "189d98bc1e8d4b2336e58aa4a14dc9c0b84042c6903b886c115b43dfdbb16519",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "189d98bc1e8d4b2336e58aa4a14dc9c0b84042c6903b886c115b43dfdbb16519",
+      "patch": {
+        "path": "core-patches/src__ui__face-font.ts.patch",
+        "sha256": "273bc6b4c1f6b2d26444a6b2d2473e35afa057b1d87b8485815881b1b4ed45c5",
+        "seam": "S5",
+        "reason": "Select measured Mac font metrics and keep saved alternative fonts while drawing Tahoma on Mac."
+      },
+      "postPatchSha256": "8f8acec6fbfe4fc9bca8f078e3cab88372b80a415401553b2b534e196a75bc43"
+    },
+    {
+      "source": "src/ui/format.ts",
+      "destination": "src/ui/format.ts",
+      "sourceSha256": "bb06da1704179a7d4116bb04df156c84c2c896f27602445002f034c96abe1578",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "bb06da1704179a7d4116bb04df156c84c2c896f27602445002f034c96abe1578",
+      "patch": null,
+      "postPatchSha256": "bb06da1704179a7d4116bb04df156c84c2c896f27602445002f034c96abe1578"
+    },
+    {
+      "source": "src/ui/gauge.ts",
+      "destination": "src/ui/gauge.ts",
+      "sourceSha256": "84795d11dd8b221663082181676f579989ad5689941ff2c9ad521d4f87c26e33",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "84795d11dd8b221663082181676f579989ad5689941ff2c9ad521d4f87c26e33",
+      "patch": null,
+      "postPatchSha256": "84795d11dd8b221663082181676f579989ad5689941ff2c9ad521d4f87c26e33"
+    },
+    {
+      "source": "src/ui/key-layout.ts",
+      "destination": "src/ui/key-layout.ts",
+      "sourceSha256": "db9c3ec3623faf0949fc70793e1b0e4bd059f86a44ce230506b7c334306055be",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "db9c3ec3623faf0949fc70793e1b0e4bd059f86a44ce230506b7c334306055be",
+      "patch": null,
+      "postPatchSha256": "db9c3ec3623faf0949fc70793e1b0e4bd059f86a44ce230506b7c334306055be"
+    },
+    {
+      "source": "src/ui/key-renderer.ts",
+      "destination": "src/ui/key-renderer.ts",
+      "sourceSha256": "bc102770946a97cc0dddadfae89dc2126100f8af31bcaaf8e31c5c4c70cec855",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "bc102770946a97cc0dddadfae89dc2126100f8af31bcaaf8e31c5c4c70cec855",
+      "patch": {
+        "path": "core-patches/src__ui__key-renderer.ts.patch",
+        "sha256": "5751ac628078ea310f941f6b3f09a776880aea1ef024591f8abb9cbf37f58373",
+        "seam": "S5",
+        "reason": "Permit pre-rendered font-setup pixels and preserve the Back mark without resolving a font."
+      },
+      "postPatchSha256": "a4c1225604b4e7723e758ff78c088c3463db0eeb22e09c6bfff95fbe3b2c30f7"
+    },
+    {
+      "source": "src/ui/measure.ts",
+      "destination": "src/ui/measure.ts",
+      "sourceSha256": "de1a7020b80175f55158eaf73d894927112472a531acaeb421fd42884019a63d",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "de1a7020b80175f55158eaf73d894927112472a531acaeb421fd42884019a63d",
+      "patch": null,
+      "postPatchSha256": "de1a7020b80175f55158eaf73d894927112472a531acaeb421fd42884019a63d"
+    },
+    {
+      "source": "src/ui/sensor-value-color.ts",
+      "destination": "src/ui/sensor-value-color.ts",
+      "sourceSha256": "baafd62bf06276383fb2b0da7913f168fb831879d5da83a1a7b188463f895d85",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "baafd62bf06276383fb2b0da7913f168fb831879d5da83a1a7b188463f895d85",
+      "patch": null,
+      "postPatchSha256": "baafd62bf06276383fb2b0da7913f168fb831879d5da83a1a7b188463f895d85"
+    },
+    {
+      "source": "src/ui/state-screens.ts",
+      "destination": "src/ui/state-screens.ts",
+      "sourceSha256": "7bdfdbce9be393988c7ed4d433b4853a215ec26c2f41b37f0561e07c4c388b67",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "7bdfdbce9be393988c7ed4d433b4853a215ec26c2f41b37f0561e07c4c388b67",
+      "patch": {
+        "path": "core-patches/src__ui__state-screens.ts.patch",
+        "sha256": "7b13ea13e7bbbf18e5f771c370523dcd47ed16a2483882584beb858f13193c99",
+        "seam": "S1/S5",
+        "reason": "Declare optional raster dial setup output and select the status type through the platform seam."
+      },
+      "postPatchSha256": "a7c22be9c884003059635407422c386c3f52b6d84cf3daa1099a802c0d6ef7a0"
+    },
+    {
+      "source": "src/ui/tahoma-bold-metrics.ts",
+      "destination": "src/ui/tahoma-bold-metrics.ts",
+      "sourceSha256": "abea19cf2a303529fbc43bd2a3a9c6857310167af6df0b635fbd7dc368cc062b",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "abea19cf2a303529fbc43bd2a3a9c6857310167af6df0b635fbd7dc368cc062b",
+      "patch": null,
+      "postPatchSha256": "abea19cf2a303529fbc43bd2a3a9c6857310167af6df0b635fbd7dc368cc062b"
+    },
+    {
+      "source": "src/ui/text-colors.ts",
+      "destination": "src/ui/text-colors.ts",
+      "sourceSha256": "6c25c1cdbd3436709c98275f9cee4f60593c402c4e5cc1238be562bd44088d06",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "6c25c1cdbd3436709c98275f9cee4f60593c402c4e5cc1238be562bd44088d06",
+      "patch": null,
+      "postPatchSha256": "6c25c1cdbd3436709c98275f9cee4f60593c402c4e5cc1238be562bd44088d06"
+    },
+    {
+      "source": "src/ui/theme-store.ts",
+      "destination": "src/ui/theme-store.ts",
+      "sourceSha256": "6bb1d4a5befa7416011867ea88c542e013ddb9a6919a22105eee4532cbbe8ea9",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "6bb1d4a5befa7416011867ea88c542e013ddb9a6919a22105eee4532cbbe8ea9",
+      "patch": null,
+      "postPatchSha256": "6bb1d4a5befa7416011867ea88c542e013ddb9a6919a22105eee4532cbbe8ea9"
+    },
+    {
+      "source": "src/ui/themes.ts",
+      "destination": "src/ui/themes.ts",
+      "sourceSha256": "caed5deae13ffc5d5c81caf792c0c8c63c573c2e951df27ddaebb71cc7c775b8",
+      "rewriteCounts": [
+        1,
+        0,
+        0
+      ],
+      "rewrittenSha256": "ae64ed9f72f479fee6700e3acc8ec4310adaa37ca5e08e1681aaf235e10db707",
+      "patch": null,
+      "postPatchSha256": "ae64ed9f72f479fee6700e3acc8ec4310adaa37ca5e08e1681aaf235e10db707"
+    },
+    {
+      "source": "test/back-face.test.ts",
+      "destination": "test/back-face.test.ts",
+      "sourceSha256": "6bf14eef8ff1bcf44d16c41ba777ccf26be3038f14a044d5373b72c4b318752d",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "6bf14eef8ff1bcf44d16c41ba777ccf26be3038f14a044d5373b72c4b318752d",
+      "patch": null,
+      "postPatchSha256": "6bf14eef8ff1bcf44d16c41ba777ccf26be3038f14a044d5373b72c4b318752d"
+    },
+    {
+      "source": "test/clock.test.ts",
+      "destination": "test/clock.test.ts",
+      "sourceSha256": "ae8ac69bb251497b82a572f63293dcb1c5d85b342a9af5bb41ce437ac1495540",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "ae8ac69bb251497b82a572f63293dcb1c5d85b342a9af5bb41ce437ac1495540",
+      "patch": null,
+      "postPatchSha256": "ae8ac69bb251497b82a572f63293dcb1c5d85b342a9af5bb41ce437ac1495540"
+    },
+    {
+      "source": "test/compat.test.ts",
+      "destination": "test/compat.test.ts",
+      "sourceSha256": "cc54d9266aab6e8ccd9d39bd7b274d16adeb9c4709774599fecbb3060507ed15",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "cc54d9266aab6e8ccd9d39bd7b274d16adeb9c4709774599fecbb3060507ed15",
+      "patch": null,
+      "postPatchSha256": "cc54d9266aab6e8ccd9d39bd7b274d16adeb9c4709774599fecbb3060507ed15"
+    },
+    {
+      "source": "test/controls.test.ts",
+      "destination": "test/controls.test.ts",
+      "sourceSha256": "aaab2f253a1a5a33fd3068aea1395501b67291bc0c54867d3d42087c2d131af3",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "aaab2f253a1a5a33fd3068aea1395501b67291bc0c54867d3d42087c2d131af3",
+      "patch": null,
+      "postPatchSha256": "aaab2f253a1a5a33fd3068aea1395501b67291bc0c54867d3d42087c2d131af3"
+    },
+    {
+      "source": "test/density.test.ts",
+      "destination": "test/density.test.ts",
+      "sourceSha256": "ba4ec08ba7c770d870fe8b0fa2149a1dfe86fb8dc27bebec890a2b239eb3cc8b",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "ba4ec08ba7c770d870fe8b0fa2149a1dfe86fb8dc27bebec890a2b239eb3cc8b",
+      "patch": null,
+      "postPatchSha256": "ba4ec08ba7c770d870fe8b0fa2149a1dfe86fb8dc27bebec890a2b239eb3cc8b"
+    },
+    {
+      "source": "test/detail-faces.test.ts",
+      "destination": "test/detail-faces.test.ts",
+      "sourceSha256": "acdcbeee0201a74a91555736af973be81a6f5ca555a6047cb156ca0ce8b6884c",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "acdcbeee0201a74a91555736af973be81a6f5ca555a6047cb156ca0ce8b6884c",
+      "patch": null,
+      "postPatchSha256": "acdcbeee0201a74a91555736af973be81a6f5ca555a6047cb156ca0ce8b6884c"
+    },
+    {
+      "source": "test/detail-filter-parity.test.ts",
+      "destination": "test/detail-filter-parity.test.ts",
+      "sourceSha256": "874146ceed802f1e3ebe468b8e77c143702071fe2f345f7b13b227467ef693f1",
+      "rewriteCounts": [
+        1,
+        0,
+        0
+      ],
+      "rewrittenSha256": "0eb4bd8afd1d9a46bae0832368f59cb28636cf4ebcb4fb9ae5a545df6db4317c",
+      "patch": null,
+      "postPatchSha256": "0eb4bd8afd1d9a46bae0832368f59cb28636cf4ebcb4fb9ae5a545df6db4317c"
+    },
+    {
+      "source": "test/detail-group.test.ts",
+      "destination": "test/detail-group.test.ts",
+      "sourceSha256": "1eac0cfd4837cc264a2408755e2168256a95bc2ca935b639c75bc3e7a59ab781",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "1eac0cfd4837cc264a2408755e2168256a95bc2ca935b639c75bc3e7a59ab781",
+      "patch": null,
+      "postPatchSha256": "1eac0cfd4837cc264a2408755e2168256a95bc2ca935b639c75bc3e7a59ab781"
+    },
+    {
+      "source": "test/detail-navigation.test.ts",
+      "destination": "test/detail-navigation.test.ts",
+      "sourceSha256": "313daf4dd5ee4f82e220205ab9ec6f899f1b0111cffc8efdb459337bd2160663",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "313daf4dd5ee4f82e220205ab9ec6f899f1b0111cffc8efdb459337bd2160663",
+      "patch": null,
+      "postPatchSha256": "313daf4dd5ee4f82e220205ab9ec6f899f1b0111cffc8efdb459337bd2160663"
+    },
+    {
+      "source": "test/detail-role.test.ts",
+      "destination": "test/detail-role.test.ts",
+      "sourceSha256": "36a81028e77b90a44f72a0d17eafb62dae643522ea836d872d0a15ec2a53bc48",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "36a81028e77b90a44f72a0d17eafb62dae643522ea836d872d0a15ec2a53bc48",
+      "patch": null,
+      "postPatchSha256": "36a81028e77b90a44f72a0d17eafb62dae643522ea836d872d0a15ec2a53bc48"
+    },
+    {
+      "source": "test/devices.test.ts",
+      "destination": "test/devices.test.ts",
+      "sourceSha256": "5716d80439d6050edc8abc2d47053218363364cef0b19c242c99a62ca969c2f7",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "5716d80439d6050edc8abc2d47053218363364cef0b19c242c99a62ca969c2f7",
+      "patch": null,
+      "postPatchSha256": "5716d80439d6050edc8abc2d47053218363364cef0b19c242c99a62ca969c2f7"
+    },
+    {
+      "source": "test/dial-renderer.test.ts",
+      "destination": "test/dial-renderer.test.ts",
+      "sourceSha256": "d1439effa646660b2031d298e95f271bfe839a6765b3a0ef2b2f8082ddba438f",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "d1439effa646660b2031d298e95f271bfe839a6765b3a0ef2b2f8082ddba438f",
+      "patch": null,
+      "postPatchSha256": "d1439effa646660b2031d298e95f271bfe839a6765b3a0ef2b2f8082ddba438f"
+    },
+    {
+      "source": "test/dial-sensor-colors.test.ts",
+      "destination": "test/dial-sensor-colors.test.ts",
+      "sourceSha256": "c4ebc36a1744ef1cafd7365f79e579df9764247bae1fff480578c2810ca29687",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "c4ebc36a1744ef1cafd7365f79e579df9764247bae1fff480578c2810ca29687",
+      "patch": null,
+      "postPatchSha256": "c4ebc36a1744ef1cafd7365f79e579df9764247bae1fff480578c2810ca29687"
+    },
+    {
+      "source": "test/face-font.test.ts",
+      "destination": "test/face-font.test.ts",
+      "sourceSha256": "67be62ebef9b36c334fa03ce090e996d1df00d64595372ab358fadac2f29af8f",
+      "rewriteCounts": [
+        1,
+        0,
+        0
+      ],
+      "rewrittenSha256": "d1cf214175fb92ca5f61ca4ab1bce5e172fdc68db25c4aa11284a2f289a13696",
+      "patch": null,
+      "postPatchSha256": "d1cf214175fb92ca5f61ca4ab1bce5e172fdc68db25c4aa11284a2f289a13696"
+    },
+    {
+      "source": "test/format.test.ts",
+      "destination": "test/format.test.ts",
+      "sourceSha256": "4e2e193f4ebc07dc25949d304f7832fb6d8f8d0b1e224056b7700201ac416187",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "4e2e193f4ebc07dc25949d304f7832fb6d8f8d0b1e224056b7700201ac416187",
+      "patch": null,
+      "postPatchSha256": "4e2e193f4ebc07dc25949d304f7832fb6d8f8d0b1e224056b7700201ac416187"
+    },
+    {
+      "source": "test/gauge.test.ts",
+      "destination": "test/gauge.test.ts",
+      "sourceSha256": "815cd6cae9817b2b9f6f9b7facbeeda656385f8f45e8db4515f52ac29fae4d87",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "815cd6cae9817b2b9f6f9b7facbeeda656385f8f45e8db4515f52ac29fae4d87",
+      "patch": null,
+      "postPatchSha256": "815cd6cae9817b2b9f6f9b7facbeeda656385f8f45e8db4515f52ac29fae4d87"
+    },
+    {
+      "source": "test/gesture-replay.test.ts",
+      "destination": "test/gesture-replay.test.ts",
+      "sourceSha256": "f8e3bace1bddaeeeb48d1f6a035d0f703def70ef28a5a4a0846c49f83eb7c1c2",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "f8e3bace1bddaeeeb48d1f6a035d0f703def70ef28a5a4a0846c49f83eb7c1c2",
+      "patch": null,
+      "postPatchSha256": "f8e3bace1bddaeeeb48d1f6a035d0f703def70ef28a5a4a0846c49f83eb7c1c2"
+    },
+    {
+      "source": "test/gestures.test.ts",
+      "destination": "test/gestures.test.ts",
+      "sourceSha256": "91c30e016f3cfa31c256155c5523e9cc830a93fa8a01515c8aaa48000a4e5d01",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "91c30e016f3cfa31c256155c5523e9cc830a93fa8a01515c8aaa48000a4e5d01",
+      "patch": null,
+      "postPatchSha256": "91c30e016f3cfa31c256155c5523e9cc830a93fa8a01515c8aaa48000a4e5d01"
+    },
+    {
+      "source": "test/global-settings.test.mjs",
+      "destination": "test/global-settings.test.mjs",
+      "sourceSha256": "244a7344fc8d3f9971d5242eb7e5a02a81ab09446758f2b823b9acf583e7fd57",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "244a7344fc8d3f9971d5242eb7e5a02a81ab09446758f2b823b9acf583e7fd57",
+      "patch": null,
+      "postPatchSha256": "244a7344fc8d3f9971d5242eb7e5a02a81ab09446758f2b823b9acf583e7fd57"
+    },
+    {
+      "source": "test/golden/dial-color-baseline.json",
+      "destination": "test/golden/dial-color-baseline.json",
+      "sourceSha256": "697b1f44db7b1c82f77ca802f35f486088e2aa967699d3af49681efa8b66c6ba",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "697b1f44db7b1c82f77ca802f35f486088e2aa967699d3af49681efa8b66c6ba",
+      "patch": null,
+      "postPatchSha256": "697b1f44db7b1c82f77ca802f35f486088e2aa967699d3af49681efa8b66c6ba"
+    },
+    {
+      "source": "test/golden/legacy-faces.json",
+      "destination": "test/golden/legacy-faces.json",
+      "sourceSha256": "fe5b6058f5f446866e8b1267cc6e822af02133bc4d907cfae39e94790bf25852",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "fe5b6058f5f446866e8b1267cc6e822af02133bc4d907cfae39e94790bf25852",
+      "patch": null,
+      "postPatchSha256": "fe5b6058f5f446866e8b1267cc6e822af02133bc4d907cfae39e94790bf25852"
+    },
+    {
+      "source": "test/hwinfo-control.test.ts",
+      "destination": "test/hwinfo-control.test.ts",
+      "sourceSha256": "1056bf034e1c9cb3bf0f2ecd67c77bff2c852e1ef2f46a6755dbc692a1f2c654",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "1056bf034e1c9cb3bf0f2ecd67c77bff2c852e1ef2f46a6755dbc692a1f2c654",
+      "patch": null,
+      "postPatchSha256": "1056bf034e1c9cb3bf0f2ecd67c77bff2c852e1ef2f46a6755dbc692a1f2c654"
+    },
+    {
+      "source": "test/ink-fit.test.ts",
+      "destination": "test/ink-fit.test.ts",
+      "sourceSha256": "bbc6fa41c7950b88cc33cc40ad981c169a742222617645c8bae9f1635e000470",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "bbc6fa41c7950b88cc33cc40ad981c169a742222617645c8bae9f1635e000470",
+      "patch": null,
+      "postPatchSha256": "bbc6fa41c7950b88cc33cc40ad981c169a742222617645c8bae9f1635e000470"
+    },
+    {
+      "source": "test/inline-gap.ts",
+      "destination": "test/inline-gap.ts",
+      "sourceSha256": "5911c9eb9a3deaf595ad2cf9ef4d9d108b8e4ba043560f47becbae8ca4eadb7b",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "5911c9eb9a3deaf595ad2cf9ef4d9d108b8e4ba043560f47becbae8ca4eadb7b",
+      "patch": null,
+      "postPatchSha256": "5911c9eb9a3deaf595ad2cf9ef4d9d108b8e4ba043560f47becbae8ca4eadb7b"
+    },
+    {
+      "source": "test/key-renderer.test.ts",
+      "destination": "test/key-renderer.test.ts",
+      "sourceSha256": "89bc5bdeb95d182f0fa1b536a740a06459e8da803141cf33d481e15952a7fcea",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "89bc5bdeb95d182f0fa1b536a740a06459e8da803141cf33d481e15952a7fcea",
+      "patch": null,
+      "postPatchSha256": "89bc5bdeb95d182f0fa1b536a740a06459e8da803141cf33d481e15952a7fcea"
+    },
+    {
+      "source": "test/measure.test.ts",
+      "destination": "test/measure.test.ts",
+      "sourceSha256": "439434001acebd2a22a84204b137f1088e4e518e5f1a9f24ddb8a74c420827fe",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "439434001acebd2a22a84204b137f1088e4e518e5f1a9f24ddb8a74c420827fe",
+      "patch": null,
+      "postPatchSha256": "439434001acebd2a22a84204b137f1088e4e518e5f1a9f24ddb8a74c420827fe"
+    },
+    {
+      "source": "test/measurement-integrity.test.ts",
+      "destination": "test/measurement-integrity.test.ts",
+      "sourceSha256": "c9bc1e15b68efa399c40f38f461a552559ecc9aedf59af319d49a7a38d6c1472",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "c9bc1e15b68efa399c40f38f461a552559ecc9aedf59af319d49a7a38d6c1472",
+      "patch": null,
+      "postPatchSha256": "c9bc1e15b68efa399c40f38f461a552559ecc9aedf59af319d49a7a38d6c1472"
+    },
+    {
+      "source": "test/panel-folds.test.ts",
+      "destination": "test/panel-folds.test.ts",
+      "sourceSha256": "53e1f4b989fff5b9bdcf529dcda766e12b5bd00a60582b68b38d063740c23a36",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "53e1f4b989fff5b9bdcf529dcda766e12b5bd00a60582b68b38d063740c23a36",
+      "patch": null,
+      "postPatchSha256": "53e1f4b989fff5b9bdcf529dcda766e12b5bd00a60582b68b38d063740c23a36"
+    },
+    {
+      "source": "test/parent-liveness.test.ts",
+      "destination": "test/parent-liveness.test.ts",
+      "sourceSha256": "b5df210e7618fe588f5eac6f5e0e1def62ffecb0ed982a183acd6f595c05c6f4",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "b5df210e7618fe588f5eac6f5e0e1def62ffecb0ed982a183acd6f595c05c6f4",
+      "patch": null,
+      "postPatchSha256": "b5df210e7618fe588f5eac6f5e0e1def62ffecb0ed982a183acd6f595c05c6f4"
+    },
+    {
+      "source": "test/pi-alias-contract.test.ts",
+      "destination": "test/pi-alias-contract.test.ts",
+      "sourceSha256": "8f34acd627439af1dc3ab82ca3d8fb2050efb913d4a5815811b3825be99d0422",
+      "rewriteCounts": [
+        2,
+        0,
+        0
+      ],
+      "rewrittenSha256": "69d0327671df0ffc81654af2bfee6118fa7549552ca1cf8494f6728cfc3d1f3f",
+      "patch": null,
+      "postPatchSha256": "69d0327671df0ffc81654af2bfee6118fa7549552ca1cf8494f6728cfc3d1f3f"
+    },
+    {
+      "source": "test/pi-build-token.test.ts",
+      "destination": "test/pi-build-token.test.ts",
+      "sourceSha256": "cf6d501ed6883039a7fb0502f025894a7c702c37bb8795182d5ff669a74bccfd",
+      "rewriteCounts": [
+        1,
+        0,
+        0
+      ],
+      "rewrittenSha256": "0d9335f39a7b8b34026c583d0fbf80ef69b35a79b363463a2ad948317b01ac2b",
+      "patch": null,
+      "postPatchSha256": "0d9335f39a7b8b34026c583d0fbf80ef69b35a79b363463a2ad948317b01ac2b"
+    },
+    {
+      "source": "test/pi-control.test.mjs",
+      "destination": "test/pi-control.test.mjs",
+      "sourceSha256": "fa148f97828a7c06a7ccf1b326c6c1092b96d132627b81b18ed1050eeb43acb2",
+      "rewriteCounts": [
+        1,
+        0,
+        0
+      ],
+      "rewrittenSha256": "195f62e6c63e7ba1e631f7c89ff60916880985e4bf2f604df4bab1a3cbcb2317",
+      "patch": null,
+      "postPatchSha256": "195f62e6c63e7ba1e631f7c89ff60916880985e4bf2f604df4bab1a3cbcb2317"
+    },
+    {
+      "source": "test/pi-detail-cells.test.mjs",
+      "destination": "test/pi-detail-cells.test.mjs",
+      "sourceSha256": "91c9dd8e8d4c22bd369904c1f07bb50ea0d6efd395d417253ebe0f1e3898b5b4",
+      "rewriteCounts": [
+        1,
+        0,
+        0
+      ],
+      "rewrittenSha256": "896a1de7f2969381982eed99c422496b0339ebf17813dc0033eaf5cc84181ca5",
+      "patch": null,
+      "postPatchSha256": "896a1de7f2969381982eed99c422496b0339ebf17813dc0033eaf5cc84181ca5"
+    },
+    {
+      "source": "test/pi-markup.test.ts",
+      "destination": "test/pi-markup.test.ts",
+      "sourceSha256": "253e91eeaac103f868249e9e4bc0b35332010839a772b4bb6464b06c9df52020",
+      "rewriteCounts": [
+        1,
+        0,
+        0
+      ],
+      "rewrittenSha256": "ef8cb27e0e0a307063f094258650f8df85f351e55d315e921743a035db848338",
+      "patch": null,
+      "postPatchSha256": "ef8cb27e0e0a307063f094258650f8df85f351e55d315e921743a035db848338"
+    },
+    {
+      "source": "test/pi-model.test.ts",
+      "destination": "test/pi-model.test.ts",
+      "sourceSha256": "d3825879089b6254381dc63b56c23d3de3be4ae6a7ea1d3e96780fba19a47f8c",
+      "rewriteCounts": [
+        3,
+        0,
+        0
+      ],
+      "rewrittenSha256": "00d77e55598cca2e71addf2e11e2e6e860603583326337d72a93d2dee2162fbe",
+      "patch": null,
+      "postPatchSha256": "00d77e55598cca2e71addf2e11e2e6e860603583326337d72a93d2dee2162fbe"
+    },
+    {
+      "source": "test/pi-preview.test.ts",
+      "destination": "test/pi-preview.test.ts",
+      "sourceSha256": "991523cf8a6e74c2f49d054f8f2dcb98980455497aaeba422df447de0fc97c35",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "991523cf8a6e74c2f49d054f8f2dcb98980455497aaeba422df447de0fc97c35",
+      "patch": null,
+      "postPatchSha256": "991523cf8a6e74c2f49d054f8f2dcb98980455497aaeba422df447de0fc97c35"
+    },
+    {
+      "source": "test/poller-links.test.ts",
+      "destination": "test/poller-links.test.ts",
+      "sourceSha256": "8d404807c7ea432195dabb4bda21194c2a4b36dd710f8fe60df966b6cb54c270",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "8d404807c7ea432195dabb4bda21194c2a4b36dd710f8fe60df966b6cb54c270",
+      "patch": null,
+      "postPatchSha256": "8d404807c7ea432195dabb4bda21194c2a4b36dd710f8fe60df966b6cb54c270"
+    },
+    {
+      "source": "test/poller-provenance.test.ts",
+      "destination": "test/poller-provenance.test.ts",
+      "sourceSha256": "e25bb8fceb0bc3c3e542b6d23d9a41549d781cc7c651b26b34338bdf4656885c",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "e25bb8fceb0bc3c3e542b6d23d9a41549d781cc7c651b26b34338bdf4656885c",
+      "patch": null,
+      "postPatchSha256": "e25bb8fceb0bc3c3e542b6d23d9a41549d781cc7c651b26b34338bdf4656885c"
+    },
+    {
+      "source": "test/poller-series.test.ts",
+      "destination": "test/poller-series.test.ts",
+      "sourceSha256": "3f34f58470eb2d6a0c6af6cbb633b9ba44e81b18ca46d2987db5a061472a0531",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "3f34f58470eb2d6a0c6af6cbb633b9ba44e81b18ca46d2987db5a061472a0531",
+      "patch": null,
+      "postPatchSha256": "3f34f58470eb2d6a0c6af6cbb633b9ba44e81b18ca46d2987db5a061472a0531"
+    },
+    {
+      "source": "test/press-engine.test.ts",
+      "destination": "test/press-engine.test.ts",
+      "sourceSha256": "55a01b57689760458d46493b81003f4638cf1b560c9b13a6ea7270b9c4c6b76d",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "55a01b57689760458d46493b81003f4638cf1b560c9b13a6ea7270b9c4c6b76d",
+      "patch": null,
+      "postPatchSha256": "55a01b57689760458d46493b81003f4638cf1b560c9b13a6ea7270b9c4c6b76d"
+    },
+    {
+      "source": "test/replay.ts",
+      "destination": "test/replay.ts",
+      "sourceSha256": "0ee15f14ad8e9342bb35770808e0387d06019f7cd711a4d278e6fe59790cc0b5",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "0ee15f14ad8e9342bb35770808e0387d06019f7cd711a4d278e6fe59790cc0b5",
+      "patch": null,
+      "postPatchSha256": "0ee15f14ad8e9342bb35770808e0387d06019f7cd711a4d278e6fe59790cc0b5"
+    },
+    {
+      "source": "test/rotation.test.ts",
+      "destination": "test/rotation.test.ts",
+      "sourceSha256": "a4461387a1aa82372281317e33ce2a47cfacaefb1e3474ddbdf5530f72671fb7",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "a4461387a1aa82372281317e33ce2a47cfacaefb1e3474ddbdf5530f72671fb7",
+      "patch": null,
+      "postPatchSha256": "a4461387a1aa82372281317e33ce2a47cfacaefb1e3474ddbdf5530f72671fb7"
+    },
+    {
+      "source": "test/series.test.ts",
+      "destination": "test/series.test.ts",
+      "sourceSha256": "f0608105051d17709523d2d47e85dcb7042de51815a866ca44a0241739aa0c60",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "f0608105051d17709523d2d47e85dcb7042de51815a866ca44a0241739aa0c60",
+      "patch": null,
+      "postPatchSha256": "f0608105051d17709523d2d47e85dcb7042de51815a866ca44a0241739aa0c60"
+    },
+    {
+      "source": "test/slot-bindings.test.ts",
+      "destination": "test/slot-bindings.test.ts",
+      "sourceSha256": "f73f2e92c144d076dc9c999e9de9ad2d4a0736877fd5445da4fdf5c29b2415d3",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "f73f2e92c144d076dc9c999e9de9ad2d4a0736877fd5445da4fdf5c29b2415d3",
+      "patch": null,
+      "postPatchSha256": "f73f2e92c144d076dc9c999e9de9ad2d4a0736877fd5445da4fdf5c29b2415d3"
+    },
+    {
+      "source": "test/state-screens.test.ts",
+      "destination": "test/state-screens.test.ts",
+      "sourceSha256": "bd09defe2b88c5e1d07dea7c238596e2db9b5a8a30fe2bb1250b5121a88af18f",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "bd09defe2b88c5e1d07dea7c238596e2db9b5a8a30fe2bb1250b5121a88af18f",
+      "patch": null,
+      "postPatchSha256": "bd09defe2b88c5e1d07dea7c238596e2db9b5a8a30fe2bb1250b5121a88af18f"
+    },
+    {
+      "source": "test/stats.test.ts",
+      "destination": "test/stats.test.ts",
+      "sourceSha256": "7c24f555b9234d1177c492c9ff2bda03e4609a34f1febb73617cfe48156f8b1d",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "7c24f555b9234d1177c492c9ff2bda03e4609a34f1febb73617cfe48156f8b1d",
+      "patch": null,
+      "postPatchSha256": "7c24f555b9234d1177c492c9ff2bda03e4609a34f1febb73617cfe48156f8b1d"
+    },
+    {
+      "source": "test/text-colors.test.ts",
+      "destination": "test/text-colors.test.ts",
+      "sourceSha256": "df860e14c9e4c0999ff34769a6c899ccc580819edeec15bcdcc801a6b37b5939",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "df860e14c9e4c0999ff34769a6c899ccc580819edeec15bcdcc801a6b37b5939",
+      "patch": null,
+      "postPatchSha256": "df860e14c9e4c0999ff34769a6c899ccc580819edeec15bcdcc801a6b37b5939"
+    },
+    {
+      "source": "test/themes.test.ts",
+      "destination": "test/themes.test.ts",
+      "sourceSha256": "74420db4ceaac6f903a8a0c0b15424347357cc08baa0dcaec5df30100dad5d2a",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "74420db4ceaac6f903a8a0c0b15424347357cc08baa0dcaec5df30100dad5d2a",
+      "patch": null,
+      "postPatchSha256": "74420db4ceaac6f903a8a0c0b15424347357cc08baa0dcaec5df30100dad5d2a"
+    },
+    {
+      "source": "test/traces/device-disconnect-reconnect.json",
+      "destination": "test/traces/device-disconnect-reconnect.json",
+      "sourceSha256": "959ce377516a1cc1a50f7183ec4e4a0e3342e44c816d9f60bcecfb604e200976",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "959ce377516a1cc1a50f7183ec4e4a0e3342e44c816d9f60bcecfb604e200976",
+      "patch": null,
+      "postPatchSha256": "959ce377516a1cc1a50f7183ec4e4a0e3342e44c816d9f60bcecfb604e200976"
+    },
+    {
+      "source": "test/traces/ignore-turns.json",
+      "destination": "test/traces/ignore-turns.json",
+      "sourceSha256": "a4be5a81814c310007d3d00141e120a02fdc4e44e414bd634a714f058b6fcf06",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "a4be5a81814c310007d3d00141e120a02fdc4e44e414bd634a714f058b6fcf06",
+      "patch": null,
+      "postPatchSha256": "a4be5a81814c310007d3d00141e120a02fdc4e44e414bd634a714f058b6fcf06"
+    },
+    {
+      "source": "test/traces/missing-sensor-guard.json",
+      "destination": "test/traces/missing-sensor-guard.json",
+      "sourceSha256": "af1b5590c83e5fa258199c3091bb02030c02018aed4c44414c29da721728e208",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "af1b5590c83e5fa258199c3091bb02030c02018aed4c44414c29da721728e208",
+      "patch": null,
+      "postPatchSha256": "af1b5590c83e5fa258199c3091bb02030c02018aed4c44414c29da721728e208"
+    },
+    {
+      "source": "test/traces/normal-rotation.json",
+      "destination": "test/traces/normal-rotation.json",
+      "sourceSha256": "5dd899b72ebd21ebee31dcb068aa241fc152f1659d716ac0cd71cbf78dc8ea82",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "5dd899b72ebd21ebee31dcb068aa241fc152f1659d716ac0cd71cbf78dc8ea82",
+      "patch": null,
+      "postPatchSha256": "5dd899b72ebd21ebee31dcb068aa241fc152f1659d716ac0cd71cbf78dc8ea82"
+    },
+    {
+      "source": "test/traces/page-disappear-appear.json",
+      "destination": "test/traces/page-disappear-appear.json",
+      "sourceSha256": "58f8ec14a9381d1e964fb18116830519af67bb55123b7de4501c7ffca67da77e",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "58f8ec14a9381d1e964fb18116830519af67bb55123b7de4501c7ffca67da77e",
+      "patch": null,
+      "postPatchSha256": "58f8ec14a9381d1e964fb18116830519af67bb55123b7de4501c7ffca67da77e"
+    },
+    {
+      "source": "test/traces/pin-blocks-turns.json",
+      "destination": "test/traces/pin-blocks-turns.json",
+      "sourceSha256": "42a58110e97862724cc7bfd32137116c50584071aa7065ebbff209e286476961",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "42a58110e97862724cc7bfd32137116c50584071aa7065ebbff209e286476961",
+      "patch": null,
+      "postPatchSha256": "42a58110e97862724cc7bfd32137116c50584071aa7065ebbff209e286476961"
+    },
+    {
+      "source": "test/traces/press-timing-elite.json",
+      "destination": "test/traces/press-timing-elite.json",
+      "sourceSha256": "140cd589e3522c2db5c892a082aac51a0bb51e3f879254fa958cc47092bd30c4",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "140cd589e3522c2db5c892a082aac51a0bb51e3f879254fa958cc47092bd30c4",
+      "patch": null,
+      "postPatchSha256": "140cd589e3522c2db5c892a082aac51a0bb51e3f879254fa958cc47092bd30c4"
+    },
+    {
+      "source": "test/traces/press-without-rotation-legacy.json",
+      "destination": "test/traces/press-without-rotation-legacy.json",
+      "sourceSha256": "f04d523faeb50b0334f0e606c261eebaaf9de4be5a070b41a2f94aefe40ccca3",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "f04d523faeb50b0334f0e606c261eebaaf9de4be5a070b41a2f94aefe40ccca3",
+      "patch": null,
+      "postPatchSha256": "f04d523faeb50b0334f0e606c261eebaaf9de4be5a070b41a2f94aefe40ccca3"
+    },
+    {
+      "source": "test/traces/pressed-rotation.json",
+      "destination": "test/traces/pressed-rotation.json",
+      "sourceSha256": "ca822421ae1e909478c66688f66943f7e1ab56b438dc8c5be2f8de8e0d8395bf",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "ca822421ae1e909478c66688f66943f7e1ab56b438dc8c5be2f8de8e0d8395bf",
+      "patch": null,
+      "postPatchSha256": "ca822421ae1e909478c66688f66943f7e1ab56b438dc8c5be2f8de8e0d8395bf"
+    },
+    {
+      "source": "test/traces/rapid-rotation.json",
+      "destination": "test/traces/rapid-rotation.json",
+      "sourceSha256": "ea92119e26906a2ce6464fb9d67da6ed111cb0b7cea92c7487eb24838f8d43fb",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "ea92119e26906a2ce6464fb9d67da6ed111cb0b7cea92c7487eb24838f8d43fb",
+      "patch": null,
+      "postPatchSha256": "ea92119e26906a2ce6464fb9d67da6ed111cb0b7cea92c7487eb24838f8d43fb"
+    },
+    {
+      "source": "test/traces/replayed-legacy-down.json",
+      "destination": "test/traces/replayed-legacy-down.json",
+      "sourceSha256": "3ff113052bdebcb6d789d67b511f2dc8a3c3704ace24a9e0e8351c41b0e8ae9b",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "3ff113052bdebcb6d789d67b511f2dc8a3c3704ace24a9e0e8351c41b0e8ae9b",
+      "patch": null,
+      "postPatchSha256": "3ff113052bdebcb6d789d67b511f2dc8a3c3704ace24a9e0e8351c41b0e8ae9b"
+    },
+    {
+      "source": "test/traces/rotation-groups.json",
+      "destination": "test/traces/rotation-groups.json",
+      "sourceSha256": "754220f5dbc66f376c9154cc9c5c008fdaa674611cdbda35cf3884520d26f322",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "754220f5dbc66f376c9154cc9c5c008fdaa674611cdbda35cf3884520d26f322",
+      "patch": null,
+      "postPatchSha256": "754220f5dbc66f376c9154cc9c5c008fdaa674611cdbda35cf3884520d26f322"
+    },
+    {
+      "source": "test/traces/six-encoders-plus-xl.json",
+      "destination": "test/traces/six-encoders-plus-xl.json",
+      "sourceSha256": "9a86fd9889113400c34f78d272347e948e377cf7da7120482fcaffa0f895102f",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "9a86fd9889113400c34f78d272347e948e377cf7da7120482fcaffa0f895102f",
+      "patch": null,
+      "postPatchSha256": "9a86fd9889113400c34f78d272347e948e377cf7da7120482fcaffa0f895102f"
+    },
+    {
+      "source": "test/traces/touch-hold.json",
+      "destination": "test/traces/touch-hold.json",
+      "sourceSha256": "deb1b7e4c95c7fdd139ef26012981c45fae88459bce3d777d710d00b009b6b75",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "deb1b7e4c95c7fdd139ef26012981c45fae88459bce3d777d710d00b009b6b75",
+      "patch": null,
+      "postPatchSha256": "deb1b7e4c95c7fdd139ef26012981c45fae88459bce3d777d710d00b009b6b75"
+    },
+    {
+      "source": "test/traces/touch-zones.json",
+      "destination": "test/traces/touch-zones.json",
+      "sourceSha256": "4560ae234f041ea54d362113032528f921acc7a553ef493ed64614e246781488",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "4560ae234f041ea54d362113032528f921acc7a553ef493ed64614e246781488",
+      "patch": null,
+      "postPatchSha256": "4560ae234f041ea54d362113032528f921acc7a553ef493ed64614e246781488"
+    },
+    {
+      "source": "test/traces/two-devices.json",
+      "destination": "test/traces/two-devices.json",
+      "sourceSha256": "974a89e5030ebc45e28a003f6b15a11c0cad73057a7c7f23f3acd2e1e30f51d8",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "974a89e5030ebc45e28a003f6b15a11c0cad73057a7c7f23f3acd2e1e30f51d8",
+      "patch": null,
+      "postPatchSha256": "974a89e5030ebc45e28a003f6b15a11c0cad73057a7c7f23f3acd2e1e30f51d8"
+    },
+    {
+      "source": "test/wcag.ts",
+      "destination": "test/wcag.ts",
+      "sourceSha256": "3b325a5102c5ddb2bd3b270372ece77957732593219198cb48c97a239bb103e0",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "3b325a5102c5ddb2bd3b270372ece77957732593219198cb48c97a239bb103e0",
+      "patch": null,
+      "postPatchSha256": "3b325a5102c5ddb2bd3b270372ece77957732593219198cb48c97a239bb103e0"
+    }
+  ],
+  "copiedTests": [
+    "test/back-face.test.ts",
+    "test/clock.test.ts",
+    "test/compat.test.ts",
+    "test/controls.test.ts",
+    "test/density.test.ts",
+    "test/detail-faces.test.ts",
+    "test/detail-filter-parity.test.ts",
+    "test/detail-group.test.ts",
+    "test/detail-navigation.test.ts",
+    "test/detail-role.test.ts",
+    "test/devices.test.ts",
+    "test/dial-renderer.test.ts",
+    "test/dial-sensor-colors.test.ts",
+    "test/face-font.test.ts",
+    "test/format.test.ts",
+    "test/gauge.test.ts",
+    "test/gesture-replay.test.ts",
+    "test/gestures.test.ts",
+    "test/global-settings.test.mjs",
+    "test/hwinfo-control.test.ts",
+    "test/ink-fit.test.ts",
+    "test/key-renderer.test.ts",
+    "test/measure.test.ts",
+    "test/measurement-integrity.test.ts",
+    "test/panel-folds.test.ts",
+    "test/parent-liveness.test.ts",
+    "test/pi-alias-contract.test.ts",
+    "test/pi-build-token.test.ts",
+    "test/pi-control.test.mjs",
+    "test/pi-detail-cells.test.mjs",
+    "test/pi-markup.test.ts",
+    "test/pi-model.test.ts",
+    "test/pi-preview.test.ts",
+    "test/poller-links.test.ts",
+    "test/poller-provenance.test.ts",
+    "test/poller-series.test.ts",
+    "test/press-engine.test.ts",
+    "test/rotation.test.ts",
+    "test/series.test.ts",
+    "test/slot-bindings.test.ts",
+    "test/state-screens.test.ts",
+    "test/stats.test.ts",
+    "test/text-colors.test.ts",
+    "test/themes.test.ts"
+  ],
+  "ports": [
+    {
+      "source": "scripts/abi-check.mjs",
+      "upstreamSha256": "901598e5186f2bdf958cd258c3485f590c0a1808e5357841c805658519b8da90",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/bench-parse.ts",
+      "upstreamSha256": "9012f3e705b6d852ba065c55cde5db9c3134bcd1ed1b586ce3349db01d4cc1d9",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/build-detail-profiles.ts",
+      "upstreamSha256": "f1503156fca29772da55368b445cc90a5ab70ce6f36ea05ed9a229567069cd35",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/capture-pi-reading-colors.mjs",
+      "upstreamSha256": "5f80be86091185ee7423684b499327de153c7077e2f8a5a9c86dcbf9e2145a4e",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/capture-pi.mjs",
+      "upstreamSha256": "2a61efdac80d6ea04039cbca4bcf6fe57dffde4696609a54b6fe74ff39d898bb",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/contact-sheet.mjs",
+      "upstreamSha256": "aa16d3c009470606c579ed30532862ac405e3e3383a58f6ba8e737107ea0c316",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/dial-color-comparison.mjs",
+      "upstreamSha256": "6da41720fed67f27726743937b9f05a6fb4d8a57f6769b502f940b79b82562f5",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/docs-crawl.mjs",
+      "upstreamSha256": "dea53fb7750ff637cf05d010afc69430c8a4226d48a10b673e4781cc526dc08c",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/docs-preview-publish.mjs",
+      "upstreamSha256": "4faeff0469a8b5a2fdc38456b9789a8d4d781da1c7713b246f988af9e43e3af5",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/docs-site-shots.mjs",
+      "upstreamSha256": "99535fe8a8fe0c20d4ce6230211f8dd426e2587649f838a3cca489d6a1bae224",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/docs-v17-images.mjs",
+      "upstreamSha256": "1f74da8653bb2a1a1d7a02bf32f4ddde82db550a342d1f4fabda2462506d229c",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/dump-keys.mjs",
+      "upstreamSha256": "58084cc9d388966fe5248d98a1cef6aaca6e97c1ca29f82b261fee39daf8fee9",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/e2e-drilldown.mjs",
+      "upstreamSha256": "db9bbb8d566da247b22dbc7d52332241642aaec69c43613cc8459cc3030c6bcd",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/e2e-harness.mjs",
+      "upstreamSha256": "e66bb03322c28922a5f37bd204786a6f689d587ee6a09bde2ce8dd1fa6dea13c",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/e2e-load.mjs",
+      "upstreamSha256": "47c147d8e3be567bbb1f35f1f992e92c023a0292cae22997de4b7bb87985cf66",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/e2e-native-edge.mjs",
+      "upstreamSha256": "15f3b4f7c8ad3065dabcfd19da304eedcddb0f560a39632c2369fb239f12ce72",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/e2e-pi-panels.mjs",
+      "upstreamSha256": "f82604d6a1e65f04d8519668a49800352fcc9549c70f1c5d79638433c2e418f4",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/e2e-pi-persistence.mjs",
+      "upstreamSha256": "4bf38b68d78b7cdd1df491c518ed61a8f5d6c578c88a54491e73702611dfc15f",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/e2e-resilience.mjs",
+      "upstreamSha256": "37aedfc348f0aa83e560bc844e5024cab6f40a274adea7e98a881f8c60429b24",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/e2e-socket-close.mjs",
+      "upstreamSha256": "4d42b337a9e646169fc869e382cd537848f2b4ff64999b7adcc155a7f38c5203",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/gadget-interleaving.mjs",
+      "upstreamSha256": "8d1b0eff986b015801b2d0a5b6dca68dd6316d123d2261b82702aad7aefe06c7",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/gadget-scan-benchmark.mjs",
+      "upstreamSha256": "837250f55a86c1c05cb8f2160def765e8699470a85ba1480c17725e29f737160",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/gadget-scan-live.mjs",
+      "upstreamSha256": "2aac897b41b04345b972355e650d3dd5eaea0b0fac91b2abbe7bcfdb729ec8b5",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/gen-changelog-page.mjs",
+      "upstreamSha256": "2c9e6c9f27adfa937af01f1c4bc03dedef4cfd6f77715038aad07554ee7a684b",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/gen-docs-shots.mjs",
+      "upstreamSha256": "aefa59257c0cd31c748311c5abb5638dc19f408d43471805755956b17e57a04e",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/gen-icons.mjs",
+      "upstreamSha256": "5dc8b4c6a157975915fa42d0cdcac8cd695339b62eaf88b6e5796bdc086f2c3e",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/gen-tahoma-metrics.mjs",
+      "upstreamSha256": "b25cdd3d1d38cc46dbb41ba1758d3949a5474e709716a9614749b78318c2c41e",
+      "reviewedThroughSha256": "b25cdd3d1d38cc46dbb41ba1758d3949a5474e709716a9614749b78318c2c41e",
+      "disposition": "implemented",
+      "reason": "Mac implementation retains the required capability; source review completed at the pinned commit.",
+      "destinations": [
+        "scripts/gen-tahoma-metrics.mjs"
+      ],
+      "evidence": [
+        "npm run core:parity",
+        "npm run test:mac"
+      ]
+    },
+    {
+      "source": "scripts/hygiene.mjs",
+      "upstreamSha256": "2af0945bb60cdd7e9a8dd6b9dc865f5fb2c98540827aefe9b98e17984add34b5",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/lib/cdp.mjs",
+      "upstreamSha256": "25a34f1143d95da6c3b9d86bad00195eb0f77d214b60b7743bb99c1867419998",
+      "reviewedThroughSha256": "25a34f1143d95da6c3b9d86bad00195eb0f77d214b60b7743bb99c1867419998",
+      "disposition": "implemented",
+      "reason": "Mac implementation retains the required capability; source review completed at the pinned commit.",
+      "destinations": [
+        "scripts/lib/cdp.mjs"
+      ],
+      "evidence": [
+        "Mac Chrome panel capture at 320 and 480 pixels"
+      ]
+    },
+    {
+      "source": "scripts/lib/detail-profile-archive.ts",
+      "upstreamSha256": "f90b917d41500bafa576076724f6665fe28ecb0cc81b59f1cf36dc13f3c2e242",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/lib/e2e-common.mjs",
+      "upstreamSha256": "821d1859369b4f169d2b691b5c704ccb71ff6823bb44b328d282f5f720423ffa",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/lib/pack-contract.mjs",
+      "upstreamSha256": "8d20dd4f213b523420ce1e52a8cf394bded4563854a6cf2726b28ae990161da4",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/lib/pack-fixture.mjs",
+      "upstreamSha256": "d225ee124683b708bc04f386cadbd18459235073947f4eb24f4c6a97ffae23fe",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/lib/pack-validation.mjs",
+      "upstreamSha256": "2fca8c191c705d9b4b6afecf923bcbbc04bc5da566b638d99ea8a92832f84a70",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/lib/pi-sim.mjs",
+      "upstreamSha256": "1c0e8c677691dcaec0604f4ac8d08bba9ea81884fc655e18ccb1f20c298d2a60",
+      "reviewedThroughSha256": "1c0e8c677691dcaec0604f4ac8d08bba9ea81884fc655e18ccb1f20c298d2a60",
+      "disposition": "implemented",
+      "reason": "Mac implementation retains the required capability; source review completed at the pinned commit.",
+      "destinations": [
+        "scripts/lib/pi-sim.mjs"
+      ],
+      "evidence": [
+        "node --test test/mac/panel-stage.test.mjs"
+      ]
+    },
+    {
+      "source": "scripts/lib/process-ownership.mjs",
+      "upstreamSha256": "78701f2722bfaf0cd798bd080869a0c058909d48c6111789c46557b9d8138dc4",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/lib/soak-adversary-safety.mjs",
+      "upstreamSha256": "5982c7d3aed959a2c1bf6241461cebb1d9d1ee91642115ae8a00d2c94e44f465",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/lib/soak-host.mjs",
+      "upstreamSha256": "853adeec1d8eb08e4c45e32bc3fd774b91b752377f24346446fdb87adec0a9ab",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/lib/soak-producer-freshness.mjs",
+      "upstreamSha256": "cabe7973b26f1dd48b1ce741a5276837a5e4cd0283f990cac0d99a73525b84a6",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/lib/ttf.mjs",
+      "upstreamSha256": "8ae1be3c171a0e259892b21f9f990ed4c51012afcc6aa5972d460fcd2973bf85",
+      "reviewedThroughSha256": "8ae1be3c171a0e259892b21f9f990ed4c51012afcc6aa5972d460fcd2973bf85",
+      "disposition": "implemented",
+      "reason": "Mac implementation retains the required capability; source review completed at the pinned commit.",
+      "destinations": [
+        "scripts/lib/ttf.mjs"
+      ],
+      "evidence": [
+        "npm run test:mac"
+      ]
+    },
+    {
+      "source": "scripts/marketplace-shots.mjs",
+      "upstreamSha256": "2743ec46e13de8fdf3345cbc59b91db4961ecb2da22ea703cfcd9a4b2600a38e",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/native-manifest.mjs",
+      "upstreamSha256": "0b208f95f7fa906db605dd09e7b98743d8d6ce2794ba25b8b2ab91eff9b58eb8",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/native-source-id.mjs",
+      "upstreamSha256": "8a743aaef9bacd089bbfba4802ef496152008f54b5c7dbd696cbd6d811f2cb61",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/pack.mjs",
+      "upstreamSha256": "af3cde73b552935fa89e88d12a6743abce4fa26adb496eee15ee82b0cb1f6106",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/perf-detail.mjs",
+      "upstreamSha256": "923a79ba0fdafd8da00dec7aaa679b5dd0363c81586aa374a77f60d37434c709",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/perf-report.mjs",
+      "upstreamSha256": "47b769fdd8402b09720953aa0aa07e158b4ab7703c06faf216d337cdc562c9f7",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/pi-harness.mjs",
+      "upstreamSha256": "8532e910cb743eb78c9745183df6ff0222a154e30c7a305787143ad6a4b66530",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/pi-lab.mjs",
+      "upstreamSha256": "346bd0023d87a61b50e7e67c98686f488bbc0a0a5d51c200474dff03859f962d",
+      "reviewedThroughSha256": "346bd0023d87a61b50e7e67c98686f488bbc0a0a5d51c200474dff03859f962d",
+      "disposition": "implemented",
+      "reason": "Mac implementation retains the required capability; source review completed at the pinned commit.",
+      "destinations": [
+        "scripts/pi-lab.mjs"
+      ],
+      "evidence": [
+        "npm run stage:panels",
+        "node --test test/mac/panel-stage.test.mjs"
+      ]
+    },
+    {
+      "source": "scripts/qualify.mjs",
+      "upstreamSha256": "4bcdd96412881ad5f47396022fea648c4444b12102d1d006919b2fb68c827d78",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/readability-report.mjs",
+      "upstreamSha256": "59db3bca34920c7f52d8ff1cd8790f97412bd40c586d87ed8077a99e75b9a46a",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/readme-boards.mjs",
+      "upstreamSha256": "17d2ec03b4a7d2fac56581d58985d561269fa956b64f8eba339ec739cb5b8537",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/soak-adversary.mjs",
+      "upstreamSha256": "ac283a35dc760e733dc54eedaeb71354ed8c972989da990bb72d71df82cd1aa0",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/soak-monitor.mjs",
+      "upstreamSha256": "67f4a8246fce71df8fad1c1c337cb866ac38a55b7dc024f1ae2c9e35c11a3ab7",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/validate-native.mjs",
+      "upstreamSha256": "ec4915a34e21855d0fa49bf0b60f7e62f53ba838214fe95a1dd62cf816e6c00d",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/validate-pack.mjs",
+      "upstreamSha256": "ce6c18a983ff32753ace4e1cd4a8f1f7b555a8e1464c9613ba1a12e27e851b26",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/validate-release-copy.mjs",
+      "upstreamSha256": "b322d3d7989560929bc93b6685e719fd21a39ab415e1b16e8abc8386887ca56d",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/verify-pack-version.mjs",
+      "upstreamSha256": "e3ccaf54761ab39cdd9f29eda2edcb1a1eb8043f1a6bbea3ce87914cefac831f",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "scripts/verify-release-tag.mjs",
+      "upstreamSha256": "69b5faadd9d1b51abe9c2896d2447469ea5b85b032c85e55a64055ac7ff2993b",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "test/capture-pi-reading-colors.test.mjs",
+      "upstreamSha256": "434b54a944878e48030d84d6e6d4ab089c1f33f69afbfa1db267267db33be09a",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "test/detail-profiles.test.ts",
+      "upstreamSha256": "37d0a009bf2cfb0b7143ce813a8e02e4c8207b1186d419984064b1f367c2794f",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "test/diagnostics.test.ts",
+      "upstreamSha256": "ac3715878f23fa5c0591dfc728147d42b9cd950e529eb27eed4550fb6512ced4",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "test/docs-crawl.test.mjs",
+      "upstreamSha256": "6b4623ccb00e2e1355c41c14f294678236a3570147af49b5183171943d2b79f8",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "test/docs-image-provenance.test.ts",
+      "upstreamSha256": "f540b20f31c3d99c333745fbe86e0e467aeacb0524ef4b898d9178c27c6d84ad",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "test/docs-preview-stage.test.mjs",
+      "upstreamSha256": "03ec3dd77503043c475ff4f361b946634d4ad0c9b412c18bcc333840d8cc5490",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "test/docs-site-shots.test.mjs",
+      "upstreamSha256": "7ac8364f1944f8f2e278308757dc64e521f067a5f065525e17d77b4cfae88cc8",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "test/e2e-load.test.mjs",
+      "upstreamSha256": "3a000a5a8b846390738a2fd96711da2a09c7994c6dc78554e5d8ba4933e013eb",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "test/hygiene-pi-startup.test.mjs",
+      "upstreamSha256": "bcdc8327f11a7620d4f57a994c26f7105616ea30eeaf3cb4bf6085cb513dd374",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "test/native-manifest.test.ts",
+      "upstreamSha256": "97f77fa7c2044d6355ca015fca4590e30ed943fae31fcf5381bea2b62bd4ea7c",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "test/pack-staging.test.mjs",
+      "upstreamSha256": "faa0461b34d76d589c991c920d7d49791b090d54590149377a2a58883cb7e6b1",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "test/process-ownership.test.mjs",
+      "upstreamSha256": "556ede0df2c582fd0d2109336691dd0f91cc6a7c25f98fcb497b8bb67384496e",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "test/qualify.test.mjs",
+      "upstreamSha256": "4eb6a32ecb95be88b91b3b8f19ebc73eb492c9f05b00f4b31a1434393acc0e24",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "test/release-inputs.test.ts",
+      "upstreamSha256": "771bfcdb683a224c1d4b447a5372e71e4ec759ed34fa8005bd0dcd3c74311d6a",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "test/script-failures.test.mjs",
+      "upstreamSha256": "47916de76a0d1e70d0595c2555c9a9fa9847147447c709748e07419d233ddb0d",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "test/soak-adversary.test.mjs",
+      "upstreamSha256": "896c8dec881dcc843149e9072f46487c090727ffd96f7014efcebcc42c7a2719",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "test/soak-host.test.mjs",
+      "upstreamSha256": "33fd9bbd7bbf164d638d6a8088b1000a783923fcadeb6b84a387a34306de79cc",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "test/soak-monitor.test.ts",
+      "upstreamSha256": "59acb153028c8e3dd2ff1e913d4d74bfe0a5d505b843d545f273a3ad4da515d5",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "test/validate-native.test.ts",
+      "upstreamSha256": "adc4cc6eb76f66b27f4653d4048ff5777cd9f4d65030208075574622ed3503ed",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "test/validate-pack.test.mjs",
+      "upstreamSha256": "07b045604df1b4c07eb8f2dc0362e47279d1314d94ceb51bc9fdbb02d8c146ef",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    },
+    {
+      "source": "test/verify-pack-version.test.ts",
+      "upstreamSha256": "d03a17e00af8b82eb34c45b5b26df5fa0f944d39ae3e854f6d90d933bd95ea94",
+      "reviewedThroughSha256": null,
+      "disposition": "pending",
+      "reason": "Mac implementation gate remains open",
+      "destinations": [],
+      "evidence": []
+    }
+  ],
+  "notTaken": [
+    {
+      "source": "scripts/copy-hwsm.mjs",
+      "sha256": "0559833fca53c5d7689ae53dbbfad13550890ea614401d8c564b824b9bcce8a4",
+      "reason": "Windows-only source/producer behavior; Mac native/provider tests replace its relevant boundary."
+    },
+    {
+      "source": "scripts/e2e-dead-fallback.mjs",
+      "sha256": "be284f7fa1992a61d3e2136dff04b0bff723d034d7e38ec365c88ba871cf520c",
+      "reason": "Windows-only source/producer behavior; Mac native/provider tests replace its relevant boundary."
+    },
+    {
+      "source": "scripts/e2e-gadget-raw.mjs",
+      "sha256": "3f5c99cd23440a4edca067b69e6e542c69d8ce29eccd6b67535b00928b6ab8eb",
+      "reason": "Windows-only source/producer behavior; Mac native/provider tests replace its relevant boundary."
+    },
+    {
+      "source": "scripts/e2e-gadget.mjs",
+      "sha256": "82bc4a13acc530545b73176244a59ccedd64e7b8d27702aa8bdc57c0bea7d8ba",
+      "reason": "Windows-only source/producer behavior; Mac native/provider tests replace its relevant boundary."
+    },
+    {
+      "source": "scripts/e2e-reading-links.mjs",
+      "sha256": "e298dd30db6d7a40e7bb50596310d8c5a24ab8d58d4351ff220b1a223a011b1a",
+      "reason": "Windows-only source/producer behavior; Mac native/provider tests replace its relevant boundary."
+    },
+    {
+      "source": "scripts/fake-hwinfo.mjs",
+      "sha256": "42467f238ad26b2b5cd05cbda7421cd78bda9734d1844c82f220b3d028f5ff83",
+      "reason": "Windows-only source/producer behavior; Mac native/provider tests replace its relevant boundary."
+    },
+    {
+      "source": "scripts/issue3-proof.mjs",
+      "sha256": "3e7ab2c187d26eb910a5b0cdceb808fb4e4b459e440a8319cfe6eb9d76e90a64",
+      "reason": "G2 reviewed semantic classification: Mac platform/tooling behavior or Windows-only scope overrides lexical screening."
+    },
+    {
+      "source": "scripts/native-test-producer.mjs",
+      "sha256": "301bdc1dd03578ce5df7d12d253a3ab234904696984fa2e8d3dd2966c7546716",
+      "reason": "Windows-only source/producer behavior; Mac native/provider tests replace its relevant boundary."
+    },
+    {
+      "source": "scripts/pi-studies/README.md",
+      "sha256": "81eac307faac655e46725618bcf70b46fa58a643eea0dbb80003b205ff4079cc",
+      "reason": "G2 reviewed semantic classification: Mac platform/tooling behavior or Windows-only scope overrides lexical screening."
+    },
+    {
+      "source": "scripts/pi-studies/palette.css",
+      "sha256": "342c8763e7d840e04830b461f6b0d151dee94dc2c7363afbda73e929d5c9a426",
+      "reason": "G2 reviewed semantic classification: Mac platform/tooling behavior or Windows-only scope overrides lexical screening."
+    },
+    {
+      "source": "scripts/pi-studies/palette.js",
+      "sha256": "6c46ca903d4db46e45334e1347c278b53ebb33b70b5ffe66f1cb93772baae5a4",
+      "reason": "G2 reviewed semantic classification: Mac platform/tooling behavior or Windows-only scope overrides lexical screening."
+    },
+    {
+      "source": "scripts/pi-studies/study-b.css",
+      "sha256": "aa0030e117fa0138065d00e2543573de28fdfa142e6516cf828be1bd0ad3990d",
+      "reason": "G2 reviewed semantic classification: Mac platform/tooling behavior or Windows-only scope overrides lexical screening."
+    },
+    {
+      "source": "scripts/pi-studies/study-c.css",
+      "sha256": "6a975fdc21df78bdf8c86a7b61e3940b8ba3a1e73e74257368f8cf660c5f7294",
+      "reason": "G2 reviewed semantic classification: Mac platform/tooling behavior or Windows-only scope overrides lexical screening."
+    },
+    {
+      "source": "scripts/pi-studies/study.js",
+      "sha256": "f4d91914e92732734257a3d643db712bac45800bdf51820efa811ca76bc4cf91",
+      "reason": "G2 reviewed semantic classification: Mac platform/tooling behavior or Windows-only scope overrides lexical screening."
+    },
+    {
+      "source": "scripts/shot2-hardware.mjs",
+      "sha256": "3640fd617e56d7c059a72dd325629653b37d3b2327374d99cb111d4bf951b70a",
+      "reason": "G2 reviewed semantic classification: Mac platform/tooling behavior or Windows-only scope overrides lexical screening."
+    },
+    {
+      "source": "test/gadget-provider.test.ts",
+      "sha256": "e5ab0c451d1d4007246308673aa0ee7c16acf9e8d405c525abf5f2d41de47017",
+      "reason": "Windows-only source/producer behavior; Mac native/provider tests replace its relevant boundary."
+    },
+    {
+      "source": "test/gadget-value.test.ts",
+      "sha256": "97648685efef7ced3df60c6dd0f60a096becf2a37eaf17a2ec3cb7ca8306b97c",
+      "reason": "Windows-only source/producer behavior; Mac native/provider tests replace its relevant boundary."
+    },
+    {
+      "source": "test/native-hwsm.test.ts",
+      "sha256": "3d610a69d2bcd9e1f965a9d2bec669618eb41d6d1f68667d37db7fd3c1e94477",
+      "reason": "Windows-only source/producer behavior; Mac native/provider tests replace its relevant boundary."
+    },
+    {
+      "source": "test/reader.test.ts",
+      "sha256": "e8d1850ba53dbb6029323162732439e97c7db1c05663703f201a743f17a6ab0a",
+      "reason": "Windows-only source/producer behavior; Mac native/provider tests replace its relevant boundary."
+    }
+  ],
+  "runtimePins": {
+    "@elgato/streamdeck": "2.1.2",
+    "@elgato/utils": "0.6.0",
+    "tslib": "2.8.1",
+    "ws": "8.21.3"
+  },
+  "ownedRegions": [
+    {
+      "path": "src",
+      "recursive": false
+    },
+    {
+      "path": "src/actions",
+      "recursive": true
+    },
+    {
+      "path": "src/detail",
+      "recursive": true
+    },
+    {
+      "path": "src/hwinfo",
+      "recursive": true
+    },
+    {
+      "path": "src/ui",
+      "recursive": true
+    },
+    {
+      "path": "test",
+      "recursive": false
+    },
+    {
+      "path": "test/golden",
+      "recursive": true
+    },
+    {
+      "path": "test/traces",
+      "recursive": true
+    },
+    {
+      "path": "com.lawrensen.mac.sdPlugin/ui",
+      "recursive": true
+    }
+  ],
+  "ownedExclusions": []
+}
