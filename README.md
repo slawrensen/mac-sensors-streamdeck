@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <a href="docs/index.md">Documentation</a> ·
+  <a href="https://docs.slawrensen.com/mac-streamdeck/index.html">Documentation</a> ·
   <a href="https://github.com/slawrensen/mac-sensors-streamdeck/releases">Releases</a> ·
   <a href="https://github.com/slawrensen/mac-sensors-streamdeck/issues">Report a bug</a>
 </p>
@@ -29,7 +29,7 @@
 </p>
 
 > [!NOTE]
-> **1.0.0.0 is a candidate under qualification.** The final observation window is still running. This repository is private; its releases require access. Documentation is readable in this repository while the hosted preview is offline.
+> **1.0.0.0 is a candidate under qualification.** The final observation window is still running. This repository is private; its releases require access. The hosted documentation is available; product source remains private.
 
 ## Try the candidate
 
@@ -39,7 +39,7 @@
 
 Needs macOS 13.5+, Stream Deck 7.1+ and Tahoma Bold. Availability varies by Mac; the hardware compatibility page distinguishes measured results from pending physical checks.
 
-**More:** [Installation](docs/installation.md) · [Getting started](docs/getting-started.md) · [Hardware compatibility](docs/hardware.md)
+**More:** [Installation](https://docs.slawrensen.com/mac-streamdeck/installation.html) · [Getting started](https://docs.slawrensen.com/mac-streamdeck/getting-started.html) · [Hardware compatibility](https://docs.slawrensen.com/mac-streamdeck/hardware.html)
 
 ## Give each reading its space
 
@@ -53,7 +53,7 @@ Show a large number or put two, three or four readings on one key.
 - Use a sparkline, bar or ring where the layout supports it.
 - Keep a saved selection when a sensor is temporarily unavailable.
 
-**More:** [Sensor Reading](docs/sensor-reading.md) · [Getting started](docs/getting-started.md)
+**More:** [Sensor Reading](https://docs.slawrensen.com/mac-streamdeck/sensor-reading.html) · [Getting started](https://docs.slawrensen.com/mac-streamdeck/getting-started.html)
 
 ## Open the details
 
@@ -67,7 +67,7 @@ Put a group of readings behind one key and return through a configurable Back ti
 - Mix tile densities while labels and colors travel with their readings.
 - Use the second Back tile at the opener's position where supported.
 
-**More:** [Sensor details](docs/sensor-details.md)
+**More:** [Sensor details](https://docs.slawrensen.com/mac-streamdeck/sensor-details.html)
 
 ## Keep a reading set on a dial
 
@@ -81,7 +81,7 @@ Turn through readings and groups with one-reading, two-row and overview views.
 - Use local session min, max and average from genuine observations.
 - Choose a preset or assign the individual controls you need.
 
-**More:** [Sensor Dial](docs/sensor-dial.md) · [Controls and presets](docs/dial-controls.md)
+**More:** [Sensor Dial](https://docs.slawrensen.com/mac-streamdeck/sensor-dial.html) · [Controls and presets](https://docs.slawrensen.com/mac-streamdeck/dial-controls.html)
 
 ## Share a look, keep local choices
 
@@ -95,7 +95,7 @@ Choose a theme for the whole deck or override it on one action.
 - Make shared applies your choice as the shared default.
 - Custom text and per-reading colors remain subordinate to alerts.
 
-**More:** [Themes and colors](docs/themes.md)
+**More:** [Themes and colors](https://docs.slawrensen.com/mac-streamdeck/themes.html)
 
 ## See a threshold crossing
 
@@ -109,7 +109,7 @@ Warning and critical colors mark the limits you choose for a reading.
 - Gauge zones stay muted the same way the device draws them.
 - Alerts change the display; hardware remains read-only.
 
-**More:** [Thresholds and alerts](docs/thresholds.md)
+**More:** [Thresholds and alerts](https://docs.slawrensen.com/mac-streamdeck/thresholds.html)
 
 ## Know when data is unavailable
 
@@ -123,7 +123,7 @@ Status screens preserve your selection and name the condition the plugin can est
 - Check again requests a new eligible read.
 - A fixed setup image remains available when Tahoma Bold is missing.
 
-**More:** [Status screens](docs/status-screens.md) · [Troubleshooting](docs/troubleshooting.md)
+**More:** [Status screens](https://docs.slawrensen.com/mac-streamdeck/status-screens.html) · [Troubleshooting](https://docs.slawrensen.com/mac-streamdeck/troubleshooting.html)
 
 ## Give each dial reading its own color
 
@@ -137,7 +137,7 @@ Keep the same reading set and assign a distinct number color to each row.
 - Keep shared themes and local reading choices together.
 - Warning and critical colors take priority when thresholds are crossed.
 
-**More:** [Themes and colors](docs/themes.md) · [Sensor Dial](docs/sensor-dial.md)
+**More:** [Themes and colors](https://docs.slawrensen.com/mac-streamdeck/themes.html) · [Sensor Dial](https://docs.slawrensen.com/mac-streamdeck/sensor-dial.html)
 
 ## Choose readings and make it yours
 
@@ -151,7 +151,7 @@ Search this Mac's available readings, then adjust the layout, graph and colors i
 - Keep saved selections when a source is temporarily unavailable.
 - Apply a shared look or customize one action.
 
-**More:** [Getting started](docs/getting-started.md) · [Dial controls](docs/dial-controls.md)
+**More:** [Getting started](https://docs.slawrensen.com/mac-streamdeck/getting-started.html) · [Dial controls](https://docs.slawrensen.com/mac-streamdeck/dial-controls.html)
 
 ## Requirements and scope
 
@@ -159,11 +159,11 @@ macOS 13.5 or later, Stream Deck 7.1 or later, and Tahoma Bold. The package incl
 
 Sensor availability varies by Mac. The measured M5 Pro catalog includes temperatures, fans, system power, CPU activity, named memory counters, storage space and aggregate transfer rates. CPU/GPU clocks and unqualified private GPU usage are not offered. Key provider statistics are unavailable; dial session statistics are local.
 
-[Hardware compatibility](docs/hardware.md) distinguishes actual app, hosted CI, Rosetta and physical-device evidence. [PERF.md](PERF.md) records timing windows and their limits. Images above use sample data and do not represent a hardware photograph.
+[Hardware compatibility](https://docs.slawrensen.com/mac-streamdeck/hardware.html) distinguishes actual app, hosted CI, Rosetta and physical-device evidence. [PERF.md](PERF.md) records timing windows and their limits. Images above use sample data and do not represent a hardware photograph.
 
 ## Privacy and license
 
-The plugin makes no internet requests and sends no telemetry. It reads local macOS interfaces and communicates with the local Stream Deck app. You choose when to copy and share a support report. See the [privacy details](docs/faq.md#privacy).
+The plugin makes no internet requests and sends no telemetry. It reads local macOS interfaces and communicates with the local Stream Deck app. You choose when to copy and share a support report. See the [privacy details](https://docs.slawrensen.com/mac-streamdeck/faq.html#privacy).
 
 Free, MIT licensed, no ads, no telemetry. [License](LICENSE) · [Third-party notices](NOTICE.md) · [Security reporting](SECURITY.md)
 

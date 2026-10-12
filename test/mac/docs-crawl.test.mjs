@@ -8,11 +8,14 @@ const crawler = fileURLToPath(new URL("../../scripts/docs-crawl.mjs", import.met
 
 async function fixture(t, pages) {
 	const requests = new Map();
+	const closed = new Map();
 	const server = createServer((req, res) => {
 		const pathname = new URL(req.url, "http://127.0.0.1").pathname;
 		requests.set(pathname, (requests.get(pathname) ?? 0) + 1);
 		const page = pages[pathname] ?? { status: 404, html: "Not found" };
-		res.writeHead(page.status ?? 200, { "content-type": "text/html; charset=utf-8" });
+		res.once('close',()=>closed.set(pathname,true));
+		res.writeHead(page.status ?? 200, { "content-type": page.contentType ?? "text/html; charset=utf-8" });
+		if(page.keepOpen){res.write(page.html??'asset');return;}
 		res.end(page.html);
 	});
 	await new Promise((resolve, reject) => {
@@ -25,7 +28,7 @@ async function fixture(t, pages) {
 			server.closeAllConnections();
 		});
 	});
-	return { root: `http://127.0.0.1:${server.address().port}/`, requests };
+	return { root: `http://127.0.0.1:${server.address().port}/`, requests, closed };
 }
 
 async function crawl(root, ...args) {
@@ -45,6 +48,18 @@ async function crawl(root, ...args) {
 }
 
 describe("docs crawler inspects every reachable page and proves private 404s", () => {
+	it("cancels unused asset bodies and exits after reporting success", async (t) => {
+		const {root,closed}=await fixture(t,{
+			'/':{html:'<img src="image.png"><script src="client.js"></script>'},
+			'/image.png':{contentType:'image/png',keepOpen:true},
+			'/client.js':{contentType:'application/javascript',keepOpen:true}
+		});
+		const result=await crawl(root);
+		assert.equal(result.code,0,result.stderr);
+		assert.match(result.stdout,/DOCS CRAWL: no broken links/);
+		assert.equal(closed.get('/image.png'),true);
+		assert.equal(closed.get('/client.js'),true);
+	});
 	it("inspects a page first fetched for an anchor and finds its broken child", async (t) => {
 		const { root, requests } = await fixture(t, {
 			"/": { html: '<a href="target.html#exists">Target</a>' },
