@@ -1,3 +1,4 @@
+import './lib/no-active-soak.mjs';
 // Mac port: staged Mac panels; legacy identity and alias fixtures exercise saved-document compatibility only.
 import "./lib/script-failures.mjs";
 // Property-inspector settings-persistence regression (issue #5 revision

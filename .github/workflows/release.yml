@@ -8,6 +8,8 @@ jobs:
   build:
     runs-on: macos-26
     timeout-minutes: 40
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
     outputs:
       version: ${{ steps.version.outputs.version }}
       preview: ${{ steps.version.outputs.preview }}
@@ -17,7 +19,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 24
+          node-version: 24.13.1
           cache: npm
       - name: Verify literal release inputs before dependency execution
         id: version

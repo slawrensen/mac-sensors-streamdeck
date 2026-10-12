@@ -1,3 +1,4 @@
+import './lib/no-active-soak.mjs';
 import './lib/script-failures.mjs';
 import fs from 'node:fs';
 import os from 'node:os';

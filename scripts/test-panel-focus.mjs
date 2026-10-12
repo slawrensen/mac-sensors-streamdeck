@@ -1,3 +1,4 @@
+import './lib/no-active-soak.mjs';
 import './lib/script-failures.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
