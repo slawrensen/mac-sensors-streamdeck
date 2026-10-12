@@ -11,12 +11,12 @@ heading_anchors: true
 exclude:
   - release/
 aux_links:
-  GitHub: https://github.com/slawrensen/mac-streamdeck
-  Download: https://github.com/slawrensen/mac-streamdeck/releases
+  GitHub: https://github.com/slawrensen/mac-sensors-streamdeck
+  Download: https://github.com/slawrensen/mac-sensors-streamdeck/releases
 aux_links_new_tab: true
 gh_edit_link: true
 gh_edit_link_text: Edit this page on GitHub
-gh_edit_repository: https://github.com/slawrensen/mac-streamdeck
+gh_edit_repository: https://github.com/slawrensen/mac-sensors-streamdeck
 gh_edit_branch: main
 gh_edit_source: docs
 gh_edit_view_mode: tree

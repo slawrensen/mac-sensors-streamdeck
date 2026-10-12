@@ -58,11 +58,11 @@
       "kind": "production-rendered sample data",
       "width": 1920,
       "height": 960,
-      "sha256": "c50afa7cad479a7a3ce5b4771ecb36f0fbf4db1e4e55deb98e70de577cbb5000",
+      "sha256": "84315122eab21a16cdbe8f73fd27380aae5c7a1c8e61895df97f14845eddd1ba",
       "inputs": [
         {
           "file": "docs/assets/img/key-layouts.png",
-          "sha256": "ccdb5ce0c186e0db16b14a2b22b527e6efcf8dc0d76d27fdd1e0cf6c3f461f68"
+          "sha256": "81ddcbfdf5d5a1d69857861389ede243c77879b7d47f3ab92a8502a652a57774"
         }
       ]
     },
@@ -84,11 +84,11 @@
       "kind": "production-rendered sample data",
       "width": 1920,
       "height": 960,
-      "sha256": "5759bda9bb4bc31e8a274e4758b831e6a1994255fb8e60cc192a6351cfc8a4a2",
+      "sha256": "4a7944d3bb665d92318e5d2958855e8e8eef25a1dedc5750218dc9efd0ccba1b",
       "inputs": [
         {
           "file": "docs/assets/img/details.png",
-          "sha256": "2b76063813a2c1f7bd9fdf90570b262ff042f348904216f247217c6c3ff4a7e4"
+          "sha256": "76d1d369b9dc4ac436872a390c8ec4c7a4d944cd8bb619a83a6898a4966b4f56"
         }
       ]
     },

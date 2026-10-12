@@ -8,7 +8,7 @@ nav_order: 2
 
 You need macOS 13.5 or later and Stream Deck 7.1 or later. The package includes arm64 and x86_64 readers and requests the app's Node 24 runtime. No separate sensor application is required.
 
-1. Download the `.streamDeckPlugin` file from the [GitHub releases page](https://github.com/slawrensen/mac-streamdeck/releases).
+1. Download the `.streamDeckPlugin` file from the [GitHub releases page](https://github.com/slawrensen/mac-sensors-streamdeck/releases).
 2. Open the downloaded file in Finder and choose **Install** in Stream Deck.
 3. Find **Mac Sensors** in the Actions list and drag **Sensor Reading** onto a key.
 4. Pick a reading in the settings panel.

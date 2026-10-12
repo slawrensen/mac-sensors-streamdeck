@@ -18,6 +18,6 @@ If a detail key does not switch profiles, confirm the matching managed profile i
 
 Open **Advanced**, then **Support**, and choose **Copy support report**. Include the exact status, what action you were using, app/macOS versions and whether the package came from GitHub or the Marketplace. Review the report before posting it.
 
-Report bugs through [GitHub Issues](https://github.com/slawrensen/mac-streamdeck/issues). Report security issues privately using the repository's security reporting route rather than a public issue.
+Report bugs through [GitHub Issues](https://github.com/slawrensen/mac-sensors-streamdeck/issues). Report security issues privately using the repository's security reporting route rather than a public issue.
 
 Do not overwrite a loaded native addon. Stop the specific development instance, replace files by copy and rename, then restart that plugin and verify its hashes. Developer instrumentation uses the `MACSENSORS_` prefix; normal use needs no environment settings.

@@ -52,6 +52,7 @@ export function composeScenes():Scene[] {
 	return scenes;
 }
 export const boardDefinitions=[
+	{id:'readme-hero',title:'Mac Sensors',subtitle:'Seven themes. Live readings on keys and dials. Hardware stays read-only.',scenes:['theme-void','theme-graphite','theme-ultraviolet','theme-midnight','theme-forest','theme-ember','theme-paper','layout-quad','reading-0','reading-1','reading-2','reading-3','reading-4','reading-5','reading-6','reading-7','layout-dual','layout-triple','ring','bar','warn','crit','back','detail-title','dial-single','dial-tworow','dial-overview','dial-overview-colored'],columns:8},
 	{id:'hero',title:'Mac Sensors',subtitle:'Your Mac, on your keys and dials.',scenes:['reading-0','reading-1','reading-2','reading-4','dial-tworow'],columns:4},
 	{id:'key-layouts',title:'Give each reading the space it needs',subtitle:'One, two, three or four readings on a key.',scenes:['reading-0','layout-dual','layout-triple','layout-quad','bar','ring','reading-5','reading-6'],columns:4},
 	{id:'details',title:'A closer look, one press away',subtitle:'Reading cells, a configurable Back tile and clear navigation.',scenes:['back','detail-title','reading-1','detail-next','layout-dual','layout-triple','layout-quad','reading-3'],columns:4},
