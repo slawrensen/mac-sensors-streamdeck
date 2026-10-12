@@ -47,7 +47,15 @@
     "pi:lab": "tsx --tsconfig tsconfig.mac.json scripts/pi-lab.mjs",
     "build:observer": "node scripts/build-observer.mjs",
     "test:soak": "node --test test/mac/soak.test.mjs",
-    "soak": "node scripts/soak-monitor.mjs"
+    "soak": "node scripts/soak-monitor.mjs",
+    "docs:assets": "tsx --tsconfig tsconfig.mac.json scripts/docs-assets.mjs",
+    "capture:panels": "tsx --tsconfig tsconfig.mac.json scripts/capture-mac-panels.mjs",
+    "readme-boards": "node scripts/readme-boards.mjs",
+    "marketing:shots": "node scripts/marketplace-shots.mjs",
+    "changelog:page": "node scripts/gen-changelog-page.mjs",
+    "docs:validate": "node scripts/validate-docs.mjs",
+    "docs:crawl": "node scripts/docs-crawl.mjs",
+    "docs:shots": "node scripts/docs-site-shots.mjs"
   },
   "dependencies": {
     "@elgato/streamdeck": "^2.1.2",

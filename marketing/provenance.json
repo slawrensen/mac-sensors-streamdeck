@@ -1,0 +1,128 @@
+{
+  "version": "1.0.0",
+  "assets": [
+    {
+      "file": "thumbnail.png",
+      "kind": "production-rendered sample data",
+      "width": 1920,
+      "height": 960,
+      "sha256": "3aa28e1e49768e275a1c9f44c6329eddd70120bfb2ae0714f853eb905e4536c1",
+      "inputs": [
+        {
+          "file": "docs/assets/img/hero.png",
+          "sha256": "ccffb53e41dda9188f3dde078c87f2da8efe8a4bab7f57ca8f7dfad1b9b6ef1f"
+        }
+      ]
+    },
+    {
+      "file": "shot-1-hero.png",
+      "kind": "production-rendered sample data",
+      "width": 1920,
+      "height": 960,
+      "sha256": "3aa28e1e49768e275a1c9f44c6329eddd70120bfb2ae0714f853eb905e4536c1",
+      "inputs": [
+        {
+          "file": "docs/assets/img/hero.png",
+          "sha256": "ccffb53e41dda9188f3dde078c87f2da8efe8a4bab7f57ca8f7dfad1b9b6ef1f"
+        }
+      ]
+    },
+    {
+      "file": "shot-3-themes.png",
+      "kind": "production-rendered sample data",
+      "width": 1920,
+      "height": 960,
+      "sha256": "24128266de05123aa607933297c8fc258db43b14671fb56ad0044be37e77b81c",
+      "inputs": [
+        {
+          "file": "docs/assets/img/themes.png",
+          "sha256": "1d6b21f88aef9a5841b821fe25226c52c3ba7afc01b6c6a74aa24ca7e4099dc9"
+        }
+      ]
+    },
+    {
+      "file": "shot-5-dials.png",
+      "kind": "production-rendered sample data",
+      "width": 1920,
+      "height": 960,
+      "sha256": "45fd8da5ecc60a778aeb4cbfb9ce177869fc84aba26d6f14455d07bfbc71a020",
+      "inputs": [
+        {
+          "file": "docs/assets/img/dials.png",
+          "sha256": "16ce97a1ea236697fd0581e8142eb3e0dd0255cfd5dd410a6b06847fb4c579be"
+        }
+      ]
+    },
+    {
+      "file": "shot-6-multi.png",
+      "kind": "production-rendered sample data",
+      "width": 1920,
+      "height": 960,
+      "sha256": "c50afa7cad479a7a3ce5b4771ecb36f0fbf4db1e4e55deb98e70de577cbb5000",
+      "inputs": [
+        {
+          "file": "docs/assets/img/key-layouts.png",
+          "sha256": "ccdb5ce0c186e0db16b14a2b22b527e6efcf8dc0d76d27fdd1e0cf6c3f461f68"
+        }
+      ]
+    },
+    {
+      "file": "shot-7-dial-views.png",
+      "kind": "production-rendered sample data",
+      "width": 1920,
+      "height": 960,
+      "sha256": "45fd8da5ecc60a778aeb4cbfb9ce177869fc84aba26d6f14455d07bfbc71a020",
+      "inputs": [
+        {
+          "file": "docs/assets/img/dials.png",
+          "sha256": "16ce97a1ea236697fd0581e8142eb3e0dd0255cfd5dd410a6b06847fb4c579be"
+        }
+      ]
+    },
+    {
+      "file": "shot-8-drilldown.png",
+      "kind": "production-rendered sample data",
+      "width": 1920,
+      "height": 960,
+      "sha256": "5759bda9bb4bc31e8a274e4758b831e6a1994255fb8e60cc192a6351cfc8a4a2",
+      "inputs": [
+        {
+          "file": "docs/assets/img/details.png",
+          "sha256": "2b76063813a2c1f7bd9fdf90570b262ff042f348904216f247217c6c3ff4a7e4"
+        }
+      ]
+    },
+    {
+      "file": "shot-4-settings.png",
+      "kind": "settings-panel capture, simulated host",
+      "width": 1920,
+      "height": 960,
+      "sha256": "ccb0819d04d48694514d6c6a531627f02ea8b8660818d017311b80ae789ae890",
+      "inputs": [
+        {
+          "file": "docs/assets/img/settings-key.png",
+          "sha256": "2cb000e235224a20e694ceb3e4be7633df7b6740bec819b444ccd751e0c5074f"
+        },
+        {
+          "file": "docs/assets/img/settings-dial.png",
+          "sha256": "0f115f5243a653c69fd579b7dfa56fd64946f6a14a220bcfb55470afb345eb82"
+        }
+      ]
+    },
+    {
+      "file": "app-icon-288.png",
+      "kind": "pinned app mark",
+      "width": 288,
+      "height": 288,
+      "sha256": "02fe7e2e4fcfa855b559aa4af56c4b50f136127e210619600c72cca134af7724",
+      "inputs": [
+        {
+          "file": "com.lawrensen.mac.sdPlugin/imgs/plugin/marketplace@2x.png",
+          "sha256": "feaa2c2fbd7d119347a4b542f096562a3645a2b79b5dfdb0fd0d366eb64de587"
+        }
+      ]
+    }
+  ],
+  "hardwarePhoto": "Owner-only; no substitute image generated",
+  "demoVideo": "Owner-only; shot list prepared separately"
+}

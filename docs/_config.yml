@@ -1,0 +1,26 @@
+title: Mac Sensors
+description: Read-only Mac sensor readings on Stream Deck keys and dials.
+url: https://docs.slawrensen.com
+baseurl: /mac-streamdeck
+remote_theme: just-the-docs/just-the-docs@v0.10.1
+plugins:
+  - jekyll-remote-theme
+color_scheme: dark
+search_enabled: true
+heading_anchors: true
+exclude:
+  - release/
+aux_links:
+  GitHub: https://github.com/slawrensen/mac-streamdeck
+  Download: https://github.com/slawrensen/mac-streamdeck/releases
+aux_links_new_tab: true
+gh_edit_link: true
+gh_edit_link_text: Edit this page on GitHub
+gh_edit_repository: https://github.com/slawrensen/mac-streamdeck
+gh_edit_branch: main
+gh_edit_source: docs
+gh_edit_view_mode: tree
+footer_content: >-
+  Free and MIT licensed. No ads or telemetry. Not affiliated with Apple or Elgato.
+  Mac and macOS are trademarks of Apple Inc. Stream Deck is a trademark of Corsair Memory, Inc.
+  &copy; Stephen Lawrensen.
