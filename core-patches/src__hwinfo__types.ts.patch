@@ -1,0 +1,33 @@
+Source: slawrensen/hwinfo-streamdeck/src/hwinfo/types.ts@11b9645b78395f157493648d873a3066673ba493
+Seam: S1
+Reason: Append per-reading acquisition evidence and explicit Mac unavailable reasons.
+Before: c41b8ac3d406b88fe65a466c324516331b5e1f762ff633913a079ad7f917f1cb
+After: ad1eb0cc44e1ba71169cbd6d07e6f9529cac7e3dfb76e126c6fb9fe962f03a89
+
+diff --git a/src/hwinfo/types.ts b/src/hwinfo/types.ts
+index 17a5d1c..4b0d0f2 100644
+--- a/src/hwinfo/types.ts
++++ b/src/hwinfo/types.ts
+@@ -25,6 +25,9 @@ export interface SensorSource {
+ 
+ /** A single reading, e.g. "CPU (Tctl/Tdie) = 56.3 °C". */
+ export interface Reading {
++	/** Native continuous acquisition time and row-specific accepted observation. */
++	readonly observationTime?: number;
++	readonly observationRevision?: number;
+ 	/** Every key that resolves to this measurement (its provider key and the
+ 	 * confirmed aliases: explicit cross-provider links, and legacy Gadget keys
+ 	 * kept resolvable), in the runtime's lookup order. Absent when the key
+@@ -123,7 +126,11 @@ export type HwinfoUnavailableReason =
+ 	/** The hwsm native bridge would not load on a supported machine (missing
+ 	 * or blocked bin/hwsm.node, e.g. an antivirus quarantine): permanent until
+ 	 * the install is repaired, unlike the transient "invalid". */
+-	| "bridge-failed";
++	| "bridge-failed"
++	| "pending"
++	| "no-readable-sensors"
++	| "source-error"
++	| "font-missing";
+ 
+ export class HwinfoError extends Error {
+ 	constructor(

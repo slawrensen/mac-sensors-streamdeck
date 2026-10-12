@@ -1,0 +1,33 @@
+Source: slawrensen/hwinfo-streamdeck/src/diagnostics.ts@11b9645b78395f157493648d873a3066673ba493
+Seam: S6
+Reason: Use the platform name and redacted error adapter for support reports.
+Before: aad51a4e8872b3b8701e5d00e59598782ec3c6db5828d1dd80f66e8a5bf7484b
+After: 7e8f633d495c6e6be191fabe053398bcbf0daac2a111d1a7d7cb859867f7ca77
+
+diff --git a/src/diagnostics.ts b/src/diagnostics.ts
+index 48f28fe..cd99008 100644
+--- a/src/diagnostics.ts
++++ b/src/diagnostics.ts
+@@ -1,3 +1,4 @@
++import { runtime } from "#platform/runtime";
+ /**
+  * Redacted support report: what a bug report needs, nothing a bug report
+  * doesn't. Built locally on request from the settings panel ("Copy support
+@@ -40,7 +41,7 @@ export function buildSupportReport(base: SupportReportBase): string {
+ 		generatedAt: new Date().toISOString(),
+ 		plugin: base.pluginVersion,
+ 		streamDeckApp: base.appVersion,
+-		windows: base.platformVersion,
++		[runtime.platformName]: base.platformVersion,
+ 		eventTraceEnabled: traceEnabled(),
+ 		devices,
+ 		recentEvents: recentEvents()
+@@ -49,7 +50,7 @@ export function buildSupportReport(base: SupportReportBase): string {
+ 		try {
+ 			report[name] = provider();
+ 		} catch (err) {
+-			report[name] = `unavailable: ${String(err)}`;
++			report[name] = `unavailable: ${runtime.errorText(err)}`;
+ 		}
+ 	}
+ 	return JSON.stringify(report, null, "\t");

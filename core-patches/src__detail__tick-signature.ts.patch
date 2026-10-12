@@ -1,0 +1,19 @@
+Source: slawrensen/hwinfo-streamdeck/src/detail/tick-signature.ts@11b9645b78395f157493648d873a3066673ba493
+Seam: S1
+Reason: Select the checked platform poller alias while upstream tests keep the original policy.
+Before: f5deb0e88167801725118115aeaf8af8fdca0de3cba7049a888e632664078fe6
+After: 56f5043926cec38d049407133f8031b8b4bd1bcc062e10b1b50f22eda1838719
+
+diff --git a/src/detail/tick-signature.ts b/src/detail/tick-signature.ts
+index 828bd5b..34ad7f6 100644
+--- a/src/detail/tick-signature.ts
++++ b/src/detail/tick-signature.ts
+@@ -11,7 +11,7 @@
+  * pure so the unit suite can prove the gate without the controller's
+  * dependency graph.
+  */
+-import type { PollerStatus } from "../poller";
++import type { PollerStatus } from "#platform/poller";
+ 
+ export function tickSignature(status: PollerStatus): string {
+ 	if (status.state === "ok") {

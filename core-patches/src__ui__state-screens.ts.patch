@@ -1,0 +1,26 @@
+Source: slawrensen/hwinfo-streamdeck/src/ui/state-screens.ts@11b9645b78395f157493648d873a3066673ba493
+Seam: S1/S5
+Reason: Declare optional raster dial setup output and select the status type through the platform seam.
+Before: 7bdfdbce9be393988c7ed4d433b4853a215ec26c2f41b37f0561e07c4c388b67
+After: a7c22be9c884003059635407422c386c3f52b6d84cf3daa1099a802c0d6ef7a0
+
+diff --git a/src/ui/state-screens.ts b/src/ui/state-screens.ts
+index c404a12..d8f5240 100644
+--- a/src/ui/state-screens.ts
++++ b/src/ui/state-screens.ts
+@@ -1,5 +1,5 @@
+ /** Maps poller/selection states to key art and short dial texts. */
+-import type { PollerStatus } from "../poller";
++import type { PollerStatus } from "#platform/poller";
+ import type { StatusKeyOptions } from "./key-renderer";
+ 
+ const BLUE = "#4cc2ff";
+@@ -51,7 +51,7 @@ export function missingReadingScreen(): StatusKeyOptions {
+ }
+ 
+ /** Short two-line text for the Stream Deck + touchscreen. */
+-export function statusDialText(status: PollerStatus): { title: string; value: string } | null {
++export function statusDialText(status: PollerStatus): { title: string; value: string; rasterSVG?: string } | null {
+ 	if (status.state === "ok") {
+ 		return null;
+ 	}

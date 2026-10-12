@@ -1,0 +1,459 @@
+// Detail-view faces: the Back tile carries the opener's presentation,
+// thresholds and the return mark through every data state; reading slots
+// deliberately drop the opener's thresholds; pagers dim at boundaries;
+// and the additive returnMark option changes nothing unless asked for.
+import assert from "node:assert/strict";
+import { describe, it } from "node:test";
+
+import { createHash } from "node:crypto";
+
+import { chunkMicroLabels, composeBackFace, composeChunkFace, composeIdleFace, composePagerFace, composeReadingFace, composeTitleFace, type DetailFaceContext } from "../src/detail/detail-faces";
+import { pageOf } from "../src/detail/detail-group";
+import type { DeviceDetailState } from "../src/detail/navigation";
+import type { PollerStatus } from "../src/poller";
+import { QUAD_DEFAULT_COLORS, renderReadingKey, renderStatusKey } from "../src/ui/key-renderer";
+import { DIM_VALUE_BLEND, effectiveTextSettings, mixToward, parseTextSettings, readableValueColor } from "../src/ui/text-colors";
+import { loadThemes, resolvePalette } from "../src/ui/themes";
+import { SensorType, type Reading, type SensorSnapshot } from "../src/hwinfo/types";
+import { contrast } from "./wcag";
+import { beforeInlineGap } from "./inline-gap";
+
+import { setFaceFont } from "../src/ui/face-font";
+
+// These tests hold the Segoe UI calibration and its goldens (the Text font
+// option); the Tahoma default has its own suite in test/face-font.test.ts.
+setFaceFont("segoe-ui");
+
+function reading(key: string, value: number, unit = "°C", label = key): Reading {
+	return { key, type: unit === "W" ? SensorType.Power : SensorType.Temperature, sensorIndex: 0, id: 0, label, unit, value, valueMin: value - 10, valueMax: value + 10, valueAvg: value };
+}
+
+const snapshot: SensorSnapshot = (() => {
+	const readings = [
+		reading("cpu:0:0", 55, "°C", "CPU Tctl"),
+		reading("cpu:0:1", 120, "W", "CPU Power"),
+		reading("cpu:0:2", 42, "°C", "CPU CCD1"),
+		// The live dGPU labels this machine publishes, the group that
+		// collapses the quad micro-labels to "GPU" four times under the
+		// first-word rule (the Thermal Limit constant then poses as a live
+		// temperature).
+		reading("gpu:0:1", 38, "°C", "GPU Memory Junction Temperature"),
+		reading("gpu:0:2", 44, "°C", "GPU Hot Spot Temperature"),
+		reading("gpu:0:3", 84, "°C", "GPU Thermal Limit"),
+		reading("gpu:0:4", 0.88, "V", "GPU Core Voltage")
+	];
+	return { pollTime: 1, version: 1, revision: 1, sensors: [{ index: 0, id: 0, instance: 0, name: "CPU [#0]" }], readings, byKey: new Map(readings.map((r) => [r.key, r])) };
+})();
+
+const ok: PollerStatus = { state: "ok", snapshot, source: "shared-memory" };
+const down: PollerStatus = { state: "unavailable", reason: "not-running", message: "gone" };
+
+function stateOf(overrides?: Partial<DeviceDetailState> & { presentation?: DeviceDetailState["presentation"] }): DeviceDetailState {
+	return {
+		deviceId: "dev1",
+		pageSize: 11,
+		density: 1,
+		tilePlan: [],
+		primaryKey: "cpu:0:0",
+		groupSettings: { readingKey: "cpu:0:0" },
+		presentation: {},
+		group: { mode: "source", primaryKey: "cpu:0:0", title: "CPU [#0]", keys: ["cpu:0:1", "cpu:0:2"] },
+		offset: 0,
+		statModes: new Map(),
+		surfaceCount: 1,
+		pending: false,
+		dispatchedAt: 0,
+		openerCell: null,
+		mirrorSlotIndex: null,
+		...overrides
+	};
+}
+
+const config = loadThemes();
+function ctxOf(): DetailFaceContext {
+	return {
+		config,
+		deckThemeId: config.defaultTheme,
+		typeAccents: true,
+		measure: { decimals: "auto", fahrenheit: false, dataUnits: "decimal" },
+		text: effectiveTextSettings(parseTextSettings({}), null)
+	};
+}
+
+describe("Back tile", () => {
+	it("renders the opener's live reading with the return mark", () => {
+		const svg = composeBackFace(stateOf(), ok, ctxOf());
+		assert.match(svg, />CPU Tctl</);
+		assert.match(svg, />55(\.0)?</);
+		assert.match(svg, /M33 119/); // the return hook
+	});
+
+	it("keeps the opener's thresholds: warn recolors the whole tile", () => {
+		const calm = composeBackFace(stateOf(), ok, ctxOf());
+		const warned = composeBackFace(stateOf({ presentation: { warnValue: "50" } }), ok, ctxOf());
+		assert.notEqual(calm, warned);
+		const warnBg = resolvePalette(config, config.defaultTheme, null, "warn").bg;
+		assert.ok(warned.includes(warnBg), "warn palette background expected");
+	});
+
+	it("an alerting Back tile is the calm tile recolored: no severity mark at warn or crit", () => {
+		const geometryOf = (svg: string): string => svg.replace(/#[0-9A-Fa-f]{6}/g, "#");
+		const calm = composeBackFace(stateOf(), ok, ctxOf());
+		for (const [level, presentation] of [["warn", { warnValue: "50" }], ["crit", { warnValue: "40", critValue: "50" }]] as const) {
+			const svg = composeBackFace(stateOf({ presentation }), ok, ctxOf());
+			assert.ok(svg.includes(resolvePalette(config, config.defaultTheme, null, level).bg), `${level} palette background expected`);
+			assert.doesNotMatch(svg, /data-severity/);
+			assert.equal(geometryOf(svg), geometryOf(calm), `${level}: something other than color differs from the calm tile`);
+		}
+	});
+
+	it("stays operable through unavailable data and a missing primary", () => {
+		const gone = composeBackFace(stateOf(), down, ctxOf());
+		assert.match(gone, /Start HWiNFO/);
+		assert.match(gone, /M33 119/);
+		const missing = composeBackFace(stateOf({ primaryKey: "vanished:0:0" }), ok, ctxOf());
+		assert.match(missing, /Sensor missing/);
+		assert.match(missing, /M33 119/);
+	});
+
+	it("honors the opener's custom label and theme override", () => {
+		const svg = composeBackFace(stateOf({ presentation: { label: "My CPU", theme: "paper" } }), ok, ctxOf());
+		assert.match(svg, />My CPU</);
+		assert.ok(svg.includes(resolvePalette(config, "paper", null, "normal").bg));
+	});
+});
+
+describe("reading slots", () => {
+	it("renders live value, unit and no badge in current mode", () => {
+		const svg = composeReadingFace(stateOf(), "cpu:0:1", "current", ok, ctxOf());
+		assert.match(svg, />CPU Power</);
+		assert.match(svg, />120(\.0)?</);
+		assert.doesNotMatch(svg, />MIN</);
+		assert.doesNotMatch(svg, /M33 119/); // no return mark on ordinary slots
+	});
+
+	it("stat modes show their value and badge", () => {
+		const svg = composeReadingFace(stateOf(), "cpu:0:1", "min", ok, ctxOf());
+		assert.match(svg, />110(\.0)?</);
+		assert.match(svg, />MIN</);
+	});
+
+	it("never inherits the opener's thresholds (power reading vs a 50 degree warn)", () => {
+		const state = stateOf({ presentation: { warnValue: "50" } });
+		const svg = composeReadingFace(state, "cpu:0:1", "current", ok, ctxOf());
+		const warnBg = resolvePalette(config, config.defaultTheme, null, "warn").bg;
+		assert.equal(svg.includes(warnBg), false, "slot recolored by the opener's threshold");
+	});
+
+	it("a configured-but-missing reading keeps its slot as a placeholder", () => {
+		const svg = composeReadingFace(stateOf(), "not-there:0:0", "current", ok, ctxOf());
+		assert.match(svg, /Sensor missing/);
+		assert.match(svg, />—</);
+	});
+
+	it("an empty slot is just the themed face; unavailable shows the status art", () => {
+		const empty = composeReadingFace(stateOf(), undefined, "current", ok, ctxOf());
+		assert.doesNotMatch(empty, /<text/);
+		const gone = composeReadingFace(stateOf(), "cpu:0:1", "current", down, ctxOf());
+		assert.match(gone, /Start HWiNFO/);
+	});
+});
+
+describe("title and pagers", () => {
+	it("the title tile shows the group name and range", () => {
+		const state = stateOf();
+		const svg = composeTitleFace(state, pageOf(state.group.keys, 0, state.pageSize), ctxOf());
+		assert.match(svg, />CPU \[#0\]</);
+		assert.match(svg, />1-2 \/ 2</);
+	});
+
+	it("pagers dim at their boundaries and brighten when a page exists", () => {
+		const many = stateOf({ group: { mode: "source", primaryKey: "cpu:0:0", title: "CPU", keys: Array.from({ length: 30 }, (_, i) => `k${i}`) } });
+		const first = pageOf(many.group.keys, 0, 11);
+		const prevDisabled = composePagerFace("previous", first, many, ctxOf());
+		const nextEnabled = composePagerFace("next", first, many, ctxOf());
+		assert.notEqual(prevDisabled, nextEnabled.replace("62,48 86,72 62,96", "82,48 58,72 82,96"));
+		const second = pageOf(many.group.keys, 11, 11);
+		assert.notEqual(composePagerFace("previous", second, many, ctxOf()), prevDisabled);
+	});
+
+	it("idle faces say so, and the idle Back stays a back affordance", () => {
+		assert.match(composeIdleFace("reading"), /No detail/);
+		assert.match(composeIdleFace("back"), />Back</);
+	});
+});
+
+describe("dense reading tiles (composeChunkFace)", () => {
+	it("a one-reading chunk is BYTE-IDENTICAL to the single face; an empty tile to the blank", () => {
+		for (const status of [ok, down]) {
+			for (const mode of ["current", "min"] as const) {
+				assert.equal(composeChunkFace(stateOf(), ["cpu:0:1"], mode, status, ctxOf()), composeReadingFace(stateOf(), "cpu:0:1", mode, status, ctxOf()));
+				assert.equal(composeChunkFace(stateOf(), ["not-there:0:0"], mode, status, ctxOf()), composeReadingFace(stateOf(), "not-there:0:0", mode, status, ctxOf()));
+				assert.equal(composeChunkFace(stateOf(), [], mode, status, ctxOf()), composeReadingFace(stateOf(), undefined, mode, status, ctxOf()));
+			}
+		}
+	});
+
+	it("two readings: the dual face with full labels, stat values and ONE shared badge", () => {
+		const svg = composeChunkFace(stateOf(), ["cpu:0:1", "cpu:0:2"], "min", ok, ctxOf());
+		assert.match(svg, />CPU Power</);
+		assert.match(svg, />CPU CCD1</);
+		assert.match(svg, />110(\.0)?</); // 120 W at MIN
+		assert.match(svg, />32(\.0)?</); // 42 °C at MIN
+		assert.equal((svg.match(/>MIN</g) ?? []).length, 1, "exactly one shared badge");
+		const live = composeChunkFace(stateOf(), ["cpu:0:1", "cpu:0:2"], "current", ok, ctxOf());
+		assert.doesNotMatch(live, />MIN</);
+		assert.match(live, />120(\.0)?</);
+	});
+
+	it("three readings: rows, with a missing reading holding its row as the placeholder", () => {
+		const svg = composeChunkFace(stateOf(), ["cpu:0:1", "not-there:0:0", "cpu:0:2"], "current", ok, ctxOf());
+		assert.match(svg, />CPU Power</);
+		assert.match(svg, /Sensor missing/);
+		assert.match(svg, />—</);
+		assert.match(svg, />CPU CCD1</);
+	});
+
+	it("four readings: the labeled quad with shared-token-stripped micro-labels", () => {
+		const svg = composeChunkFace(stateOf(), ["gpu:0:1", "gpu:0:2", "gpu:0:3", "gpu:0:4"], "current", ok, ctxOf());
+		for (const micro of [">MEMO<", ">HOT<", ">THER<", ">CORE<"]) {
+			assert.ok(svg.includes(micro), `expected micro-label ${micro}`);
+		}
+		assert.ok(!svg.includes(">GPU<"), "the shared GPU token must not survive");
+		assert.match(svg, />84(\.0)?</); // the Thermal Limit constant, now labeled THER
+		assert.match(svg, />0\.88</);
+		assert.match(svg, />°C</);
+		assert.match(svg, />V</);
+	});
+
+	it("micro-labels fall back to first words when the chunk shares no leading token", () => {
+		const svg = composeChunkFace(stateOf(), ["cpu:0:1", "gpu:0:1", "cpu:0:2", "gpu:0:2"], "current", ok, ctxOf());
+		assert.match(svg, />CPU</);
+		assert.match(svg, />GPU</);
+	});
+
+	it("the tile's type accent follows its FIRST reading", () => {
+		// MIN exposes the resolved accent on the shared badge. Backgrounds
+		// are identical across type accents, and reordering rows changes an
+		// SVG even if accent selection is broken, so neither proves this.
+		for (const tail of [[], ["gpu:0:1"], ["gpu:0:1", "gpu:0:2"]]) {
+			for (const [keys, accent] of [
+				[["cpu:0:1", "cpu:0:2", ...tail], config.typeAccents.power],
+				[["cpu:0:2", "cpu:0:1", ...tail], config.typeAccents.temperature]
+			] as const) {
+				const svg = composeChunkFace(stateOf(), keys, "min", ok, ctxOf());
+				const badgeFills = [...svg.matchAll(/<text\b[^>]*fill="([^"]+)"[^>]*>MIN<\/text>/g)].map((match) => match[1]);
+				assert.deepEqual(badgeFills, [accent], `${keys.length} readings, first ${keys[0]}`);
+			}
+		}
+	});
+
+	it("never inherits the opener's thresholds at any density", () => {
+		const state = stateOf({ presentation: { warnValue: "50" } });
+		const config = loadThemes();
+		const warnBg = resolvePalette(config, config.defaultTheme, null, "warn").bg;
+		for (const chunk of [["cpu:0:1", "cpu:0:2"], ["cpu:0:1", "cpu:0:2", "gpu:0:1"], ["gpu:0:1", "gpu:0:2", "gpu:0:3", "gpu:0:4"]]) {
+			const svg = composeChunkFace(state, chunk, "current", ok, ctxOf());
+			assert.equal(svg.includes(warnBg), false, `chunk of ${chunk.length} recolored by the opener's threshold`);
+		}
+	});
+
+	it("status screens ride every density", () => {
+		const svg = composeChunkFace(stateOf(), ["cpu:0:1", "cpu:0:2", "gpu:0:1"], "current", down, ctxOf());
+		assert.match(svg, /Start HWiNFO/);
+	});
+});
+
+describe("hand-grouped tile specs (composeChunkFace + spec)", () => {
+	const spec = (size: 1 | 2 | 3 | 4, extra: Partial<import("../src/detail/detail-settings").DetailTileSpec> = {}): import("../src/detail/detail-settings").DetailTileSpec => ({
+		size,
+		labels: Array.from({ length: size }, () => ""),
+		colors: Array.from({ length: size }, () => null),
+		cellLabels: true,
+		...extra
+	});
+
+	it("no spec means byte-identical uniform faces at every size", () => {
+		for (const chunk of [["cpu:0:1"], ["cpu:0:1", "cpu:0:2"], ["gpu:0:1", "gpu:0:2", "gpu:0:3", "gpu:0:4"]]) {
+			assert.equal(composeChunkFace(stateOf(), chunk, "current", ok, ctxOf(), undefined), composeChunkFace(stateOf(), chunk, "current", ok, ctxOf()));
+		}
+	});
+
+	it("per-cell labels override at every size, missing cells included", () => {
+		const single = composeChunkFace(stateOf(), ["cpu:0:1"], "current", ok, ctxOf(), spec(1, { labels: ["Package W"] }));
+		assert.match(single, />Package W</);
+		assert.doesNotMatch(single, />CPU Power</);
+		const dual = composeChunkFace(stateOf(), ["cpu:0:1", "not-there:0:0"], "current", ok, ctxOf(), spec(2, { labels: ["Top", "Gone"] }));
+		assert.match(dual, />Top</);
+		assert.match(dual, />Gone</); // the placeholder row keeps the custom label
+		const quad = composeChunkFace(stateOf(), ["gpu:0:1", "gpu:0:2", "gpu:0:3", "gpu:0:4"], "current", ok, ctxOf(), spec(4, { labels: ["", "SPOT", "", ""] }));
+		assert.match(quad, />SPOT</);
+		assert.match(quad, />MEMO</); // unlabeled cells keep the stripped fallback
+		assert.match(quad, />THER</);
+	});
+
+	it("quad identity colors override per cell; junk stays default", () => {
+		const dressed = composeChunkFace(stateOf(), ["gpu:0:1", "gpu:0:2", "gpu:0:3", "gpu:0:4"], "current", ok, ctxOf(), spec(4, { colors: ["#ABCDEF", null, null, null] }));
+		assert.ok(dressed.includes('fill="#ABCDEF">MEMO<'), "custom color carries the first micro-label");
+		assert.ok(dressed.includes(QUAD_DEFAULT_COLORS[1] as string), "unset cells keep the default identity");
+	});
+
+	it("cellLabels false renders the color-coded bare-value variant", () => {
+		const bare = composeChunkFace(stateOf(), ["gpu:0:1", "gpu:0:2", "gpu:0:3", "gpu:0:4"], "current", ok, ctxOf(), spec(4, { cellLabels: false }));
+		assert.doesNotMatch(bare, />MEMO</);
+		assert.ok(bare.includes(`fill="${QUAD_DEFAULT_COLORS[0] as string}">38`), "values wear the identity colors");
+	});
+
+	// On a bare-values tile the color IS the cell's identity, and the panel
+	// writes a moved reading's worn color into the cell it lands in, so this
+	// combination (no labels, explicit colors) is what a reordered tile
+	// actually stores. The value must wear the stored color, not the
+	// default its position would otherwise hand it.
+	it("cellLabels false honors an explicit per-cell color", () => {
+		const bare = composeChunkFace(stateOf(), ["gpu:0:1", "gpu:0:2", "gpu:0:3", "gpu:0:4"], "current", ok, ctxOf(), spec(4, { cellLabels: false, colors: [QUAD_DEFAULT_COLORS[1] as string, null, null, null] }));
+		assert.ok(bare.includes(`fill="${QUAD_DEFAULT_COLORS[1] as string}">38`), "the first value wears the color that traveled with its reading");
+		assert.ok(!bare.includes(`fill="${QUAD_DEFAULT_COLORS[0] as string}">38`), "and not the default its position would hand it");
+	});
+
+	// A hand-grouped tile color follows the dial per-reading color contract:
+	// exact in Theme whatever its contrast, only blended in Dim, never
+	// lifted. The unset cells beside it keep the automatic readable defaults.
+	it("a dark hand-grouped tile color renders exact in Theme and only blended in Dim", () => {
+		const palette = resolvePalette(config, config.defaultTheme, "temperature", "normal");
+		assert.ok(contrast("#123456", palette.bg) < 4.5, "the fixture starts below the numeric floor");
+		const theme = composeChunkFace(stateOf(), ["gpu:0:1", "gpu:0:2", "gpu:0:3", "gpu:0:4"], "current", ok, ctxOf(), spec(4, { cellLabels: false, colors: ["#123456", null, null, null] }));
+		assert.ok(theme.includes('fill="#123456">38'), "the chosen color reaches the value byte-exact");
+		assert.ok(theme.includes(`fill="${readableValueColor(QUAD_DEFAULT_COLORS[1] as string, palette.bg)}">44`), "the default beside it keeps its readable lift");
+		const labeled = composeChunkFace(stateOf(), ["gpu:0:1", "gpu:0:2", "gpu:0:3", "gpu:0:4"], "current", ok, ctxOf(), spec(4, { colors: ["#123456", null, null, null] }));
+		assert.ok(labeled.includes('fill="#123456">MEMO<'), "the chosen color carries the micro-label byte-exact");
+		const dimCtx = { ...ctxOf(), text: effectiveTextSettings(parseTextSettings({ textMode: "dim" }), null) };
+		const dim = composeChunkFace(stateOf(), ["gpu:0:1", "gpu:0:2", "gpu:0:3", "gpu:0:4"], "current", ok, dimCtx, spec(4, { cellLabels: false, colors: ["#123456", null, null, null] }));
+		const blended = mixToward("#123456", palette.bg, DIM_VALUE_BLEND);
+		assert.ok(dim.includes(`fill="${blended}">38`), `Dim blends the chosen color to ${blended} and stops there`);
+		assert.ok(contrast(blended, palette.bg) < 4.5, "no lift happened");
+	});
+});
+
+describe("chunk micro-label stripping", () => {
+	it("strips the tokens every present label shares, keeping one token minimum", () => {
+		assert.deepEqual(chunkMicroLabels(["Core 0 VID", "Core 1 VID", "Core 2 VID", "Core 3 VID"]), ["0", "1", "2", "3"]);
+		assert.deepEqual(chunkMicroLabels(["GPU Memory Junction Temperature", "GPU Hot Spot Temperature", "GPU Thermal Limit", "GPU Core Voltage"]), ["Memory", "Hot", "Thermal", "Core"]);
+		assert.deepEqual(chunkMicroLabels(["Performance Limit - Power", "Performance Limit - Thermal"]), ["Power", "Thermal"]);
+	});
+
+	it("identical labels strip to their last token and stay identical", () => {
+		assert.deepEqual(chunkMicroLabels(["GPU Fan1", "GPU Fan1"]), ["Fan1", "Fan1"]);
+	});
+
+	it("missing readings sit out; fewer than two present labels strip nothing", () => {
+		assert.deepEqual(chunkMicroLabels(["Core 0 VID", undefined, "Core 2 VID", "Core 3 VID"]), ["0", "", "2", "3"]);
+		assert.deepEqual(chunkMicroLabels(["GPU Hot Spot Temperature", undefined, undefined, undefined]), ["GPU", "", "", ""]);
+		assert.deepEqual(chunkMicroLabels([undefined, undefined]), ["", ""]);
+	});
+
+	it("unshared or one-token labels keep their first words (the standalone quad rule)", () => {
+		assert.deepEqual(chunkMicroLabels(["Vcore", "VSOC", "VDDIO", "VDD18"]), ["Vcore", "VSOC", "VDDIO", "VDD18"]);
+		assert.deepEqual(chunkMicroLabels(["CPU Package", "GPU Power"]), ["CPU", "GPU"]);
+	});
+
+	it("a shorter label caps the strip so it never empties", () => {
+		assert.deepEqual(chunkMicroLabels(["Core 0", "Core 0 Effective Clock"]), ["0", "0"]);
+	});
+});
+
+describe("dense tile goldens", () => {
+	// Byte-locks for the three dense face families, like the archive pins in
+	// detail-profiles.test.ts: same fixed snapshot, default theme, default
+	// measure. The hashes are the 1.6.0 faces and stay the reference. What a
+	// later release draws differently is enumerated in SINCE_1_6_0 and put
+	// back before hashing, so the entry states exactly which bytes were
+	// allowed to move and every other byte still compares exactly. Extend the
+	// list ONLY alongside a deliberate face change.
+	// September 2026 (1.7): the void unit token rose to the numeric 4.5 floor
+	// in themes.json. On these faces that is every unit text and tspan and
+	// nothing else: 2 fills on the dual, 3 on the triple, 4 on the quad.
+	const golden = (svg: string): string => createHash("sha256").update(svg).digest("hex");
+	const SINCE_1_6_0: ReadonlyArray<readonly [before: string, after: string]> = [["#667082", "#6B7586"]];
+	// September 2026 (bench): the device gap fix moved each unit gap from
+	// dx into the tspan; beforeInlineGap puts the dx back, counted per face.
+	// October 2026 (1.7): one font family name, since the app's QtSvg read
+	// the old list as one name and drew Tahoma; every text element names it.
+	const asOf160 = (svg: string, movedFills: number, gaps: number): string => {
+		assert.ok(!svg.includes('font-family="Segoe UI, Arial, sans-serif"'), "the 1.6.0 family list cannot still be drawn");
+		let out = beforeInlineGap(svg, gaps).replaceAll('font-family="Segoe UI"', 'font-family="Segoe UI, Arial, sans-serif"');
+		for (const [before, after] of SINCE_1_6_0) {
+			assert.equal(out.split(after).length - 1, movedFills, `${after} must appear exactly ${movedFills} times`);
+			assert.ok(!out.includes(before), `${before} is the 1.6.0 token and cannot still be drawn`);
+			out = out.replaceAll(after, before);
+		}
+		return out;
+	};
+
+	it("dual chunk", () => {
+		const svg = composeChunkFace(stateOf(), ["cpu:0:1", "cpu:0:2"], "current", ok, ctxOf());
+		assert.match(svg, />CPU Power</);
+		assert.equal(golden(asOf160(svg, 2, 2)), "27c1e1fa909a340aa32d5b16390bb41515c45fdf70e20695aca7a522a1abb017");
+	});
+
+	it("triple chunk", () => {
+		const svg = composeChunkFace(stateOf(), ["cpu:0:1", "cpu:0:2", "gpu:0:4"], "current", ok, ctxOf());
+		assert.match(svg, />GPU Core…</); // the row ladder ellipsizes beside the value chunk
+		// October 2026 (d25): the unit sits against its value with no gap, as
+		// 1.6.0 drew it on the device, and every label takes that room ("CPU
+		// Power" 12 to 14 px), so each label, mask and unit moves at once. The
+		// face is pinned at the d25 bytes from here; the unit stays tight.
+		assert.match(svg, />W<\/tspan>/);
+		assert.doesNotMatch(svg, /<tspan[^>]*>[\u2002\u2004 ]/);
+		assert.match(svg, /font-size="14" font-weight="600" fill="#7A8393">CPU Power</);
+		assert.equal(golden(svg), "39533062f56258a95516b05b5d9df9fdb26e579cc2cc8cd2f681948fd050ec45");
+	});
+
+	it("quad chunk with the shared badge", () => {
+		const svg = composeChunkFace(stateOf(), ["gpu:0:1", "gpu:0:2", "gpu:0:3", "gpu:0:4"], "max", ok, ctxOf());
+		assert.match(svg, />MAX</);
+		// October 2026 (1.7): the app's QtSvg draws no letter-spacing, so the
+		// four micro-labels and the badge no longer write their +0.5; exactly
+		// those five sites go back here.
+		assert.doesNotMatch(svg, /letter-spacing/);
+		const tracked = /(<text x="[0-9]+" y="(?:20|92|76)" text-anchor="middle" [^>]*font-weight="700")( fill="#[0-9A-Fa-f]{6}">[A-Z]{1,4}<)/g;
+		assert.equal(svg.match(tracked)?.length, 5);
+		assert.equal(golden(asOf160(svg.replace(tracked, '$1 letter-spacing="0.5"$2'), 4, 0)), "150cd08b20b5105d5783e5fec085d6b90c2f8ec35770388d00d18dea12fd0ec2");
+	});
+});
+
+describe("returnMark stays additive", () => {
+	const palette = resolvePalette(config, config.defaultTheme, null, "normal");
+
+	it("renderReadingKey without the option is mark-free", () => {
+		const base = { label: "CPU", valueText: "55", unitText: "°C", statBadge: "", palette };
+		assert.doesNotMatch(renderReadingKey(base), /M33 119/);
+		assert.match(renderReadingKey({ ...base, returnMark: true }), /M33 119/);
+	});
+
+	it("renderStatusKey behaves the same way", () => {
+		const base = { icon: "power" as const, accent: "#4cc2ff", lines: ["Start HWiNFO"] };
+		assert.doesNotMatch(renderStatusKey(base), /M33 119/);
+		assert.match(renderStatusKey({ ...base, returnMark: true }), /M33 119/);
+	});
+});
+
+describe("hostile text degrades instead of aborting the encode", () => {
+	// A lone surrogate can arrive via JSON-escaped settings or a raw
+	// registry label; every face's text must survive the data-URI encode.
+	it("a lone surrogate in the opener label, a reading label, or a tile spec label never throws", () => {
+		const hostile = [
+			reading("cpu:0:0", 55, "°C", "CPU\uD800Tctl"),
+			reading("cpu:0:1", 120, "W", "CPU Power")
+		];
+		const snap: SensorSnapshot = { pollTime: 1, version: 1, revision: 1, sensors: [{ index: 0, id: 0, instance: 0, name: "CPU [#0]" }], readings: hostile, byKey: new Map(hostile.map((r) => [r.key, r])) };
+		const hostileOk: PollerStatus = { state: "ok", snapshot: snap, source: "shared-memory" };
+		const openerLabel = composeBackFace(stateOf({ presentation: { label: "My\uD800CPU" } }), ok, ctxOf());
+		assert.doesNotThrow(() => encodeURIComponent(openerLabel));
+		const readingLabel = composeReadingFace(stateOf(), "cpu:0:0", "current", hostileOk, ctxOf());
+		assert.doesNotThrow(() => encodeURIComponent(readingLabel));
+		assert.match(readingLabel, /�/);
+		const specLabel = composeChunkFace(stateOf(), ["cpu:0:1"], "current", hostileOk, ctxOf(), { size: 1, labels: ["X\uD800"], colors: [null], cellLabels: true });
+		assert.doesNotThrow(() => encodeURIComponent(specLabel));
+		assert.match(specLabel, /�/);
+	});
+});

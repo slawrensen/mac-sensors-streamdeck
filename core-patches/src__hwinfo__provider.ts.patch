@@ -1,0 +1,19 @@
+Source: slawrensen/hwinfo-streamdeck/src/hwinfo/provider.ts@11b9645b78395f157493648d873a3066673ba493
+Seam: S1
+Reason: Append the Mac source identity without changing upstream provider behavior.
+Before: 6a07b4242cdd51b7c50cdecbc5af6dcdec434248084280b5b1721a512cc6135f
+After: b7b39bd08da5e8386970f8531907a0b086dc8157a4f8a0d95a1533c0c543ab8b
+
+diff --git a/src/hwinfo/provider.ts b/src/hwinfo/provider.ts
+index 0458ad4..7e34a32 100644
+--- a/src/hwinfo/provider.ts
++++ b/src/hwinfo/provider.ts
+@@ -13,7 +13,7 @@ import { SnapshotParser } from "./reader";
+ import { SharedMemorySession } from "./shared-memory";
+ import type { SensorSnapshot } from "./types";
+ 
+-export type SnapshotSource = "shared-memory" | "gadget";
++export type SnapshotSource = "shared-memory" | "gadget" | "mac";
+ 
+ export interface SnapshotProvider {
+ 	readonly source: SnapshotSource;

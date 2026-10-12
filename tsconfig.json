@@ -1,0 +1,42 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ES2022",
+    "moduleResolution": "Bundler",
+    "lib": [
+      "ES2022"
+    ],
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "noEmit": true,
+    "types": [
+      "node"
+    ],
+    "paths": {
+      "#platform/poller": [
+        "./src/poller.ts"
+      ],
+      "#platform/native": [
+        "./src/hwinfo/hwsm-loader.ts"
+      ],
+      "#platform/status": [
+        "./src/ui/state-screens.ts"
+      ],
+      "#platform/runtime": [
+        "./src/platform/upstream.ts"
+      ],
+      "#platform/font-metrics": [
+        "./src/ui/tahoma-bold-metrics.ts"
+      ]
+    }
+  },
+  "include": [
+    "src/**/*.ts",
+    "test/**/*.ts",
+    "scripts/**/*.ts"
+  ]
+}

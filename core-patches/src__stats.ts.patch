@@ -1,0 +1,33 @@
+Source: slawrensen/hwinfo-streamdeck/src/stats.ts@11b9645b78395f157493648d873a3066673ba493
+Seam: S1
+Reason: Use row-specific acquisition evidence when present so unrelated source frames do not duplicate history.
+Before: 997007a379f86652386f0f77b6983cec2a7f5940cc6bb63e9cce736e4a6919b4
+After: e62807cf4f0693336d9ca1e796c8b5b4020d84d95186ce9900d07b3fb85463a5
+
+diff --git a/src/stats.ts b/src/stats.ts
+index 59b89af..d5214f8 100644
+--- a/src/stats.ts
++++ b/src/stats.ts
+@@ -37,6 +37,8 @@ export function sessionResetMessage(reason: SessionResetReason): string {
+ }
+ 
+ type Observation = {
++	observationRevision?: number;
++	observationTime?: number;
+ 	pollTime: number;
+ 	value: number;
+ 	source: string;
+@@ -84,9 +86,11 @@ export class SessionStatsStore {
+ 			this.reset([reading.key]);
+ 			return;
+ 		}
+-		if (reason === undefined && previous?.pollTime === snapshot.pollTime && Object.is(previous.value, reading.value)) return;
++		if (reading.observationRevision !== undefined) {
++			if (reason === undefined && previous?.observationRevision === reading.observationRevision && previous.observationTime === reading.observationTime) return;
++		} else if (reason === undefined && previous?.pollTime === snapshot.pollTime && Object.is(previous.value, reading.value)) return;
+ 		this.sample(reading.key, reading.value);
+-		this.observations.set(reading.key, { pollTime: snapshot.pollTime, value: reading.value, source, type: reading.type, unit: reading.unit, identity: liveKeyOf(reading) });
++		this.observations.set(reading.key, { observationRevision: reading.observationRevision, observationTime: reading.observationTime, pollTime: snapshot.pollTime, value: reading.value, source, type: reading.type, unit: reading.unit, identity: liveKeyOf(reading) });
+ 		return reason;
+ 	}
+ 

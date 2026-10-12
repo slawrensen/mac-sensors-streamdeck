@@ -1,0 +1,405 @@
+{
+  "seams": [
+    "S2",
+    "S5",
+    "S8"
+  ],
+  "files": {
+    "control.html": [
+      {
+        "before": "\t\t<title>HWiNFO Control settings</title>",
+        "after": "\t\t<title>Sensor Control settings</title>",
+        "count": 1
+      },
+      {
+        "before": "\t\t\t\t\t<p class=\"hw-head-kind\">HWiNFO Control key</p>",
+        "after": "\t\t\t\t\t<p class=\"hw-head-kind\">Sensor Control key</p>",
+        "count": 1
+      }
+    ],
+    "pi-command.js": [
+      {
+        "before": "/* The HWiNFO Control panel: the header and summary say what a press does",
+        "after": "/* The Sensor Control panel: the header and summary say what a press does",
+        "count": 1
+      }
+    ],
+    "pi-common.js": [
+      {
+        "before": "Pressing the key cycles current \u2192 min \u2192 max \u2192 avg. With Shared Memory these are HWiNFO's own, since HWiNFO started; Gadget has none, so they show N/A.",
+        "after": "Pressing the key cycles current, min, max and avg. Mac Sensors has no provider history, so min, max and avg show N/A.",
+        "count": 1
+      },
+      {
+        "before": "\tconsole.log(`hwinfo PI build ${PI_BUILD}`);",
+        "after": "\tconsole.log(`Mac Sensors PI build ${PI_BUILD}`);",
+        "count": 1
+      },
+      {
+        "before": "\tlet treeFetchedOk = false; // last sensorTree arrived while HWiNFO was up",
+        "after": "\tlet treeFetchedOk = false; // last sensorTree arrived while Mac Sensors was up",
+        "count": 1
+      },
+      {
+        "before": "\t * being gone, while the panel's own hint says HWiNFO is not running. */",
+        "after": "\t * being gone, while the panel's own hint says Mac Sensors is not running. */",
+        "count": 1
+      },
+      {
+        "before": "\t// A stored reading key is HWiNFO's stable identity (\"f0000301:0:8000005\"),",
+        "after": "\t// A stored reading key is the sensor source's stable identity (\"f0000301:0:8000005\"),",
+        "count": 1
+      },
+      {
+        "before": "\t// stale the moment HWiNFO renames the sensor. A Gadget key (\"g:<source>:",
+        "after": "\t// stale the moment Mac Sensors renames the sensor. A Gadget key (\"g:<source>:",
+        "count": 1
+      },
+      {
+        "before": "\t// <label>\", the names as HWiNFO writes them) already reads as a name and",
+        "after": "\t// <label>\", the names as Mac Sensors writes them) already reads as a name and",
+        "count": 1
+      },
+      {
+        "before": "\t * last character: its spaces are HWiNFO's own (issue #21 meets custom",
+        "after": "\t * last character: its spaces are the sensor source's own (issue #21 meets custom",
+        "count": 1
+      },
+      {
+        "before": "\t * resolves: the reading is not in the current HWiNFO layout, or the tree",
+        "after": "\t * resolves: the reading is not in the current Mac Sensors layout, or the tree",
+        "count": 1
+      },
+      {
+        "before": "\t/** Where a saved key's row sits in HWiNFO's list (sensor, then reading). */",
+        "after": "\t/** Where a saved key's row sits in the sensor source's list (sensor, then reading). */",
+        "count": 1
+      },
+      {
+        "before": "\t * reading's place among its twins in HWiNFO's list. Every twin gets a",
+        "after": "\t * reading's place among its twins in the sensor source's list. Every twin gets a",
+        "count": 1
+      },
+      {
+        "before": "\tconst MISSING_TITLE = \"Not in HWiNFO's current list: keeps its place and is skipped until it returns\";",
+        "after": "\tconst MISSING_TITLE = \"Not in the sensor source's current list: keeps its place and is skipped until it returns\";",
+        "count": 1
+      },
+      {
+        "before": "\t\treturn missing === 1 ? \"the missing one is skipped until HWiNFO lists it again\" : `the ${missing} missing ones are skipped until HWiNFO lists them again`;",
+        "after": "\t\treturn missing === 1 ? \"the missing one is skipped until Mac Sensors lists it again\" : `the ${missing} missing ones are skipped until Mac Sensors lists them again`;",
+        "count": 1
+      },
+      {
+        "before": "\t\t\t// The runtime holds the dial (advance() returns) while HWiNFO is",
+        "after": "\t\t\t// The runtime holds the dial (advance() returns) while Mac Sensors is",
+        "count": 1
+      },
+      {
+        "before": "\t\t\t\t\t? \"Nothing moves the dial until HWiNFO data returns.\"",
+        "after": "\t\t\t\t\t? \"Nothing moves the dial until Mac Sensors data returns.\"",
+        "count": 1
+      },
+      {
+        "before": "\t\t\t\t\t\t\t\t\t: `${live === 0 ? \"None\" : \"Only one\"} of these ${total} readings is in HWiNFO's list now, so rotation does not move until ${live === 0 ? \"they return\" : \"another returns\"}.`,",
+        "after": "\t\t\t\t\t\t\t\t\t: `${live === 0 ? \"None\" : \"Only one\"} of these ${total} readings is in the sensor source's list now, so rotation does not move until ${live === 0 ? \"they return\" : \"another returns\"}.`,",
+        "count": 1
+      },
+      {
+        "before": "\t\t\tconst skipped = missing === 0 ? \"\" : ` ${missing === 1 ? \"One missing reading is\" : `${missing} missing readings are`} skipped until HWiNFO lists ${missing === 1 ? \"it\" : \"them\"} again.`;",
+        "after": "\t\t\tconst skipped = missing === 0 ? \"\" : ` ${missing === 1 ? \"One missing reading is\" : `${missing} missing readings are`} skipped until Mac Sensors lists ${missing === 1 ? \"it\" : \"them\"} again.`;",
+        "count": 1
+      },
+      {
+        "before": "\t\tinput.placeholder = \"Empty uses HWiNFO's name\";",
+        "after": "\t\tinput.placeholder = \"Empty uses the sensor source's name\";",
+        "count": 1
+      },
+      {
+        "before": "\t\tname.setAttribute(\"aria-label\", `Rename this cell's label, now ${name.textContent}${keyIsMissing(key) ? \", missing from HWiNFO's list\" : \"\"}`);",
+        "after": "\t\tname.setAttribute(\"aria-label\", `Rename this cell's label, now ${name.textContent}${keyIsMissing(key) ? \", missing from the sensor source's list\" : \"\"}`);",
+        "count": 1
+      },
+      {
+        "before": "\t\t * reading is not in HWiNFO's current output. */",
+        "after": "\t\t * reading is not in the sensor source's current output. */",
+        "count": 1
+      },
+      {
+        "before": "\t\t\t\t// Missing only when HWiNFO answered with a snapshot (ok or stale)",
+        "after": "\t\t\t\t// Missing only when Mac Sensors answered with a snapshot (ok or stale)",
+        "count": 1
+      },
+      {
+        "before": "\t\t\t\tsearchEl.title = \"The reading saved here is not in HWiNFO's current list. Search to pick another.\";",
+        "after": "\t\t\t\tsearchEl.title = \"The reading saved here is not in the sensor source's current list. Search to pick another.\";",
+        "count": 1
+      },
+      {
+        "before": "\t\t\t\t// No usable list (HWiNFO down): the saved reading is unknown,",
+        "after": "\t\t\t\t// No usable list (Mac Sensors down): the saved reading is unknown,",
+        "count": 1
+      },
+      {
+        "before": "\t\t\t\tsearchEl.placeholder = \"Saved reading kept (no HWiNFO data to show it)\";",
+        "after": "\t\t\t\tsearchEl.placeholder = \"Saved reading kept (no Mac Sensors data to show it)\";",
+        "count": 1
+      },
+      {
+        "before": "\t\t\tconst noneText = shown > 0 ? \"\" : tokens.length > 0 ? `No readings match \"${raw.trim()}\".` : \"HWiNFO publishes no readings right now.\";",
+        "after": "\t\t\tconst noneText = shown > 0 ? \"\" : tokens.length > 0 ? `No readings match \"${raw.trim()}\".` : \"Mac Sensors publishes no readings right now.\";",
+        "count": 1
+      },
+      {
+        "before": "\t\t\tif (speak) hw.announce(\"rotation-order\", name !== \"\" ? `Named ${name} on the dial` : `${readingLabelOf(key) ?? key} uses HWiNFO's name again`, { repeat: true });",
+        "after": "\t\t\tif (speak) hw.announce(\"rotation-order\", name !== \"\" ? `Named ${name} on the dial` : `${readingLabelOf(key) ?? key} uses the sensor source's name again`, { repeat: true });",
+        "count": 1
+      },
+      {
+        "before": "\t\t\t\t\tsay(\"This replaces the shared settings every HWiNFO key and dial uses. Press again to confirm.\");",
+        "after": "\t\t\t\t\tsay(\"This replaces the shared settings every Mac Sensors key and dial uses. Press again to confirm.\");",
+        "count": 1
+      }
+    ],
+    "pi-model.js": [
+      {
+        "before": "const font = globals.textFont === \"segoe-ui\" ? \"Segoe UI\" : \"Tahoma\";",
+        "after": "const font = globals.textFont !== undefined && globals.textFont !== \"tahoma\" ? \"Tahoma (saved font kept)\" : \"Tahoma\";",
+        "count": 1
+      },
+      {
+        "before": "const src = globals.source === \"shared-memory\" ? \"Shared Memory only\" : globals.source === \"gadget\" ? \"Gadget only\" : \"Auto source\";",
+        "after": "const src = \"Mac sensors\";",
+        "count": 2
+      },
+      {
+        "before": "\t\tif (preview?.missing === true || (name === null && preview?.state === \"ok\")) return \"Saved reading not found in HWiNFO\";",
+        "after": "\t\tif (preview?.missing === true || (name === null && preview?.state === \"ok\")) return \"Saved reading not found in Mac Sensors\";",
+        "count": 1
+      }
+    ],
+    "pi-shell.js": [
+      {
+        "before": "\tfunction forcedSource() {\n\t\tconst src = state.globals.source;\n\t\treturn src === \"gadget\" ? \"Gadget registry only\" : src === \"shared-memory\" ? \"Shared Memory only\" : null;\n\t}",
+        "after": "\tfunction forcedSource() { return null; }",
+        "count": 1
+      },
+      {
+        "before": "p.source === \"gadget\" ? \"Live \u00b7 Gadget registry\" : \"Live \u00b7 Shared Memory\"",
+        "after": "\"Live \u00b7 Mac sensors\"",
+        "count": 1
+      },
+      {
+        "before": "`HWiNFO ready \u00b7 ${p.source === \"gadget\" ? \"Gadget registry\" : \"Shared Memory\"}`",
+        "after": "\"Mac sensors ready\"",
+        "count": 1
+      },
+      {
+        "before": "p.source === \"gadget\" ? \"HWiNFO data age unknown\" : \"HWiNFO data not updating\"",
+        "after": "\"Sensor data not updating\"",
+        "count": 1
+      },
+      {
+        "before": "\t\t\tif (forced !== null) {\n\t\t\t\tlines.push(\n\t\t\t\t\tstate.globals.source === \"gadget\"\n\t\t\t\t\t\t? \"Data source is set to Gadget registry only, so Shared Memory is never read, even when enabled. Auto tries Shared Memory first, then Gadget.\"\n\t\t\t\t\t\t: \"Data source is set to Shared Memory only, so the Gadget registry is never read. Auto falls back to Gadget.\"\n\t\t\t\t);\n\t\t\t}",
+        "after": "",
+        "count": 1
+      },
+      {
+        "before": "\t\t\t\tlines.push(\n\t\t\t\t\tp.source === \"gadget\"\n\t\t\t\t\t\t? p.hint || \"Gadget freshness is unknown. Check HWiNFO and Gadget reporting, or use Shared Memory Support.\"\n\t\t\t\t\t\t: \"No new Shared Memory measurements are arriving. Check HWiNFO and Shared Memory Support; a busy connection can also prevent reads.\"\n\t\t\t\t);\n",
+        "after": "\t\t\t\tlines.push(p.hint || \"No recent sensor measurement is available. Choose Check again.\");",
+        "count": 1
+      },
+      {
+        "before": "\t\t} else if (p !== null && p.state === \"ok\" && p.source === \"gadget\" && p.hint) {\n\t\t\t// One line on every healthy Gadget panel; the plugin's whole\n\t\t\t// account sits under Advanced > Connection (#source-now). A\n\t\t\t// withheld-reading note asks the person to act, so when the\n\t\t\t// plugin sends one the whole hint stays here (round 3, R11).\n\t\t\ttone = \"info\";\n\t\t\tlines = [/withheld/.test(p.hint) ? p.hint : \"Gadget registry: current values only, no min, max or average.\"];\n\t\t}",
+        "after": "\t\t}",
+        "count": 1
+      },
+      {
+        "before": "const text = p !== null && p.state === \"ok\" && p.source === \"gadget\" && p.hint ? p.hint : \"\";",
+        "after": "const text = p !== null && p.state === \"ok\" && p.hint ? p.hint : \"\";",
+        "count": 1
+      },
+      {
+        "before": "function renderSummaries() {",
+        "after": "function renderSummaries() {\n\t\tconst fontStatus = document.getElementById(\"mac-font-status\");\n\t\tif (fontStatus) fontStatus.textContent = state.globals.textFont !== undefined && state.globals.textFont !== \"tahoma\" ? \"Tahoma Bold is used. Your saved font setting is kept.\" : \"Tahoma Bold is used on every face.\";",
+        "count": 1
+      },
+      {
+        "before": "\t\t// The target itself too: \"HWiNFO setup steps\" is a disclosure, and",
+        "after": "\t\t// The target itself too: \"Sensor setup\" is a disclosure, and",
+        "count": 1
+      },
+      {
+        "before": "\t\tif (p.state === \"unavailable\") return { text: \"No HWiNFO data\", tone: \"danger\" };",
+        "after": "\t\tif (p.state === \"unavailable\") return { text: \"No Mac Sensors data\", tone: \"danger\" };",
+        "count": 1
+      },
+      {
+        "before": "\t\t// whether there is HWiNFO data to pick from.",
+        "after": "\t\t// whether there is Mac Sensors data to pick from.",
+        "count": 1
+      },
+      {
+        "before": "\t\t\tif (p.holding === true) return { text: \"Reopening HWiNFO's source\", tone: \"warn\" };",
+        "after": "\t\t\tif (p.holding === true) return { text: \"Reopening the sensor source's source\", tone: \"warn\" };",
+        "count": 1
+      },
+      {
+        "before": "\t\t// rotation gives this reading, then HWiNFO's label. The header leads",
+        "after": "\t\t// rotation gives this reading, then the sensor source's label. The header leads",
+        "count": 1
+      },
+      {
+        "before": "\t\t// with what the dial shows and keeps HWiNFO's name on the source line",
+        "after": "\t\t// with what the dial shows and keeps the sensor source's name on the source line",
+        "count": 1
+      },
+      {
+        "before": "\t\t\tlines = [\"The HWiNFO Sensors plugin is not answering this panel. Settings you change here are still saved; restarting the Stream Deck app restarts the plugin.\"];",
+        "after": "\t\t\tlines = [\"The Mac Sensors plugin is not answering this panel. Settings you change here are still saved; restarting the Stream Deck app restarts the plugin.\"];",
+        "count": 1
+      },
+      {
+        "before": "\t\t\tlines = [p.hint || \"HWiNFO data is unavailable.\"];",
+        "after": "\t\t\tlines = [p.hint || \"Mac Sensors data is unavailable.\"];",
+        "count": 1
+      },
+      {
+        "before": "\t\t\tlines.push(configured ? \"Your reading and every setting stay saved. Display settings can still be changed; they apply when data returns.\" : \"Readings appear under Reading once HWiNFO publishes data.\");",
+        "after": "\t\t\tlines.push(configured ? \"Your reading and every setting stay saved. Display settings can still be changed; they apply when data returns.\" : \"Readings appear under Reading once Mac Sensors publishes data.\");",
+        "count": 1
+      },
+      {
+        "before": "\t\t\tactions = [[\"retry\", \"Check again\"], [\"setup\", \"HWiNFO setup steps\"]];",
+        "after": "\t\t\tactions = [[\"retry\", \"Check again\"], [\"setup\", \"Sensor setup\"]];",
+        "count": 1
+      },
+      {
+        "before": "\t\t\tlines = [`The plugin is reopening HWiNFO's data source (a sensor layout change, an HWiNFO restart or a busy source). The ${kind === \"dial\" ? \"dial\" : \"key\"} stays as it was for up to 15 s after the last new data, then shows live values or the problem. Your reading and settings are unchanged.`];",
+        "after": "\t\t\tlines = [`The plugin is reopening the sensor source's data source (a sensor layout change, an Mac Sensors restart or a busy source). The ${kind === \"dial\" ? \"dial\" : \"key\"} stays as it was for up to 15 s after the last new data, then shows live values or the problem. Your reading and settings are unchanged.`];",
+        "count": 1
+      },
+      {
+        "before": "\t\t\t\t\t`The saved reading is not in HWiNFO's current sensor list${tree !== null && Array.isArray(tree.groups) && tree.groups.length === 0 ? \" (HWiNFO publishes no readings right now)\" : \"\"}. It stays saved with its label and colors, and shows again if HWiNFO publishes it (for example after a sensor wakes or HWiNFO restarts).`",
+        "after": "\t\t\t\t\t`The saved reading is not in the sensor source's current sensor list${tree !== null && Array.isArray(tree.groups) && tree.groups.length === 0 ? \" (Mac Sensors publishes no readings right now)\" : \"\"}. It stays saved with its label and colors, and shows again if Mac Sensors publishes it (for example after a sensor wakes or Mac Sensors restarts).`",
+        "count": 1
+      },
+      {
+        "before": "\t\t\tlines = [\"HWiNFO is running but publishes no readings.\"];",
+        "after": "\t\t\tlines = [\"Mac Sensors is running but publishes no readings.\"];",
+        "count": 1
+      },
+      {
+        "before": "\t\t\tactions = [[\"setup\", \"HWiNFO setup steps\"]];",
+        "after": "\t\t\tactions = [[\"setup\", \"Sensor setup\"]];",
+        "count": 1
+      },
+      {
+        "before": "\t\t\tannounce(\"check\", picked ? \"HWiNFO answered: the reading is live again.\" : \"HWiNFO is answering again.\", { repeat: true });",
+        "after": "\t\t\tannounce(\"check\", picked ? \"Mac Sensors answered: the reading is live again.\" : \"Mac Sensors is answering again.\", { repeat: true });",
+        "count": 1
+      },
+      {
+        "before": "\t\tack.textContent = `Checked again at ${at}: no change yet. The plugin also reads HWiNFO every ${every} on its own.`;",
+        "after": "\t\tack.textContent = `Checked again at ${at}: no change yet. The plugin also reads Mac Sensors every ${every} on its own.`;",
+        "count": 1
+      }
+    ],
+    "pi.css": [
+      {
+        "before": "/* A small disclosure inside a section (the HWiNFO setup steps). */",
+        "after": "/* A small disclosure inside a section (the Sensor setup). */",
+        "count": 1
+      }
+    ],
+    "sensor-dial.html": [
+      {
+        "before": "<div class=\"hw-field\">\n\t\t\t\t\t\t\t<label for=\"shared-font\">Text font</label>\n\t\t\t\t\t\t\t<select id=\"shared-font\" data-setting=\"textFont\" data-global data-default=\"tahoma\" aria-describedby=\"font-help\">\n\t\t\t\t\t\t\t\t<option value=\"tahoma\">Tahoma</option>\n\t\t\t\t\t\t\t\t<option value=\"segoe-ui\">Segoe UI</option>\n\t\t\t\t\t\t\t</select>\n\t\t\t\t\t\t\t<p class=\"hw-help\" id=\"font-help\">Tahoma is the original look. Segoe UI is lighter and narrower.</p>\n\t\t\t\t\t\t</div>",
+        "after": "<div class=\"hw-field\"><p>Text font: Tahoma Bold</p><p class=\"hw-help\" id=\"mac-font-status\">Saved font settings are kept.</p></div>",
+        "count": 1
+      },
+      {
+        "before": "<div class=\"hw-field\">\n\t\t\t\t\t\t\t<label for=\"shared-source\">Data source</label>\n\t\t\t\t\t\t\t<select id=\"shared-source\" data-setting=\"source\" data-global data-default=\"auto\" aria-describedby=\"source-help\">\n\t\t\t\t\t\t\t\t<option value=\"auto\">Auto (Shared Memory, else Gadget)</option>\n\t\t\t\t\t\t\t\t<option value=\"shared-memory\">Shared Memory only</option>\n\t\t\t\t\t\t\t\t<option value=\"gadget\">Gadget registry only</option>\n\t\t\t\t\t\t\t</select>\n\t\t\t\t\t\t</div>",
+        "after": "<p class=\"hw-help\">Reads available sensors on this Mac. It does not change hardware settings.</p>",
+        "count": 1
+      },
+      {
+        "before": "\t\t\t\t\t\t<p class=\"hw-help\" id=\"source-help\">Auto switches providers. To keep a selection working on both, link its Shared Memory and Gadget keys in the shared Config document; see <a href=\"https://docs.slawrensen.com/hwinfo-streamdeck/data-sources.html#link-readings-across-providers\" target=\"_blank\" rel=\"noopener\">reading links</a>.</p>",
+        "after": "\t\t\t\t\t\t<p class=\"hw-help\" id=\"source-help\">Available readings depend on this Mac and macOS version. A saved reading stays selected when it is unavailable.</p>",
+        "count": 1
+      },
+      {
+        "before": "<details class=\"hw-inline-help\" id=\"setup-help\">\n\t\t\t\t\t\t\t<summary>HWiNFO setup steps</summary>\n\t\t\t\t\t\t\t<ol class=\"hw-help\">\n\t\t\t\t\t\t\t\t<li>Install and start HWiNFO (hwinfo.com) in Sensors-only mode.</li>\n\t\t\t\t\t\t\t\t<li>In HWiNFO Settings, enable Shared Memory Support. On the free version you can instead click Configure Sensors in the sensor window, open the HWiNFO Gadget tab, tick Enable reporting to Gadget, then tick \"Report value in Gadget\" on the readings you want (no 12-hour limit).</li>\n\t\t\t\t\t\t\t\t<li>Pick a reading under Reading.</li>\n\t\t\t\t\t\t\t</ol>\n\t\t\t\t\t\t</details>",
+        "after": "<details class=\"hw-inline-help\" id=\"setup-help\"><summary>Sensor setup</summary><ol class=\"hw-help\"><li>Pick a reading under Reading.</li><li>If no readings appear, choose Check again or Copy support report under Advanced, Support.</li><li>If Tahoma is missing, install Tahoma Bold in Font Book and choose Check again.</li></ol></details>",
+        "count": 1
+      },
+      {
+        "before": "\t\t\t\t<p class=\"hw-help\" id=\"alerts-help\">Warn, Critical and the bar ends apply only to readings in the unit that was on the dial when you last changed any of them, so a temperature limit never fires on a fan. The dial stays themed; the bar, or an overview row's value, takes the alert color. Alerts check the current value in the reading's own unit (\u00b0F when \u00b0F is on); for bytes and rates that is HWiNFO's number and unit, which the dial may show rescaled.</p>",
+        "after": "\t\t\t\t<p class=\"hw-help\" id=\"alerts-help\">Warn, Critical and the bar ends apply only to readings in the unit that was on the dial when you last changed any of them, so a temperature limit never fires on a fan. The dial stays themed; the bar, or an overview row's value, takes the alert color. Alerts check the current value in the reading's own unit (\u00b0F when \u00b0F is on); for bytes and rates that is the sensor source's number and unit, which the dial may show rescaled.</p>",
+        "count": 1
+      },
+      {
+        "before": "\t\t\t\t\t<p class=\"hw-help\" id=\"link-help\">HWiNFO Control keys whose Target is this name steer this dial, from any key, pedal or Multi Action.</p>",
+        "after": "\t\t\t\t\t<p class=\"hw-help\" id=\"link-help\">Sensor Control keys whose Target is this name steer this dial, from any key, pedal or Multi Action.</p>",
+        "count": 1
+      },
+      {
+        "before": "\t\t\t\t\t\t<p class=\"hw-help\">Used by every HWiNFO key and dial, on every Stream Deck, that is set to Default. A key or dial with its own choice keeps it.</p>",
+        "after": "\t\t\t\t\t\t<p class=\"hw-help\">Used by every Mac Sensors key and dial, on every Stream Deck, that is set to Default. A key or dial with its own choice keeps it.</p>",
+        "count": 1
+      },
+      {
+        "before": "\t\t\t\t\t\t<p class=\"hw-help\">The exact settings as JSON: Copy one to back a dial up, paste a saved one and Replace to restore or clone it. Replace swaps the whole document, reloads this panel and keeps fields this version does not know. Replacing shared settings changes every HWiNFO key and dial and asks for a second click.</p>",
+        "after": "\t\t\t\t\t\t<p class=\"hw-help\">The exact settings as JSON: Copy one to back a dial up, paste a saved one and Replace to restore or clone it. Replace swaps the whole document, reloads this panel and keeps fields this version does not know. Replacing shared settings changes every Mac Sensors key and dial and asks for a second click.</p>",
+        "count": 1
+      }
+    ],
+    "sensor-reading.html": [
+      {
+        "before": "<div class=\"hw-field\">\n\t\t\t\t\t\t\t<label for=\"shared-font\">Text font</label>\n\t\t\t\t\t\t\t<select id=\"shared-font\" data-setting=\"textFont\" data-global data-default=\"tahoma\" aria-describedby=\"font-help\">\n\t\t\t\t\t\t\t\t<option value=\"tahoma\">Tahoma</option>\n\t\t\t\t\t\t\t\t<option value=\"segoe-ui\">Segoe UI</option>\n\t\t\t\t\t\t\t</select>\n\t\t\t\t\t\t\t<p class=\"hw-help\" id=\"font-help\">Tahoma is the original look. Segoe UI is lighter and narrower.</p>\n\t\t\t\t\t\t</div>",
+        "after": "<div class=\"hw-field\"><p>Text font: Tahoma Bold</p><p class=\"hw-help\" id=\"mac-font-status\">Saved font settings are kept.</p></div>",
+        "count": 1
+      },
+      {
+        "before": "<div class=\"hw-field\">\n\t\t\t\t\t\t\t<label for=\"shared-source\">Data source</label>\n\t\t\t\t\t\t\t<select id=\"shared-source\" data-setting=\"source\" data-global data-default=\"auto\" aria-describedby=\"source-help\">\n\t\t\t\t\t\t\t\t<option value=\"auto\">Auto (Shared Memory, else Gadget)</option>\n\t\t\t\t\t\t\t\t<option value=\"shared-memory\">Shared Memory only</option>\n\t\t\t\t\t\t\t\t<option value=\"gadget\">Gadget registry only</option>\n\t\t\t\t\t\t\t</select>\n\t\t\t\t\t\t</div>",
+        "after": "<p class=\"hw-help\">Reads available sensors on this Mac. It does not change hardware settings.</p>",
+        "count": 1
+      },
+      {
+        "before": "\t\t\t\t\t\t<p class=\"hw-help\" id=\"source-help\">Auto switches providers. To keep a selection working on both, link its Shared Memory and Gadget keys in the shared Config document; see <a href=\"https://docs.slawrensen.com/hwinfo-streamdeck/data-sources.html#link-readings-across-providers\" target=\"_blank\" rel=\"noopener\">reading links</a>.</p>",
+        "after": "\t\t\t\t\t\t<p class=\"hw-help\" id=\"source-help\">Available readings depend on this Mac and macOS version. A saved reading stays selected when it is unavailable.</p>",
+        "count": 1
+      },
+      {
+        "before": "<details class=\"hw-inline-help\" id=\"setup-help\">\n\t\t\t\t\t\t\t<summary>HWiNFO setup steps</summary>\n\t\t\t\t\t\t\t<ol class=\"hw-help\">\n\t\t\t\t\t\t\t\t<li>Install and start HWiNFO (hwinfo.com) in Sensors-only mode.</li>\n\t\t\t\t\t\t\t\t<li>In HWiNFO Settings, enable Shared Memory Support. On the free version you can instead click Configure Sensors in the sensor window, open the HWiNFO Gadget tab, tick Enable reporting to Gadget, then tick \"Report value in Gadget\" on the readings you want (no 12-hour limit).</li>\n\t\t\t\t\t\t\t\t<li>Pick a reading under Reading.</li>\n\t\t\t\t\t\t\t</ol>\n\t\t\t\t\t\t</details>",
+        "after": "<details class=\"hw-inline-help\" id=\"setup-help\"><summary>Sensor setup</summary><ol class=\"hw-help\"><li>Pick a reading under Reading.</li><li>If no readings appear, choose Check again or Copy support report under Advanced, Support.</li><li>If Tahoma is missing, install Tahoma Bold in Font Book and choose Check again.</li></ol></details>",
+        "count": 1
+      },
+      {
+        "before": "\t\t\t\t\t<p class=\"hw-help\" id=\"display-help\" hidden>Spans 0 to 100 for percentages and 0 to 1 for Yes/No readings, otherwise the observed range (Shared Memory: HWiNFO's session min and max; Gadget: the last 36 samples), with amber and red zones at your alert thresholds.</p>",
+        "after": "\t\t\t\t\t<p class=\"hw-help\" id=\"display-help\" hidden>Spans 0 to 100 for percentages and 0 to 1 for Yes/No readings, otherwise the observed range, with amber and red zones at your alert thresholds.</p>",
+        "count": 1
+      },
+      {
+        "before": "\t\t\t\t\t<p class=\"hw-help\" id=\"show-help\">Pressing the key cycles current \u2192 min \u2192 max \u2192 avg. Shared Memory gives HWiNFO's own minimum, maximum and average since it started; Gadget publishes none, so they show N/A.</p>",
+        "after": "\t\t\t\t\t<p class=\"hw-help\" id=\"show-help\">Pressing the key cycles current, min, max and avg. Mac Sensors has no provider history, so min, max and avg show N/A.</p>",
+        "count": 1
+      },
+      {
+        "before": "\t\t\t\t<p class=\"hw-help\" id=\"alerts-help\">At or past Warn the key turns amber, at or past Critical red. Alerts check the current value in the reading's own unit (\u00b0F when \u00b0F is on); for bytes and rates that is HWiNFO's number and unit, which the key may show rescaled.<span id=\"alerts-first\" hidden> Only reading 1 is checked; it recolors the whole key.</span></p>",
+        "after": "\t\t\t\t<p class=\"hw-help\" id=\"alerts-help\">At or past Warn the key turns amber, at or past Critical red. Alerts check the current value in the reading's own unit (\u00b0F when \u00b0F is on); for bytes and rates that is the sensor source's number and unit, which the key may show rescaled.<span id=\"alerts-first\" hidden> Only reading 1 is checked; it recolors the whole key.</span></p>",
+        "count": 1
+      },
+      {
+        "before": "\t\t\t\t\t\t<p class=\"hw-help\">Used by every HWiNFO key and dial, on every Stream Deck, that is set to Default. A key or dial with its own choice keeps it.</p>",
+        "after": "\t\t\t\t\t\t<p class=\"hw-help\">Used by every Mac Sensors key and dial, on every Stream Deck, that is set to Default. A key or dial with its own choice keeps it.</p>",
+        "count": 1
+      },
+      {
+        "before": "\t\t\t\t\t\t<p class=\"hw-help\">The exact settings as JSON: Copy one to back a layout up, paste a saved one and Replace to restore or clone it. Replace swaps the whole document, reloads this panel and keeps fields this version does not know. Replacing shared settings changes every HWiNFO key and dial and asks for a second click.</p>",
+        "after": "\t\t\t\t\t\t<p class=\"hw-help\">The exact settings as JSON: Copy one to back a layout up, paste a saved one and Replace to restore or clone it. Replace swaps the whole document, reloads this panel and keeps fields this version does not know. Replacing shared settings changes every Mac Sensors key and dial and asks for a second click.</p>",
+        "count": 1
+      }
+    ]
+  }
+}

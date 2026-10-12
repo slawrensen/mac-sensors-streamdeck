@@ -1,0 +1,41 @@
+Source: slawrensen/hwinfo-streamdeck/src/pi-protocol.ts@11b9645b78395f157493648d873a3066673ba493
+Seam: S1/S2
+Reason: Select platform poller, status and historical-statistics copy while preserving upstream defaults.
+Before: 2f210099484aff9e94a42155aba19f324dffffcf409732f0901c2ce9c5fe9646
+After: 03c40a7f7f3541aa1b7c5350aae74a5e04f1863522a6eb0303e8e69dc756429f
+
+diff --git a/src/pi-protocol.ts b/src/pi-protocol.ts
+index 57b2a05..9653ae8 100644
+--- a/src/pi-protocol.ts
++++ b/src/pi-protocol.ts
+@@ -1,3 +1,4 @@
++import { runtime } from "#platform/runtime";
+ /**
+  * Message shapes exchanged with the property inspector pages (ui/pi-common.js).
+  * All are `type` aliases (not interfaces) so they satisfy the SDK's JsonValue.
+@@ -10,14 +11,14 @@ import { detailProfileFor } from "./detail/managed-profiles";
+ import { deviceCapabilities } from "./devices";
+ import { buildSupportReport } from "./diagnostics";
+ import { panelFolds, panelKindOf } from "./panel-folds";
+-import { poller, type PollerStatus } from "./poller";
++import { poller, type PollerStatus } from "#platform/poller";
+ import { resolveControls, schemeCanSwitchGroups } from "./controls";
+ import { overviewWindow, rotationGroupsOf } from "./rotation";
+ import { dialViewOf, overviewRowColors, stepListOf } from "./ui/dial-overview";
+ import { alertLevel, convertUnit, parseThreshold, thresholdsApplyTo, type DecimalsSetting } from "./ui/format";
+ import { drawnKeyLayout } from "./ui/key-layout";
+ import { formatMeasurement, formatStat, type MeasureOptions } from "./ui/measure";
+-import { statusSentence } from "./ui/state-screens";
++import { statusSentence } from "#platform/status";
+ import { appliedTextMode, parseTextSettings, resolveTextColors } from "./ui/text-colors";
+ import { effectiveTextFor, effectiveThemeFor, getDataUnits, getDeckTheme, measureOptionsFrom, typeAccentsEnabled } from "./ui/theme-store";
+ import { loadThemes, resolvePalette } from "./ui/themes";
+@@ -316,7 +317,7 @@ export function buildPreview(status: PollerStatus, settings: PreviewSettings | u
+ 	payload.display = {
+ 		value: m.valueText,
+ 		unit: m.unitText,
+-		stats: status.source === "gadget" ? "Historical statistics unavailable in Gadget" : `min ${formatStat(reading.valueMin, reading.unit, opts)} · max ${formatStat(reading.valueMax, reading.unit, opts)} · avg ${formatStat(reading.valueAvg, reading.unit, opts)}`,
++		stats: runtime.statisticsNotice(status.source) ?? `min ${formatStat(reading.valueMin, reading.unit, opts)} · max ${formatStat(reading.valueMax, reading.unit, opts)} · avg ${formatStat(reading.valueAvg, reading.unit, opts)}`,
+ 		bg: background,
+ 		valueColor,
+ 		statsColor
