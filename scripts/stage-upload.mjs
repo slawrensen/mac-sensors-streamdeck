@@ -1,4 +1,4 @@
-// Owner upload kit from public release assets only. This performs no upload.
+// Owner upload kit from published release assets only. This performs no upload.
 import fs from 'node:fs';
 import path from 'node:path';
 import {execFileSync} from 'node:child_process';
@@ -9,7 +9,7 @@ const release=JSON.parse(execFileSync('gh',['api',`repos/slawrensen/mac-sensors-
 const out=path.resolve('release','upload-'+tag.slice(1)+'.0');if(fs.existsSync(out))throw new Error('Upload directory already exists; preserve it for review');fs.mkdirSync(out,{recursive:true});
 execFileSync('gh',['release','download',tag,'--repo','slawrensen/mac-sensors-streamdeck','--pattern','com.lawrensen.mac.streamDeckPlugin','--pattern','native-manifest.json','--pattern','SHA256SUMS.txt','--dir',out],{stdio:'inherit'});
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
-for(const line of fs.readFileSync(path.join(out,'SHA256SUMS.txt'),'utf8').trim().split('\n')){const match=line.match(/^([a-f0-9]{64})\s+[* ]?([^/\\]+)$/);if(!match||hash(fs.readFileSync(path.join(out,match[2])))!==match[1])throw new Error('Public release checksum mismatch');}
+for(const line of fs.readFileSync(path.join(out,'SHA256SUMS.txt'),'utf8').trim().split('\n')){const match=line.match(/^([a-f0-9]{64})\s+[* ]?([^/\\]+)$/);if(!match||hash(fs.readFileSync(path.join(out,match[2])))!==match[1])throw new Error('Published release checksum mismatch');}
 const pack=fs.readFileSync(path.join(out,'com.lawrensen.mac.streamDeckPlugin')),native=JSON.parse(fs.readFileSync(path.join(out,'native-manifest.json')));validatePack({archiveBytes:pack,packageVersion:tag.slice(1),sourceId:native.sourceId});
 const vt=path.join(out,'virustotal');fs.mkdirSync(vt);fs.writeFileSync(path.join(vt,'com.lawrensen.mac.streamDeckPlugin'),pack);const members=payloadOf(pack);
 if(native.entries.length!==2||new Set(native.entries.map(entry=>entry.file)).size!==2)throw new Error('Invalid native member inventory');

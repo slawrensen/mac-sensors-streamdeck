@@ -34,10 +34,13 @@ async function fetchPage(url) {
 	let html;
 	let type = "";
 	try {
-		const res = await fetch(url, { redirect: "follow" });
+		const res = await fetch(url, { redirect: "follow", signal: AbortSignal.timeout(15_000) });
 		status = res.status;
 		type = res.headers.get("content-type") ?? "";
 		html = type.includes("text/html") ? await res.text() : "";
+		// The status check does not need asset bytes. Leaving these streams
+		// unread can keep sockets and the crawler alive after its final report.
+		if (!type.includes("text/html")) await res.body?.cancel();
 	} catch (err) {
 		status = -1;
 		html = String(err);
