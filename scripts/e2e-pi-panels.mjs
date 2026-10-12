@@ -1988,6 +1988,13 @@ try {
 		// (external review AX14): it shares nothing, and the newer choice
 		// stays until a fresh press. Mouse and Space, key and dial.
 		const SPACE = { key: " ", code: "Space", windowsVirtualKeyCode: 32 };
+		const themeArrived = async (theme) => {
+			for(let attempt=0;attempt<100;attempt++){
+				if(await b.evaluate(`document.querySelector('#theme-gallery .hw-theme[aria-checked="true"]')?.dataset.theme === ${JSON.stringify(theme)}`))return;
+				await sleep(20);
+			}
+			throw new Error('Host theme delivery did not reach the panel before release');
+		};
 		const shareCenter = async () => b.evaluate(`(() => { const e = document.getElementById("theme-share"); e.scrollIntoView({ block: "center" }); const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; })()`);
 		for (const [fx, where] of [["key-configured", "key"], ["dial-configured", "dial"]]) {
 			for (const how of ["mouse", "Space"]) {
@@ -2002,7 +2009,9 @@ try {
 					await b.send("Input.dispatchKeyEvent", { type: "keyDown", ...SPACE, text: " " });
 				}
 				sim.pushSettings({ ...sim.settings, theme: "forest" });
-				await sleep(40);
+				// A socket send is not a delivered setting. Observe the changed
+				// selection before releasing, including on a busy hosted runner.
+				await themeArrived("forest");
 				if (how === "mouse") await b.send("Input.dispatchMouseEvent", { type: "mouseReleased", x: p.x, y: p.y, button: "left", clickCount: 1 });
 				else await b.send("Input.dispatchKeyEvent", { type: "keyUp", ...SPACE });
 				await sleep(400);
@@ -2019,7 +2028,7 @@ try {
 		await b.send("Input.dispatchMouseEvent", { type: "mousePressed", x: tabPoint.x, y: tabPoint.y, button: "left", clickCount: 1 });
 		sim.pushSettings({ ...sim.settings, theme: "forest" });
 		await b.key("Tab");
-		await sleep(40);
+		await themeArrived("forest");
 		await b.send("Input.dispatchMouseEvent", { type: "mouseReleased", x: tabPoint.x, y: tabPoint.y, button: "left", clickCount: 1 });
 		await sleep(400);
 		const tabbed = await ms();
@@ -2034,7 +2043,7 @@ try {
 		await b.evaluate(`document.getElementById("theme-share").focus()`);
 		await b.send("Input.dispatchKeyEvent", { type: "keyDown", ...SPACE, text: " " });
 		sim.pushSettings({ ...sim.settings, theme: "forest" });
-		await sleep(80);
+		await themeArrived("forest");
 		await b.send("Input.dispatchKeyEvent", { type: "keyUp", ...ENTER });
 		await sleep(20);
 		await b.send("Input.dispatchKeyEvent", { type: "keyUp", ...SPACE });
