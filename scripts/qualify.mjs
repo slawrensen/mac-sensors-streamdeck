@@ -5,6 +5,7 @@ import {spawnSync,execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import {validatePack} from './lib/pack-validation.mjs';
 const args=process.argv.slice(2),option=name=>{const index=args.indexOf(name);return index<0?undefined:args[index+1];};
+for(let i=0;i<args.length;i++){if(args[i]==='--list')continue;if(!['--stages','--out'].includes(args[i])||!args[i+1]||args[i+1].startsWith('--'))throw new Error('Invalid qualification arguments');i++;}
 const order=['prerequisites','core','lint','typecheck','build:native','build','unit','native','pack','archive','abi','recovery','native-gate','cli-validate','copy','tree'];
 if(args.includes('--list')){console.log(order.join('\n'));process.exit(0);}
 const selected=new Set((option('--stages')??order.join(',')).split(','));if([...selected].some(stage=>!order.includes(stage)))throw new Error('Unknown qualification stage');
@@ -25,7 +26,7 @@ for(const stage of order) {
 			case 'prerequisites':if(process.platform!=='darwin'||Number(process.versions.node.split('.')[0])<24)throw new Error('Requires macOS and Node24 or later');result=many([['xcrun','--find','clang'],['xcrun','--sdk','macosx','--show-sdk-version'],['node_modules/.bin/streamdeck','-v']]);if(result.ok&&!result.output.includes('1.7.4'))throw new Error('Elgato CLI must be1.7.4');break;
 			case 'core':result=many([[process.execPath,'scripts/core/sync.mjs','check',...(upstream?['--upstream',upstream]:[])],[process.execPath,'scripts/core/parity.mjs',...(upstream?['--upstream',upstream]:[])]]);break;
 			case 'lint':case 'typecheck':case 'build:native':case 'build':result=run('npm',['run',stage]);break;
-			case 'unit':result=many([['npm','test'],['npm','run','test:mac'],[process.execPath,'--test','test/mac/core-sync.test.mjs','test/mac/panel-stage.test.mjs']]);break;
+			case 'unit':result=many([['npm','test'],['npm','run','test:mac'],[process.execPath,'--test','test/mac/core-sync.test.mjs','test/mac/panel-stage.test.mjs','test/mac/process-ownership.test.mjs','test/mac/release-gates.test.mjs','test/mac/load-metrics.test.mjs']]);break;
 			case 'native':result=run('npm',['run','test:native']);break;
 			case 'pack':result=node('scripts/pack.mjs');break;
 			case 'archive':{if(fs.existsSync(extracted))throw new Error('Use a fresh qualification output directory');const record=JSON.parse(fs.readFileSync('build/native/build-record.json'));const pkg=JSON.parse(fs.readFileSync('package.json'));const report=validatePack({archiveBytes:fs.readFileSync('release/com.lawrensen.mac.streamDeckPlugin'),stagingDir:'build/plugin',packageVersion:pkg.version,sourceId:record.sourceId,extractTo:extracted});const rejection=node('test/mac/pack.test.mjs');result={ok:rejection.ok,output:JSON.stringify(report)+'\n'+rejection.output};break;}
@@ -40,6 +41,7 @@ for(const stage of order) {
 	fs.writeFileSync(path.join(out,stage.replaceAll(':','-')+'.log'),result.output);results.push({stage,status:result.ok?'PASS':'FAIL',elapsedMs:Date.now()-at});console.log(stage+': '+(result.ok?'PASS':'FAIL'));
 	if(!result.ok)break;
 }
+for(const stage of order)if(!results.some(result=>result.stage===stage))results.push({stage,status:'SKIPPED'});
 const complete=results.filter(result=>result.status==='PASS').length===selected.size;
 const artifact=fs.existsSync('release/com.lawrensen.mac.streamDeckPlugin')?createHash('sha256').update(fs.readFileSync('release/com.lawrensen.mac.streamDeckPlugin')).digest('hex'):null;
 fs.writeFileSync(path.join(out,'record.json'),JSON.stringify({sourceSha,startedAt,finishedAt:new Date().toISOString(),node:process.version,platform:process.platform,architecture:process.arch,selected:[...selected],results,artifactSha256:artifact,sourceInputs:beforeInputs,passed:complete,scope:'Software qualification; physical/device/soak evidence is separate'},null,2)+'\n');if(!complete)process.exitCode=1;

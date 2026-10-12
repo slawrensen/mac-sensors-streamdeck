@@ -2277,11 +2277,16 @@
     {
       "source": "scripts/e2e-load.mjs",
       "upstreamSha256": "47c147d8e3be567bbb1f35f1f992e92c023a0292cae22997de4b7bb87985cf66",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "47c147d8e3be567bbb1f35f1f992e92c023a0292cae22997de4b7bb87985cf66",
+      "disposition": "implemented",
+      "reason": "Mac-specific runtime, staged-panel, package and process-identity counterparts preserve this capability. Windows-only source controls are replaced by saved-setting preservation and absence checks; synthetic alias fixtures remain compatibility tests.",
+      "destinations": [
+        "scripts/e2e.mjs",
+        "scripts/lib/load-metrics.mjs"
+      ],
+      "evidence": [
+        "npm run e2e:load"
+      ]
     },
     {
       "source": "scripts/e2e-native-edge.mjs",
@@ -2299,20 +2304,30 @@
     {
       "source": "scripts/e2e-pi-panels.mjs",
       "upstreamSha256": "f82604d6a1e65f04d8519668a49800352fcc9549c70f1c5d79638433c2e418f4",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "f82604d6a1e65f04d8519668a49800352fcc9549c70f1c5d79638433c2e418f4",
+      "disposition": "implemented",
+      "reason": "Mac-specific runtime, staged-panel, package and process-identity counterparts preserve this capability. Windows-only source controls are replaced by saved-setting preservation and absence checks; synthetic alias fixtures remain compatibility tests.",
+      "destinations": [
+        "scripts/e2e-pi-panels.mjs",
+        "scripts/test-catalog-panel.mjs"
+      ],
+      "evidence": [
+        "npm run e2e:pi-panels",
+        "npm run suite:full"
+      ]
     },
     {
       "source": "scripts/e2e-pi-persistence.mjs",
       "upstreamSha256": "4bf38b68d78b7cdd1df491c518ed61a8f5d6c578c88a54491e73702611dfc15f",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "4bf38b68d78b7cdd1df491c518ed61a8f5d6c578c88a54491e73702611dfc15f",
+      "disposition": "implemented",
+      "reason": "Mac-specific runtime, staged-panel, package and process-identity counterparts preserve this capability. Windows-only source controls are replaced by saved-setting preservation and absence checks; synthetic alias fixtures remain compatibility tests.",
+      "destinations": [
+        "scripts/e2e-pi-persistence.mjs"
+      ],
+      "evidence": [
+        "npm run e2e:pi"
+      ]
     },
     {
       "source": "scripts/e2e-resilience.mjs",
@@ -2416,11 +2431,16 @@
     {
       "source": "scripts/hygiene.mjs",
       "upstreamSha256": "2af0945bb60cdd7e9a8dd6b9dc865f5fb2c98540827aefe9b98e17984add34b5",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "2af0945bb60cdd7e9a8dd6b9dc865f5fb2c98540827aefe9b98e17984add34b5",
+      "disposition": "implemented",
+      "reason": "Mac-specific runtime, staged-panel, package and process-identity counterparts preserve this capability. Windows-only source controls are replaced by saved-setting preservation and absence checks; synthetic alias fixtures remain compatibility tests.",
+      "destinations": [
+        "scripts/suite.mjs",
+        "scripts/lib/build-evidence.mjs"
+      ],
+      "evidence": [
+        "npm run suite:full"
+      ]
     },
     {
       "source": "scripts/lib/cdp.mjs",
@@ -2517,11 +2537,17 @@
     {
       "source": "scripts/lib/process-ownership.mjs",
       "upstreamSha256": "78701f2722bfaf0cd798bd080869a0c058909d48c6111789c46557b9d8138dc4",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "78701f2722bfaf0cd798bd080869a0c058909d48c6111789c46557b9d8138dc4",
+      "disposition": "implemented",
+      "reason": "Mac-specific runtime, staged-panel, package and process-identity counterparts preserve this capability. Windows-only source controls are replaced by saved-setting preservation and absence checks; synthetic alias fixtures remain compatibility tests.",
+      "destinations": [
+        "scripts/lib/process-ownership.mjs",
+        "scripts/suite.mjs"
+      ],
+      "evidence": [
+        "node --test test/mac/process-ownership.test.mjs",
+        "npm run suite:full"
+      ]
     },
     {
       "source": "scripts/lib/soak-adversary-safety.mjs",
@@ -2795,11 +2821,17 @@
     {
       "source": "test/diagnostics.test.ts",
       "upstreamSha256": "ac3715878f23fa5c0591dfc728147d42b9cd950e529eb27eed4550fb6512ced4",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "ac3715878f23fa5c0591dfc728147d42b9cd950e529eb27eed4550fb6512ced4",
+      "disposition": "implemented",
+      "reason": "Mac-specific runtime, staged-panel, package and process-identity counterparts preserve this capability. Windows-only source controls are replaced by saved-setting preservation and absence checks; synthetic alias fixtures remain compatibility tests.",
+      "destinations": [
+        "test/mac/diagnostics.test.ts",
+        "scripts/e2e.mjs"
+      ],
+      "evidence": [
+        "npm run test:mac",
+        "npm run e2e"
+      ]
     },
     {
       "source": "test/docs-crawl.test.mjs",
@@ -2840,11 +2872,15 @@
     {
       "source": "test/e2e-load.test.mjs",
       "upstreamSha256": "3a000a5a8b846390738a2fd96711da2a09c7994c6dc78554e5d8ba4933e013eb",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "3a000a5a8b846390738a2fd96711da2a09c7994c6dc78554e5d8ba4933e013eb",
+      "disposition": "implemented",
+      "reason": "Mac-specific runtime, staged-panel, package and process-identity counterparts preserve this capability. Windows-only source controls are replaced by saved-setting preservation and absence checks; synthetic alias fixtures remain compatibility tests.",
+      "destinations": [
+        "test/mac/load-metrics.test.mjs"
+      ],
+      "evidence": [
+        "node --test test/mac/load-metrics.test.mjs"
+      ]
     },
     {
       "source": "test/hygiene-pi-startup.test.mjs",
@@ -2872,38 +2908,57 @@
     {
       "source": "test/pack-staging.test.mjs",
       "upstreamSha256": "faa0461b34d76d589c991c920d7d49791b090d54590149377a2a58883cb7e6b1",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "faa0461b34d76d589c991c920d7d49791b090d54590149377a2a58883cb7e6b1",
+      "disposition": "implemented",
+      "reason": "Mac-specific runtime, staged-panel, package and process-identity counterparts preserve this capability. Windows-only source controls are replaced by saved-setting preservation and absence checks; synthetic alias fixtures remain compatibility tests.",
+      "destinations": [
+        "test/mac/pack.test.mjs",
+        "scripts/lib/build-evidence.mjs"
+      ],
+      "evidence": [
+        "node --test test/mac/pack.test.mjs",
+        "npm run release:validate"
+      ]
     },
     {
       "source": "test/process-ownership.test.mjs",
       "upstreamSha256": "556ede0df2c582fd0d2109336691dd0f91cc6a7c25f98fcb497b8bb67384496e",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "556ede0df2c582fd0d2109336691dd0f91cc6a7c25f98fcb497b8bb67384496e",
+      "disposition": "implemented",
+      "reason": "Mac-specific runtime, staged-panel, package and process-identity counterparts preserve this capability. Windows-only source controls are replaced by saved-setting preservation and absence checks; synthetic alias fixtures remain compatibility tests.",
+      "destinations": [
+        "test/mac/process-ownership.test.mjs"
+      ],
+      "evidence": [
+        "node --test test/mac/process-ownership.test.mjs"
+      ]
     },
     {
       "source": "test/qualify.test.mjs",
       "upstreamSha256": "4eb6a32ecb95be88b91b3b8f19ebc73eb492c9f05b00f4b31a1434393acc0e24",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "4eb6a32ecb95be88b91b3b8f19ebc73eb492c9f05b00f4b31a1434393acc0e24",
+      "disposition": "implemented",
+      "reason": "Mac-specific runtime, staged-panel, package and process-identity counterparts preserve this capability. Windows-only source controls are replaced by saved-setting preservation and absence checks; synthetic alias fixtures remain compatibility tests.",
+      "destinations": [
+        "test/mac/release-gates.test.mjs"
+      ],
+      "evidence": [
+        "node --test test/mac/release-gates.test.mjs"
+      ]
     },
     {
       "source": "test/release-inputs.test.ts",
       "upstreamSha256": "771bfcdb683a224c1d4b447a5372e71e4ec759ed34fa8005bd0dcd3c74311d6a",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "771bfcdb683a224c1d4b447a5372e71e4ec759ed34fa8005bd0dcd3c74311d6a",
+      "disposition": "implemented",
+      "reason": "Mac-specific runtime, staged-panel, package and process-identity counterparts preserve this capability. Windows-only source controls are replaced by saved-setting preservation and absence checks; synthetic alias fixtures remain compatibility tests.",
+      "destinations": [
+        "test/mac/release-gates.test.mjs",
+        "test/mac/pack.test.mjs"
+      ],
+      "evidence": [
+        "node --test test/mac/release-gates.test.mjs test/mac/pack.test.mjs"
+      ]
     },
     {
       "source": "test/script-failures.test.mjs",
@@ -2971,11 +3026,15 @@
     {
       "source": "test/verify-pack-version.test.ts",
       "upstreamSha256": "d03a17e00af8b82eb34c45b5b26df5fa0f944d39ae3e854f6d90d933bd95ea94",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "d03a17e00af8b82eb34c45b5b26df5fa0f944d39ae3e854f6d90d933bd95ea94",
+      "disposition": "implemented",
+      "reason": "Mac-specific runtime, staged-panel, package and process-identity counterparts preserve this capability. Windows-only source controls are replaced by saved-setting preservation and absence checks; synthetic alias fixtures remain compatibility tests.",
+      "destinations": [
+        "test/mac/pack.test.mjs"
+      ],
+      "evidence": [
+        "node --test test/mac/pack.test.mjs"
+      ]
     }
   ],
   "notTaken": [

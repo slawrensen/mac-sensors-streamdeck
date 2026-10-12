@@ -36,7 +36,7 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."
 // against this build's plugin side, for before/after measurements.
 // Resolved, so a forward-slash Windows path still passes the served-file
 // containment check below.
-const pluginDir = path.resolve(process.env.PI_SIM_PLUGIN_DIR ?? path.join(repoRoot, "com.lawrensen.mac.sdPlugin"));
+const pluginDir = path.resolve(process.env.PI_SIM_PLUGIN_DIR ?? path.join(repoRoot, "build/plugin"));
 
 export const PAGES = {
 	"sensor-reading.html": { action: "com.lawrensen.mac.reading", controller: "Keypad", kind: "key" },
@@ -49,7 +49,7 @@ const MIME = { ".html": "text/html; charset=utf-8", ".js": "text/javascript", ".
 
 /** The data states a fixture can put the provider in. */
 function statusFor(data, snapshot) {
-	if (data === "unavailable") return { state: "unavailable", reason: "not-running", message: "The simulated source is unavailable." };
+	if (data === "unavailable") return { state: "unavailable", reason: "no-readable-sensors", message: "The simulated source is unavailable." };
 	if (data === "stale") return { state: "stale", snapshot, source: "shared-memory", staleForMs: 42_000 };
 	if (data === "gadget") return { state: "ok", snapshot, source: "gadget" };
 	// The poller riding out a source reopen: the status is still the last ok

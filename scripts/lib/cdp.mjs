@@ -16,11 +16,9 @@
  * its connections open; close() stops that one too.)
  */
 import { spawn } from "node:child_process";
-import { existsSync, mkdtempSync, rmSync } from "node:fs";
-import os from "node:os";
-import path from "node:path";
+import { existsSync, rmSync } from "node:fs";
 import WebSocket from "ws";
-import { browserDebuggerPort } from "./process-ownership.mjs";
+import { browserDebuggerPort, createBrowserProfile } from "./process-ownership.mjs";
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -35,7 +33,7 @@ export function chromePath() {
 
 /** Launches Chromium on a free port and resolves a connected client. */
 export async function launch({ width = 400, height = 900, scale = 1 } = {}) {
-	const profile = mkdtempSync(path.join(os.tmpdir(), "mac-sensors-pi-lab-"));
+	const profile = createBrowserProfile("mac-sensors-pi-lab-");
 	const args = ["--headless=new", "--disable-gpu", "--no-first-run", "--no-default-browser-check", "--remote-debugging-port=0", `--user-data-dir=${profile}`, "--hide-scrollbars", "--font-render-hinting=none", "about:blank"];
 	if (process.platform === "linux" && process.getuid?.() === 0) args.unshift("--no-sandbox");
 	

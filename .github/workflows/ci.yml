@@ -40,7 +40,7 @@ jobs:
           MACSENSORS_UPSTREAM_DIR: ${{ github.workspace }}/upstream
         run: npm run release:validate -- --out release/ci-qualification
       - run: npm run build:test
-      - run: npm run e2e:resilience
+      - run: npm run suite:full
       - name: Retain exact native bytes for the ABI matrix
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:

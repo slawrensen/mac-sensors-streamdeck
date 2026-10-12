@@ -26,7 +26,7 @@
     ],
     "pi-common.js": [
       {
-        "before": "Pressing the key cycles current \u2192 min \u2192 max \u2192 avg. With Shared Memory these are HWiNFO's own, since HWiNFO started; Gadget has none, so they show N/A.",
+        "before": "Pressing the key cycles current → min → max → avg. With Shared Memory these are HWiNFO's own, since HWiNFO started; Gadget has none, so they show N/A.",
         "after": "Pressing the key cycles current, min, max and avg. Mac Sensors has no provider history, so min, max and avg show N/A.",
         "count": 1
       },
@@ -200,12 +200,12 @@
         "count": 1
       },
       {
-        "before": "p.source === \"gadget\" ? \"Live \u00b7 Gadget registry\" : \"Live \u00b7 Shared Memory\"",
-        "after": "\"Live \u00b7 Mac sensors\"",
+        "before": "p.source === \"gadget\" ? \"Live · Gadget registry\" : \"Live · Shared Memory\"",
+        "after": "\"Live · Mac sensors\"",
         "count": 1
       },
       {
-        "before": "`HWiNFO ready \u00b7 ${p.source === \"gadget\" ? \"Gadget registry\" : \"Shared Memory\"}`",
+        "before": "`HWiNFO ready · ${p.source === \"gadget\" ? \"Gadget registry\" : \"Shared Memory\"}`",
         "after": "\"Mac sensors ready\"",
         "count": 1
       },
@@ -256,7 +256,7 @@
       },
       {
         "before": "\t\t\tif (p.holding === true) return { text: \"Reopening HWiNFO's source\", tone: \"warn\" };",
-        "after": "\t\t\tif (p.holding === true) return { text: \"Reopening the sensor source's source\", tone: \"warn\" };",
+        "after": "\t\t\tif (p.holding === true) return { text: \"Reopening the sensor source\", tone: \"warn\" };",
         "count": 1
       },
       {
@@ -291,7 +291,7 @@
       },
       {
         "before": "\t\t\tlines = [`The plugin is reopening HWiNFO's data source (a sensor layout change, an HWiNFO restart or a busy source). The ${kind === \"dial\" ? \"dial\" : \"key\"} stays as it was for up to 15 s after the last new data, then shows live values or the problem. Your reading and settings are unchanged.`];",
-        "after": "\t\t\tlines = [`The plugin is reopening the sensor source's data source (a sensor layout change, an Mac Sensors restart or a busy source). The ${kind === \"dial\" ? \"dial\" : \"key\"} stays as it was for up to 15 s after the last new data, then shows live values or the problem. Your reading and settings are unchanged.`];",
+        "after": "\t\t\tlines = [`The plugin is reopening the sensor source after a layout change, restart or busy read. The ${kind === \"dial\" ? \"dial\" : \"key\"} stays as it was for up to 15 s after the last new data, then shows live values or the problem. Your reading and settings are unchanged.`];",
         "count": 1
       },
       {
@@ -316,7 +316,7 @@
       },
       {
         "before": "\t\tack.textContent = `Checked again at ${at}: no change yet. The plugin also reads HWiNFO every ${every} on its own.`;",
-        "after": "\t\tack.textContent = `Checked again at ${at}: no change yet. The plugin also reads Mac Sensors every ${every} on its own.`;",
+        "after": "\t\tack.textContent = `Checked again at ${at}: no change yet. The plugin also reads sensors every ${every} on its own.`;",
         "count": 1
       },
       {
@@ -329,6 +329,26 @@
       {
         "before": "/* A small disclosure inside a section (the HWiNFO setup steps). */",
         "after": "/* A small disclosure inside a section (the Sensor setup). */",
+        "count": 1
+      },
+      {
+        "before": ".hw-group-box > .hw-field-first {\n\tmargin-top: var(--hw-s1);\n}",
+        "after": ".hw-group-box > .hw-field-first {\n\tmargin-top: 3px;\n}",
+        "count": 1
+      },
+      {
+        "before": "padding: 0 8px 4px;",
+        "after": "padding: 0 8px 6px;",
+        "count": 1
+      },
+      {
+        "before": "padding: 0 4px 4px;",
+        "after": "padding: 0 4px 6px;",
+        "count": 1
+      },
+      {
+        "before": "margin-right: 90px;",
+        "after": "margin-right: 96px;",
         "count": 1
       }
     ],
@@ -345,7 +365,7 @@
       },
       {
         "before": "\t\t\t\t\t\t<p class=\"hw-help\" id=\"source-help\">Auto switches providers. To keep a selection working on both, link its Shared Memory and Gadget keys in the shared Config document; see <a href=\"https://docs.slawrensen.com/hwinfo-streamdeck/data-sources.html#link-readings-across-providers\" target=\"_blank\" rel=\"noopener\">reading links</a>.</p>",
-        "after": "\t\t\t\t\t\t<p class=\"hw-help\" id=\"source-help\">Available readings depend on this Mac and macOS version. A saved reading stays selected when it is unavailable.</p>",
+        "after": "\t\t\t\t\t\t<p class=\"hw-help\" id=\"source-help\">Available readings depend on this Mac and macOS version. A saved reading stays selected when it is unavailable. See <a href=\"https://docs.slawrensen.com/mac-streamdeck/data-sources.html\" target=\"_blank\" rel=\"noopener\">available data sources</a>.</p>",
         "count": 1
       },
       {
@@ -354,8 +374,8 @@
         "count": 1
       },
       {
-        "before": "\t\t\t\t<p class=\"hw-help\" id=\"alerts-help\">Warn, Critical and the bar ends apply only to readings in the unit that was on the dial when you last changed any of them, so a temperature limit never fires on a fan. The dial stays themed; the bar, or an overview row's value, takes the alert color. Alerts check the current value in the reading's own unit (\u00b0F when \u00b0F is on); for bytes and rates that is HWiNFO's number and unit, which the dial may show rescaled.</p>",
-        "after": "\t\t\t\t<p class=\"hw-help\" id=\"alerts-help\">Warn, Critical and the bar ends apply only to readings in the unit that was on the dial when you last changed any of them, so a temperature limit never fires on a fan. The dial stays themed; the bar, or an overview row's value, takes the alert color. Alerts check the current value in the reading's own unit (\u00b0F when \u00b0F is on); for bytes and rates that is the sensor source's number and unit, which the dial may show rescaled.</p>",
+        "before": "\t\t\t\t<p class=\"hw-help\" id=\"alerts-help\">Warn, Critical and the bar ends apply only to readings in the unit that was on the dial when you last changed any of them, so a temperature limit never fires on a fan. The dial stays themed; the bar, or an overview row's value, takes the alert color. Alerts check the current value in the reading's own unit (°F when °F is on); for bytes and rates that is HWiNFO's number and unit, which the dial may show rescaled.</p>",
+        "after": "\t\t\t\t<p class=\"hw-help\" id=\"alerts-help\">Warn, Critical and the bar ends apply only to readings in the unit that was on the dial when you last changed any of them, so a temperature limit never fires on a fan. The dial stays themed; the bar, or an overview row's value, takes the alert color. Alerts check the current value in the reading's own unit (°F when °F is on); for bytes and rates that is the sensor source's number and unit, which the dial may show rescaled.</p>",
         "count": 1
       },
       {
@@ -387,7 +407,7 @@
       },
       {
         "before": "\t\t\t\t\t\t<p class=\"hw-help\" id=\"source-help\">Auto switches providers. To keep a selection working on both, link its Shared Memory and Gadget keys in the shared Config document; see <a href=\"https://docs.slawrensen.com/hwinfo-streamdeck/data-sources.html#link-readings-across-providers\" target=\"_blank\" rel=\"noopener\">reading links</a>.</p>",
-        "after": "\t\t\t\t\t\t<p class=\"hw-help\" id=\"source-help\">Available readings depend on this Mac and macOS version. A saved reading stays selected when it is unavailable.</p>",
+        "after": "\t\t\t\t\t\t<p class=\"hw-help\" id=\"source-help\">Available readings depend on this Mac and macOS version. A saved reading stays selected when it is unavailable. See <a href=\"https://docs.slawrensen.com/mac-streamdeck/data-sources.html\" target=\"_blank\" rel=\"noopener\">available data sources</a>.</p>",
         "count": 1
       },
       {
@@ -401,13 +421,13 @@
         "count": 1
       },
       {
-        "before": "\t\t\t\t\t<p class=\"hw-help\" id=\"show-help\">Pressing the key cycles current \u2192 min \u2192 max \u2192 avg. Shared Memory gives HWiNFO's own minimum, maximum and average since it started; Gadget publishes none, so they show N/A.</p>",
+        "before": "\t\t\t\t\t<p class=\"hw-help\" id=\"show-help\">Pressing the key cycles current → min → max → avg. Shared Memory gives HWiNFO's own minimum, maximum and average since it started; Gadget publishes none, so they show N/A.</p>",
         "after": "\t\t\t\t\t<p class=\"hw-help\" id=\"show-help\">Pressing the key cycles current, min, max and avg. Mac Sensors has no provider history, so min, max and avg show N/A.</p>",
         "count": 1
       },
       {
-        "before": "\t\t\t\t<p class=\"hw-help\" id=\"alerts-help\">At or past Warn the key turns amber, at or past Critical red. Alerts check the current value in the reading's own unit (\u00b0F when \u00b0F is on); for bytes and rates that is HWiNFO's number and unit, which the key may show rescaled.<span id=\"alerts-first\" hidden> Only reading 1 is checked; it recolors the whole key.</span></p>",
-        "after": "\t\t\t\t<p class=\"hw-help\" id=\"alerts-help\">At or past Warn the key turns amber, at or past Critical red. Alerts check the current value in the reading's own unit (\u00b0F when \u00b0F is on); for bytes and rates that is the sensor source's number and unit, which the key may show rescaled.<span id=\"alerts-first\" hidden> Only reading 1 is checked; it recolors the whole key.</span></p>",
+        "before": "\t\t\t\t<p class=\"hw-help\" id=\"alerts-help\">At or past Warn the key turns amber, at or past Critical red. Alerts check the current value in the reading's own unit (°F when °F is on); for bytes and rates that is HWiNFO's number and unit, which the key may show rescaled.<span id=\"alerts-first\" hidden> Only reading 1 is checked; it recolors the whole key.</span></p>",
+        "after": "\t\t\t\t<p class=\"hw-help\" id=\"alerts-help\">At or past Warn the key turns amber, at or past Critical red. Alerts check the current value in the reading's own unit (°F when °F is on); for bytes and rates that is the sensor source's number and unit, which the key may show rescaled.<span id=\"alerts-first\" hidden> Only reading 1 is checked; it recolors the whole key.</span></p>",
         "count": 1
       },
       {

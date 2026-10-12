@@ -5,8 +5,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import {createHash} from 'node:crypto';
-import {startMock,sleep,until} from './lib/mock-host.mjs';
+import {execFileSync} from 'node:child_process';
+import {startMock,sleep,until,decodeSvg} from './lib/mock-host.mjs';
 import {profileCells} from './lib/profile-cells.mjs';
+import {assessLoadMetrics,expectedRssSampleCount} from './lib/load-metrics.mjs';
 const mode=process.argv[2]??'core',output=process.argv[3]??`build/e2e-${mode}.json`;
 const temperature='mac:v1:smc:Mac17%2C9:54423154:temp.v1',memory='mac:v1:system:memory-total';
 const records=[];
@@ -39,6 +41,27 @@ else if(mode==='resilience')await withHost(async host=>{
 	host.setFixture({hold:['smc'],smc:{value:35}});await sleep(16_000);assert.ok(host.svg('temperature')?.includes('Sensor missing'));assert.ok(!host.svg('memory')?.includes('No sensor data'));
 	host.setFixture({smc:{value:40}});await until(()=>hasValue(host.svg('temperature'),40));
 	host.event('temperature','willDisappear');host.event('memory','willDisappear');await sleep(300);host.appear('temperature-return','reading',{readingKey:temperature});await until(()=>hasValue(host.svg('temperature-return'),40));
+});
+else if(mode==='load')await withHost(async host=>{
+	const count=64,start=performance.now();
+	for(let i=0;i<count;i++)host.appear('load'+i,i%4===0?'dial':'reading',{readingKey:temperature,displayMode:i%2?'sparkline':'numeric'},i%6);
+	await until(()=>Array.from({length:count},(_,i)=>hasValue(host.svg('load'+i),30)).every(Boolean),10_000);
+	const firstFramesMs=performance.now()-start;
+	host.setFixture({smc:{value:55}});
+	await until(()=>Array.from({length:count},(_,i)=>hasValue(host.svg('load'+i),55)).every(Boolean),10_000);
+	const rss=[],durationMs=45_000,intervalMs=15_000,started=performance.now();
+	for(let sample=0;sample<expectedRssSampleCount(durationMs,intervalMs);sample++){
+		const delay=started+sample*intervalMs-performance.now();if(delay>0)await sleep(delay);
+		rss.push(Number(execFileSync('/bin/ps',['-p',String(host.child.pid),'-o','rss='],{encoding:'utf8'}).trim())/1024);
+	}
+	const invalidFrames=host.messages.filter(message=>['setImage','setFeedback'].includes(message.event)).filter(message=>{const svg=decodeSvg(message.payload?.image??message.payload?.canvas);return !svg||!svg.startsWith('<svg')||/\b(?:NaN|Infinity|undefined)\b/.test(svg);}).length;
+	const metrics=assessLoadMetrics(rss,expectedRssSampleCount(durationMs,intervalMs),invalidFrames);
+	assert.ok(metrics.complete&&metrics.framesValid&&metrics.peak<300&&metrics.growth<25,JSON.stringify(metrics));
+	for(let i=0;i<count;i++)host.event('load'+i,'willDisappear');
+	await sleep(700);const frames=host.messages.filter(message=>['setImage','setFeedback'].includes(message.event)).length;
+	await sleep(1200);assert.equal(host.messages.filter(message=>['setImage','setFeedback'].includes(message.event)).length,frames,'hidden actions kept rendering');
+	assert.equal(host.messages.filter(message=>message.event==='setSettings').length,0);
+	records.push({actions:count,firstFramesMs,allAdvanced:true,hiddenActionsStopped:true,durationMs,rssMiB:rss,metrics});
 });
 else if(mode==='socket-close')await withHost(async host=>{
 	host.appear('key','reading',{readingKey:temperature});await until(()=>hasValue(host.svg('key'),30));host.closeSocket();await until(()=>host.exit()!==undefined,5000);assert.equal(host.exit().code,0);
