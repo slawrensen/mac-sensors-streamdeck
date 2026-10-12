@@ -21,3 +21,9 @@ test('panel captures and marketing artwork retain their recorded sources',()=>{
 	const marketing=JSON.parse(fs.readFileSync('marketing/provenance.json','utf8')) as {assets:{file:string;sha256:string;width:number;height:number;inputs:{file:string;sha256:string}[]}[]};
 	for(const asset of marketing.assets){assert.equal(hash(fs.readFileSync(path.join('marketing',asset.file))),asset.sha256);assert.equal(asset.width,asset.file==='app-icon-288.png'?288:1920);assert.equal(asset.height,asset.file==='app-icon-288.png'?288:960);for(const input of asset.inputs)assert.equal(hash(fs.readFileSync(input.file)),input.sha256);}
 });
+
+
+test('individual dial colors change fills while preserving all geometry and words',()=>{
+ const scenes=composeScenes(),plain=scenes.find(scene=>scene.id==='dial-overview')!,colored=scenes.find(scene=>scene.id==='dial-overview-colored')!;
+ assert.notEqual(plain.svg,colored.svg);const withoutFills=(svg:string)=>svg.replace(/fill="#(?:[0-9a-f]{6}|[0-9a-f]{8})"/gi,'fill="COLOR"');assert.equal(withoutFills(plain.svg),withoutFills(colored.svg));
+});

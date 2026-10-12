@@ -65,6 +65,15 @@ const watchdog = setTimeout(async () => {
 watchdog.unref();
 
 async function open(fixture, overrides) {
+	// Replace actions intentionally reload their inspector after 350 ms.
+	// Dispose that document before seeding another fixture, so its delayed
+	// navigation cannot replace the next test's page or satisfy its load event.
+	let blank = false;
+	for (let attempt = 0; attempt < 2 && !blank; attempt++) {
+		await b.goto('about:blank');
+		blank = await b.evaluate('location.href === "about:blank" && document.readyState === "complete"');
+	}
+	if (!blank) throw new Error('Could not dispose the previous inspector document');
 	sim.setFixture(fixture, overrides);
 	await b.goto(sim.url(fixture));
 	for (let i = 0; i < 40; i++) {

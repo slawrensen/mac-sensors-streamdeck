@@ -52,6 +52,31 @@
       "width": 378,
       "dpr": 2,
       "overflow": 0
+    },
+    {
+      "file": "settings-reading-colors.png",
+      "kind": "settings-panel capture, simulated host, sample data",
+      "sha256": "e0362f826bb55504e59cbbe54c490e263381dd06f49a1dc482d2a0fd64791e5d",
+      "settings": {
+        "readingKey": "mac:v1:smc:Mac17%2C9:54703030:temp.v1",
+        "label": "CPU super 1",
+        "rotationKeys": [
+          "mac:v1:smc:Mac17%2C9:54703030:temp.v1",
+          "mac:v1:smc:Mac17%2C9:54673055:temp.v1",
+          "mac:v1:smc:Mac17%2C9:46304163:rpm.v1"
+        ],
+        "dialView": "overview",
+        "theme": "void",
+        "readingColors": {
+          "mac:v1:smc:Mac17%2C9:54703030:temp.v1": "#4CC2FF",
+          "mac:v1:smc:Mac17%2C9:54673055:temp.v1": "#FF7E8E",
+          "mac:v1:smc:Mac17%2C9:46304163:rpm.v1": "#38CD89"
+        }
+      },
+      "build": "1.0.0.0-mac7",
+      "width": 378,
+      "dpr": 2,
+      "overflow": 0
     }
   ]
 }

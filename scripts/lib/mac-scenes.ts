@@ -43,6 +43,8 @@ export function composeScenes():Scene[] {
 		const settings:DialSettings={readingKey:sampleReadings[0]!.key,label:'CPU super 1',rotationKeys:sampleReadings.slice(0,3).map(row=>row.key),dialView,overviewLabels:'full',theme:'void',...(dialView==='single'?{warnValue:'75',critValue:'90'}:{})};
 		const state:DialRenderState={settings,stats,statMode:'current',overlay:null,pinned:false,cyclePaused:false};scenes.push({id:'dial-'+dialView,kind:'dial',svg:composeDialSvg(state,status,key=>histories.get(key)??[]),description:dialView+' dial view'});
 	}
+	const colored:DialRenderState={settings:{readingKey:sampleReadings[0]!.key,label:'CPU super 1',rotationKeys:sampleReadings.slice(0,3).map(row=>row.key),dialView:'overview',overviewLabels:'full',theme:'void',readingColors:Object.fromEntries(sampleReadings.slice(0,3).map((row,index)=>[row.key,['#4CC2FF','#FF7E8E','#38CD89'][index]!]))},stats,statMode:'current',overlay:null,pinned:false,cyclePaused:false};
+	scenes.push({id:'dial-overview-colored',kind:'dial',svg:composeDialSvg(colored,status,key=>histories.get(key)??[]),description:'Individual number colors'});
 	for(const reason of ['pending','busy','no-readable-sensors','access-denied','unsupported-platform','bridge-failed','font-missing','source-error'] as const)scenes.push({id:'status-'+reason,kind:'key',svg:compose({readingKey:sampleReadings[0]!.key},{state:'unavailable',reason,message:''}),description:reason});
 	scenes.push({id:'status-missing',kind:'key',svg:compose({readingKey:'mac:v1:system:missing'},status),description:'Saved sensor missing'});
 	const palette=resolvePalette(loadThemes(),'void',null,'normal');
@@ -56,5 +58,6 @@ export const boardDefinitions=[
 	{id:'dials',title:'Turn through your reading set',subtitle:'Single, two-row and overview views with local session statistics.',scenes:['dial-single','dial-tworow','dial-overview'],columns:3},
 	{id:'themes',title:'Choose the look that fits your desk',subtitle:'A shared default, with local choices when you want them.',scenes:['theme-void','theme-graphite','theme-ultraviolet','theme-midnight','theme-forest','theme-ember','theme-paper'],columns:4},
 	{id:'alerts',title:'See when a reading crosses your threshold',subtitle:'Normal, warning and critical states. Hardware remains read-only.',scenes:['reading-0','warn','crit','bar'],columns:4},
+	{id:'reading-colors',title:'Give readings their own number colors',subtitle:'The same readings and geometry. Only numeric fills change.',scenes:['dial-overview','dial-overview-colored'],columns:2},
 	{id:'status',title:'A reason when a reading is unavailable',subtitle:'Saved selections stay saved. No stale value is promoted to live.',scenes:['status-pending','status-busy','status-missing','status-no-readable-sensors','status-access-denied','status-bridge-failed','status-font-missing','status-source-error'],columns:4}
 ];

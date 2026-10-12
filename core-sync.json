@@ -2175,11 +2175,19 @@
     {
       "source": "scripts/capture-pi-reading-colors.mjs",
       "upstreamSha256": "5f80be86091185ee7423684b499327de153c7077e2f8a5a9c86dcbf9e2145a4e",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "5f80be86091185ee7423684b499327de153c7077e2f8a5a9c86dcbf9e2145a4e",
+      "disposition": "implemented",
+      "reason": "Mac-specific documentation/reporting counterparts replace the Windows paths and fixtures. Production SVG provenance, explicit simulated-host capture scope, image hashes and observable failure checks are retained; physical media is owner-only.",
+      "destinations": [
+        "scripts/capture-mac-panels.mjs",
+        "scripts/docs-assets.mjs",
+        "test/mac/docs-assets.test.ts"
+      ],
+      "evidence": [
+        "npm run capture:panels",
+        "npm run docs:assets",
+        "npm run test:mac"
+      ]
     },
     {
       "source": "scripts/capture-pi.mjs",
@@ -2199,65 +2207,112 @@
     {
       "source": "scripts/contact-sheet.mjs",
       "upstreamSha256": "aa16d3c009470606c579ed30532862ac405e3e3383a58f6ba8e737107ea0c316",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "aa16d3c009470606c579ed30532862ac405e3e3383a58f6ba8e737107ea0c316",
+      "disposition": "implemented",
+      "reason": "Mac-specific documentation/reporting counterparts replace the Windows paths and fixtures. Production SVG provenance, explicit simulated-host capture scope, image hashes and observable failure checks are retained; physical media is owner-only.",
+      "destinations": [
+        "scripts/contact-sheet.mjs"
+      ],
+      "evidence": [
+        "node scripts/contact-sheet.mjs <output> <input PNGs>"
+      ]
     },
     {
       "source": "scripts/dial-color-comparison.mjs",
       "upstreamSha256": "6da41720fed67f27726743937b9f05a6fb4d8a57f6769b502f940b79b82562f5",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "6da41720fed67f27726743937b9f05a6fb4d8a57f6769b502f940b79b82562f5",
+      "disposition": "implemented",
+      "reason": "Mac-specific documentation/reporting counterparts replace the Windows paths and fixtures. Production SVG provenance, explicit simulated-host capture scope, image hashes and observable failure checks are retained; physical media is owner-only.",
+      "destinations": [
+        "scripts/docs-assets.mjs",
+        "scripts/marketplace-shots.mjs",
+        "scripts/readme-boards.mjs",
+        "test/mac/docs-assets.test.ts"
+      ],
+      "evidence": [
+        "npm run docs:assets",
+        "npm run marketing:shots",
+        "npm run readme-boards",
+        "npm run test:mac"
+      ]
     },
     {
       "source": "scripts/docs-crawl.mjs",
       "upstreamSha256": "dea53fb7750ff637cf05d010afc69430c8a4226d48a10b673e4781cc526dc08c",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "dea53fb7750ff637cf05d010afc69430c8a4226d48a10b673e4781cc526dc08c",
+      "disposition": "implemented",
+      "reason": "Mac-specific documentation/reporting counterparts replace the Windows paths and fixtures. Production SVG provenance, explicit simulated-host capture scope, image hashes and observable failure checks are retained; physical media is owner-only.",
+      "destinations": [
+        "scripts/docs-crawl.mjs",
+        "test/mac/docs-crawl.test.mjs"
+      ],
+      "evidence": [
+        "node --test test/mac/docs-crawl.test.mjs",
+        "npm run docs:crawl -- <published docs URL>"
+      ]
     },
     {
       "source": "scripts/docs-preview-publish.mjs",
       "upstreamSha256": "4faeff0469a8b5a2fdc38456b9789a8d4d781da1c7713b246f988af9e43e3af5",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "4faeff0469a8b5a2fdc38456b9789a8d4d781da1c7713b246f988af9e43e3af5",
+      "disposition": "implemented",
+      "reason": "The Mac preview uses a committed normal branch of the existing repository and restores main after merge. It creates no orphan history or disposable publishing repository. Clean-tree, remote, private-path and pushed-head checks precede the Pages API mutation.",
+      "destinations": [
+        "scripts/docs-preview-publish.mjs",
+        "test/mac/docs-tools.test.mjs"
+      ],
+      "evidence": [
+        "node --test test/mac/docs-tools.test.mjs"
+      ]
     },
     {
       "source": "scripts/docs-site-shots.mjs",
       "upstreamSha256": "99535fe8a8fe0c20d4ce6230211f8dd426e2587649f838a3cca489d6a1bae224",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "99535fe8a8fe0c20d4ce6230211f8dd426e2587649f838a3cca489d6a1bae224",
+      "disposition": "implemented",
+      "reason": "Mac-specific documentation/reporting counterparts replace the Windows paths and fixtures. Production SVG provenance, explicit simulated-host capture scope, image hashes and observable failure checks are retained; physical media is owner-only.",
+      "destinations": [
+        "scripts/docs-site-shots.mjs",
+        "scripts/lib/cdp.mjs",
+        "test/mac/docs-tools.test.mjs"
+      ],
+      "evidence": [
+        "npm run docs:shots -- <output> <published docs URL> <commit>",
+        "node --test test/mac/docs-tools.test.mjs"
+      ]
     },
     {
       "source": "scripts/docs-v17-images.mjs",
       "upstreamSha256": "1f74da8653bb2a1a1d7a02bf32f4ddde82db550a342d1f4fabda2462506d229c",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "1f74da8653bb2a1a1d7a02bf32f4ddde82db550a342d1f4fabda2462506d229c",
+      "disposition": "implemented",
+      "reason": "Mac-specific documentation/reporting counterparts replace the Windows paths and fixtures. Production SVG provenance, explicit simulated-host capture scope, image hashes and observable failure checks are retained; physical media is owner-only.",
+      "destinations": [
+        "scripts/docs-assets.mjs",
+        "scripts/marketplace-shots.mjs",
+        "scripts/readme-boards.mjs",
+        "test/mac/docs-assets.test.ts"
+      ],
+      "evidence": [
+        "npm run docs:assets",
+        "npm run marketing:shots",
+        "npm run readme-boards",
+        "npm run test:mac"
+      ]
     },
     {
       "source": "scripts/dump-keys.mjs",
       "upstreamSha256": "58084cc9d388966fe5248d98a1cef6aaca6e97c1ca29f82b261fee39daf8fee9",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "58084cc9d388966fe5248d98a1cef6aaca6e97c1ca29f82b261fee39daf8fee9",
+      "disposition": "implemented",
+      "reason": "Mac-specific documentation/reporting counterparts replace the Windows paths and fixtures. Production SVG provenance, explicit simulated-host capture scope, image hashes and observable failure checks are retained; physical media is owner-only.",
+      "destinations": [
+        "scripts/dump-keys.mjs",
+        "scripts/lib/mac-scenes.ts"
+      ],
+      "evidence": [
+        "tsx --tsconfig tsconfig.mac.json scripts/dump-keys.mjs"
+      ]
     },
     {
       "source": "scripts/e2e-drilldown.mjs",
@@ -2414,20 +2469,36 @@
     {
       "source": "scripts/gen-changelog-page.mjs",
       "upstreamSha256": "2c9e6c9f27adfa937af01f1c4bc03dedef4cfd6f77715038aad07554ee7a684b",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "2c9e6c9f27adfa937af01f1c4bc03dedef4cfd6f77715038aad07554ee7a684b",
+      "disposition": "implemented",
+      "reason": "Mac-specific documentation/reporting counterparts replace the Windows paths and fixtures. Production SVG provenance, explicit simulated-host capture scope, image hashes and observable failure checks are retained; physical media is owner-only.",
+      "destinations": [
+        "scripts/gen-changelog-page.mjs",
+        "scripts/validate-docs.mjs"
+      ],
+      "evidence": [
+        "npm run changelog:page",
+        "npm run docs:validate"
+      ]
     },
     {
       "source": "scripts/gen-docs-shots.mjs",
       "upstreamSha256": "aefa59257c0cd31c748311c5abb5638dc19f408d43471805755956b17e57a04e",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "aefa59257c0cd31c748311c5abb5638dc19f408d43471805755956b17e57a04e",
+      "disposition": "implemented",
+      "reason": "Mac-specific documentation/reporting counterparts replace the Windows paths and fixtures. Production SVG provenance, explicit simulated-host capture scope, image hashes and observable failure checks are retained; physical media is owner-only.",
+      "destinations": [
+        "scripts/docs-assets.mjs",
+        "scripts/marketplace-shots.mjs",
+        "scripts/readme-boards.mjs",
+        "test/mac/docs-assets.test.ts"
+      ],
+      "evidence": [
+        "npm run docs:assets",
+        "npm run marketing:shots",
+        "npm run readme-boards",
+        "npm run test:mac"
+      ]
     },
     {
       "source": "scripts/gen-icons.mjs",
@@ -2640,11 +2711,21 @@
     {
       "source": "scripts/marketplace-shots.mjs",
       "upstreamSha256": "2743ec46e13de8fdf3345cbc59b91db4961ecb2da22ea703cfcd9a4b2600a38e",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "2743ec46e13de8fdf3345cbc59b91db4961ecb2da22ea703cfcd9a4b2600a38e",
+      "disposition": "implemented",
+      "reason": "Mac-specific documentation/reporting counterparts replace the Windows paths and fixtures. Production SVG provenance, explicit simulated-host capture scope, image hashes and observable failure checks are retained; physical media is owner-only.",
+      "destinations": [
+        "scripts/docs-assets.mjs",
+        "scripts/marketplace-shots.mjs",
+        "scripts/readme-boards.mjs",
+        "test/mac/docs-assets.test.ts"
+      ],
+      "evidence": [
+        "npm run docs:assets",
+        "npm run marketing:shots",
+        "npm run readme-boards",
+        "npm run test:mac"
+      ]
     },
     {
       "source": "scripts/native-manifest.mjs",
@@ -2690,20 +2771,33 @@
     {
       "source": "scripts/perf-detail.mjs",
       "upstreamSha256": "923a79ba0fdafd8da00dec7aaa679b5dd0363c81586aa374a77f60d37434c709",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "923a79ba0fdafd8da00dec7aaa679b5dd0363c81586aa374a77f60d37434c709",
+      "disposition": "implemented",
+      "reason": "Mac-specific documentation/reporting counterparts replace the Windows paths and fixtures. Production SVG provenance, explicit simulated-host capture scope, image hashes and observable failure checks are retained; physical media is owner-only.",
+      "destinations": [
+        "scripts/perf-detail.mjs",
+        "scripts/e2e.mjs"
+      ],
+      "evidence": [
+        "tsx --tsconfig tsconfig.mac.json scripts/perf-detail.mjs",
+        "npm run e2e:load",
+        "npm run e2e:drilldown"
+      ]
     },
     {
       "source": "scripts/perf-report.mjs",
       "upstreamSha256": "47b769fdd8402b09720953aa0aa07e158b4ab7703c06faf216d337cdc562c9f7",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "47b769fdd8402b09720953aa0aa07e158b4ab7703c06faf216d337cdc562c9f7",
+      "disposition": "implemented",
+      "reason": "Mac-specific documentation/reporting counterparts replace the Windows paths and fixtures. Production SVG provenance, explicit simulated-host capture scope, image hashes and observable failure checks are retained; physical media is owner-only.",
+      "destinations": [
+        "scripts/perf-report.mjs",
+        "test/mac/docs-tools.test.mjs"
+      ],
+      "evidence": [
+        "node scripts/perf-report.mjs <completed soak> <package hash> <bytes>",
+        "node --test test/mac/docs-tools.test.mjs"
+      ]
     },
     {
       "source": "scripts/pi-harness.mjs",
@@ -2766,11 +2860,21 @@
     {
       "source": "scripts/readme-boards.mjs",
       "upstreamSha256": "17d2ec03b4a7d2fac56581d58985d561269fa956b64f8eba339ec739cb5b8537",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "17d2ec03b4a7d2fac56581d58985d561269fa956b64f8eba339ec739cb5b8537",
+      "disposition": "implemented",
+      "reason": "Mac-specific documentation/reporting counterparts replace the Windows paths and fixtures. Production SVG provenance, explicit simulated-host capture scope, image hashes and observable failure checks are retained; physical media is owner-only.",
+      "destinations": [
+        "scripts/docs-assets.mjs",
+        "scripts/marketplace-shots.mjs",
+        "scripts/readme-boards.mjs",
+        "test/mac/docs-assets.test.ts"
+      ],
+      "evidence": [
+        "npm run docs:assets",
+        "npm run marketing:shots",
+        "npm run readme-boards",
+        "npm run test:mac"
+      ]
     },
     {
       "source": "scripts/soak-adversary.mjs",
@@ -2875,11 +2979,19 @@
     {
       "source": "test/capture-pi-reading-colors.test.mjs",
       "upstreamSha256": "434b54a944878e48030d84d6e6d4ab089c1f33f69afbfa1db267267db33be09a",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "434b54a944878e48030d84d6e6d4ab089c1f33f69afbfa1db267267db33be09a",
+      "disposition": "implemented",
+      "reason": "Mac-specific documentation/reporting counterparts replace the Windows paths and fixtures. Production SVG provenance, explicit simulated-host capture scope, image hashes and observable failure checks are retained; physical media is owner-only.",
+      "destinations": [
+        "scripts/capture-mac-panels.mjs",
+        "scripts/docs-assets.mjs",
+        "test/mac/docs-assets.test.ts"
+      ],
+      "evidence": [
+        "npm run capture:panels",
+        "npm run docs:assets",
+        "npm run test:mac"
+      ]
     },
     {
       "source": "test/detail-profiles.test.ts",
@@ -2912,38 +3024,66 @@
     {
       "source": "test/docs-crawl.test.mjs",
       "upstreamSha256": "6b4623ccb00e2e1355c41c14f294678236a3570147af49b5183171943d2b79f8",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "6b4623ccb00e2e1355c41c14f294678236a3570147af49b5183171943d2b79f8",
+      "disposition": "implemented",
+      "reason": "Mac-specific documentation/reporting counterparts replace the Windows paths and fixtures. Production SVG provenance, explicit simulated-host capture scope, image hashes and observable failure checks are retained; physical media is owner-only.",
+      "destinations": [
+        "scripts/docs-crawl.mjs",
+        "test/mac/docs-crawl.test.mjs"
+      ],
+      "evidence": [
+        "node --test test/mac/docs-crawl.test.mjs",
+        "npm run docs:crawl -- <published docs URL>"
+      ]
     },
     {
       "source": "test/docs-image-provenance.test.ts",
       "upstreamSha256": "f540b20f31c3d99c333745fbe86e0e467aeacb0524ef4b898d9178c27c6d84ad",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "f540b20f31c3d99c333745fbe86e0e467aeacb0524ef4b898d9178c27c6d84ad",
+      "disposition": "implemented",
+      "reason": "Mac-specific documentation/reporting counterparts replace the Windows paths and fixtures. Production SVG provenance, explicit simulated-host capture scope, image hashes and observable failure checks are retained; physical media is owner-only.",
+      "destinations": [
+        "scripts/docs-assets.mjs",
+        "scripts/marketplace-shots.mjs",
+        "scripts/readme-boards.mjs",
+        "test/mac/docs-assets.test.ts"
+      ],
+      "evidence": [
+        "npm run docs:assets",
+        "npm run marketing:shots",
+        "npm run readme-boards",
+        "npm run test:mac"
+      ]
     },
     {
       "source": "test/docs-preview-stage.test.mjs",
       "upstreamSha256": "03ec3dd77503043c475ff4f361b946634d4ad0c9b412c18bcc333840d8cc5490",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "03ec3dd77503043c475ff4f361b946634d4ad0c9b412c18bcc333840d8cc5490",
+      "disposition": "implemented",
+      "reason": "The Mac preview uses a committed normal branch of the existing repository and restores main after merge. It creates no orphan history or disposable publishing repository. Clean-tree, remote, private-path and pushed-head checks precede the Pages API mutation.",
+      "destinations": [
+        "scripts/docs-preview-publish.mjs",
+        "test/mac/docs-tools.test.mjs"
+      ],
+      "evidence": [
+        "node --test test/mac/docs-tools.test.mjs"
+      ]
     },
     {
       "source": "test/docs-site-shots.test.mjs",
       "upstreamSha256": "7ac8364f1944f8f2e278308757dc64e521f067a5f065525e17d77b4cfae88cc8",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "7ac8364f1944f8f2e278308757dc64e521f067a5f065525e17d77b4cfae88cc8",
+      "disposition": "implemented",
+      "reason": "Mac-specific documentation/reporting counterparts replace the Windows paths and fixtures. Production SVG provenance, explicit simulated-host capture scope, image hashes and observable failure checks are retained; physical media is owner-only.",
+      "destinations": [
+        "scripts/docs-site-shots.mjs",
+        "scripts/lib/cdp.mjs",
+        "test/mac/docs-tools.test.mjs"
+      ],
+      "evidence": [
+        "npm run docs:shots -- <output> <published docs URL> <commit>",
+        "node --test test/mac/docs-tools.test.mjs"
+      ]
     },
     {
       "source": "test/e2e-load.test.mjs",
@@ -3046,11 +3186,17 @@
     {
       "source": "test/script-failures.test.mjs",
       "upstreamSha256": "47916de76a0d1e70d0595c2555c9a9fa9847147447c709748e07419d233ddb0d",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "47916de76a0d1e70d0595c2555c9a9fa9847147447c709748e07419d233ddb0d",
+      "disposition": "implemented",
+      "reason": "Mac-specific documentation/reporting counterparts replace the Windows paths and fixtures. Production SVG provenance, explicit simulated-host capture scope, image hashes and observable failure checks are retained; physical media is owner-only.",
+      "destinations": [
+        "scripts/lib/script-failures.mjs",
+        "test/mac/docs-tools.test.mjs",
+        "test/mac/release-gates.test.mjs"
+      ],
+      "evidence": [
+        "node --test test/mac/docs-tools.test.mjs test/mac/release-gates.test.mjs"
+      ]
     },
     {
       "source": "test/soak-adversary.test.mjs",

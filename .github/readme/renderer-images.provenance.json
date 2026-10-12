@@ -289,6 +289,12 @@
       "svgSha256": "962b1c6dab644c11600647c613ae9ac35ec9a6784372d526c8ce4f185ad88c93"
     },
     {
+      "id": "dial-overview-colored",
+      "kind": "dial",
+      "description": "Individual number colors",
+      "svgSha256": "263c15d280bb8ee9c9fc9ee2df9dc939aa99039bcbf317aa4dd1891947b38b33"
+    },
+    {
       "id": "status-pending",
       "kind": "key",
       "description": "pending",
@@ -442,6 +448,17 @@
         "warn",
         "crit",
         "bar"
+      ],
+      "kind": "production-rendered sample data"
+    },
+    {
+      "file": "reading-colors.png",
+      "width": 1280,
+      "height": 720,
+      "sha256": "e33bac43cb36b71f2a31f3a8a12a5e0ddcf0457b2c52cd969fd12afd9fd6011b",
+      "sceneIds": [
+        "dial-overview",
+        "dial-overview-colored"
       ],
       "kind": "production-rendered sample data"
     },

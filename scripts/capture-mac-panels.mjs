@@ -12,11 +12,13 @@ browser.on('Runtime.exceptionThrown',row=>errors.push(row.exceptionDetails?.text
 try{
  for(const [fixture,file,settings] of [
   ['key-configured','settings-key.png',{readingKey:sampleReadings[0].key,label:'CPU super 1',displayMode:'sparkline',theme:'void',warnValue:'75',critValue:'90'}],
-  ['dial-configured','settings-dial.png',{readingKey:sampleReadings[0].key,label:'CPU super 1',rotationKeys:sampleReadings.slice(0,3).map(r=>r.key),dialView:'overview',theme:'void'}]
+  ['dial-configured','settings-dial.png',{readingKey:sampleReadings[0].key,label:'CPU super 1',rotationKeys:sampleReadings.slice(0,3).map(r=>r.key),dialView:'overview',theme:'void'}],
+  ['dial-configured','settings-reading-colors.png',{readingKey:sampleReadings[0].key,label:'CPU super 1',rotationKeys:sampleReadings.slice(0,3).map(r=>r.key),dialView:'overview',theme:'void',readingColors:Object.fromEntries(sampleReadings.slice(0,3).map((row,index)=>[row.key,['#4CC2FF','#FF7E8E','#38CD89'][index]]))}]
  ]){
   sim.setFixture(fixture,{snapshot:sampleSnapshot(),settings,globals:{theme:'void',textMode:'theme',typeAccents:'off',pollIntervalMs:'1000'}});await browser.goto(sim.url(fixture));
   for(let i=0;i<100;i++){if(await browser.evaluate('!!window.__hwPanel?.tree && !document.documentElement.hasAttribute("data-folds-pending")'))break;await new Promise(resolve=>setTimeout(resolve,30));}
   await browser.evaluate('document.fonts.ready');await browser.evaluate('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))');
+  if(file==='settings-reading-colors.png')await browser.evaluate('document.querySelectorAll("details").forEach(element=>element.open=true)');
   const png=await browser.screenshot({full:true});fs.writeFileSync(path.join(out,file),png);const facts=await browser.evaluate('({build:window.__hwPiVersion,width:innerWidth,dpr:devicePixelRatio,overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth})');
   if(facts.overflow||sim.writes.length||sim.globalWrites.length||errors.length)throw new Error('Capture did not remain a clean observation');captures.push({file,kind:'settings-panel capture, simulated host, sample data',sha256:createHash('sha256').update(png).digest('hex'),settings,...facts});
  }

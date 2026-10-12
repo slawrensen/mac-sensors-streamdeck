@@ -1,0 +1,8 @@
+// A public-safe report from a completed private soak. Raw paths and IDs stay out.
+import fs from 'node:fs';
+import path from 'node:path';
+const [directory,packHash,packBytes]=process.argv.slice(2);
+if(!directory||!/^[a-f0-9]{64}$/.test(packHash??'')||!Number.isSafeInteger(Number(packBytes)))throw new Error('Usage: perf-report <completed soak directory> <package SHA256> <package bytes>');
+const summary=JSON.parse(fs.readFileSync(path.join(directory,'summary.json'))),state=JSON.parse(fs.readFileSync(path.join(directory,'state.json')));
+const slopes=summary.segments.map(s=>s.slopeMiBPer30Minutes).filter(x=>x!==null),max=field=>Math.max(...summary.segments.map(s=>s[field]));
+console.log(`### ${state.startedAt.slice(0,10)}: Mac candidate observation\n\nCommand: npm run soak. Package SHA-256: ${packHash} (${packBytes} bytes). Development bundle SHA-256: ${state.files['bin/plugin.js']}.\n\n| Measure | Result |\n| --- | --- |\n| Window | ${summary.elapsedHours.toFixed(3)} hours, ${summary.samples} samples |\n| Maximum measured RSS slope | ${slopes.length?Math.max(...slopes).toFixed(3)+' MiB per30minutes':'not enough data'} |\n| Maximum RSS | ${(max('maxRss')/1048576).toFixed(2)} MiB |\n| Maximum footprint | ${(max('maxFootprint')/1048576).toFixed(2)} MiB |\n| CPU time | ${summary.segments.reduce((n,s)=>n+s.cpuSeconds,0).toFixed(2)} seconds |\n| Unexplained flags | ${summary.unexplained} |\n| Resource/freshness gate | ${summary.passed?'PASS':'NOT PASSED'} |\n\nScope: actual app development identity. Physical device gestures, Intel hardware and owner-only events require their own evidence. New diagnostic reports: ${summary.newDiagnosticReports.length}; review: ${summary.crashReview}.\n`);

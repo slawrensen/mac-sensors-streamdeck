@@ -23,3 +23,11 @@ Physical rotate, push, touch and long-touch validation requires a deck with enco
 ![Sensor Dial settings](assets/img/settings-dial.png)
 
 *Settings-panel capture, panel build 1.0.0.0-mac7. Simulated host with sample data.*
+
+![Individual reading colors](assets/img/reading-colors.png)
+
+*Production-rendered sample data. The comparison changes number colors and preserves geometry.*
+
+![Reading color settings](assets/img/settings-reading-colors.png)
+
+*Settings-panel capture of individual reading colors. Simulated host with sample data.*

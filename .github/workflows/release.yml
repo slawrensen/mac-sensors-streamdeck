@@ -26,6 +26,7 @@ jobs:
         env:
           RELEASE_TAG: ${{ github.ref_name }}
         run: node scripts/verify-release-tag.mjs
+      - run: npm run core:check -- --release
       - run: npm ci --ignore-scripts
       - run: npm run release:validate -- --out release/tag-qualification
       - run: npm run native:repro
