@@ -1,0 +1,234 @@
+#include "collectors.h"
+#include "smc.h"
+#include <CoreFoundation/CoreFoundation.h>
+#include <CoreText/CoreText.h>
+#include <mach/mach.h>
+#include <mach/mach_time.h>
+#include <sys/sysctl.h>
+#include <sys/mount.h>
+#include <net/if.h>
+#include <net/if_dl.h>
+#include <net/if_types.h>
+#include <ifaddrs.h>
+#include <errno.h>
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include "catalog.inc"
+
+bool hwmac_catalog_applies(unsigned scope, const char *model, const char *chip, int apple_silicon) {
+	if (scope == 0) return true;
+	if (apple_silicon != 1) return false;
+	if (scope == 1) return true;
+	for (size_t i = 0; i < sizeof(HWMAC_MODELS) / sizeof(HWMAC_MODELS[0]); i++) {
+		if (scope == HWMAC_MODELS[i].scope && strcmp(model, HWMAC_MODELS[i].model) == 0 && strcmp(chip, HWMAC_MODELS[i].chip) == 0) return true;
+	}
+	return false;
+}
+static double tick_ms(uint64_t ticks) {
+	mach_timebase_info_data_t base;
+	if (mach_timebase_info(&base) != KERN_SUCCESS || base.denom == 0) return NAN;
+	return (double)ticks * (double)base.numer / (double)base.denom / 1e6;
+}
+double hwmac_continuous_ms(void) { return tick_ms(mach_continuous_time()); }
+double hwmac_awake_ms(void) { return tick_ms(mach_absolute_time()); }
+static double wall_now(void) {
+	struct timespec time;
+	if (clock_gettime(CLOCK_REALTIME, &time) != 0) return NAN;
+	return (double)time.tv_sec + (double)time.tv_nsec / 1e9;
+}
+static bool sys_number(const char *name, void *value, size_t size) {
+	size_t length = size;
+	return sysctlbyname(name, value, &length, NULL, 0) == 0 && length == size;
+}
+void hwmac_facts(source_packet *packet) {
+	size_t length = sizeof(packet->model);
+	if (sysctlbyname("hw.model", packet->model, &length, NULL, 0) != 0 || length == 0 || length > sizeof(packet->model)) packet->model[0] = 0;
+	packet->model[sizeof(packet->model) - 1] = 0;
+	int family = 0;
+	packet->apple_silicon = sys_number("hw.optional.arm64", &family, sizeof(family)) ? (family == 1) : -1;
+	int translated = 0; errno = 0;
+	if (sys_number("sysctl.proc_translated", &translated, sizeof(translated))) packet->translated = translated == 1;
+	else { packet->translated = -1; packet->translation_error = errno != 0 ? errno : EIO; }
+	io_registry_entry_t entry = IORegistryEntryFromPath(kIOMainPortDefault, "IODeviceTree:/arm-io");
+	if (entry != 0) {
+		CFTypeRef property = IORegistryEntryCreateCFProperty(entry, CFSTR("device_type"), kCFAllocatorDefault, 0);
+		if (property != NULL && CFGetTypeID(property) == CFDataGetTypeID()) {
+			CFIndex count = CFDataGetLength((CFDataRef)property);
+			if (count > 0 && count < (CFIndex)sizeof(packet->chip)) memcpy(packet->chip, CFDataGetBytePtr((CFDataRef)property), (size_t)count);
+			char *suffix = strstr(packet->chip, "-io"); if (suffix != NULL) *suffix = 0;
+		}
+		if (property != NULL) CFRelease(property);
+		IOObjectRelease(entry);
+	}
+}
+static const char *unit_for(const char *kind) {
+	if (strcmp(kind, "temperature") == 0) return "°C";
+	if (strcmp(kind, "fan") == 0) return "RPM";
+	if (strcmp(kind, "voltage") == 0) return "V";
+	if (strcmp(kind, "current") == 0) return "A";
+	if (strcmp(kind, "power") == 0) return "W";
+	return "B";
+}
+static sensor_row *new_row(source_packet *packet, const char *key, const char *label, const char *group, const char *kind, const char *unit) {
+	if (packet->count >= HWMAC_MAX_ROWS) return NULL;
+	sensor_row *row = &packet->rows[packet->count++];
+	snprintf(row->key, sizeof(row->key), "%s", key);
+	snprintf(row->label, sizeof(row->label), "%s", label);
+	snprintf(row->group, sizeof(row->group), "%s", group);
+	snprintf(row->kind, sizeof(row->kind), "%s", kind);
+	snprintf(row->unit, sizeof(row->unit), "%s", unit);
+	row->value = NAN;
+	return row;
+}
+static void observed(sensor_row *row, double value) {
+	if (row == NULL) return;
+	row->continuous_ms = hwmac_continuous_ms(); row->wall_seconds = wall_now();
+	row->valid = isfinite(value) && isfinite(row->continuous_ms) && isfinite(row->wall_seconds);
+	row->value = row->valid ? value : NAN;
+}
+static void system_value(source_packet *packet, const char *key, const char *label, const char *group, double value) {
+	observed(new_row(packet, key, label, group, "other", "B"), value);
+}
+void hwmac_close_smc(smc_context *context) {
+	if (context->connection != 0) IOServiceClose(context->connection);
+	memset(context, 0, sizeof(*context));
+}
+void hwmac_collect_smc(smc_context *context, source_packet *packet) {
+	double start = hwmac_continuous_ms(); hwmac_facts(packet);
+	if (context->connection == 0) {
+		io_service_t service = IOServiceGetMatchingService(kIOMainPortDefault, IOServiceMatching("AppleSMC"));
+		if (service == 0) { packet->error = 10; goto done; }
+		kern_return_t status = IOServiceOpen(service, mach_task_self(), 0, &context->connection);
+		IOObjectRelease(service);
+		if (status != KERN_SUCCESS) { packet->error = 11; packet->system_error = status; context->connection = 0; goto done; }
+	}
+	bool broken = false;
+	for (size_t i = 0; i < sizeof(HWMAC_CATALOG) / sizeof(HWMAC_CATALOG[0]); i++) {
+		const sensor_spec *spec = &HWMAC_CATALOG[i];
+		if (!hwmac_catalog_applies(spec->scope, packet->model, packet->chip, packet->apple_silicon)) continue;
+		sensor_row *row = new_row(packet, spec->key, spec->label, spec->group, spec->kind, unit_for(spec->kind));
+		if (row == NULL) { packet->error = 12; break; }
+		uint8_t reply[80]; smc_result result = {0};
+		uint32_t key = smc_key(spec->key);
+		/* Metadata is bounded discovery, cached only for this connection. Missing keys retry. */
+		if (context->sizes[i] == 0) {
+			row->operation = 9;
+			result = smc_read_request(context->connection, 9, key, 0, 0, reply, IOConnectCallStructMethod);
+			if (result.code == 0) {
+				context->types[i] = smc_u32(reply + 32); context->sizes[i] = smc_u32(reply + 28);
+				if (context->sizes[i] == 0 || context->sizes[i] > 32) { result.code = 2; context->sizes[i] = 0; }
+			}
+		}
+		double acquired = NAN, acquired_wall = NAN;
+		if (result.code == 0) { row->operation = 5; acquired = hwmac_continuous_ms(); acquired_wall = wall_now(); result = smc_read_request(context->connection, 5, key, context->sizes[i], 0, reply, IOConnectCallStructMethod); }
+		if (result.code != 0) {
+			row->error = result.code; row->system_error = result.system_code; row->firmware_error = result.firmware_code;
+			if (result.code == 3) broken = true;
+			continue;
+		}
+		double value;
+		if (!smc_decode(context->types[i], context->sizes[i], reply + 48, &value) || value < spec->minimum || value > spec->maximum) { row->error = 13; continue; }
+		observed(row, value);
+		/* Age from the start of the actual read, never from a delayed return. */
+		row->continuous_ms = acquired; row->wall_seconds = acquired_wall;
+	}
+	if (broken) hwmac_close_smc(context);
+ done:
+	packet->continuous_ms = hwmac_continuous_ms(); packet->awake_ms = hwmac_awake_ms(); packet->wall_seconds = wall_now(); packet->duration_ms = packet->continuous_ms - start;
+}
+static int compare_u64(const void *a, const void *b) {
+	uint64_t aa = *(const uint64_t *)a, bb = *(const uint64_t *)b;
+	return aa < bb ? -1 : aa > bb ? 1 : 0;
+}
+static uint64_t membership(uint64_t *members, size_t count) {
+	qsort(members, count, sizeof(*members), compare_u64);
+	uint64_t hash = UINT64_C(1469598103934665603);
+	for (size_t i = 0; i < count; i++) for (unsigned shift = 0; shift < 64; shift += 8) { hash ^= (members[i] >> shift) & 255; hash *= UINT64_C(1099511628211); }
+	return hash;
+}
+static void network(source_packet *packet) {
+	struct ifaddrs *list = NULL;
+	if (getifaddrs(&list) != 0) return;
+	uint64_t members[128]; size_t count = 0; bool valid = true;
+	for (struct ifaddrs *item = list; item != NULL; item = item->ifa_next) {
+		if (item->ifa_addr == NULL || item->ifa_addr->sa_family != AF_LINK || item->ifa_data == NULL || item->ifa_name == NULL) continue;
+		const struct if_data *data = (const struct if_data *)item->ifa_data;
+		if (data->ifi_type != IFT_ETHER || strncmp(item->ifa_name, "en", 2) != 0 || item->ifa_name[2] == 0) continue;
+		bool digits = true; for (const char *part = item->ifa_name + 2; *part != 0; part++) if (*part < '0' || *part > '9') digits = false;
+		if (!digits) continue;
+		char *end = NULL; unsigned long index = strtoul(item->ifa_name + 2, &end, 10);
+		if (end == NULL || *end != 0 || index > UINT32_MAX) continue;
+		uint64_t member = (uint64_t)index; bool duplicate = false;
+		for (size_t i = 0; i < count; i++) if (members[i] == member) duplicate = true;
+		if (duplicate) continue;
+		if (count == 128 || UINT64_MAX - packet->network_in < data->ifi_ibytes || UINT64_MAX - packet->network_out < data->ifi_obytes) { valid = false; break; }
+		members[count++] = member; packet->network_in += data->ifi_ibytes; packet->network_out += data->ifi_obytes;
+	}
+	freeifaddrs(list);
+	packet->network_valid = valid && count > 0; packet->network_members = membership(members, count);
+}
+static bool dictionary_counter(CFDictionaryRef dictionary, CFStringRef key, uint64_t *value) {
+	CFTypeRef property = CFDictionaryGetValue(dictionary, key); int64_t number = -1;
+	if (property == NULL || CFGetTypeID(property) != CFNumberGetTypeID() || !CFNumberGetValue((CFNumberRef)property, kCFNumberSInt64Type, &number) || number < 0) return false;
+	*value = (uint64_t)number; return true;
+}
+static void storage(source_packet *packet) {
+	io_iterator_t iterator = 0;
+	if (IOServiceGetMatchingServices(kIOMainPortDefault, IOServiceMatching("IOBlockStorageDriver"), &iterator) != KERN_SUCCESS) return;
+	uint64_t members[128]; size_t count = 0; bool valid = true; io_service_t service;
+	while ((service = IOIteratorNext(iterator)) != 0) {
+		uint64_t identifier = 0, read = 0, written = 0;
+		kern_return_t id_status = IORegistryEntryGetRegistryEntryID(service, &identifier);
+		CFTypeRef stats = IORegistryEntryCreateCFProperty(service, CFSTR("Statistics"), kCFAllocatorDefault, 0);
+		IOObjectRelease(service);
+		bool duplicate = false; for (size_t i = 0; i < count; i++) if (members[i] == identifier) duplicate = true;
+		bool found = id_status == KERN_SUCCESS && stats != NULL && CFGetTypeID(stats) == CFDictionaryGetTypeID() && dictionary_counter((CFDictionaryRef)stats, CFSTR("Bytes (Read)"), &read) && dictionary_counter((CFDictionaryRef)stats, CFSTR("Bytes (Write)"), &written);
+		if (stats != NULL) CFRelease(stats);
+		if (duplicate) continue;
+		if (!found || count == 128 || UINT64_MAX - packet->storage_read < read || UINT64_MAX - packet->storage_write < written) { valid = false; continue; }
+		members[count++] = identifier; packet->storage_read += read; packet->storage_write += written;
+	}
+	IOObjectRelease(iterator);
+	packet->storage_valid = valid && count > 0; packet->storage_members = membership(members, count);
+}
+void hwmac_collect_public(source_packet *packet) {
+	/* This batch is not atomic across APIs. Its oldest possible acquisition
+	 * bounds every aggregate, so a late storage call cannot freshen CPU data. */
+	double start = hwmac_continuous_ms(), awake_start = hwmac_awake_ms(), wall_start = wall_now(); hwmac_facts(packet);
+	CTFontRef font = CTFontCreateWithNameAndOptions(CFSTR("Tahoma-Bold"), 12, NULL, kCTFontOptionsPreventAutoActivation);
+	if (font != NULL) { CFStringRef name = CTFontCopyPostScriptName(font); packet->font_available = name != NULL && CFEqual(name, CFSTR("Tahoma-Bold")); if (name != NULL) CFRelease(name); CFRelease(font); }
+	mach_port_t host = mach_host_self();
+	natural_t cpus = 0; processor_info_array_t info = NULL; mach_msg_type_number_t length = 0;
+	if (host_processor_info(host, PROCESSOR_CPU_LOAD_INFO, &cpus, &info, &length) == KERN_SUCCESS) {
+		if (cpus > 0 && cpus <= HWMAC_MAX_CPUS && length == cpus * CPU_STATE_MAX) {
+			packet->cpu_count = cpus; packet->cpu_valid = true;
+			for (unsigned cpu = 0; cpu < cpus; cpu++) for (unsigned state = 0; state < 4; state++) packet->cpu_ticks[cpu][state] = (uint32_t)info[cpu * 4 + state];
+		}
+		vm_deallocate(mach_task_self(), (vm_address_t)info, (vm_size_t)length * sizeof(integer_t));
+	}
+	uint64_t total = 0;
+	if (sys_number("hw.memsize", &total, sizeof(total))) system_value(packet, "memory-total", "Memory total", "Memory", (double)total);
+	vm_size_t page_size = 0; vm_statistics64_data_t vm; mach_msg_type_number_t vm_count = HOST_VM_INFO64_COUNT;
+	if (host_page_size(host, &page_size) == KERN_SUCCESS && host_statistics64(host, HOST_VM_INFO64, (host_info64_t)&vm, &vm_count) == KERN_SUCCESS && vm_count == HOST_VM_INFO64_COUNT) {
+		system_value(packet, "memory-free", "Memory free", "Memory", (double)vm.free_count * page_size);
+		system_value(packet, "memory-active", "Memory active", "Memory", (double)vm.active_count * page_size);
+		system_value(packet, "memory-inactive", "Memory inactive", "Memory", (double)vm.inactive_count * page_size);
+		system_value(packet, "memory-wired", "Memory wired", "Memory", (double)vm.wire_count * page_size);
+		system_value(packet, "memory-compressed", "Memory compressed", "Memory", (double)vm.compressor_page_count * page_size);
+	}
+	mach_port_deallocate(mach_task_self(), host);
+	struct xsw_usage swap;
+	if (sys_number("vm.swapusage", &swap, sizeof(swap))) system_value(packet, "swap-used", "Swap used", "Memory", (double)swap.xsu_used);
+	struct statfs disk;
+	if (statfs("/", &disk) == 0 && disk.f_bsize > 0) {
+		system_value(packet, "disk-root-total", "Startup volume total", "Storage", (double)disk.f_blocks * disk.f_bsize);
+		system_value(packet, "disk-root-available", "Startup volume available", "Storage", (double)disk.f_bavail * disk.f_bsize);
+	}
+	network(packet); storage(packet);
+	packet->duration_ms = hwmac_continuous_ms() - start;
+	packet->continuous_ms = start; packet->awake_ms = awake_start; packet->wall_seconds = wall_start;
+	for (unsigned i = 0; i < packet->count; i++) { packet->rows[i].continuous_ms = start; packet->rows[i].wall_seconds = wall_start; }
+}

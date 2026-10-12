@@ -1,11 +1,11 @@
 Source: slawrensen/hwinfo-streamdeck/src/pi-protocol.ts@11b9645b78395f157493648d873a3066673ba493
 Seam: S1/S2
-Reason: Select platform poller, status and historical-statistics copy while preserving upstream defaults.
+Reason: Expose Mac catalog revisions and an explicit manual refresh flag; retain upstream payloads and cadence by default.
 Before: 2f210099484aff9e94a42155aba19f324dffffcf409732f0901c2ce9c5fe9646
-After: 03c40a7f7f3541aa1b7c5350aae74a5e04f1863522a6eb0303e8e69dc756429f
+After: 36258aaa0bf25fe99fd06d98e00adf58e3a83a084e1457de791fd438fec001d6
 
 diff --git a/src/pi-protocol.ts b/src/pi-protocol.ts
-index 57b2a05..9653ae8 100644
+index 57b2a05..85b9b8f 100644
 --- a/src/pi-protocol.ts
 +++ b/src/pi-protocol.ts
 @@ -1,3 +1,4 @@
@@ -30,7 +30,39 @@ index 57b2a05..9653ae8 100644
  import { appliedTextMode, parseTextSettings, resolveTextColors } from "./ui/text-colors";
  import { effectiveTextFor, effectiveThemeFor, getDataUnits, getDeckTheme, measureOptionsFrom, typeAccentsEnabled } from "./ui/theme-store";
  import { loadThemes, resolvePalette } from "./ui/themes";
-@@ -316,7 +317,7 @@ export function buildPreview(status: PollerStatus, settings: PreviewSettings | u
+@@ -70,6 +71,7 @@ type TreeGroup = {
+ };
+ 
+ type SensorTreePayload = {
++	catalogRevision?: number;
+ 	event: "sensorTree";
+ 	groups: TreeGroup[];
+ 	/** Poller state at fetch time — lets the PI refetch after HWiNFO comes up. */
+@@ -81,6 +83,7 @@ type SensorTreePayload = {
+ };
+ 
+ type PreviewPayload = {
++	catalogRevision?: number;
+ 	event: "preview";
+ 	state: PollerStatus["state"];
+ 	/** Active data source ("shared-memory" | "gadget"); absent when unavailable. */
+@@ -231,6 +234,7 @@ export function buildSensorTree(status: PollerStatus): SensorTreePayload {
+ 	const payload: SensorTreePayload = { event: "sensorTree", groups, state: status.state, hint: statusSentence(status) };
+ 	if (status.state !== "unavailable") {
+ 		payload.source = status.source;
++		if (status.snapshot.catalogRevision !== undefined) payload.catalogRevision = status.snapshot.catalogRevision;
+ 	}
+ 	return payload;
+ }
+@@ -259,6 +263,7 @@ export function buildPreview(status: PollerStatus, settings: PreviewSettings | u
+ 	}
+ 	if (status.state !== "unavailable") {
+ 		payload.source = status.source;
++		if (status.snapshot.catalogRevision !== undefined) payload.catalogRevision = status.snapshot.catalogRevision;
+ 		if (extras.holding === true) {
+ 			payload.holding = true;
+ 		}
+@@ -316,7 +321,7 @@ export function buildPreview(status: PollerStatus, settings: PreviewSettings | u
  	payload.display = {
  		value: m.valueText,
  		unit: m.unitText,
@@ -39,3 +71,11 @@ index 57b2a05..9653ae8 100644
  		bg: background,
  		valueColor,
  		statsColor
+@@ -389,6 +394,7 @@ export function handlePiRequest(payload: JsonValue): void {
+ 		return;
+ 	}
+ 	if (payload.event === "getSensorTree") {
++		if (payload.refresh === true) poller.checkAgain();
+ 		void streamDeck.ui.sendToPropertyInspector(buildSensorTree(poller.getStatus()));
+ 	} else if (payload.event === "getThemes") {
+ 		void streamDeck.ui.sendToPropertyInspector(buildThemesPayload());

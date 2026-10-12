@@ -1,0 +1,499 @@
+{
+  "schema": 1,
+  "modelTables": {
+    "Mac17,9": {
+      "chip": "t6050",
+      "table": "m5"
+    }
+  },
+  "rows": [
+    {
+      "key": "TC0D",
+      "label": "CPU diode",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "common",
+      "sourceLine": 341
+    },
+    {
+      "key": "TC0E",
+      "label": "CPU diode virtual",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "common",
+      "sourceLine": 342
+    },
+    {
+      "key": "TC0P",
+      "label": "CPU proximity",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "common",
+      "sourceLine": 345
+    },
+    {
+      "key": "TG0D",
+      "label": "GPU diode",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "common",
+      "sourceLine": 357
+    },
+    {
+      "key": "TG0P",
+      "label": "GPU proximity",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "common",
+      "sourceLine": 360
+    },
+    {
+      "key": "TB1T",
+      "label": "Battery",
+      "group": "Battery",
+      "type": "temperature",
+      "scope": "common",
+      "sourceLine": 364
+    },
+    {
+      "key": "TW0P",
+      "label": "Airport",
+      "group": "System",
+      "type": "temperature",
+      "scope": "common",
+      "sourceLine": 365
+    },
+    {
+      "key": "Tp00",
+      "label": "CPU super core 1",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 488
+    },
+    {
+      "key": "Tp04",
+      "label": "CPU super core 2",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 489
+    },
+    {
+      "key": "Tp08",
+      "label": "CPU super core 3",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 490
+    },
+    {
+      "key": "Tp0C",
+      "label": "CPU super core 4",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 491
+    },
+    {
+      "key": "Tp0G",
+      "label": "CPU super core 5",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 492
+    },
+    {
+      "key": "Tp0K",
+      "label": "CPU super core 6",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 493
+    },
+    {
+      "key": "Tp0O",
+      "label": "CPU performance core 1",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 495
+    },
+    {
+      "key": "Tp0R",
+      "label": "CPU performance core 2",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 496
+    },
+    {
+      "key": "Tp0U",
+      "label": "CPU performance core 3",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 497
+    },
+    {
+      "key": "Tp0X",
+      "label": "CPU performance core 4",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 498
+    },
+    {
+      "key": "Tp0a",
+      "label": "CPU performance core 5",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 499
+    },
+    {
+      "key": "Tp0d",
+      "label": "CPU performance core 6",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 500
+    },
+    {
+      "key": "Tp0g",
+      "label": "CPU performance core 7",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 501
+    },
+    {
+      "key": "Tp0j",
+      "label": "CPU performance core 8",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 502
+    },
+    {
+      "key": "Tp0m",
+      "label": "CPU performance core 9",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 503
+    },
+    {
+      "key": "Tp0p",
+      "label": "CPU performance core 10",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 504
+    },
+    {
+      "key": "Tp0u",
+      "label": "CPU performance core 11",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 505
+    },
+    {
+      "key": "Tp0y",
+      "label": "CPU performance core 12",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 506
+    },
+    {
+      "key": "Tg0U",
+      "label": "GPU 1",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 508
+    },
+    {
+      "key": "Tg0X",
+      "label": "GPU 2",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 509
+    },
+    {
+      "key": "Tg0d",
+      "label": "GPU 3",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 510
+    },
+    {
+      "key": "Tg0g",
+      "label": "GPU 4",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 511
+    },
+    {
+      "key": "Tg0j",
+      "label": "GPU 5",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 512
+    },
+    {
+      "key": "Tg1Y",
+      "label": "GPU 6",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 513
+    },
+    {
+      "key": "Tg1c",
+      "label": "GPU 7",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 514
+    },
+    {
+      "key": "Tg1g",
+      "label": "GPU 8",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 515
+    },
+    {
+      "key": "TaLP",
+      "label": "Airflow left",
+      "group": "System",
+      "type": "temperature",
+      "scope": "apple",
+      "sourceLine": 566
+    },
+    {
+      "key": "TaRF",
+      "label": "Airflow right",
+      "group": "System",
+      "type": "temperature",
+      "scope": "apple",
+      "sourceLine": 567
+    },
+    {
+      "key": "TH0x",
+      "label": "NAND",
+      "group": "System",
+      "type": "temperature",
+      "scope": "apple",
+      "sourceLine": 569
+    },
+    {
+      "key": "TB2T",
+      "label": "Battery 2",
+      "group": "Battery",
+      "type": "temperature",
+      "scope": "apple",
+      "sourceLine": 571
+    },
+    {
+      "key": "VM0R",
+      "label": "Memory",
+      "group": "System",
+      "type": "voltage",
+      "scope": "common",
+      "sourceLine": 582
+    },
+    {
+      "key": "VD0R",
+      "label": "DC In",
+      "group": "System",
+      "type": "voltage",
+      "scope": "common",
+      "sourceLine": 585
+    },
+    {
+      "key": "IC0R",
+      "label": "CPU High side",
+      "group": "System",
+      "type": "current",
+      "scope": "common",
+      "sourceLine": 595
+    },
+    {
+      "key": "IG0R",
+      "label": "GPU High side",
+      "group": "System",
+      "type": "current",
+      "scope": "common",
+      "sourceLine": 596
+    },
+    {
+      "key": "ID0R",
+      "label": "DC In",
+      "group": "System",
+      "type": "current",
+      "scope": "common",
+      "sourceLine": 597
+    },
+    {
+      "key": "IBAC",
+      "label": "Battery",
+      "group": "Battery",
+      "type": "current",
+      "scope": "common",
+      "sourceLine": 598
+    },
+    {
+      "key": "PCPC",
+      "label": "CPU Package",
+      "group": "CPU",
+      "type": "power",
+      "scope": "common",
+      "sourceLine": 610
+    },
+    {
+      "key": "PCTR",
+      "label": "CPU Total",
+      "group": "CPU",
+      "type": "power",
+      "scope": "common",
+      "sourceLine": 611
+    },
+    {
+      "key": "PCPT",
+      "label": "CPU Package total",
+      "group": "CPU",
+      "type": "power",
+      "scope": "common",
+      "sourceLine": 612
+    },
+    {
+      "key": "PCPR",
+      "label": "CPU Package total (SMC)",
+      "group": "CPU",
+      "type": "power",
+      "scope": "common",
+      "sourceLine": 613
+    },
+    {
+      "key": "PG0C",
+      "label": "GPU",
+      "group": "GPU",
+      "type": "power",
+      "scope": "common",
+      "sourceLine": 619
+    },
+    {
+      "key": "PCGC",
+      "label": "Intel GPU",
+      "group": "GPU",
+      "type": "power",
+      "scope": "common",
+      "sourceLine": 622
+    },
+    {
+      "key": "PPBR",
+      "label": "Battery",
+      "group": "Battery",
+      "type": "power",
+      "scope": "common",
+      "sourceLine": 626
+    },
+    {
+      "key": "PDTR",
+      "label": "DC In",
+      "group": "System",
+      "type": "power",
+      "scope": "common",
+      "sourceLine": 627
+    },
+    {
+      "key": "PMTR",
+      "label": "Memory Total",
+      "group": "System",
+      "type": "power",
+      "scope": "common",
+      "sourceLine": 628
+    },
+    {
+      "key": "PSTR",
+      "label": "System Total",
+      "group": "System",
+      "type": "power",
+      "scope": "common",
+      "sourceLine": 629
+    },
+    {
+      "key": "F0Ac",
+      "label": "Fan 1",
+      "group": "Fans",
+      "type": "fan",
+      "scope": "common",
+      "sourceLine": null
+    },
+    {
+      "key": "F1Ac",
+      "label": "Fan 2",
+      "group": "Fans",
+      "type": "fan",
+      "scope": "common",
+      "sourceLine": null
+    },
+    {
+      "key": "F2Ac",
+      "label": "Fan 3",
+      "group": "Fans",
+      "type": "fan",
+      "scope": "common",
+      "sourceLine": null
+    },
+    {
+      "key": "F3Ac",
+      "label": "Fan 4",
+      "group": "Fans",
+      "type": "fan",
+      "scope": "common",
+      "sourceLine": null
+    },
+    {
+      "key": "F4Ac",
+      "label": "Fan 5",
+      "group": "Fans",
+      "type": "fan",
+      "scope": "common",
+      "sourceLine": null
+    },
+    {
+      "key": "F5Ac",
+      "label": "Fan 6",
+      "group": "Fans",
+      "type": "fan",
+      "scope": "common",
+      "sourceLine": null
+    },
+    {
+      "key": "F6Ac",
+      "label": "Fan 7",
+      "group": "Fans",
+      "type": "fan",
+      "scope": "common",
+      "sourceLine": null
+    },
+    {
+      "key": "F7Ac",
+      "label": "Fan 8",
+      "group": "Fans",
+      "type": "fan",
+      "scope": "common",
+      "sourceLine": null
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+Source: slawrensen/hwinfo-streamdeck/src/poller.ts@11b9645b78395f157493648d873a3066673ba493
+Seam: S1
+Reason: Expose a no-op upstream recheck hook; the Mac adapter requests an immediate bounded read only while visible.
+Before: e48494d45ab42eaa1a19bf1bb29f957b812e975dd88bc2b322967708c21d222a
+After: 4d2fdad6e93432008f9487c1d815b605a3fc0f8f64407ae2472fea3dc3ee9caa
+
+diff --git a/src/poller.ts b/src/poller.ts
+index fb5845f..7457aec 100644
+--- a/src/poller.ts
++++ b/src/poller.ts
+@@ -140,6 +140,9 @@ class HwinfoPoller extends EventEmitter {
+ 	// values; converted only at render.
+ 	private readonly series = new Map<string, number[]>();
+ 
++	/** Platform hook; the upstream policy keeps its existing cadence. */
++	checkAgain(): void {}
++
+ 	/** Latest status; safe to read at any time (e.g. right after willAppear). */
+ 	getStatus(): PollerStatus {
+ 		return this.status;

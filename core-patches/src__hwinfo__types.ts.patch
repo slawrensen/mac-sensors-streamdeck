@@ -1,11 +1,11 @@
 Source: slawrensen/hwinfo-streamdeck/src/hwinfo/types.ts@11b9645b78395f157493648d873a3066673ba493
 Seam: S1
-Reason: Append per-reading acquisition evidence and explicit Mac unavailable reasons.
+Reason: Append per-row acquisition evidence, explicit Mac reasons and optional catalog revision without changing upstream snapshots.
 Before: c41b8ac3d406b88fe65a466c324516331b5e1f762ff633913a079ad7f917f1cb
-After: ad1eb0cc44e1ba71169cbd6d07e6f9529cac7e3dfb76e126c6fb9fe962f03a89
+After: b20e01fd7554e9c65a9c44d528efdd17ccd02f8e4b4c98f2352c5d2904558b59
 
 diff --git a/src/hwinfo/types.ts b/src/hwinfo/types.ts
-index 17a5d1c..4b0d0f2 100644
+index 17a5d1c..7bf5c1a 100644
 --- a/src/hwinfo/types.ts
 +++ b/src/hwinfo/types.ts
 @@ -25,6 +25,9 @@ export interface SensorSource {
@@ -18,7 +18,16 @@ index 17a5d1c..4b0d0f2 100644
  	/** Every key that resolves to this measurement (its provider key and the
  	 * confirmed aliases: explicit cross-provider links, and legacy Gadget keys
  	 * kept resolvable), in the runtime's lookup order. Absent when the key
-@@ -123,7 +126,11 @@ export type HwinfoUnavailableReason =
+@@ -71,6 +74,8 @@ export interface Reading {
+  * cache `Reading` objects across ticks expecting historical values.
+  */
+ export interface SensorSnapshot {
++	/** Optional catalog membership/label revision for independently completing sources. */
++	readonly catalogRevision?: number;
+ 	/** Rendering invalidation for changed explicit provider links. */
+ 	readonly bindingRevision?: number;
+ 	/** Gadget readings withheld because their names are incomplete, or
+@@ -123,7 +128,11 @@ export type HwinfoUnavailableReason =
  	/** The hwsm native bridge would not load on a supported machine (missing
  	 * or blocked bin/hwsm.node, e.g. an antivirus quarantine): permanent until
  	 * the install is repaired, unlike the transient "invalid". */

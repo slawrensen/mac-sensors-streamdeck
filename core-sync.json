@@ -864,11 +864,11 @@
       "rewrittenSha256": "c41b8ac3d406b88fe65a466c324516331b5e1f762ff633913a079ad7f917f1cb",
       "patch": {
         "path": "core-patches/src__hwinfo__types.ts.patch",
-        "sha256": "e37b3af3ad79d990c0445e9295e1b5ac461b8425a29f934d108ef5e56facff33",
+        "sha256": "80c2218c0c95a1a8760304ce0f5bbb3b7650016148a0f757911eeb1268f0d700",
         "seam": "S1",
-        "reason": "Append per-reading acquisition evidence and explicit Mac unavailable reasons."
+        "reason": "Append per-row acquisition evidence, explicit Mac reasons and optional catalog revision without changing upstream snapshots."
       },
-      "postPatchSha256": "ad1eb0cc44e1ba71169cbd6d07e6f9529cac7e3dfb76e126c6fb9fe962f03a89"
+      "postPatchSha256": "b20e01fd7554e9c65a9c44d528efdd17ccd02f8e4b4c98f2352c5d2904558b59"
     },
     {
       "source": "src/panel-folds.ts",
@@ -908,11 +908,11 @@
       "rewrittenSha256": "2f210099484aff9e94a42155aba19f324dffffcf409732f0901c2ce9c5fe9646",
       "patch": {
         "path": "core-patches/src__pi-protocol.ts.patch",
-        "sha256": "f6762087cdf757c47bc72d7b5a939cac335db9142e33d0af2a7a1fac292f6b43",
+        "sha256": "e1f01badf9c978c7d3c15c513662a4e2831656deead21ef9b21bd082a4e155cc",
         "seam": "S1/S2",
-        "reason": "Select platform poller, status and historical-statistics copy while preserving upstream defaults."
+        "reason": "Expose Mac catalog revisions and an explicit manual refresh flag; retain upstream payloads and cadence by default."
       },
-      "postPatchSha256": "03c40a7f7f3541aa1b7c5350aae74a5e04f1863522a6eb0303e8e69dc756429f"
+      "postPatchSha256": "36258aaa0bf25fe99fd06d98e00adf58e3a83a084e1457de791fd438fec001d6"
     },
     {
       "source": "src/plugin.ts",
@@ -942,8 +942,13 @@
         0
       ],
       "rewrittenSha256": "e48494d45ab42eaa1a19bf1bb29f957b812e975dd88bc2b322967708c21d222a",
-      "patch": null,
-      "postPatchSha256": "e48494d45ab42eaa1a19bf1bb29f957b812e975dd88bc2b322967708c21d222a"
+      "patch": {
+        "path": "core-patches/src__poller.ts.patch",
+        "sha256": "27ca72de2f59f58abec97f23c1019ee5588e32d74f7b188c0ce7ea9d8e4fe158",
+        "seam": "S1",
+        "reason": "Expose a no-op upstream recheck hook; the Mac adapter requests an immediate bounded read only while visible."
+      },
+      "postPatchSha256": "4d2fdad6e93432008f9487c1d815b605a3fc0f8f64407ae2472fea3dc3ee9caa"
     },
     {
       "source": "src/recorder.ts",
@@ -2126,20 +2131,28 @@
     {
       "source": "scripts/abi-check.mjs",
       "upstreamSha256": "901598e5186f2bdf958cd258c3485f590c0a1808e5357841c805658519b8da90",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "901598e5186f2bdf958cd258c3485f590c0a1808e5357841c805658519b8da90",
+      "disposition": "implemented",
+      "reason": "Mac native capability replaces the Windows native boundary; exact artifacts, source hashes and metadata are independently validated.",
+      "destinations": [
+        "scripts/abi-check.mjs"
+      ],
+      "evidence": [
+        "npm run abi"
+      ]
     },
     {
       "source": "scripts/bench-parse.ts",
       "upstreamSha256": "9012f3e705b6d852ba065c55cde5db9c3134bcd1ed1b586ce3349db01d4cc1d9",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "9012f3e705b6d852ba065c55cde5db9c3134bcd1ed1b586ce3349db01d4cc1d9",
+      "disposition": "implemented",
+      "reason": "Mac native capability replaces the Windows native boundary; exact artifacts, source hashes and metadata are independently validated.",
+      "destinations": [
+        "scripts/bench-native.mjs"
+      ],
+      "evidence": [
+        "node scripts/bench-native.mjs build/native-bench"
+      ]
     },
     {
       "source": "scripts/build-detail-profiles.ts",
@@ -2512,20 +2525,30 @@
     {
       "source": "scripts/native-manifest.mjs",
       "upstreamSha256": "0b208f95f7fa906db605dd09e7b98743d8d6ce2794ba25b8b2ab91eff9b58eb8",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "0b208f95f7fa906db605dd09e7b98743d8d6ce2794ba25b8b2ab91eff9b58eb8",
+      "disposition": "implemented",
+      "reason": "Mac native capability replaces the Windows native boundary; exact artifacts, source hashes and metadata are independently validated.",
+      "destinations": [
+        "scripts/native-manifest.mjs",
+        "scripts/lib/macho.mjs"
+      ],
+      "evidence": [
+        "npm run native:manifest",
+        "npm run native:validate"
+      ]
     },
     {
       "source": "scripts/native-source-id.mjs",
       "upstreamSha256": "8a743aaef9bacd089bbfba4802ef496152008f54b5c7dbd696cbd6d811f2cb61",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "8a743aaef9bacd089bbfba4802ef496152008f54b5c7dbd696cbd6d811f2cb61",
+      "disposition": "implemented",
+      "reason": "Mac native capability replaces the Windows native boundary; exact artifacts, source hashes and metadata are independently validated.",
+      "destinations": [
+        "scripts/native-source-id.mjs"
+      ],
+      "evidence": [
+        "npm run native:validate"
+      ]
     },
     {
       "source": "scripts/pack.mjs",
@@ -2625,11 +2648,15 @@
     {
       "source": "scripts/validate-native.mjs",
       "upstreamSha256": "ec4915a34e21855d0fa49bf0b60f7e62f53ba838214fe95a1dd62cf816e6c00d",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "ec4915a34e21855d0fa49bf0b60f7e62f53ba838214fe95a1dd62cf816e6c00d",
+      "disposition": "implemented",
+      "reason": "Mac native capability replaces the Windows native boundary; exact artifacts, source hashes and metadata are independently validated.",
+      "destinations": [
+        "scripts/validate-native.mjs"
+      ],
+      "evidence": [
+        "npm run test:native"
+      ]
     },
     {
       "source": "scripts/validate-pack.mjs",
@@ -2751,11 +2778,16 @@
     {
       "source": "test/native-manifest.test.ts",
       "upstreamSha256": "97f77fa7c2044d6355ca015fca4590e30ed943fae31fcf5381bea2b62bd4ea7c",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "97f77fa7c2044d6355ca015fca4590e30ed943fae31fcf5381bea2b62bd4ea7c",
+      "disposition": "implemented",
+      "reason": "Mac native capability replaces the Windows native boundary; exact artifacts, source hashes and metadata are independently validated.",
+      "destinations": [
+        "test/mac/native-package.test.mjs"
+      ],
+      "evidence": [
+        "npm run test:native",
+        "npm run native:repro"
+      ]
     },
     {
       "source": "test/pack-staging.test.mjs",
@@ -2832,11 +2864,16 @@
     {
       "source": "test/validate-native.test.ts",
       "upstreamSha256": "adc4cc6eb76f66b27f4653d4048ff5777cd9f4d65030208075574622ed3503ed",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "adc4cc6eb76f66b27f4653d4048ff5777cd9f4d65030208075574622ed3503ed",
+      "disposition": "implemented",
+      "reason": "Mac native capability replaces the Windows native boundary; exact artifacts, source hashes and metadata are independently validated.",
+      "destinations": [
+        "test/mac/native-package.test.mjs",
+        "test/mac/native.test.mjs"
+      ],
+      "evidence": [
+        "npm run test:native"
+      ]
     },
     {
       "source": "test/validate-pack.test.mjs",
