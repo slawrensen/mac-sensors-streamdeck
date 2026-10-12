@@ -23,3 +23,7 @@ native/hwmac/build/
 *.streamDeckPlugin
 *.log
 .DS_Store
+
+# Read-only CI reference checkout
+/upstream/
+/native-artifact/

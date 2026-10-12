@@ -4,6 +4,7 @@ import streamDeck from '@elgato/streamdeck';
 import { HwinfoError, type SensorSnapshot } from '../hwinfo/types';
 import { liveKeyOf } from '../hwinfo/reading-links';
 import { pushSample } from '../series';
+import {trace,traceEnabled} from '../recorder';
 import type { PollerStatus } from '../poller';
 import { openMacProvider, type MacSnapshotProvider } from './native-loader';
 export type { PollerStatus } from '../poller';
@@ -24,6 +25,7 @@ export class MacPoller extends EventEmitter {
 	private status = pending();
 	private readonly series = new Map<string, number[]>();
 	private readonly observations = new Map<string, string>();
+	private tracedObservation = -1;
 	constructor(private readonly factory: Factory = openMacProvider) { super(); }
 	onTick(listener: (status: PollerStatus) => void): void { this.on('tick', listener); }
 	checkAgain(): void { if (this.refs > 0) this.tick(); }
@@ -66,6 +68,17 @@ export class MacPoller extends EventEmitter {
 	private accept(snapshot: SensorSnapshot): void {
 		if (!snapshot.readings.length) throw new HwinfoError('no-readable-sensors', 'No readable sensors were found.');
 		this.status = { state: 'ok', source: 'mac', snapshot };
+		if (traceEnabled()) {
+			const revision = Math.max(0, ...snapshot.readings.map(reading => reading.observationRevision ?? 0));
+			if (revision !== this.tracedObservation) {
+				this.tracedObservation = revision;
+				const sources = ['system', 'smc'].map(source => {
+					const rows = snapshot.readings.filter(reading => reading.key.startsWith(`mac:v1:${source}:`));
+					return { source, rows: rows.length, observation: Math.max(0, ...rows.map(reading => reading.observationRevision ?? 0)), acquired: rows.length ? Math.min(...rows.map(reading => reading.observationTime ?? 0)) : null };
+				});
+				trace({ event: 'sourceObservation', note: JSON.stringify({ catalog: snapshot.catalogRevision, sources }) });
+			}
+		}
 		for (const [key, ring] of this.series) {
 			const reading = snapshot.byKey.get(key);
 			if (!reading || !Number.isFinite(reading.value)) { ring.length = 0; this.observations.delete(key); continue; }

@@ -2157,11 +2157,15 @@
     {
       "source": "scripts/build-detail-profiles.ts",
       "upstreamSha256": "f1503156fca29772da55368b445cc90a5ab70ce6f36ea05ed9a229567069cd35",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "f1503156fca29772da55368b445cc90a5ab70ce6f36ea05ed9a229567069cd35",
+      "disposition": "implemented",
+      "reason": "Mac-owned capability and regression coverage replace the platform-bound origin; see the mapped commands.",
+      "destinations": [
+        "scripts/build-detail-profiles.ts"
+      ],
+      "evidence": [
+        "npm run test:mac"
+      ]
     },
     {
       "source": "scripts/capture-pi-reading-colors.mjs",
@@ -2247,74 +2251,109 @@
     {
       "source": "scripts/e2e-drilldown.mjs",
       "upstreamSha256": "db9bbb8d566da247b22dbc7d52332241642aaec69c43613cc8459cc3030c6bcd",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "db9bbb8d566da247b22dbc7d52332241642aaec69c43613cc8459cc3030c6bcd",
+      "disposition": "implemented",
+      "reason": "Mac-owned capability and regression coverage replace the platform-bound origin; see the mapped commands.",
+      "destinations": [
+        "scripts/e2e.mjs"
+      ],
+      "evidence": [
+        "npm run e2e:drilldown"
+      ]
     },
     {
       "source": "scripts/e2e-harness.mjs",
       "upstreamSha256": "e66bb03322c28922a5f37bd204786a6f689d587ee6a09bde2ce8dd1fa6dea13c",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "e66bb03322c28922a5f37bd204786a6f689d587ee6a09bde2ce8dd1fa6dea13c",
+      "disposition": "implemented",
+      "reason": "Mac-owned capability and regression coverage replace the platform-bound origin; see the mapped commands.",
+      "destinations": [
+        "scripts/e2e.mjs"
+      ],
+      "evidence": [
+        "npm run e2e"
+      ]
     },
     {
       "source": "scripts/e2e-load.mjs",
       "upstreamSha256": "47c147d8e3be567bbb1f35f1f992e92c023a0292cae22997de4b7bb87985cf66",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "47c147d8e3be567bbb1f35f1f992e92c023a0292cae22997de4b7bb87985cf66",
+      "disposition": "implemented",
+      "reason": "Mac-specific runtime, staged-panel, package and process-identity counterparts preserve this capability. Windows-only source controls are replaced by saved-setting preservation and absence checks; synthetic alias fixtures remain compatibility tests.",
+      "destinations": [
+        "scripts/e2e.mjs",
+        "scripts/lib/load-metrics.mjs"
+      ],
+      "evidence": [
+        "npm run e2e:load"
+      ]
     },
     {
       "source": "scripts/e2e-native-edge.mjs",
       "upstreamSha256": "15f3b4f7c8ad3065dabcfd19da304eedcddb0f560a39632c2369fb239f12ce72",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "15f3b4f7c8ad3065dabcfd19da304eedcddb0f560a39632c2369fb239f12ce72",
+      "disposition": "implemented",
+      "reason": "Mac-owned capability and regression coverage replace the platform-bound origin; see the mapped commands.",
+      "destinations": [
+        "scripts/e2e.mjs"
+      ],
+      "evidence": [
+        "npm run e2e:native-edge"
+      ]
     },
     {
       "source": "scripts/e2e-pi-panels.mjs",
       "upstreamSha256": "f82604d6a1e65f04d8519668a49800352fcc9549c70f1c5d79638433c2e418f4",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "f82604d6a1e65f04d8519668a49800352fcc9549c70f1c5d79638433c2e418f4",
+      "disposition": "implemented",
+      "reason": "Mac-specific runtime, staged-panel, package and process-identity counterparts preserve this capability. Windows-only source controls are replaced by saved-setting preservation and absence checks; synthetic alias fixtures remain compatibility tests.",
+      "destinations": [
+        "scripts/e2e-pi-panels.mjs",
+        "scripts/test-catalog-panel.mjs"
+      ],
+      "evidence": [
+        "npm run e2e:pi-panels",
+        "npm run suite:full"
+      ]
     },
     {
       "source": "scripts/e2e-pi-persistence.mjs",
       "upstreamSha256": "4bf38b68d78b7cdd1df491c518ed61a8f5d6c578c88a54491e73702611dfc15f",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "4bf38b68d78b7cdd1df491c518ed61a8f5d6c578c88a54491e73702611dfc15f",
+      "disposition": "implemented",
+      "reason": "Mac-specific runtime, staged-panel, package and process-identity counterparts preserve this capability. Windows-only source controls are replaced by saved-setting preservation and absence checks; synthetic alias fixtures remain compatibility tests.",
+      "destinations": [
+        "scripts/e2e-pi-persistence.mjs"
+      ],
+      "evidence": [
+        "npm run e2e:pi"
+      ]
     },
     {
       "source": "scripts/e2e-resilience.mjs",
       "upstreamSha256": "37aedfc348f0aa83e560bc844e5024cab6f40a274adea7e98a881f8c60429b24",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "37aedfc348f0aa83e560bc844e5024cab6f40a274adea7e98a881f8c60429b24",
+      "disposition": "implemented",
+      "reason": "Mac-owned capability and regression coverage replace the platform-bound origin; see the mapped commands.",
+      "destinations": [
+        "scripts/e2e.mjs"
+      ],
+      "evidence": [
+        "npm run e2e:resilience"
+      ]
     },
     {
       "source": "scripts/e2e-socket-close.mjs",
       "upstreamSha256": "4d42b337a9e646169fc869e382cd537848f2b4ff64999b7adcc155a7f38c5203",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "4d42b337a9e646169fc869e382cd537848f2b4ff64999b7adcc155a7f38c5203",
+      "disposition": "implemented",
+      "reason": "Mac-owned capability and regression coverage replace the platform-bound origin; see the mapped commands.",
+      "destinations": [
+        "scripts/e2e.mjs"
+      ],
+      "evidence": [
+        "npm run e2e:socket-close"
+      ]
     },
     {
       "source": "scripts/gadget-interleaving.mjs",
@@ -2364,11 +2403,16 @@
     {
       "source": "scripts/gen-icons.mjs",
       "upstreamSha256": "5dc8b4c6a157975915fa42d0cdcac8cd695339b62eaf88b6e5796bdc086f2c3e",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "5dc8b4c6a157975915fa42d0cdcac8cd695339b62eaf88b6e5796bdc086f2c3e",
+      "disposition": "implemented",
+      "reason": "Mac-owned capability and regression coverage replace the platform-bound origin; see the mapped commands.",
+      "destinations": [
+        "scripts/gen-icons.mjs"
+      ],
+      "evidence": [
+        "npm run build",
+        "npm run pack:validate"
+      ]
     },
     {
       "source": "scripts/gen-tahoma-metrics.mjs",
@@ -2387,11 +2431,16 @@
     {
       "source": "scripts/hygiene.mjs",
       "upstreamSha256": "2af0945bb60cdd7e9a8dd6b9dc865f5fb2c98540827aefe9b98e17984add34b5",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "2af0945bb60cdd7e9a8dd6b9dc865f5fb2c98540827aefe9b98e17984add34b5",
+      "disposition": "implemented",
+      "reason": "Mac-specific runtime, staged-panel, package and process-identity counterparts preserve this capability. Windows-only source controls are replaced by saved-setting preservation and absence checks; synthetic alias fixtures remain compatibility tests.",
+      "destinations": [
+        "scripts/suite.mjs",
+        "scripts/lib/build-evidence.mjs"
+      ],
+      "evidence": [
+        "npm run suite:full"
+      ]
     },
     {
       "source": "scripts/lib/cdp.mjs",
@@ -2409,47 +2458,68 @@
     {
       "source": "scripts/lib/detail-profile-archive.ts",
       "upstreamSha256": "f90b917d41500bafa576076724f6665fe28ecb0cc81b59f1cf36dc13f3c2e242",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "f90b917d41500bafa576076724f6665fe28ecb0cc81b59f1cf36dc13f3c2e242",
+      "disposition": "implemented",
+      "reason": "Mac-owned capability and regression coverage replace the platform-bound origin; see the mapped commands.",
+      "destinations": [
+        "scripts/lib/detail-profile-archive.ts"
+      ],
+      "evidence": [
+        "npm run profiles:detail",
+        "npm run test:mac"
+      ]
     },
     {
       "source": "scripts/lib/e2e-common.mjs",
       "upstreamSha256": "821d1859369b4f169d2b691b5c704ccb71ff6823bb44b328d282f5f720423ffa",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "821d1859369b4f169d2b691b5c704ccb71ff6823bb44b328d282f5f720423ffa",
+      "disposition": "implemented",
+      "reason": "Mac-owned capability and regression coverage replace the platform-bound origin; see the mapped commands.",
+      "destinations": [
+        "scripts/lib/mock-host.mjs"
+      ],
+      "evidence": [
+        "npm run suite:full"
+      ]
     },
     {
       "source": "scripts/lib/pack-contract.mjs",
       "upstreamSha256": "8d20dd4f213b523420ce1e52a8cf394bded4563854a6cf2726b28ae990161da4",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "8d20dd4f213b523420ce1e52a8cf394bded4563854a6cf2726b28ae990161da4",
+      "disposition": "implemented",
+      "reason": "Mac-owned capability and regression coverage replace the platform-bound origin; see the mapped commands.",
+      "destinations": [
+        "scripts/lib/pack-contract.mjs"
+      ],
+      "evidence": [
+        "node --test test/mac/pack.test.mjs"
+      ]
     },
     {
       "source": "scripts/lib/pack-fixture.mjs",
       "upstreamSha256": "d225ee124683b708bc04f386cadbd18459235073947f4eb24f4c6a97ffae23fe",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "d225ee124683b708bc04f386cadbd18459235073947f4eb24f4c6a97ffae23fe",
+      "disposition": "implemented",
+      "reason": "Mac-owned capability and regression coverage replace the platform-bound origin; see the mapped commands.",
+      "destinations": [
+        "test/mac/pack.test.mjs"
+      ],
+      "evidence": [
+        "node --test test/mac/pack.test.mjs"
+      ]
     },
     {
       "source": "scripts/lib/pack-validation.mjs",
       "upstreamSha256": "2fca8c191c705d9b4b6afecf923bcbbc04bc5da566b638d99ea8a92832f84a70",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "2fca8c191c705d9b4b6afecf923bcbbc04bc5da566b638d99ea8a92832f84a70",
+      "disposition": "implemented",
+      "reason": "Mac-owned capability and regression coverage replace the platform-bound origin; see the mapped commands.",
+      "destinations": [
+        "scripts/lib/pack-validation.mjs"
+      ],
+      "evidence": [
+        "node --test test/mac/pack.test.mjs"
+      ]
     },
     {
       "source": "scripts/lib/pi-sim.mjs",
@@ -2467,11 +2537,17 @@
     {
       "source": "scripts/lib/process-ownership.mjs",
       "upstreamSha256": "78701f2722bfaf0cd798bd080869a0c058909d48c6111789c46557b9d8138dc4",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "78701f2722bfaf0cd798bd080869a0c058909d48c6111789c46557b9d8138dc4",
+      "disposition": "implemented",
+      "reason": "Mac-specific runtime, staged-panel, package and process-identity counterparts preserve this capability. Windows-only source controls are replaced by saved-setting preservation and absence checks; synthetic alias fixtures remain compatibility tests.",
+      "destinations": [
+        "scripts/lib/process-ownership.mjs",
+        "scripts/suite.mjs"
+      ],
+      "evidence": [
+        "node --test test/mac/process-ownership.test.mjs",
+        "npm run suite:full"
+      ]
     },
     {
       "source": "scripts/lib/soak-adversary-safety.mjs",
@@ -2553,11 +2629,15 @@
     {
       "source": "scripts/pack.mjs",
       "upstreamSha256": "af3cde73b552935fa89e88d12a6743abce4fa26adb496eee15ee82b0cb1f6106",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "af3cde73b552935fa89e88d12a6743abce4fa26adb496eee15ee82b0cb1f6106",
+      "disposition": "implemented",
+      "reason": "Mac-owned capability and regression coverage replace the platform-bound origin; see the mapped commands.",
+      "destinations": [
+        "scripts/pack.mjs"
+      ],
+      "evidence": [
+        "npm run release:validate"
+      ]
     },
     {
       "source": "scripts/perf-detail.mjs",
@@ -2603,11 +2683,15 @@
     {
       "source": "scripts/qualify.mjs",
       "upstreamSha256": "4bcdd96412881ad5f47396022fea648c4444b12102d1d006919b2fb68c827d78",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "4bcdd96412881ad5f47396022fea648c4444b12102d1d006919b2fb68c827d78",
+      "disposition": "implemented",
+      "reason": "Mac-owned capability and regression coverage replace the platform-bound origin; see the mapped commands.",
+      "destinations": [
+        "scripts/qualify.mjs"
+      ],
+      "evidence": [
+        "npm run release:validate"
+      ]
     },
     {
       "source": "scripts/readability-report.mjs",
@@ -2661,38 +2745,56 @@
     {
       "source": "scripts/validate-pack.mjs",
       "upstreamSha256": "ce6c18a983ff32753ace4e1cd4a8f1f7b555a8e1464c9613ba1a12e27e851b26",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "ce6c18a983ff32753ace4e1cd4a8f1f7b555a8e1464c9613ba1a12e27e851b26",
+      "disposition": "implemented",
+      "reason": "Mac-owned capability and regression coverage replace the platform-bound origin; see the mapped commands.",
+      "destinations": [
+        "scripts/validate-pack.mjs"
+      ],
+      "evidence": [
+        "npm run pack:validate"
+      ]
     },
     {
       "source": "scripts/validate-release-copy.mjs",
       "upstreamSha256": "b322d3d7989560929bc93b6685e719fd21a39ab415e1b16e8abc8386887ca56d",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "b322d3d7989560929bc93b6685e719fd21a39ab415e1b16e8abc8386887ca56d",
+      "disposition": "implemented",
+      "reason": "Mac-owned capability and regression coverage replace the platform-bound origin; see the mapped commands.",
+      "destinations": [
+        "scripts/validate-release-copy.mjs"
+      ],
+      "evidence": [
+        "npm run copy:validate"
+      ]
     },
     {
       "source": "scripts/verify-pack-version.mjs",
       "upstreamSha256": "e3ccaf54761ab39cdd9f29eda2edcb1a1eb8043f1a6bbea3ce87914cefac831f",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "e3ccaf54761ab39cdd9f29eda2edcb1a1eb8043f1a6bbea3ce87914cefac831f",
+      "disposition": "implemented",
+      "reason": "Mac-owned capability and regression coverage replace the platform-bound origin; see the mapped commands.",
+      "destinations": [
+        "scripts/lib/pack-validation.mjs",
+        "scripts/validate-release-copy.mjs"
+      ],
+      "evidence": [
+        "npm run copy:validate",
+        "npm run pack:validate"
+      ]
     },
     {
       "source": "scripts/verify-release-tag.mjs",
       "upstreamSha256": "69b5faadd9d1b51abe9c2896d2447469ea5b85b032c85e55a64055ac7ff2993b",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "69b5faadd9d1b51abe9c2896d2447469ea5b85b032c85e55a64055ac7ff2993b",
+      "disposition": "implemented",
+      "reason": "Mac-owned capability and regression coverage replace the platform-bound origin; see the mapped commands.",
+      "destinations": [
+        "scripts/verify-release-tag.mjs"
+      ],
+      "evidence": [
+        "RELEASE_TAG=v0.9.90 node scripts/verify-release-tag.mjs (rejects undated entry until release)"
+      ]
     },
     {
       "source": "test/capture-pi-reading-colors.test.mjs",
@@ -2706,20 +2808,30 @@
     {
       "source": "test/detail-profiles.test.ts",
       "upstreamSha256": "37d0a009bf2cfb0b7143ce813a8e02e4c8207b1186d419984064b1f367c2794f",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "37d0a009bf2cfb0b7143ce813a8e02e4c8207b1186d419984064b1f367c2794f",
+      "disposition": "implemented",
+      "reason": "Mac-owned capability and regression coverage replace the platform-bound origin; see the mapped commands.",
+      "destinations": [
+        "test/mac/profiles.test.ts"
+      ],
+      "evidence": [
+        "npm run test:mac"
+      ]
     },
     {
       "source": "test/diagnostics.test.ts",
       "upstreamSha256": "ac3715878f23fa5c0591dfc728147d42b9cd950e529eb27eed4550fb6512ced4",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "ac3715878f23fa5c0591dfc728147d42b9cd950e529eb27eed4550fb6512ced4",
+      "disposition": "implemented",
+      "reason": "Mac-specific runtime, staged-panel, package and process-identity counterparts preserve this capability. Windows-only source controls are replaced by saved-setting preservation and absence checks; synthetic alias fixtures remain compatibility tests.",
+      "destinations": [
+        "test/mac/diagnostics.test.ts",
+        "scripts/e2e.mjs"
+      ],
+      "evidence": [
+        "npm run test:mac",
+        "npm run e2e"
+      ]
     },
     {
       "source": "test/docs-crawl.test.mjs",
@@ -2760,11 +2872,15 @@
     {
       "source": "test/e2e-load.test.mjs",
       "upstreamSha256": "3a000a5a8b846390738a2fd96711da2a09c7994c6dc78554e5d8ba4933e013eb",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "3a000a5a8b846390738a2fd96711da2a09c7994c6dc78554e5d8ba4933e013eb",
+      "disposition": "implemented",
+      "reason": "Mac-specific runtime, staged-panel, package and process-identity counterparts preserve this capability. Windows-only source controls are replaced by saved-setting preservation and absence checks; synthetic alias fixtures remain compatibility tests.",
+      "destinations": [
+        "test/mac/load-metrics.test.mjs"
+      ],
+      "evidence": [
+        "node --test test/mac/load-metrics.test.mjs"
+      ]
     },
     {
       "source": "test/hygiene-pi-startup.test.mjs",
@@ -2792,38 +2908,57 @@
     {
       "source": "test/pack-staging.test.mjs",
       "upstreamSha256": "faa0461b34d76d589c991c920d7d49791b090d54590149377a2a58883cb7e6b1",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "faa0461b34d76d589c991c920d7d49791b090d54590149377a2a58883cb7e6b1",
+      "disposition": "implemented",
+      "reason": "Mac-specific runtime, staged-panel, package and process-identity counterparts preserve this capability. Windows-only source controls are replaced by saved-setting preservation and absence checks; synthetic alias fixtures remain compatibility tests.",
+      "destinations": [
+        "test/mac/pack.test.mjs",
+        "scripts/lib/build-evidence.mjs"
+      ],
+      "evidence": [
+        "node --test test/mac/pack.test.mjs",
+        "npm run release:validate"
+      ]
     },
     {
       "source": "test/process-ownership.test.mjs",
       "upstreamSha256": "556ede0df2c582fd0d2109336691dd0f91cc6a7c25f98fcb497b8bb67384496e",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "556ede0df2c582fd0d2109336691dd0f91cc6a7c25f98fcb497b8bb67384496e",
+      "disposition": "implemented",
+      "reason": "Mac-specific runtime, staged-panel, package and process-identity counterparts preserve this capability. Windows-only source controls are replaced by saved-setting preservation and absence checks; synthetic alias fixtures remain compatibility tests.",
+      "destinations": [
+        "test/mac/process-ownership.test.mjs"
+      ],
+      "evidence": [
+        "node --test test/mac/process-ownership.test.mjs"
+      ]
     },
     {
       "source": "test/qualify.test.mjs",
       "upstreamSha256": "4eb6a32ecb95be88b91b3b8f19ebc73eb492c9f05b00f4b31a1434393acc0e24",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "4eb6a32ecb95be88b91b3b8f19ebc73eb492c9f05b00f4b31a1434393acc0e24",
+      "disposition": "implemented",
+      "reason": "Mac-specific runtime, staged-panel, package and process-identity counterparts preserve this capability. Windows-only source controls are replaced by saved-setting preservation and absence checks; synthetic alias fixtures remain compatibility tests.",
+      "destinations": [
+        "test/mac/release-gates.test.mjs"
+      ],
+      "evidence": [
+        "node --test test/mac/release-gates.test.mjs"
+      ]
     },
     {
       "source": "test/release-inputs.test.ts",
       "upstreamSha256": "771bfcdb683a224c1d4b447a5372e71e4ec759ed34fa8005bd0dcd3c74311d6a",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "771bfcdb683a224c1d4b447a5372e71e4ec759ed34fa8005bd0dcd3c74311d6a",
+      "disposition": "implemented",
+      "reason": "Mac-specific runtime, staged-panel, package and process-identity counterparts preserve this capability. Windows-only source controls are replaced by saved-setting preservation and absence checks; synthetic alias fixtures remain compatibility tests.",
+      "destinations": [
+        "test/mac/release-gates.test.mjs",
+        "test/mac/pack.test.mjs"
+      ],
+      "evidence": [
+        "node --test test/mac/release-gates.test.mjs test/mac/pack.test.mjs"
+      ]
     },
     {
       "source": "test/script-failures.test.mjs",
@@ -2878,20 +3013,28 @@
     {
       "source": "test/validate-pack.test.mjs",
       "upstreamSha256": "07b045604df1b4c07eb8f2dc0362e47279d1314d94ceb51bc9fdbb02d8c146ef",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "07b045604df1b4c07eb8f2dc0362e47279d1314d94ceb51bc9fdbb02d8c146ef",
+      "disposition": "implemented",
+      "reason": "Mac-owned capability and regression coverage replace the platform-bound origin; see the mapped commands.",
+      "destinations": [
+        "test/mac/pack.test.mjs"
+      ],
+      "evidence": [
+        "node --test test/mac/pack.test.mjs"
+      ]
     },
     {
       "source": "test/verify-pack-version.test.ts",
       "upstreamSha256": "d03a17e00af8b82eb34c45b5b26df5fa0f944d39ae3e854f6d90d933bd95ea94",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "d03a17e00af8b82eb34c45b5b26df5fa0f944d39ae3e854f6d90d933bd95ea94",
+      "disposition": "implemented",
+      "reason": "Mac-specific runtime, staged-panel, package and process-identity counterparts preserve this capability. Windows-only source controls are replaced by saved-setting preservation and absence checks; synthetic alias fixtures remain compatibility tests.",
+      "destinations": [
+        "test/mac/pack.test.mjs"
+      ],
+      "evidence": [
+        "node --test test/mac/pack.test.mjs"
+      ]
     }
   ],
   "notTaken": [

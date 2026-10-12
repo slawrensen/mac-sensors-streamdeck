@@ -1,0 +1,74 @@
+name: release
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: macos-26
+    timeout-minutes: 40
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      preview: ${{ steps.version.outputs.preview }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+      - name: Verify literal release inputs before dependency execution
+        id: version
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: node scripts/verify-release-tag.mjs
+      - run: npm ci --ignore-scripts
+      - run: npm run release:validate -- --out release/tag-qualification
+      - run: npm run native:repro
+      - run: npm run native:manifest
+      - name: Compare the previous published native manifest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p build/previous-release
+          previous=$(gh release list --limit 1 --exclude-drafts --json tagName --jq '.[0].tagName // empty')
+          if [ -n "$previous" ]; then
+            gh release download "$previous" --pattern native-manifest.json --dir build/previous-release
+            node scripts/native-drift.mjs build/native-manifest.json build/previous-release/native-manifest.json
+          else
+            node scripts/native-drift.mjs build/native-manifest.json
+          fi
+      - name: Prepare verified release assets
+        run: |
+          cp build/native-manifest.json release/native-manifest.json
+          cd release
+          shasum -a 256 com.lawrensen.mac.streamDeckPlugin native-manifest.json > SHA256SUMS.txt
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release-candidate
+          path: release/
+          retention-days: 14
+          if-no-files-found: error
+  draft:
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6
+        with:
+          name: release-candidate
+          path: release
+      - name: Create the draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          RELEASE_VERSION: ${{ needs.build.outputs.version }}
+          IS_PREVIEW: ${{ needs.build.outputs.preview }}
+        run: |
+          args=(--draft --title "Mac Sensors $RELEASE_VERSION" --generate-notes)
+          if [ "$IS_PREVIEW" = true ]; then args+=(--prerelease); fi
+          gh release create "$RELEASE_TAG" "${args[@]}" release/com.lawrensen.mac.streamDeckPlugin release/native-manifest.json release/SHA256SUMS.txt
