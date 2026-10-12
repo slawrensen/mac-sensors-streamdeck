@@ -1,0 +1,25 @@
+# Private working material. Never force-add these paths.
+/MARKETPLACE.md
+/design/
+/docs/release/
+/review/
+/CLAUDE.md
+/.claude/
+/.private/
+/assets/brand/
+# Dependencies and generated artifacts
+node_modules/
+/build/
+/release/
+/staging/
+/.core-sync-lock/
+/.core-sync-transaction/
+com.lawrensen.mac.sdPlugin/bin/
+com.lawrensen.mac.sdPlugin/logs/
+com.lawrensen.mac.sdPlugin/LICENSE
+com.lawrensen.mac.sdPlugin/NOTICE.md
+native/hwmac/build/
+/release-native-manifest.json
+*.streamDeckPlugin
+*.log
+.DS_Store
