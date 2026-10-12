@@ -4,7 +4,7 @@
   "devUuid": "com.lawrensen.macdev",
   "author": "Stephen Lawrensen",
   "docs": "https://docs.slawrensen.com/mac-streamdeck/",
-  "panelBuild": 5,
+  "panelBuild": 7,
   "nodeMajor": "24",
   "minimumMacOS": "13.5",
   "minimumApp": "7.1",

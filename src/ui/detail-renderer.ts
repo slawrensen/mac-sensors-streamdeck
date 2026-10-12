@@ -5,8 +5,8 @@
  * restart inside the view). Reading slots and the Back tile reuse the
  * ordinary reading renderer; these tiles are the only new furniture.
  */
-import { wrapLabelTwoLines, wrapLabelTwoLinesBy } from "./format";
-import { isTahoma } from "./face-font";
+import { fitLadderBy, wrapLabelTwoLines, wrapLabelTwoLinesBy } from "./format";
+import { faceFont, isTahoma } from "./face-font";
 import { escapeXml, fontFamily, inKeyLens, renderStatusKey, svgOpen } from "./key-renderer";
 import { mixToward, type TextColors } from "./text-colors";
 import type { Palette } from "./themes";
@@ -29,7 +29,8 @@ export function renderDetailTitleKey(opts: DetailTitleKeyOptions): string {
 	for (let i = 0; i < lines.length; i++) {
 		parts.push(`<text x="72" y="${single ? 56 : 44 + i * 24}" text-anchor="middle" font-family="${fontFamily()}" font-size="16" font-weight="600" fill="${opts.text.label}">${escapeXml(lines[i] as string)}</text>`);
 	}
-	parts.push(`<text x="72" y="110" text-anchor="middle" font-family="${fontFamily()}" font-size="18" font-weight="600" fill="${opts.text.unit}">${escapeXml(opts.rangeText)}</text>`);
+	const range = faceFont().preserveLegacyFits === false ? fitLadderBy(opts.rangeText, [18, 16, 14, 12], (line, size) => inKeyLens([{ text: line, fontSize: size }])) : {text: opts.rangeText, fontSize: 18};
+	parts.push(`<text x="72" y="110" text-anchor="middle" font-family="${fontFamily()}" font-size="${range.fontSize}" font-weight="600" fill="${opts.text.unit}">${escapeXml(range.text)}</text>`);
 	parts.push("</svg>");
 	return parts.join("");
 }

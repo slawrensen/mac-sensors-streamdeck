@@ -45,6 +45,8 @@ export interface FaceFontProfile {
 	readonly valueEm: number;
 	/** Width a key title or label row may spend, centered on the key. */
 	readonly titleBand: number;
+	/** Historical fits are valid only on the renderer where they were measured. */
+	readonly preserveLegacyFits?: boolean;
 }
 
 /**
@@ -106,7 +108,7 @@ for (const [first, units] of TAHOMA_BOLD_BLOCKS) {
  * stand alone on their line, so a title 1.6.0 drew keeps its size inside a
  * 134 px band, about what the 1.6.0 faces drew in: "CPU Package" stays at 20
  * px and "Total CPU Usage" whole at 16. */
-export const TAHOMA: FaceFontProfile = { id: "tahoma", family: "Tahoma", advance12: TAHOMA_BOLD_12, insets12: TAHOMA_INSETS_12, unmapped12: 12.35, bearingCredit12: 0, boldFactor: 1, valueEm: 0.64, titleBand: 134 };
+export const TAHOMA: FaceFontProfile = { id: "tahoma", family: "Tahoma", advance12: TAHOMA_BOLD_12, insets12: TAHOMA_INSETS_12, unmapped12: 12.35, bearingCredit12: 0, boldFactor: 1, valueEm: 0.64, titleBand: 134, preserveLegacyFits: runtime.legacyFontFits };
 /** The bearing credit makes Segoe UI estimates track rasterized ink within
  * +4/-2.5 px at 16 px; without it "Total CPU Usage" (ink 118.4) prices at 121
  * and wrongly ellipsizes. */

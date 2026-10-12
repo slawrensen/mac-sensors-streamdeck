@@ -119,6 +119,7 @@ export function inKeyLens(runs: readonly TextRun[]): boolean {
  * that drawing: of 396 values rendered so at 1.6.0's size, the only crops sat
  * at 134.15. */
 function drawnAs160(runs: readonly TextRun[]): boolean {
+	if (faceFont().preserveLegacyFits === false) return false;
 	const edges = inkEdges(runs, "middle", 72);
 	return edges.left >= 9.35 && edges.right <= 134.1;
 }
@@ -127,7 +128,7 @@ function drawnAs160(runs: readonly TextRun[]): boolean {
  * the title band; else cut inside the lens at the floor. */
 function fitLensLabel(label: string, sizes: readonly number[]): FittedText {
 	const drew = legacyLabelSize(label, sizes);
-	return fitLadderBy(label, sizes, (line, size) => inKeyLens([{ text: line, fontSize: size }]) || (line === label && size === drew && estimateKeyTextWidth(line, size) <= labelBand()));
+	return fitLadderBy(label, sizes, (line, size) => inKeyLens([{ text: line, fontSize: size }]) || (faceFont().preserveLegacyFits !== false && line === label && size === drew && estimateKeyTextWidth(line, size) <= labelBand()));
 }
 /** The single key's value: the 1.6.0 char-count size (kept while it draws
  * as 1.6.0 did), stepping down 2 px only while Tahoma's ink would leave the
@@ -874,9 +875,14 @@ export function quadIdentityOf(chosen: string | null | undefined, slot: number):
  * shares the cell); anything longer steps down 4 px per extra glyph rather
  * than overflow a 72 px cell, never below the 12 px legibility floor.
  */
-export function quadValueFontSize(text: string, labeled = false): number {
+export function quadValueFontSize(text: string, labeled = false, centerX = 36): number {
 	const count = Array.from(text).length;
 	const base = labeled ? 24 : 26;
+	if (faceFont().preserveLegacyFits === false) {
+		let size = count <= 4 ? base : Math.max(12, base - (count - 4) * 4);
+		while (size > 12 && !inksWithin([{ text, fontSize: size, fontWeight: 700 }], "middle", centerX, Math.max(LENS.first, centerX - 26), Math.min(LENS.last, centerX + 26))) size -= 1;
+		return size;
+	}
 	if (count <= 4) {
 		return base;
 	}
@@ -952,10 +958,10 @@ export function renderQuadKey(opts: QuadKeyOptions): string {
 				const fit = isTahoma()
 					? fitLadderBy(micro, QUAD_LABEL_SIZES, (line, size) => inksWithin([{ text: line, fontSize: size, fontWeight: 700 }], "middle", cx, Math.max(LENS.first, cx - 26), Math.min(LENS.last, cx + 26)))
 					: fitTextLadder(micro, QUAD_LABEL_BUDGET, QUAD_LABEL_SIZES, { fontWeight: 700 });
-				parts.push(`<text x="${cx}" y="${top + 20}" text-anchor="middle" font-family="${fontFamily()}" font-size="${fit.fontSize}" font-weight="700" fill="${cell.color}">${escapeXml(fit.text)}</text>`);
+				parts.push(`<text x="${cx}" y="${top + (faceFont().preserveLegacyFits === false ? 22 : 20)}" text-anchor="middle" font-family="${fontFamily()}" font-size="${fit.fontSize}" font-weight="700" fill="${cell.color}">${escapeXml(fit.text)}</text>`);
 			}
 		}
-		parts.push(`<text x="${cx}" y="${top + (labeled ? 45 : 40)}" text-anchor="middle" font-family="${fontFamily()}" font-size="${quadValueFontSize(valueText, labeled)}" font-weight="700" fill="${labeled ? text.value : cell.color}">${escapeXml(valueText)}</text>`);
+		parts.push(`<text x="${cx}" y="${top + (labeled ? 45 : 40)}" text-anchor="middle" font-family="${fontFamily()}" font-size="${quadValueFontSize(valueText, labeled, cx)}" font-weight="700" fill="${labeled ? text.value : cell.color}">${escapeXml(valueText)}</text>`);
 		if (cell.unitText !== "") {
 			// 14 px matches the dual layout's unit step (single 16, dual 14,
 			// quad 14): the empty band under the value has the room, and the

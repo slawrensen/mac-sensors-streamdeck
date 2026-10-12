@@ -179,7 +179,7 @@ export async function startPiSim({ httpPort, wsPort, tickMs = 0, extraRoutes = {
 	};
 
 	const info = {
-		application: { font: "Segoe UI", language: "en", platform: "windows", platformVersion: "10.0.19044", version: "6.9.0.0" },
+		application: { font: "Tahoma", language: "en", platform: "mac", platformVersion: "27.0.1", version: "7.5.0.22885" },
 		colors: {},
 		devicePixelRatio: 1,
 		devices: [{ id: "dev1", name: "Lab Deck", size: { columns: 4, rows: 2 }, type: 7 }],
