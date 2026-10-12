@@ -159,6 +159,21 @@
         "before": "\t\t\t\t\tsay(\"This replaces the shared settings every HWiNFO key and dial uses. Press again to confirm.\");",
         "after": "\t\t\t\t\tsay(\"This replaces the shared settings every Mac Sensors key and dial uses. Press again to confirm.\");",
         "count": 1
+      },
+      {
+        "before": "let treeSource;",
+        "after": "let treeSource;\n\tlet treeCatalogRevision;",
+        "count": 1
+      },
+      {
+        "before": "treeSource = p.source;",
+        "after": "treeSource = p.source;\n\t\t\ttreeCatalogRevision = p.catalogRevision;",
+        "count": 1
+      },
+      {
+        "before": "if (p.state !== \"ok\" || (p.source !== undefined && p.source !== treeSource)) treeFetchedOk = false;",
+        "after": "if (p.state !== \"ok\" || (p.source !== undefined && p.source !== treeSource) || (typeof p.catalogRevision === \"number\" && p.catalogRevision !== treeCatalogRevision)) treeFetchedOk = false;",
+        "count": 1
       }
     ],
     "pi-model.js": [
@@ -302,6 +317,11 @@
       {
         "before": "\t\tack.textContent = `Checked again at ${at}: no change yet. The plugin also reads HWiNFO every ${every} on its own.`;",
         "after": "\t\tack.textContent = `Checked again at ${at}: no change yet. The plugin also reads Mac Sensors every ${every} on its own.`;",
+        "count": 1
+      },
+      {
+        "before": "client.send(\"sendToPlugin\", { event: \"getSensorTree\" });",
+        "after": "client.send(\"sendToPlugin\", { event: \"getSensorTree\", refresh: true });",
         "count": 1
       }
     ],

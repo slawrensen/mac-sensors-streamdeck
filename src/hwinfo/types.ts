@@ -74,6 +74,8 @@ export interface Reading {
  * cache `Reading` objects across ticks expecting historical values.
  */
 export interface SensorSnapshot {
+	/** Optional catalog membership/label revision for independently completing sources. */
+	readonly catalogRevision?: number;
 	/** Rendering invalidation for changed explicit provider links. */
 	readonly bindingRevision?: number;
 	/** Gadget readings withheld because their names are incomplete, or

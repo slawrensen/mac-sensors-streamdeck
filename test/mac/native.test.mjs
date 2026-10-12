@@ -1,0 +1,78 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import { createRequire } from 'node:module';
+import { execFileSync } from 'node:child_process';
+import { Worker } from 'node:worker_threads';
+import { test } from 'node:test';
+const require=createRequire(import.meta.url),arch=process.arch==='x64'?'x86_64':'arm64';
+const nativePath=path.resolve(`build/native/test/hwmac-${arch}.node`);
+const native=require(nativePath),production=require(path.resolve(`build/native/production/hwmac-${arch}.node`));
+const reset=()=>native.configure({public:{delayMs:0,fault:0,value:68719476736},smc:{delayMs:0,fault:0,value:30}});
+test('production surface has only read capabilities; fake and wrong-protocol artifacts identify themselves',()=>{
+	assert.deepEqual(Object.getOwnPropertyNames(production).sort(),['getBuildInfo','now','open']);assert.equal(production.getBuildInfo().testHooks,false);assert.equal(native.getBuildInfo().testHooks,true);
+	assert.equal(require(path.resolve(`build/native/wrong-protocol/hwmac-${arch}.node`)).getBuildInfo().protocol,999);
+	assert.equal(production.getBuildInfo().arch,process.arch);assert.ok(production.now()>0);
+});
+test('all command bytes except the three reads are rejected before transport',()=>{
+	for(let command=0;command<=255;command++) {
+		const result=native.testCommand(command),allowed=[5,8,9].includes(command);
+		assert.equal(result.transportCalls,allowed?1:0,`command ${command}`);assert.equal(result.error===0,allowed);
+	}
+});
+test('transport status, exact returned length and firmware errors are independent',()=>{
+	assert.deepEqual(native.testTransport(80,0,0),{error:0,systemCode:0,firmwareCode:0});
+	assert.equal(native.testTransport(79,0,0).error,4);assert.equal(native.testTransport(81,0,0).error,4);
+	assert.deepEqual(native.testTransport(80,5,0),{error:3,systemCode:5,firmwareCode:0});
+	assert.deepEqual(native.testTransport(80,0,132),{error:5,systemCode:0,firmwareCode:132});
+});
+test('typed decoders preserve zero, signed and fractional values, and refuse bad sizes/nonfinite values',()=>{
+	assert.equal(native.testDecode('sp78',Buffer.from([0xf6,0x80])),-9.5);assert.equal(native.testDecode('fpe2',Buffer.from([0x0b,0xba])),750.5);
+	for(const value of [0,-12.25,53.5,NaN,Infinity,-Infinity]){const bytes=Buffer.alloc(4);bytes.writeFloatLE(value);assert.equal(native.testDecode('flt ',bytes),Number.isFinite(value)?value:null);}
+	assert.equal(native.testDecode('ui8 ',Buffer.from([0])),0);assert.equal(native.testDecode('ui16',Buffer.from([1,0])),256);assert.equal(native.testDecode('ui32',Buffer.from([0,1,0,0])),65536);
+	for(const type of ['flt ','sp78','fpe2','ui8 ','ui16','ui32','xxxx'])assert.equal(native.testDecode(type,Buffer.alloc(7)),null);
+});
+test('generation tables require the qualified runtime model, chip and hardware family',()=>{
+	assert.deepEqual(native.testCatalog('Mac17,9','t6050',1),{common:true,apple:true,m5:true});
+	for(const [model,chip,family] of [['Unknown','t6050',1],['Mac17,9','unknown',1],['Mac17,9','t6050',0],['Mac17,9','t6050',-1]])assert.equal(native.testCatalog(model,chip,family).m5,false);
+	const catalog=JSON.parse(fs.readFileSync('native/hwmac/catalog.json','utf8'));assert.equal(new Set(catalog.rows.map(r=>r.key)).size,catalog.rows.length);assert.equal(catalog.rows.filter(r=>r.scope==='m5').length,26);
+});
+test('type tags, arguments and idempotent close fail closed',()=>{
+	const session=native.open();
+	assert.throws(()=>session.read.call({},'smc'),{code:'HWMAC_RECEIVER'});assert.throws(()=>session.close.call({}),{code:'HWMAC_RECEIVER'});
+	assert.throws(()=>session.read('public\0bad'),{code:'HWMAC_ARGUMENT'});assert.throws(()=>session.read('unknown'),{code:'HWMAC_ARGUMENT'});assert.throws(()=>session.read(42),{code:'HWMAC_ARGUMENT'});assert.throws(()=>native.open({}),{code:'HWMAC_ARGUMENT'});
+	session.close();session.close();assert.throws(()=>session.read('public'),{code:'HWMAC_CLOSED'});
+});
+test('slow optional reads do not prevent public counters; replacement sessions cannot multiply pending jobs',async()=>{
+	reset();native.configure({smc:{delayMs:200}});const first=native.open(),second=native.open();
+	const slow=first.read('smc');const closed=assert.rejects(slow,{code:'HWMAC_CLOSED'});
+	const quick=await first.read('public');assert.ok(quick.rows[0].valid);assert.throws(()=>second.read('smc'),{code:'HWMAC_BUSY'});
+	first.close();assert.throws(()=>second.read('smc'),{code:'HWMAC_BUSY'});await closed;
+	native.configure({smc:{delayMs:0}});assert.ok((await second.read('smc')).rows[0].valid);second.close();reset();
+});
+test('a delayed successful response retains its acquisition age',async()=>{
+	reset();native.configure({smc:{delayMs:150}});const session=native.open();const before=native.now(),packet=await session.read('smc');session.close();
+	assert.ok(packet.rows[0].continuousMs>=before);assert.ok(native.now()-packet.rows[0].continuousMs>=140);assert.equal(packet.code,'HWMAC_OK');reset();
+});
+test('every deterministic source fault reaches the caller without invented success',async()=>{
+	for(let fault=1;fault<=5;fault++) {
+		reset();native.configure({smc:{fault}});const session=native.open();const packet=await session.read('smc');session.close();
+		if(fault===1)assert.equal(packet.error,10);if(fault===2)assert.ok(Number.isNaN(packet.rows[0].value));if(fault===3)assert.ok(packet.rows[0].value>1e20);if(fault===4)assert.equal(packet.fontAvailable,false);if(fault===5)assert.equal(packet.rows[0].valid,false);
+	}
+	reset();
+});
+test('environment teardown while work is queued/running retains resources until completion',async()=>{
+	const worker=new Worker(`const {parentPort}=require('node:worker_threads');const n=require(${JSON.stringify(nativePath)});n.configure({smc:{delayMs:200}});const s=n.open();s.read('smc').catch(()=>{});parentPort.postMessage('queued');`,{eval:true});
+	await new Promise((resolve,reject)=>{worker.once('message',resolve);worker.once('error',reject);});
+	const code=await worker.terminate();assert.equal(code,1);
+});
+test('10000 reads and 2000 open/close cycles remain inside explicit RSS and descriptor bounds',async()=>{
+	reset();const fdCount=()=>execFileSync('/usr/sbin/lsof',['-nP','-p',String(process.pid),'-F','f'],{encoding:'utf8'}).split('\n').filter(line=>/^f[0-9]+/.test(line)).length;
+	const session=native.open();for(let i=0;i<100;i++)await session.read('public');global.gc?.();
+	const baseline={rss:process.memoryUsage().rss,fds:fdCount()};let peak=baseline.rss;
+	for(let i=0;i<10000;i++){await session.read(i%2?'public':'smc');if(i%100===0)peak=Math.max(peak,process.memoryUsage().rss);}
+	session.close();for(let i=0;i<2000;i++){const s=native.open();s.close();}peak=Math.max(peak,process.memoryUsage().rss);global.gc?.();await new Promise(resolve=>setImmediate(resolve));global.gc?.();
+	const final={rss:process.memoryUsage().rss,fds:fdCount()},record={architecture:process.arch,reads:10000,cycles:2000,baseline,sampledPeakRss:Math.max(peak,final.rss),lifetimePeakRss:process.resourceUsage().maxRSS*1024,final,bounds:{rssGrowth:64*1024*1024,descriptorGrowth:2}};
+	fs.mkdirSync('build/native-test-results',{recursive:true});fs.writeFileSync(`build/native-test-results/hygiene-${arch}.json`,JSON.stringify(record,null,2)+'\n');
+	assert.ok(final.rss-baseline.rss<=record.bounds.rssGrowth,JSON.stringify(record));assert.ok(final.fds-baseline.fds<=2,JSON.stringify(record));
+});

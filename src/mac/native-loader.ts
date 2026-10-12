@@ -1,17 +1,15 @@
-/** Phase4 seam contract. Native implementation and exact-byte checks land in Phase5. */
-import { HwinfoError } from '../hwinfo/types';
+import { registerDiagnostics } from '../diagnostics';
+import { runtimeFacts } from './runtime';
+import { getBridge } from './bridge';
+import { MacProvider, type ProviderFacts } from './provider';
 import type { SensorSnapshot } from '../hwinfo/types';
 export interface MacSnapshotProvider {
-  read(): SensorSnapshot | null;
-  current(): SensorSnapshot | null;
-  untilExpiry(): number | null;
-  age(): number | null;
-  close(): void;
+	read():SensorSnapshot|null;current():SensorSnapshot|null;untilExpiry():number|null;age():number|null;close():void;notices?():string[];
 }
-export function initHwsm(): void { /* Loading errors surface through the provider without terminating the app. */ }
-export function openMacProvider(_ready: () => void): MacSnapshotProvider {
-  void _ready;
-  const error = new HwinfoError('bridge-failed', 'The native reader is not assembled yet.');
-  error.name = 'MacSensorsError';
-  throw error;
+let facts:ProviderFacts|null=null;
+/** The copied entry uses this binding name; its Mac target never loads the Windows reader. */
+export function initHwsm():void {
+	try {getBridge();}catch{/* The action status reports a typed load failure. */}
+	registerDiagnostics('mac',()=>({...runtimeFacts(),...(facts??{catalog:'not sampled'})}));
 }
+export function openMacProvider(ready:()=>void):MacSnapshotProvider {return new MacProvider(getBridge(),ready,value=>{facts=value;});}

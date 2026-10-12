@@ -17,10 +17,17 @@
     "typecheck": "tsc --noEmit",
     "test": "node scripts/core/test.mjs",
     "test:mac": "tsx --tsconfig tsconfig.mac.json --test --test-concurrency=1 test/mac/*.test.ts",
-    "build": "rollup -c",
+    "build": "node scripts/stage-native.mjs && rollup -c && node scripts/stage-panels.mjs",
     "test:core-sync": "node --test test/mac/core-sync.test.mjs",
     "core:parity": "node scripts/core/parity.mjs",
-    "stage:panels": "node scripts/stage-panels.mjs"
+    "stage:panels": "node scripts/stage-panels.mjs",
+    "build:native": "node scripts/build-native.mjs",
+    "test:native": "node --expose-gc --test --test-concurrency=1 test/mac/native.test.mjs test/mac/native-package.test.mjs",
+    "probe": "tsx --tsconfig tsconfig.mac.json scripts/probe.ts",
+    "native:repro": "node scripts/native-repro.mjs",
+    "native:manifest": "node scripts/native-manifest.mjs",
+    "native:validate": "node scripts/validate-native.mjs",
+    "abi": "node scripts/abi-check.mjs"
   },
   "dependencies": {
     "@elgato/streamdeck": "^2.1.2",

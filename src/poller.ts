@@ -140,6 +140,9 @@ class HwinfoPoller extends EventEmitter {
 	// values; converted only at render.
 	private readonly series = new Map<string, number[]>();
 
+	/** Platform hook; the upstream policy keeps its existing cadence. */
+	checkAgain(): void {}
+
 	/** Latest status; safe to read at any time (e.g. right after willAppear). */
 	getStatus(): PollerStatus {
 		return this.status;

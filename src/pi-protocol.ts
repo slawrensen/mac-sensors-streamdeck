@@ -71,6 +71,7 @@ type TreeGroup = {
 };
 
 type SensorTreePayload = {
+	catalogRevision?: number;
 	event: "sensorTree";
 	groups: TreeGroup[];
 	/** Poller state at fetch time — lets the PI refetch after HWiNFO comes up. */
@@ -82,6 +83,7 @@ type SensorTreePayload = {
 };
 
 type PreviewPayload = {
+	catalogRevision?: number;
 	event: "preview";
 	state: PollerStatus["state"];
 	/** Active data source ("shared-memory" | "gadget"); absent when unavailable. */
@@ -232,6 +234,7 @@ export function buildSensorTree(status: PollerStatus): SensorTreePayload {
 	const payload: SensorTreePayload = { event: "sensorTree", groups, state: status.state, hint: statusSentence(status) };
 	if (status.state !== "unavailable") {
 		payload.source = status.source;
+		if (status.snapshot.catalogRevision !== undefined) payload.catalogRevision = status.snapshot.catalogRevision;
 	}
 	return payload;
 }
@@ -260,6 +263,7 @@ export function buildPreview(status: PollerStatus, settings: PreviewSettings | u
 	}
 	if (status.state !== "unavailable") {
 		payload.source = status.source;
+		if (status.snapshot.catalogRevision !== undefined) payload.catalogRevision = status.snapshot.catalogRevision;
 		if (extras.holding === true) {
 			payload.holding = true;
 		}
@@ -390,6 +394,7 @@ export function handlePiRequest(payload: JsonValue): void {
 		return;
 	}
 	if (payload.event === "getSensorTree") {
+		if (payload.refresh === true) poller.checkAgain();
 		void streamDeck.ui.sendToPropertyInspector(buildSensorTree(poller.getStatus()));
 	} else if (payload.event === "getThemes") {
 		void streamDeck.ui.sendToPropertyInspector(buildThemesPayload());
