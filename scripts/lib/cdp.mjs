@@ -188,8 +188,13 @@ export async function launch({ width = 400, height = 900, scale = 1 } = {}) {
 		},
 		/** A real mouse click at the center of the element `selector` matches. */
 		async click(selector) {
-			const box = await client.evaluate(`(() => { const el = document.querySelector(${JSON.stringify(selector)}); if (!el) return null; el.scrollIntoView({ block: "center" }); const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; })()`);
-			if (box === null) throw new Error(`click: nothing matches ${selector}`);
+			let box = null;
+			const deadline = performance.now() + 3500;
+			while (box === null && performance.now() < deadline) {
+				box = await client.evaluate(`(() => { const el = document.querySelector(${JSON.stringify(selector)}); if (!el || !el.getClientRects().length) return null; el.scrollIntoView({ block: "center" }); const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0 ? { x: r.left + r.width / 2, y: r.top + r.height / 2 } : null; })()`);
+				if (box === null) await sleep(20);
+			}
+			if (box === null) throw new Error(`click: no rendered match within 3500 ms for ${selector}`);
 			await send("Input.dispatchMouseEvent", { type: "mouseMoved", x: box.x, y: box.y });
 			await send("Input.dispatchMouseEvent", { type: "mousePressed", x: box.x, y: box.y, button: "left", clickCount: 1 });
 			await send("Input.dispatchMouseEvent", { type: "mouseReleased", x: box.x, y: box.y, button: "left", clickCount: 1 });

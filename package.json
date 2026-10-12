@@ -16,7 +16,7 @@
     "lint": "eslint src scripts test --max-warnings 0",
     "typecheck": "tsc --noEmit",
     "test": "node scripts/core/test.mjs",
-    "test:mac": "tsx --tsconfig tsconfig.mac.json --test --test-concurrency=1 test/mac/*.test.ts",
+    "test:mac": "tsx --tsconfig tsconfig.mac.json --test --test-concurrency=1 test/mac/*.test.ts test/mac/pi-sim.test.mjs",
     "build": "node scripts/sync-identity.mjs && node scripts/stage-native.mjs && rollup -c && node scripts/stage-panels.mjs && node scripts/assemble.mjs",
     "test:core-sync": "node --test test/mac/core-sync.test.mjs",
     "core:parity": "node scripts/core/parity.mjs",
