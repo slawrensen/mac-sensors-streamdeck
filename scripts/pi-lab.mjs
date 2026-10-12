@@ -115,7 +115,7 @@ async function capture() {
 	const sim = await startPiSim({ httpPort: PORTS.http, wsPort: PORTS.ws, extraRoutes: studyRoutes });
 	const browser = await launch({ width: widths[0], height: 800 });
 	const manifest = [];
-	const panelRoot = process.env.PI_SIM_PLUGIN_DIR ?? "com.lawrensen.mac.sdPlugin";
+	const panelRoot = process.env.PI_SIM_PLUGIN_DIR ?? "build/plugin";
 	const expectedToken = readFileSync(path.join(panelRoot, "ui/pi-common.js"), "utf8").match(/const PI_BUILD = "([^"]+)";/)?.[1];
 	if (!expectedToken) throw new Error("Missing panel build token");
 	const pageErrors = [];

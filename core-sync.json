@@ -2184,11 +2184,17 @@
     {
       "source": "scripts/capture-pi.mjs",
       "upstreamSha256": "2a61efdac80d6ea04039cbca4bcf6fe57dffde4696609a54b6fe74ff39d898bb",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "2a61efdac80d6ea04039cbca4bcf6fe57dffde4696609a54b6fe74ff39d898bb",
+      "disposition": "implemented",
+      "reason": "Mac counterparts use public process APIs, continuous-time acquisition evidence, precise task ownership and staged-panel checks. Physical owner-corpus census evidence remains private as required; public font and lens regressions are reproducible.",
+      "destinations": [
+        "scripts/pi-lab.mjs"
+      ],
+      "evidence": [
+        "npm run test:soak",
+        "npm run test:mac",
+        "npm run suite:full"
+      ]
     },
     {
       "source": "scripts/contact-sheet.mjs",
@@ -2363,29 +2369,47 @@
     {
       "source": "scripts/gadget-interleaving.mjs",
       "upstreamSha256": "8d1b0eff986b015801b2d0a5b6dca68dd6316d123d2261b82702aad7aefe06c7",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "8d1b0eff986b015801b2d0a5b6dca68dd6316d123d2261b82702aad7aefe06c7",
+      "disposition": "not-applicable",
+      "reason": "Windows registry enumeration and interleaved Gadget writes do not exist in the read-only Mac source. The counterpart independently acquires public and SMC measurements, invalidates failed/stale rows, and tests delayed publication and changed membership.",
+      "destinations": [
+        "src/mac/provider.ts",
+        "test/mac/provider.test.ts"
+      ],
+      "evidence": [
+        "npm run test:mac",
+        "npm run e2e:resilience"
+      ]
     },
     {
       "source": "scripts/gadget-scan-benchmark.mjs",
       "upstreamSha256": "837250f55a86c1c05cb8f2160def765e8699470a85ba1480c17725e29f737160",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "837250f55a86c1c05cb8f2160def765e8699470a85ba1480c17725e29f737160",
+      "disposition": "not-applicable",
+      "reason": "Windows registry enumeration and interleaved Gadget writes do not exist in the read-only Mac source. The counterpart independently acquires public and SMC measurements, invalidates failed/stale rows, and tests delayed publication and changed membership.",
+      "destinations": [
+        "src/mac/provider.ts",
+        "test/mac/provider.test.ts"
+      ],
+      "evidence": [
+        "npm run test:mac",
+        "npm run e2e:resilience"
+      ]
     },
     {
       "source": "scripts/gadget-scan-live.mjs",
       "upstreamSha256": "2aac897b41b04345b972355e650d3dd5eaea0b0fac91b2abbe7bcfdb729ec8b5",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "2aac897b41b04345b972355e650d3dd5eaea0b0fac91b2abbe7bcfdb729ec8b5",
+      "disposition": "not-applicable",
+      "reason": "Windows registry enumeration and interleaved Gadget writes do not exist in the read-only Mac source. The counterpart independently acquires public and SMC measurements, invalidates failed/stale rows, and tests delayed publication and changed membership.",
+      "destinations": [
+        "src/mac/provider.ts",
+        "test/mac/provider.test.ts"
+      ],
+      "evidence": [
+        "npm run test:mac",
+        "npm run e2e:resilience"
+      ]
     },
     {
       "source": "scripts/gen-changelog-page.mjs",
@@ -2557,29 +2581,48 @@
     {
       "source": "scripts/lib/soak-adversary-safety.mjs",
       "upstreamSha256": "5982c7d3aed959a2c1bf6241461cebb1d9d1ee91642115ae8a00d2c94e44f465",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "5982c7d3aed959a2c1bf6241461cebb1d9d1ee91642115ae8a00d2c94e44f465",
+      "disposition": "implemented",
+      "reason": "Mac counterparts use public process APIs, continuous-time acquisition evidence, precise task ownership and staged-panel checks. Physical owner-corpus census evidence remains private as required; public font and lens regressions are reproducible.",
+      "destinations": [
+        "scripts/lib/soak-adversary-safety.mjs"
+      ],
+      "evidence": [
+        "npm run test:soak",
+        "npm run test:mac",
+        "npm run suite:full"
+      ]
     },
     {
       "source": "scripts/lib/soak-host.mjs",
       "upstreamSha256": "853adeec1d8eb08e4c45e32bc3fd774b91b752377f24346446fdb87adec0a9ab",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "853adeec1d8eb08e4c45e32bc3fd774b91b752377f24346446fdb87adec0a9ab",
+      "disposition": "implemented",
+      "reason": "Mac counterparts use public process APIs, continuous-time acquisition evidence, precise task ownership and staged-panel checks. Physical owner-corpus census evidence remains private as required; public font and lens regressions are reproducible.",
+      "destinations": [
+        "scripts/lib/soak-host.mjs",
+        "native/observer/process-observer.c"
+      ],
+      "evidence": [
+        "npm run test:soak",
+        "npm run test:mac",
+        "npm run suite:full"
+      ]
     },
     {
       "source": "scripts/lib/soak-producer-freshness.mjs",
       "upstreamSha256": "cabe7973b26f1dd48b1ce741a5276837a5e4cd0283f990cac0d99a73525b84a6",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "cabe7973b26f1dd48b1ce741a5276837a5e4cd0283f990cac0d99a73525b84a6",
+      "disposition": "implemented",
+      "reason": "Mac counterparts use public process APIs, continuous-time acquisition evidence, precise task ownership and staged-panel checks. Physical owner-corpus census evidence remains private as required; public font and lens regressions are reproducible.",
+      "destinations": [
+        "scripts/lib/soak-freshness.mjs"
+      ],
+      "evidence": [
+        "npm run test:soak",
+        "npm run test:mac",
+        "npm run suite:full"
+      ]
     },
     {
       "source": "scripts/lib/ttf.mjs",
@@ -2665,11 +2708,17 @@
     {
       "source": "scripts/pi-harness.mjs",
       "upstreamSha256": "8532e910cb743eb78c9745183df6ff0222a154e30c7a305787143ad6a4b66530",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "8532e910cb743eb78c9745183df6ff0222a154e30c7a305787143ad6a4b66530",
+      "disposition": "implemented",
+      "reason": "Mac counterparts use public process APIs, continuous-time acquisition evidence, precise task ownership and staged-panel checks. Physical owner-corpus census evidence remains private as required; public font and lens regressions are reproducible.",
+      "destinations": [
+        "scripts/lib/pi-sim.mjs"
+      ],
+      "evidence": [
+        "npm run test:soak",
+        "npm run test:mac",
+        "npm run suite:full"
+      ]
     },
     {
       "source": "scripts/pi-lab.mjs",
@@ -2701,11 +2750,18 @@
     {
       "source": "scripts/readability-report.mjs",
       "upstreamSha256": "59db3bca34920c7f52d8ff1cd8790f97412bd40c586d87ed8077a99e75b9a46a",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "59db3bca34920c7f52d8ff1cd8790f97412bd40c586d87ed8077a99e75b9a46a",
+      "disposition": "implemented",
+      "reason": "Mac counterparts use public process APIs, continuous-time acquisition evidence, precise task ownership and staged-panel checks. Physical owner-corpus census evidence remains private as required; public font and lens regressions are reproducible.",
+      "destinations": [
+        "scripts/gen-tahoma-metrics.mjs",
+        "test/mac/lens-fit.test.ts"
+      ],
+      "evidence": [
+        "npm run test:soak",
+        "npm run test:mac",
+        "npm run suite:full"
+      ]
     },
     {
       "source": "scripts/readme-boards.mjs",
@@ -2719,20 +2775,35 @@
     {
       "source": "scripts/soak-adversary.mjs",
       "upstreamSha256": "ac283a35dc760e733dc54eedaeb71354ed8c972989da990bb72d71df82cd1aa0",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "ac283a35dc760e733dc54eedaeb71354ed8c972989da990bb72d71df82cd1aa0",
+      "disposition": "implemented",
+      "reason": "Mac counterparts use public process APIs, continuous-time acquisition evidence, precise task ownership and staged-panel checks. Physical owner-corpus census evidence remains private as required; public font and lens regressions are reproducible.",
+      "destinations": [
+        "scripts/soak-adversary.mjs",
+        "scripts/lib/soak-adversary-safety.mjs"
+      ],
+      "evidence": [
+        "npm run test:soak",
+        "npm run test:mac",
+        "npm run suite:full"
+      ]
     },
     {
       "source": "scripts/soak-monitor.mjs",
       "upstreamSha256": "67f4a8246fce71df8fad1c1c337cb866ac38a55b7dc024f1ae2c9e35c11a3ab7",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "67f4a8246fce71df8fad1c1c337cb866ac38a55b7dc024f1ae2c9e35c11a3ab7",
+      "disposition": "implemented",
+      "reason": "Mac counterparts use public process APIs, continuous-time acquisition evidence, precise task ownership and staged-panel checks. Physical owner-corpus census evidence remains private as required; public font and lens regressions are reproducible.",
+      "destinations": [
+        "scripts/soak-monitor.mjs",
+        "scripts/lib/soak-analysis.mjs",
+        "scripts/lib/soak-freshness.mjs"
+      ],
+      "evidence": [
+        "npm run test:soak",
+        "npm run test:mac",
+        "npm run suite:full"
+      ]
     },
     {
       "source": "scripts/validate-native.mjs",
@@ -2890,11 +2961,18 @@
     {
       "source": "test/hygiene-pi-startup.test.mjs",
       "upstreamSha256": "bcdc8327f11a7620d4f57a994c26f7105616ea30eeaf3cb4bf6085cb513dd374",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "bcdc8327f11a7620d4f57a994c26f7105616ea30eeaf3cb4bf6085cb513dd374",
+      "disposition": "implemented",
+      "reason": "Mac counterparts use public process APIs, continuous-time acquisition evidence, precise task ownership and staged-panel checks. Physical owner-corpus census evidence remains private as required; public font and lens regressions are reproducible.",
+      "destinations": [
+        "test/mac/pi-sim.test.mjs",
+        "scripts/lib/cdp.mjs"
+      ],
+      "evidence": [
+        "npm run test:soak",
+        "npm run test:mac",
+        "npm run suite:full"
+      ]
     },
     {
       "source": "test/native-manifest.test.ts",
@@ -2977,29 +3055,47 @@
     {
       "source": "test/soak-adversary.test.mjs",
       "upstreamSha256": "896c8dec881dcc843149e9072f46487c090727ffd96f7014efcebcc42c7a2719",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "896c8dec881dcc843149e9072f46487c090727ffd96f7014efcebcc42c7a2719",
+      "disposition": "implemented",
+      "reason": "Mac counterparts use public process APIs, continuous-time acquisition evidence, precise task ownership and staged-panel checks. Physical owner-corpus census evidence remains private as required; public font and lens regressions are reproducible.",
+      "destinations": [
+        "test/mac/soak.test.mjs"
+      ],
+      "evidence": [
+        "npm run test:soak",
+        "npm run test:mac",
+        "npm run suite:full"
+      ]
     },
     {
       "source": "test/soak-host.test.mjs",
       "upstreamSha256": "33fd9bbd7bbf164d638d6a8088b1000a783923fcadeb6b84a387a34306de79cc",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "33fd9bbd7bbf164d638d6a8088b1000a783923fcadeb6b84a387a34306de79cc",
+      "disposition": "implemented",
+      "reason": "Mac counterparts use public process APIs, continuous-time acquisition evidence, precise task ownership and staged-panel checks. Physical owner-corpus census evidence remains private as required; public font and lens regressions are reproducible.",
+      "destinations": [
+        "test/mac/soak.test.mjs"
+      ],
+      "evidence": [
+        "npm run test:soak",
+        "npm run test:mac",
+        "npm run suite:full"
+      ]
     },
     {
       "source": "test/soak-monitor.test.ts",
       "upstreamSha256": "59acb153028c8e3dd2ff1e913d4d74bfe0a5d505b843d545f273a3ad4da515d5",
-      "reviewedThroughSha256": null,
-      "disposition": "pending",
-      "reason": "Mac implementation gate remains open",
-      "destinations": [],
-      "evidence": []
+      "reviewedThroughSha256": "59acb153028c8e3dd2ff1e913d4d74bfe0a5d505b843d545f273a3ad4da515d5",
+      "disposition": "implemented",
+      "reason": "Mac counterparts use public process APIs, continuous-time acquisition evidence, precise task ownership and staged-panel checks. Physical owner-corpus census evidence remains private as required; public font and lens regressions are reproducible.",
+      "destinations": [
+        "test/mac/soak.test.mjs"
+      ],
+      "evidence": [
+        "npm run test:soak",
+        "npm run test:mac",
+        "npm run suite:full"
+      ]
     },
     {
       "source": "test/validate-native.test.ts",

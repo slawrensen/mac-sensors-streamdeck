@@ -1,3 +1,4 @@
+import './lib/no-active-soak.mjs';
 import './lib/script-failures.mjs';
 // Browser regression for independent source discovery. Simulated host and sample data.
 import assert from 'node:assert/strict';

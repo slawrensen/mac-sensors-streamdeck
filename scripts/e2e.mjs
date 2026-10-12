@@ -1,3 +1,4 @@
+import './lib/no-active-soak.mjs';
 // Mac counterparts of the pinned slawrensen/hwinfo-streamdeck protocol, resilience, native-edge, drill-down and socket-close harnesses.
 import './lib/script-failures.mjs';
 import assert from 'node:assert/strict';

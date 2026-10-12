@@ -1,3 +1,4 @@
+import './lib/no-active-soak.mjs';
 // Mac port of the pinned panel suite. Windows source-choice rows are replaced by absence/preservation checks.
 import "./lib/script-failures.mjs";
 // The F01 panel suite: drives the REAL property inspectors (shipped HTML,
