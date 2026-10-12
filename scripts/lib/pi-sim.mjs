@@ -60,6 +60,7 @@ function statusFor(data, snapshot) {
 
 export async function startPiSim({ httpPort, wsPort, tickMs = 0, extraRoutes = {} }) {
 	const all = scenarios();
+	let generation = 0;
 	const sim = {
 		fixture: null,
 		page: null,
@@ -162,6 +163,11 @@ export async function startPiSim({ httpPort, wsPort, tickMs = 0, extraRoutes = {
 	sim.setFixture = (name, overrides = {}) => {
 		const fx = all.list[name];
 		if (fx === undefined) throw new Error(`unknown fixture ${name}`);
+		generation++;
+		// A fixture is a different inspector session. Old unload writes and
+		// delayed replies must not mutate the next fixture's settings.
+		sim.piWs?.terminate();
+		sim.piWs = null;
 		sim.fixture = name;
 		sim.page = fx.page;
 		sim.context = `ctx-${name}`;
@@ -179,16 +185,18 @@ export async function startPiSim({ httpPort, wsPort, tickMs = 0, extraRoutes = {
 	};
 
 	const info = {
-		application: { font: "Segoe UI", language: "en", platform: "windows", platformVersion: "10.0.19044", version: "6.9.0.0" },
+		application: { font: "Tahoma", language: "en", platform: "mac", platformVersion: "27.0.1", version: "7.5.0.22885" },
 		colors: {},
 		devicePixelRatio: 1,
 		devices: [{ id: "dev1", name: "Lab Deck", size: { columns: 4, rows: 2 }, type: 7 }],
-		plugin: { uuid: "com.lawrensen.mac", version: "1.6.0.0" }
+		plugin: { uuid: "com.lawrensen.mac", version: JSON.parse(readFileSync(path.join(repoRoot, "package.json"), "utf8")).version + ".0" }
 	};
 
 	const wss = new WebSocketServer({ host: "127.0.0.1", port: wsPort });
 	wss.on("connection", (ws) => {
+		const epoch = generation;
 		ws.on("message", (raw) => {
+			if (epoch !== generation) return;
 			const msg = JSON.parse(raw.toString());
 			sim.piMessages.push(msg);
 			const page = PAGES[sim.page];
@@ -204,7 +212,7 @@ export async function startPiSim({ httpPort, wsPort, tickMs = 0, extraRoutes = {
 					sim.settings = structuredClone(msg.payload ?? {});
 					// The plugin repaints on didReceiveSettings and the redesigned
 					// actions push the new face to the open panel at once.
-					setTimeout(sim.pushPreview, 5);
+					setTimeout(() => { if (epoch === generation) sim.pushPreview(); }, 5);
 					break;
 				case "getGlobalSettings":
 					if (sim.holdGlobalsReplies) sim.heldGlobals.push(ws);
@@ -216,6 +224,7 @@ export async function startPiSim({ httpPort, wsPort, tickMs = 0, extraRoutes = {
 					applyGlobalThemeSettings(sim.globals);
 					ws.send(JSON.stringify({ event: "didReceiveGlobalSettings", payload: { settings: sim.globals } }));
 					setTimeout(() => {
+						if (epoch !== generation) return;
 						toPi(JSON.parse(JSON.stringify(buildThemesPayload())));
 						sim.pushPreview();
 					}, 5);
@@ -223,6 +232,7 @@ export async function startPiSim({ httpPort, wsPort, tickMs = 0, extraRoutes = {
 				case "sendToPlugin": {
 					const event = msg.payload?.event;
 					const reply = () => {
+						if (epoch !== generation || ws !== sim.piWs) return;
 						if (event === "getSensorTree") toPi(buildSensorTree(status()));
 						else if (event === "getThemes") toPi(JSON.parse(JSON.stringify(buildThemesPayload())));
 						else if (event === "getDetailSupport") toPi({ event: "detailSupport", supported: true, model: "Stream Deck +" });
@@ -234,7 +244,7 @@ export async function startPiSim({ httpPort, wsPort, tickMs = 0, extraRoutes = {
 							if (event === "setPanelFolds") sim.folds.set(kind, msg.payload?.folds);
 							else if (sim.foldsDelayMs > 0) {
 								const folds = sim.folds.get(kind);
-								setTimeout(() => toPi({ event: "panelFolds", kind, folds }), sim.foldsDelayMs);
+								setTimeout(() => { if (epoch === generation) toPi({ event: "panelFolds", kind, folds }); }, sim.foldsDelayMs);
 							} else toPi({ event: "panelFolds", kind, folds: sim.folds.get(kind) });
 						}
 					};

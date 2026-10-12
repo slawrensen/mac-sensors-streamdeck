@@ -7,7 +7,7 @@ import {processSnapshot,processIdentity,ownedDescendants} from './lib/process-ow
 import {verifyBuild} from './lib/build-evidence.mjs';
 verifyBuild('build/plugin');verifyBuild('build/test-plugin',true);
 const modes=['core','resilience','native-edge','drilldown','load','socket-close'];
-const jobs=[...modes.map(mode=>({mode,args:['scripts/e2e.mjs',mode]})),{mode:'pi',args:['scripts/e2e-pi-persistence.mjs']},{mode:'pi-panels',args:['--import','tsx','scripts/e2e-pi-panels.mjs']},{mode:'catalog-panel',args:['--import','tsx','scripts/test-catalog-panel.mjs']}];
+const jobs=[...modes.map(mode=>({mode,args:['scripts/e2e.mjs',mode]})),{mode:'pi',args:['scripts/e2e-pi-persistence.mjs']},{mode:'pi-panels',args:['--import','tsx','scripts/e2e-pi-panels.mjs']},{mode:'catalog-panel',args:['--import','tsx','scripts/test-catalog-panel.mjs']},{mode:'panel-focus',args:['--import','tsx','scripts/test-panel-focus.mjs']}];
 const results=[],before=processSnapshot(),root=before.find(row=>row.pid===process.pid);
 const browserRoot=fs.mkdtempSync(path.join(os.tmpdir(),'mac-sensors-suite-'));
 if(!root)throw new Error('Suite process identity unavailable');

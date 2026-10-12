@@ -174,6 +174,16 @@
         "before": "if (p.state !== \"ok\" || (p.source !== undefined && p.source !== treeSource)) treeFetchedOk = false;",
         "after": "if (p.state !== \"ok\" || (p.source !== undefined && p.source !== treeSource) || (typeof p.catalogRevision === \"number\" && p.catalogRevision !== treeCatalogRevision)) treeFetchedOk = false;",
         "count": 1
+      },
+      {
+        "before": "reset.setAttribute(\"aria-label\", reset.title);",
+        "after": "reset.setAttribute(\"aria-label\", `Auto: ${reset.title}`);",
+        "count": 1
+      },
+      {
+        "before": "\t// The app never echoes a panel's own write, and several controls here",
+        "after": "\t// Native textarea focus may expose its caret while leaving most of the\n\t// field behind the sticky header. Keep the focused control visible.\n\tdocument.addEventListener(\"focusin\", (event) => {\n\t\tconst target = event.target;\n\t\tif (!(target instanceof HTMLElement)) return;\n\t\trequestAnimationFrame(() => {\n\t\t\tif (document.activeElement !== target || !target.matches(\":focus-visible\") || target.getClientRects().length === 0) return;\n\t\t\tconst header = document.querySelector(\".hw-head[data-pin]\");\n\t\t\tif (!header || header.contains(target) || getComputedStyle(header).position !== \"sticky\") return;\n\t\t\tconst top = target.getBoundingClientRect().top;\n\t\t\tconst clear = header.getBoundingClientRect().bottom + 8;\n\t\t\tif (top < clear) window.scrollBy(0, top - clear);\n\t\t});\n\t});\n\n\t// The app never echoes a panel's own write, and several controls here",
+        "count": 1
       }
     ],
     "pi-model.js": [

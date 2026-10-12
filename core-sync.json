@@ -1035,8 +1035,13 @@
         0
       ],
       "rewrittenSha256": "cc398c9c1a5de7a73d72b57d44b2cb8611ccb5481ce2ab2dd06d68e0141acc55",
-      "patch": null,
-      "postPatchSha256": "cc398c9c1a5de7a73d72b57d44b2cb8611ccb5481ce2ab2dd06d68e0141acc55"
+      "patch": {
+        "path": "core-patches/src__ui__detail-renderer.ts.patch",
+        "sha256": "a9e1c900376a74ad99f7951125e6aad4561cb44c359769d4a943f37183f9ba6b",
+        "seam": "S5",
+        "reason": "Fit detail ranges to the measured Mac key lens without changing upstream default output"
+      },
+      "postPatchSha256": "035836fe9822095a6daa2e7c59b97353c4ae944686aabe41a2f16d1e9303122c"
     },
     {
       "source": "src/ui/dial-overview.ts",
@@ -1076,11 +1081,11 @@
       "rewrittenSha256": "189d98bc1e8d4b2336e58aa4a14dc9c0b84042c6903b886c115b43dfdbb16519",
       "patch": {
         "path": "core-patches/src__ui__face-font.ts.patch",
-        "sha256": "273bc6b4c1f6b2d26444a6b2d2473e35afa057b1d87b8485815881b1b4ed45c5",
+        "sha256": "761a61f6741f70aab1bb6a5f61a03c740dfb4ce72972fccf58f55fe47c11c881",
         "seam": "S5",
-        "reason": "Select measured Mac font metrics and keep saved alternative fonts while drawing Tahoma on Mac."
+        "reason": "Mac font profiles do not inherit Windows-only historical ink exceptions"
       },
-      "postPatchSha256": "8f8acec6fbfe4fc9bca8f078e3cab88372b80a415401553b2b534e196a75bc43"
+      "postPatchSha256": "e03e67b64dc27f2d36ce539f8167c26d3b4690d5efc2ac334131794304acda40"
     },
     {
       "source": "src/ui/format.ts",
@@ -1133,11 +1138,11 @@
       "rewrittenSha256": "bc102770946a97cc0dddadfae89dc2126100f8af31bcaaf8e31c5c4c70cec855",
       "patch": {
         "path": "core-patches/src__ui__key-renderer.ts.patch",
-        "sha256": "5751ac628078ea310f941f6b3f09a776880aea1ef024591f8abb9cbf37f58373",
+        "sha256": "d2e6e5341a00080f2fdb670cb02b7d13c820da599d7e35903bec7c6888b80f81",
         "seam": "S5",
-        "reason": "Permit pre-rendered font-setup pixels and preserve the Back mark without resolving a font."
+        "reason": "Use measured Mac ink bounds for labels and quad values, with clearance above quad micro-labels"
       },
-      "postPatchSha256": "a4c1225604b4e7723e758ff78c088c3463db0eeb22e09c6bfff95fbe3b2c30f7"
+      "postPatchSha256": "e4d0421dbd3c68f907cb6491f04bcdf155815121d079119b991834358a952da6"
     },
     {
       "source": "src/ui/measure.ts",

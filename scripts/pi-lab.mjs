@@ -367,9 +367,20 @@ async function a11y() {
 					const partly = hr !== null && !head.contains(a) && !obscured && r.top < hr.bottom - 1;
 					return { tag: a.tagName + (a.id ? "#" + a.id : ""), hiddenBy, ring, obscured, partly };
 				})()`;
+			// Scroll repair after an inline list closes runs on the next frame.
+			// Recheck a potential occlusion after painting, without weakening
+			// the final geometry assertion or delaying every successful stop.
+			const settledStop = async () => {
+				let stop = await browser.evaluate(probeStop);
+				if (stop?.obscured || stop?.partly) {
+					await browser.evaluate('new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))');
+					stop = await browser.evaluate(probeStop);
+				}
+				return stop;
+			};
 			for (let i = 0; i < 80; i++) {
 				await browser.key("Tab");
-				const stop = await browser.evaluate(probeStop);
+				const stop = await settledStop();
 				if (stop === null) break;
 				stops.push(stop);
 			}
@@ -377,7 +388,7 @@ async function a11y() {
 			// scrolls up into it, which a forward walk never exercises.
 			for (let i = 0; i < stops.length; i++) {
 				await browser.key("Tab", { shift: true });
-				const stop = await browser.evaluate(probeStop);
+				const stop = await settledStop();
 				if (stop === null) break;
 				if (stop.obscured) own.push({ rule: "focus-obscured-by-pinned-header", el: `${stop.tag} (Shift+Tab)` });
 				if (stop.partly) own.push({ rule: "focus-partly-under-pinned-header", el: `${stop.tag} (Shift+Tab)` });

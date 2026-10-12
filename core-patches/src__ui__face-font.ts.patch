@@ -1,11 +1,11 @@
 Source: slawrensen/hwinfo-streamdeck/src/ui/face-font.ts@11b9645b78395f157493648d873a3066673ba493
 Seam: S5
-Reason: Select measured Mac font metrics and keep saved alternative fonts while drawing Tahoma on Mac.
+Reason: Mac font profiles do not inherit Windows-only historical ink exceptions
 Before: 189d98bc1e8d4b2336e58aa4a14dc9c0b84042c6903b886c115b43dfdbb16519
-After: 8f8acec6fbfe4fc9bca8f078e3cab88372b80a415401553b2b534e196a75bc43
+After: e03e67b64dc27f2d36ce539f8167c26d3b4690d5efc2ac334131794304acda40
 
 diff --git a/src/ui/face-font.ts b/src/ui/face-font.ts
-index 6cde84f..b1e4661 100644
+index 6cde84f..0075280 100644
 --- a/src/ui/face-font.ts
 +++ b/src/ui/face-font.ts
 @@ -1,3 +1,4 @@
@@ -22,7 +22,25 @@ index 6cde84f..b1e4661 100644
  
  export type FaceFontId = "tahoma" | "segoe-ui";
  
-@@ -129,7 +130,7 @@ export function parseFaceFont(raw: unknown): FaceFontId {
+@@ -44,6 +45,8 @@ export interface FaceFontProfile {
+ 	readonly valueEm: number;
+ 	/** Width a key title or label row may spend, centered on the key. */
+ 	readonly titleBand: number;
++	/** Historical fits are valid only on the renderer where they were measured. */
++	readonly preserveLegacyFits?: boolean;
+ }
+ 
+ /**
+@@ -105,7 +108,7 @@ for (const [first, units] of TAHOMA_BOLD_BLOCKS) {
+  * stand alone on their line, so a title 1.6.0 drew keeps its size inside a
+  * 134 px band, about what the 1.6.0 faces drew in: "CPU Package" stays at 20
+  * px and "Total CPU Usage" whole at 16. */
+-export const TAHOMA: FaceFontProfile = { id: "tahoma", family: "Tahoma", advance12: TAHOMA_BOLD_12, insets12: TAHOMA_INSETS_12, unmapped12: 12.35, bearingCredit12: 0, boldFactor: 1, valueEm: 0.64, titleBand: 134 };
++export const TAHOMA: FaceFontProfile = { id: "tahoma", family: "Tahoma", advance12: TAHOMA_BOLD_12, insets12: TAHOMA_INSETS_12, unmapped12: 12.35, bearingCredit12: 0, boldFactor: 1, valueEm: 0.64, titleBand: 134, preserveLegacyFits: runtime.legacyFontFits };
+ /** The bearing credit makes Segoe UI estimates track rasterized ink within
+  * +4/-2.5 px at 16 px; without it "Total CPU Usage" (ink 118.4) prices at 121
+  * and wrongly ellipsizes. */
+@@ -129,7 +132,7 @@ export function parseFaceFont(raw: unknown): FaceFontId {
  
  /** Returns true when the profile changed (the caller repaints). */
  export function setFaceFont(id: FaceFontId): boolean {
