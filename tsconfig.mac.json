@@ -16,6 +16,9 @@
       ],
       "#platform/font-metrics": [
         "./src/mac/tahoma-bold-metrics.ts"
+      ],
+      "#platform/native-policy": [
+        "./src/mac/native-policy.ts"
       ]
     }
   }

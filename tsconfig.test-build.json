@@ -1,0 +1,25 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "#platform/poller": [
+        "./src/mac/poller.ts"
+      ],
+      "#platform/native": [
+        "./src/mac/native-loader.ts"
+      ],
+      "#platform/status": [
+        "./src/mac/state-screens.ts"
+      ],
+      "#platform/runtime": [
+        "./src/mac/runtime.ts"
+      ],
+      "#platform/font-metrics": [
+        "./src/mac/tahoma-bold-metrics.ts"
+      ],
+      "#platform/native-policy": [
+        "./test/mac/native-policy.ts"
+      ]
+    }
+  }
+}

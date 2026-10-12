@@ -7,11 +7,11 @@ export function platformMap() {
 	}
 	return map;
 }
-export function platformPaths(kind) { return Object.fromEntries(Object.entries(platformMap()).map(([alias,values])=>[alias,['./'+values[kind]]])); }
+export function platformPaths(kind) { return Object.fromEntries(Object.entries(platformMap()).map(([alias,values])=>[alias,['./'+(values[kind]??values.mac)]])); }
 if(process.argv[1]?.endsWith('/platform.mjs')) {
-	for(const kind of ['upstream','mac']) {
-		const file=kind==='mac'?'tsconfig.mac.json':'tsconfig.json';
-		const config=kind==='mac'?{extends:'./tsconfig.json'}:JSON.parse(fs.readFileSync(file,'utf8'));
+	for(const kind of ['upstream','mac','test']) {
+		const file=kind==='test'?'tsconfig.test-build.json':kind==='mac'?'tsconfig.mac.json':'tsconfig.json';
+		const config=kind!=='upstream'?{extends:'./tsconfig.json'}:JSON.parse(fs.readFileSync(file,'utf8'));
 		config.compilerOptions={...config.compilerOptions,paths:platformPaths(kind)};
 		fs.writeFileSync(file,JSON.stringify(config,null,2)+'\n');
 	}

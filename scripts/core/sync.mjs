@@ -204,6 +204,6 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
 	const args = process.argv.slice(2); const mode = args.shift();
 	const option = (name) => { const at = args.indexOf(name); if (at < 0) return undefined; const value = args[at + 1]; args.splice(at, 2); return value; };
 	const flag = (name) => { const at = args.indexOf(name); if (at < 0) return false; args.splice(at, 1); return true; };
-	try { run({ root: process.cwd(), mode, upstream: option('--upstream') ?? process.env.MACSENSORS_UPSTREAM, file: option('--file'), seam: option('--seam'), reason: option('--reason'), injectFailure: Number(option('--inject-failure')) || undefined, recovery: flag('--recover'), release: flag('--release'), pin: args[0] }); }
+	try { run({ root: process.cwd(), mode, upstream: option('--upstream') ?? process.env.MACSENSORS_UPSTREAM_DIR ?? process.env.MACSENSORS_UPSTREAM, file: option('--file'), seam: option('--seam'), reason: option('--reason'), injectFailure: Number(option('--inject-failure')) || undefined, recovery: flag('--recover'), release: flag('--release'), pin: args[0] }); }
 	catch (error) { console.error(error.message); process.exitCode = 1; }
 }

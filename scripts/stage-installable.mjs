@@ -1,0 +1,10 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import {PLUGIN_ROOT} from './lib/pack-contract.mjs';
+import {validateStaging} from './lib/pack-validation.mjs';
+const record=JSON.parse(fs.readFileSync('build/native/build-record.json','utf8'));
+validateStaging('build/plugin',record.sourceId);
+const target=path.join('build',PLUGIN_ROOT),next=fs.mkdtempSync(path.join('build','.installable-'));
+fs.cpSync('build/plugin',next,{recursive:true});
+if(fs.existsSync(target)){validateStaging(target,record.sourceId);const prior=target+'.previous';if(fs.existsSync(prior))throw new Error('Unfinished installable staging');fs.renameSync(target,prior);try{fs.renameSync(next,target);}catch(error){fs.renameSync(prior,target);throw error;}fs.rmSync(prior,{recursive:true});}else fs.renameSync(next,target);
+console.log(target);

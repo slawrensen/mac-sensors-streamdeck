@@ -1,3 +1,4 @@
+import {allowTestNative,prepareNative} from '#platform/native-policy';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { readFileSync } from 'node:fs';
@@ -30,7 +31,7 @@ export function getBridge(): NativeBridge {
 		const bytes=readFileSync(url);
 		if(createHash('sha256').update(bytes).digest('hex')!==contract[architecture])throw new MacSensorError('bridge-failed','The native reader file does not match this plugin. Reinstall Mac Sensors.');
 		const require=createRequire(import.meta.url);
-		bridge=validateNative(require(fileURLToPath(url)) as NativeBridge,process.arch);
+		bridge=prepareNative(validateNative(require(fileURLToPath(url)) as NativeBridge,process.arch,allowTestNative));
 		return bridge;
 	} catch(error) {
 		failure=error instanceof MacSensorError?error:new MacSensorError('bridge-failed','The native reader could not load. Reinstall Mac Sensors.');

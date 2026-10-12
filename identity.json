@@ -1,0 +1,12 @@
+{
+	"name": "Mac Sensors",
+	"uuid": "com.lawrensen.mac",
+	"devUuid": "com.lawrensen.macdev",
+	"author": "Stephen Lawrensen",
+	"docs": "https://docs.slawrensen.com/mac-streamdeck/",
+	"panelBuild": 2,
+	"nodeMajor": "24",
+	"minimumMacOS": "13.5",
+	"minimumApp": "7.1",
+	"profileEnvironment": {"AppVersion": "7.5.0.22885", "OSType": "macOS", "OSVersion": "27.0.1"}
+}

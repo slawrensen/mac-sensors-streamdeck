@@ -38,5 +38,6 @@ export function stagePanels(destination, token) {
 if(process.argv[1]?.endsWith('/stage-panels.mjs')) {
 	const destination=process.argv[2]??'build/plugin/ui';
 	const version=JSON.parse(fs.readFileSync('package.json','utf8')).version;
-	console.log(JSON.stringify(stagePanels(destination,`${version}.0-mac2`),null,2));
+	const identity=JSON.parse(fs.readFileSync('identity.json','utf8'));
+	console.log(JSON.stringify(stagePanels(destination,`${version}.0-mac${identity.panelBuild}`),null,2));
 }

@@ -1,0 +1,82 @@
+name: ci
+on:
+  push:
+    branches: [main, assembly]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  verify:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-26
+            arch: arm64
+          - os: macos-26-intel
+            arch: x64
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+      - name: Read pinned core revision
+        id: core
+        run: node -e "const fs=require('fs');fs.appendFileSync(process.env.GITHUB_OUTPUT,'sha='+JSON.parse(fs.readFileSync('core-sync.json')).upstream.commit+'\n')"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: slawrensen/hwinfo-streamdeck
+          ref: ${{ steps.core.outputs.sha }}
+          path: upstream
+          persist-credentials: false
+      - run: npm ci --ignore-scripts
+      - name: Software qualification
+        env:
+          MACSENSORS_UPSTREAM_DIR: ${{ github.workspace }}/upstream
+        run: npm run release:validate -- --out release/ci-qualification
+      - run: npm run build:test
+      - run: npm run e2e:resilience
+      - name: Retain exact native bytes for the ABI matrix
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: native-${{ matrix.arch }}
+          path: build/native/production/
+          retention-days: 14
+          if-no-files-found: error
+      - name: Retain package and qualification record
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: ci-pack-qualification-${{ matrix.arch }}
+          path: release/
+          retention-days: 14
+  abi:
+    needs: verify
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [20, 22, 24]
+        target:
+          - os: macos-26
+            arch: arm64
+          - os: macos-26-intel
+            arch: x64
+    runs-on: ${{ matrix.target.os }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ matrix.node }}
+      - uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6
+        with:
+          name: native-${{ matrix.target.arch }}
+          path: native-artifact
+      - name: Load and read the exact artifact without rebuilding
+        run: node scripts/abi-check.mjs native-artifact
