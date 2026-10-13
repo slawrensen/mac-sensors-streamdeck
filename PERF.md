@@ -22,10 +22,32 @@ The release toolchain is Xcode 26.6 with SDK 26.5 and pinned Node 24.13.1headers
 
 The first window's slow one-second reads occurred near the same wall-clock second once per minute. Their cause is unknown. Both windows are retained; the later pass does not erase the earlier failure. These are native-component timings under background development activity, not a promise of constant latency or the total cost of rendering a deck.
 
-### 2026-10-12: Installed candidate observation in progress
+### 2026-10-12: Installed Mac candidate, 24-hour observation
 
-The 1.0.0.0 CI package is 316713 bytes, SHA-256 d8db87c270d5803a7fe0e769326acc5b2142d15bb4918cfe564757386c1f6c89. It was downloaded through Safari, opened from Finder and installed normally over 0.9.90.0. All 37 installed members match the candidate, with manifest JSON compared semantically.
+Harness: `npm run soak -- --hours 24 --interval-ms 60000`, with the frozen development directory and a separate private evidence destination. CI package SHA-256: d8db87c270d5803a7fe0e769326acc5b2142d15bb4918cfe564757386c1f6c89 (316713 bytes). Development bundle SHA-256: 9a2f9133d43927ced59fff82d0b3ec7874502cd356d4afb598d3a83c5dd6ad43.
 
-The isolated development identity uses those native bytes and product JavaScript with the documented development UUID/trace prefix. Its 24-hour real-app Virtual Stream Deck observation started 2026-10-12T12:43:22Z. A task-owned plugin kill recovered with fresh system and SMC observations in 2.28 seconds. The window is not yet qualified. Memory slopes, resource samples, acquisition evidence, logs and new diagnostic reports will be assessed after it closes.
+Host: Mac17,9, M5 Pro, macOS 27.0.1, Stream Deck 7.5.0.22885, app Node 24.13.1. The actual app exercised 32 keys on an 8 by 4 Virtual Stream Deck. The dev identity used the product JavaScript and native files with its declared UUID/trace transformation.
 
-Physical deck gestures, sleep/wake, restarting the original app and the physical Intel window remain explicit owner work. A Virtual Stream Deck and Rosetta do not replace those checks.
+| Measure | Result |
+| --- | --- |
+| Window | 2026-10-12 12:43:22 UTC to 2026-10-13 12:44:22 UTC; 24.017 hours |
+| External samples | 1,442, at one-minute intervals |
+| RSS fitted slope | 0.280 MiB per 30 minutes in the restarted process; first process had one sample and no fitted slope |
+| RSS start / close / maximum | 83.47 / 191.48 / 197.59 MiB |
+| Maximum physical footprint | 166.01 MiB |
+| File descriptors start / close / maximum | 49 / 49 / 49 |
+| Maximum threads | 12 |
+| Measured process CPU time | 663.88 seconds across process segments |
+| Plugin restart | One injected kill; fresh system and SMC observations recovered in 2.28 seconds |
+| WARN / ERROR lines | 0 / 0 |
+| Sampling gaps / freshness flags | 0 / 0 |
+| Explained process-missing samples | One during the verified kill |
+| Unexplained flags | 0 |
+| New crash or panic reports | 0; both diagnostic directories also checked recursively |
+| Resource and freshness gates | PASS |
+
+All samples, including warm-up, are retained. RSS rose in steps during the first two hours, then remained near 198 MiB before settling near 191 MiB. The full-window fit meets the declared gate; this does not establish the cause of the initial allocations or prove that every workload is leak-free. No inspector, forced collection or runtime replacement was used to alter the measured process.
+
+The production UUID was installed through Safari/Finder over 0.9.90.0, with download quarantine retained. All 37 installed members matched the CI candidate exactly. After the dev observation, the production bench reported 14 public/derived and 38 SMC readings, no source errors and changing live CPU values through the actual app inspector, with zero settings writes during the diagnostic requests. Its mapped native addon matched the qualified file.
+
+The owner requested a visible bench, so a separate hidden-window check ended after 13 samples and is not a completed hidden-for-hours test. App restart, two-minute sleep/wake, physical deck gestures and the physical Intel observation remain owner-only work. A Virtual Stream Deck and Rosetta do not replace those checks.

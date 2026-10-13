@@ -1,6 +1,6 @@
 # Security
 
-Report suspected vulnerabilities through [private vulnerability reporting](https://github.com/slawrensen/mac-sensors-streamdeck/security/advisories/new). Please avoid posting exploit details, profile exports or private logs in a public issue. The first reply target is seven days.
+Report suspected vulnerabilities through [private vulnerability reporting](https://github.com/slawrensen/slawrensen.github.io/security/advisories/new). The reporting form is hosted in the documentation repository so it is available while product source remains private. Name Mac Sensors and the affected version in the report. Please avoid posting exploit details, profile exports or private logs in a public issue. The first reply target is seven days.
 
 Security fixes target the latest published 1.x release. The plugin has no update channel of its own; updates arrive through the Elgato Marketplace or GitHub releases. Install a newer published version when a fix is announced.
 

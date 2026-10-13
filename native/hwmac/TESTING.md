@@ -60,7 +60,7 @@ Development host: Mac17,9, Apple M5 Pro, 64 GB, 18 logical CPUs, macOS 27.0.1 bu
 | 12 | Marketplace DRM route | Not executed: submission and approval are owner-only |
 | 13 | Low Power Mode, battery/AC | Not executed: owner controls; original settings recorded |
 | 14 | Sustained CPU load | Six owned workers raised measured temperatures and both automatic fan readings; no actuator calls. Physical alert-color check remains owner-only |
-| 15 | App hidden for hours | Not executed as a separate host condition |
+| 15 | App hidden for hours | Ended early at the owner's request after 13 hidden/fresh samples; not a completed hours-long check |
 | 16 | Second physical deck | Not executed: device attach/detach required |
 | 17 | Detail profiles | Software archive/navigation tests and real-app isolated profile install/switch/restore; physical managed-detail route remains owner-only |
 | 18 | Dial/control gestures | Software traces pass; physical gestures not executed |
@@ -72,4 +72,4 @@ Development host: Mac17,9, Apple M5 Pro, 64 GB, 18 logical CPUs, macOS 27.0.1 bu
 | 24 | OS point update during program | Not executed: no update performed during qualification |
 | 25 | Offline notarized first load | Not applicable: Developer ID/notarization was not selected |
 
-The dated 24-hour window is in progress. It must not be reported as a completed soak before its final resource, freshness, log and diagnostic-report review.
+The 24.017-hour development-identity window completed on 2026-10-13 with 1,442 samples, a 0.280 MiB per 30 minutes RSS slope, no unexplained flags and no new diagnostic reports. See PERF.md for the full scope and retained owner-only events. The installed production UUID also returned live readings after the window.
