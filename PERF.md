@@ -51,3 +51,9 @@ All samples, including warm-up, are retained. RSS rose in steps during the first
 The production UUID was installed through Safari/Finder over 0.9.90.0, with download quarantine retained. All 37 installed members matched the CI candidate exactly. After the dev observation, the production bench reported 14 public/derived and 38 SMC readings, no source errors and changing live CPU values through the actual app inspector, with zero settings writes during the diagnostic requests. Its mapped native addon matched the qualified file.
 
 The owner requested a visible bench, so a separate hidden-window check ended after 13 samples and is not a completed hidden-for-hours test. App restart, two-minute sleep/wake, physical deck gestures and the physical Intel observation remain owner-only work. A Virtual Stream Deck and Rosetta do not replace those checks.
+
+### 2026-10-13: Published 1.0.0.0 artifact
+
+The [private GitHub release](https://github.com/slawrensen/mac-sensors-streamdeck/releases/tag/v1.0.0) contains a 316713-byte package with SHA-256 d977a41e86e6ac4542f7bd3e0e00dfe6c01fb914ad0ecc1a9d6cac8a2ec54487. All 37 payload members match the observed CI candidate byte for byte, including both native addons. The ZIP container checksum differs from that candidate. Authenticated published downloads and the native manifest checksums passed.
+
+Safari downloaded the final package with quarantine intact. Finder opening produced the app's AlreadyInstalled result for the equal version. The existing production process continued, and every installed payload file still matched. No additional install or restart is claimed from that no-op. The completed observation and its unexecuted physical/Intel checks above apply to these identical runtime files.
