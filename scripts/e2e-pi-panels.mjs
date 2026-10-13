@@ -860,13 +860,21 @@ try {
 	await open("key-configured");
 	const kept = await foldsOf();
 	check("folds: a section a person opened stays open on the next panel", kept["sec-alerts"] === true && defaults["sec-alerts"] === false && kept["sec-reading"] === defaults["sec-reading"], JSON.stringify({ defaults, kept }));
-	// A toggle goes to the plugin's memory, never to settings, and the
-	// panel keeps nothing in web storage. The pause lets the first toggle
-	// event fire: two clicks inside one task coalesce into a single event.
+	// A toggle goes to the plugin's memory, never to settings or web storage.
+	// Wait for each message before clicking again: a fixed pause can leave
+	// both changes in the same pending browser toggle event on a busy host.
+	const waitForFoldTraffic = async (count) => {
+		const deadline = performance.now() + 3000;
+		while (sim.piMessages.filter((m) => m.payload?.event === "setPanelFolds").length < count) {
+			if (performance.now() >= deadline) throw new Error(`Expected ${count} fold messages within 3000 ms`);
+			await sleep(25);
+		}
+	};
 	await b.click("#sec-alerts > summary");
-	await sleep(60);
+	await waitForFoldTraffic(1);
+	check("folds: the first toggle reaches the plugin before the second click", sim.folds.get("key")["sec-alerts"] === false);
 	await b.click("#sec-alerts > summary");
-	await sleep(120);
+	await waitForFoldTraffic(2);
 	const foldTraffic = sim.piMessages.filter((m) => m.payload?.event === "setPanelFolds");
 	const webStorage = await b.evaluate(`Object.keys(localStorage).concat(Object.keys(sessionStorage)).filter((k) => /fold/i.test(k))`);
 	check("folds: a toggle reaches the plugin's memory, not settings or web storage", foldTraffic.length === 2 && foldTraffic.at(-1).payload.folds["sec-alerts"] === true && same(sim.folds.get("key"), { "sec-alerts": true }) && sim.writes.length === 0 && webStorage.length === 0, JSON.stringify({ sent: foldTraffic.length, plugin: sim.folds.get("key"), webStorage }));
