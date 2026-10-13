@@ -20,7 +20,7 @@
 </p>
 
 <p align="center">
-  <a href="#try-the-candidate">Try it</a> ·
+  <a href="#try-mac-sensors">Try it</a> ·
   <a href="#give-each-reading-its-space">Keys</a> ·
   <a href="#open-the-details">Details</a> ·
   <a href="#keep-a-reading-set-on-a-dial">Dials</a> ·
@@ -29,9 +29,9 @@
 </p>
 
 > [!NOTE]
-> **1.0.0.0 is a candidate under qualification.** The final observation window is still running. This repository is private; its releases require access. The hosted documentation is available; product source remains private.
+> **Mac Sensors 1.0.0.0.** This repository and its releases require access. The hosted documentation is public; product source remains private. Physical-device and Intel validation status is recorded in the compatibility guide.
 
-## Try the candidate
+## Try Mac Sensors
 
 1. Open Stream Deck and select **Virtual Stream Deck**, or use a connected physical deck.
 2. Add **Mac Sensors → Sensor Reading** to a key and choose a reading from this Mac's catalog.
