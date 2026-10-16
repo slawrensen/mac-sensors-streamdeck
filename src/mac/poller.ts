@@ -21,7 +21,9 @@ export function parsePollInterval(raw: unknown): number {
 }
 export function parseSourceMode(_raw: unknown): 'auto' { void _raw; return 'auto'; }
 type Factory = (ready: () => void) => MacSnapshotProvider;
-const pending = (): PollerStatus => ({ state: 'unavailable', reason: 'pending', message: 'Readings appear after the first successful sample.' });
+/** Shown while no reading is live yet, and again when every live reading lapsed before a full read completed. */
+const PENDING_MESSAGE = 'Readings appear after the first successful sample.';
+const pending = (): PollerStatus => ({ state: 'unavailable', reason: 'pending', message: PENDING_MESSAGE });
 /**
  * Longest a settled source's readings wait for the other source of the same read, so a
  * context that shows both gets one publication per read. Below the 250 ms minimum interval.
@@ -123,7 +125,8 @@ export class MacPoller extends EventEmitter {
 	}
 	private refresh(emit: boolean): void {
 		if (!this.provider) return;
-		try { const snapshot = this.provider.current(); if (snapshot) this.accept(snapshot); }
+		// No snapshot while ok means every published row expired or failed before the other source ever completed: never keep it live.
+		try { const snapshot = this.provider.current(); if (snapshot) this.accept(snapshot); else if (this.status.state === 'ok') this.failure(new HwinfoError('pending', PENDING_MESSAGE)); }
 		catch (error) { this.failure(error); }
 		for (const notice of this.provider.notices?.() ?? []) this.logger.warn(notice);
 		this.armExpiry();

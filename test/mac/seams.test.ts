@@ -75,3 +75,23 @@ test('explicit rechecks read only while an action is visible',()=>{
 	let reads=0;const subject=new MacPoller(()=>({read:()=>{reads++;return snapshot();},current:()=>snapshot(),untilExpiry:()=>null,age:()=>0,close:()=>{}}));
 	subject.checkAgain();assert.equal(reads,0);subject.retain();assert.equal(reads,1);subject.checkAgain();assert.equal(reads,2);subject.release();subject.checkAgain();assert.equal(reads,2);
 });
+test('readings that lapse before SMC ever completes are not kept live, whether public then fails, stalls or both sources had completed',async()=>{
+	const memory='mac:v1:system:memory-total';
+	const row=(source:NativeSource,at:number):NativeRow=>({key:source==='smc'?'TB1T':'memory-total',label:source,group:source==='smc'?'Battery':'Memory',kind:source==='smc'?'temperature':'other',unit:source==='smc'?'°C':'B',value:source==='smc'?30:1024,valid:true,continuousMs:at,wallSeconds:1.7e9+at/1000,error:0,systemCode:0});
+	const packet=(source:NativeSource,at:number):NativePacket=>({source,rows:[row(source,at)],continuousMs:at,awakeMs:at,wallSeconds:1.7e9+at/1000,durationMs:1,error:0,systemCode:0,operation:'fixture',model:'Mac17,9',chip:'t6050',appleSilicon:1,translated:0,translationError:0,fontAvailable:true,cpuValid:false,cpuTicks:[[0,0,0,0]],networkValid:false,networkIn:'0',networkOut:'0',networkMembers:'1',storageValid:false,storageRead:'0',storageWrite:'0',storageMembers:'1'});
+	const settle=():Promise<void>=>new Promise(resolve=>setImmediate(resolve));
+	for(const variant of ['public rejects','public stalls','smc had completed'] as const) {
+		const clock={now:100};const out=new Map<NativeSource,{resolve:(p:NativePacket)=>void;reject:(e:unknown)=>void}>();
+		const native:NativeBridge={getBuildInfo:()=>({protocol:1,napi:8,version:'t',sourceId:'t',arch:process.arch,platform:'darwin',testHooks:true}),now:()=>clock.now,open:()=>({read:(source)=>new Promise((resolve,reject)=>out.set(source,{resolve,reject})),close:()=>{}})};
+		const subject=new MacPoller((ready)=>new MacProvider(native,ready));subject.subscribeSeries(memory);
+		const finish=async(source:NativeSource,how:'resolve'|'reject'):Promise<void>=>{const pending=out.get(source);assert.ok(pending,`${variant}: ${source} in flight`);out.delete(source);if(how==='resolve')pending.resolve(packet(source,clock.now));else pending.reject(Object.assign(new Error('fixture'),{code:'HWMAC_ASYNC'}));await settle();};
+		subject.retain();await finish('public','resolve');if(variant==='smc had completed')await finish('smc','resolve');
+		assert.equal(subject.getStatus().state,'ok',variant);assert.equal(subject.getSeries(memory)?.length,1,variant);
+		clock.now=1100;subject.checkAgain();if(variant==='public rejects')await finish('public','reject');
+		clock.now=40_000;const status=subject.getStatus();
+		assert.equal(status.state,'unavailable',variant);
+		assert.equal(status.state==='unavailable'&&status.reason,variant==='smc had completed'?'no-readable-sensors':'pending',variant);
+		assert.equal(subject.getSeries(memory)?.length,0,`${variant}: a lapsed reading leaves no sparkline behind`);
+		subject.release();
+	}
+});
