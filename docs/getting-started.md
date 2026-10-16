@@ -12,7 +12,7 @@ The header shows the same SVG the plugin last drew for that action. Its status d
 
 Choose a label if the full sensor name is too long for the key. Under **Readings on this key**, choose one, two, three or four readings. Set **Graph under the value** for a trend, bar or ring where that layout supports it.
 
-Every key and dial updates from one shared read. **Read every**, under Advanced, Connection, sets how often: from 250 ms to 5 seconds, one second by default. Changing it clears sparkline history.
+Every reading key and dial updates from one shared read. **Read every**, under Advanced, Connection, sets how often: from 250 ms to 5 seconds, one second by default. Changing it clears sparkline history.
 
 Use [thresholds](thresholds.html) for warning and critical colors. Use [sensor details](sensor-details.html) when you want a group of readings behind one key.
 

@@ -29,7 +29,7 @@
 </p>
 
 > [!NOTE]
-> **Mac Sensors 1.0.0.0.** This repository and its releases require access. The hosted documentation is public; product source remains private. Physical-device and Intel validation status is recorded in the compatibility guide.
+> **Mac Sensors 1.0.1.0.** This repository and its releases require access. The hosted documentation is public; product source remains private. Physical-device and Intel validation status is recorded in the compatibility guide.
 
 ## Try Mac Sensors
 

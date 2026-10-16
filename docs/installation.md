@@ -13,7 +13,7 @@ You need macOS 13.5 or later and Stream Deck 7.1 or later. The package includes 
 3. Find **Mac Sensors** in the Actions list and drag **Sensor Reading** onto a key.
 4. Pick a reading in the settings panel.
 
-Version 1.0.0.0 downloads require repository access. Marketplace submission and availability are separate.
+Version 1.0.1.0 downloads require repository access. Marketplace submission and availability are separate.
 
 Tahoma Bold must be available in Font Book. If a key says **Tahoma needed**, open Font Book, install or download the available Tahoma family, and choose **Check again** in the panel. The plugin includes rendered setup artwork, not a font file.
 

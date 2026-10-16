@@ -14,7 +14,7 @@ Status text names the condition the plugin can establish. Opening a provider doe
 
 | Screen | Meaning and next step |
 | --- | --- |
-| Reading sensors | The first successful sample has not arrived yet |
+| Reading sensors | The first successful sample has not arrived yet, or every shown reading lapsed before a full read completed |
 | Source busy | A source is still occupied; the plugin retries |
 | No sensor data | No recent readable observations; copy a support report |
 | Sensor missing | The saved identity is absent; settings remain saved |
