@@ -37,7 +37,8 @@ test('upload kit takes the update notes for its own version and stops before any
 	const dir=fs.mkdtempSync(path.join(os.tmpdir(),'mac-stage-upload-test-'));t.after(()=>fs.rmSync(dir,{recursive:true,force:true}));
 	// A stand-in gh that records every call and answers the release lookup as published, so only the listing check can stop the run.
 	const calls=path.join(dir,'gh-calls.txt');fs.mkdirSync(path.join(dir,'bin'));
-	fs.writeFileSync(path.join(dir,'bin','gh'),`#!${process.execPath}\nrequire('node:fs').appendFileSync(${JSON.stringify(calls)},process.argv.slice(2).join(' ')+'\\n');\nif(process.argv[2]==='api')process.stdout.write(JSON.stringify({draft:false,published_at:'2026-10-13T13:25:34Z',html_url:'https://example.invalid/release'}));\n`,{mode:0o755});
+	fs.writeFileSync(path.join(dir,'bin','gh'),`#!/bin/sh\nexec ${JSON.stringify(process.execPath)} "$0.cjs" "$@"\n`,{mode:0o755});// a #! line cannot hold a Node path with spaces
+	fs.writeFileSync(path.join(dir,'bin','gh.cjs'),`require('node:fs').appendFileSync(${JSON.stringify(calls)},process.argv.slice(2).join(' ')+'\\n');\nif(process.argv[2]==='api')process.stdout.write(JSON.stringify({draft:false,published_at:'2026-10-13T13:25:34Z',html_url:'https://example.invalid/release'}));\n`,{mode:0o755});
 	fs.mkdirSync(path.join(dir,'docs/release'),{recursive:true});fs.writeFileSync(path.join(dir,'docs/release/STREAM_DECK_MARKETPLACE.md'),listing);
 	const stage=tag=>run('stage-upload.mjs',[tag],dir,{PATH:path.join(dir,'bin')+path.delimiter+process.env.PATH});
 	const missing=stage('v1.0.2');

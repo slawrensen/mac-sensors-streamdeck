@@ -37,4 +37,4 @@ function main(){
 	fs.copyFileSync('docs/release/OWNER-MEDIA.md',path.join(out,'OWNER-MEDIA.md'));
 	fs.writeFileSync(path.join(out,'staging.json'),JSON.stringify({tag,releaseUrl:release.html_url,publishedAt:release.published_at,packageSha256:hash(pack),packageBytes:pack.length,galleryOrder:gallery,ownerOnly:['Hardware photograph, inserted after details','Demo video and thumbnail','VirusTotal uploads','Marketplace submission and DRM install']},null,2)+'\n');console.log(out);
 }
-if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)main();
+if(process.argv[1]&&import.meta.url===pathToFileURL(fs.realpathSync(process.argv[1])).href)main();

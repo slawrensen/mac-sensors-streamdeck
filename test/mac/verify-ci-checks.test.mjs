@@ -215,7 +215,9 @@ test('the command exits 0 on pass, 1 on fail or bad input and 2 on pending, thro
 	const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'mac-ci-gate-test-'));
 	t.after(() => fs.rmSync(dir, {recursive: true, force: true}));
 	// A stand-in gh that serves fixed routes from a JSON file and fails anything else like an HTTP 404.
-	fs.writeFileSync(path.join(dir, 'gh'), `#!${process.execPath}\nconst fs = require('node:fs');\nconst routes = JSON.parse(fs.readFileSync(process.env.FAKE_GH_ROUTES, 'utf8'));\nconst [command, route] = process.argv.slice(2);\nif (command !== 'api' || !(route in routes)) { console.error('gh: HTTP 404'); process.exit(1); }\nprocess.stdout.write(JSON.stringify(routes[route]));\n`, {mode: 0o755});
+	// A /bin/sh wrapper, because a #! line cannot hold a Node path with spaces (the Stream Deck app's runtime has one).
+	fs.writeFileSync(path.join(dir, 'gh'), `#!/bin/sh\nexec ${JSON.stringify(process.execPath)} "$0.cjs" "$@"\n`, {mode: 0o755});
+	fs.writeFileSync(path.join(dir, 'gh.cjs'), `const fs = require('node:fs');\nconst routes = JSON.parse(fs.readFileSync(process.env.FAKE_GH_ROUTES, 'utf8'));\nconst [command, route] = process.argv.slice(2);\nif (command !== 'api' || !(route in routes)) { console.error('gh: HTTP 404'); process.exit(1); }\nprocess.stdout.write(JSON.stringify(routes[route]));\n`, {mode: 0o755});
 	const routesFor = (run) => ({
 		[`repos/${repo}/git/commits/${sha}`]: {sha, tree: {sha: tree}, parents: [{sha: base}]},
 		[`repos/${repo}/actions/workflows/ci.yml/runs?head_sha=${sha}&per_page=100`]: {workflow_runs: [run]},
@@ -227,12 +229,21 @@ test('the command exits 0 on pass, 1 on fail or bad input and 2 on pending, thro
 		fs.writeFileSync(file, JSON.stringify(routes));
 		return spawnSync(process.execPath, [path.join(root, 'scripts/verify-ci-checks.mjs'), ...args], {encoding: 'utf8', env: {...process.env, PATH: `${dir}${path.delimiter}${process.env.PATH}`, FAKE_GH_ROUTES: file, GH_REPO: repo, CANDIDATE_SHA: sha, ...env}});
 	};
+	assert.deepEqual(EXIT_CODES, {pass: 0, fail: 1, pending: 2}, 'the runbook documents these exit codes');
 	const passed = cli(routesFor(pushRun()));
 	assert.equal(passed.status, EXIT_CODES.pass, passed.stdout + passed.stderr);
 	assert.equal(JSON.parse(passed.stdout).state, 'pass');
 	assert.equal(cli(routesFor(pushRun({conclusion: 'failure'}))).status, EXIT_CODES.fail);
 	assert.equal(cli(routesFor(pushRun({status: 'in_progress', conclusion: null}))).status, EXIT_CODES.pending);
 	assert.equal(cli(routesFor(pushRun()), []).status, EXIT_CODES.pass);
+	// Invoked through a symlink, the gate must still run and decide, never exit 0 silently.
+	const link = path.join(dir, 'gate-link.mjs');
+	fs.symlinkSync(path.join(root, 'scripts/verify-ci-checks.mjs'), link);
+	const routesFile = path.join(dir, 'routes.json');
+	fs.writeFileSync(routesFile, JSON.stringify(routesFor(pushRun({conclusion: 'failure'}))));
+	const viaLink = spawnSync(process.execPath, [link, '--once'], {encoding: 'utf8', env: {...process.env, PATH: `${dir}${path.delimiter}${process.env.PATH}`, FAKE_GH_ROUTES: routesFile, GH_REPO: repo, CANDIDATE_SHA: sha}});
+	assert.equal(viaLink.status, EXIT_CODES.fail, viaLink.stdout + viaLink.stderr);
+	assert.equal(JSON.parse(viaLink.stdout).state, 'fail');
 	for (const [args, env] of [[['--wait'], {}], [['--once'], {CANDIDATE_SHA: 'c'.repeat(7)}], [['--once'], {GH_REPO: ''}], [['--once'], {CANDIDATE_SHA: 'a'.repeat(40)}]]) {
 		const refused = cli(routesFor(pushRun()), args, env);
 		assert.equal(refused.status, EXIT_CODES.fail, JSON.stringify({args, env}));

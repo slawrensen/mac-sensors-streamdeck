@@ -4,6 +4,7 @@
 // tree. Read-only GitHub API use through gh: it never triggers, reruns or cancels a run.
 // It checks once and never waits. Exit 0 pass, 1 fail, 2 pending; JSON on stdout.
 import {execFileSync} from 'node:child_process';
+import fs from 'node:fs';
 import path from 'node:path';
 import {pathToFileURL} from 'node:url';
 
@@ -131,7 +132,8 @@ function main() {
 	process.exitCode = EXIT_CODES[result.state];
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+// Compare real paths: Node resolves symlinks for import.meta.url, and a gate that silently skipped main() would exit 0 (pass).
+if (process.argv[1] && import.meta.url === pathToFileURL(fs.realpathSync(process.argv[1])).href) {
 	try {
 		main();
 	} catch (error) {
