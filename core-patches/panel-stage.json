@@ -381,7 +381,7 @@
       },
       {
         "before": "\t\t\t\t\t\t<p class=\"hw-help\" id=\"source-help\">Auto switches providers. To keep a selection working on both, link its Shared Memory and Gadget keys in the shared Config document; see <a href=\"https://docs.slawrensen.com/hwinfo-streamdeck/data-sources.html#link-readings-across-providers\" target=\"_blank\" rel=\"noopener\">reading links</a>.</p>",
-        "after": "\t\t\t\t\t\t<p class=\"hw-help\" id=\"source-help\">Available readings depend on this Mac and macOS version. A saved reading stays selected when it is unavailable. See <a href=\"https://docs.slawrensen.com/mac-streamdeck/data-sources.html\" target=\"_blank\" rel=\"noopener\">available data sources</a>.</p>",
+        "after": "\t\t\t\t\t\t<p class=\"hw-help\" id=\"poll-help\">Every reading key and dial updates from one shared read at this interval. Changing it clears sparkline history. Shorter intervals read the sensors more often and use more processor time.</p>\n\t\t\t\t\t\t<p class=\"hw-help\" id=\"source-help\">Available readings depend on this Mac and macOS version. A saved reading stays selected when it is unavailable. See <a href=\"https://docs.slawrensen.com/mac-streamdeck/data-sources.html\" target=\"_blank\" rel=\"noopener\">available data sources</a>.</p>",
         "count": 1
       },
       {
@@ -408,6 +408,11 @@
         "before": "\t\t\t\t\t\t<p class=\"hw-help\">The exact settings as JSON: Copy one to back a dial up, paste a saved one and Replace to restore or clone it. Replace swaps the whole document, reloads this panel and keeps fields this version does not know. Replacing shared settings changes every HWiNFO key and dial and asks for a second click.</p>",
         "after": "\t\t\t\t\t\t<p class=\"hw-help\">The exact settings as JSON: Copy one to back a dial up, paste a saved one and Replace to restore or clone it. Replace swaps the whole document, reloads this panel and keeps fields this version does not know. Replacing shared settings changes every Mac Sensors key and dial and asks for a second click.</p>",
         "count": 1
+      },
+      {
+        "before": "<select id=\"shared-poll\" data-setting=\"pollIntervalMs\" data-global data-default=\"1000\">",
+        "after": "<select id=\"shared-poll\" data-setting=\"pollIntervalMs\" data-global data-default=\"1000\" aria-describedby=\"poll-help\">",
+        "count": 1
       }
     ],
     "sensor-reading.html": [
@@ -423,7 +428,7 @@
       },
       {
         "before": "\t\t\t\t\t\t<p class=\"hw-help\" id=\"source-help\">Auto switches providers. To keep a selection working on both, link its Shared Memory and Gadget keys in the shared Config document; see <a href=\"https://docs.slawrensen.com/hwinfo-streamdeck/data-sources.html#link-readings-across-providers\" target=\"_blank\" rel=\"noopener\">reading links</a>.</p>",
-        "after": "\t\t\t\t\t\t<p class=\"hw-help\" id=\"source-help\">Available readings depend on this Mac and macOS version. A saved reading stays selected when it is unavailable. See <a href=\"https://docs.slawrensen.com/mac-streamdeck/data-sources.html\" target=\"_blank\" rel=\"noopener\">available data sources</a>.</p>",
+        "after": "\t\t\t\t\t\t<p class=\"hw-help\" id=\"poll-help\">Every reading key and dial updates from one shared read at this interval. Changing it clears sparkline history. Shorter intervals read the sensors more often and use more processor time.</p>\n\t\t\t\t\t\t<p class=\"hw-help\" id=\"source-help\">Available readings depend on this Mac and macOS version. A saved reading stays selected when it is unavailable. See <a href=\"https://docs.slawrensen.com/mac-streamdeck/data-sources.html\" target=\"_blank\" rel=\"noopener\">available data sources</a>.</p>",
         "count": 1
       },
       {
@@ -454,6 +459,11 @@
       {
         "before": "\t\t\t\t\t\t<p class=\"hw-help\">The exact settings as JSON: Copy one to back a layout up, paste a saved one and Replace to restore or clone it. Replace swaps the whole document, reloads this panel and keeps fields this version does not know. Replacing shared settings changes every HWiNFO key and dial and asks for a second click.</p>",
         "after": "\t\t\t\t\t\t<p class=\"hw-help\">The exact settings as JSON: Copy one to back a layout up, paste a saved one and Replace to restore or clone it. Replace swaps the whole document, reloads this panel and keeps fields this version does not know. Replacing shared settings changes every Mac Sensors key and dial and asks for a second click.</p>",
+        "count": 1
+      },
+      {
+        "before": "<select id=\"shared-poll\" data-setting=\"pollIntervalMs\" data-global data-default=\"1000\">",
+        "after": "<select id=\"shared-poll\" data-setting=\"pollIntervalMs\" data-global data-default=\"1000\" aria-describedby=\"poll-help\">",
         "count": 1
       }
     ]

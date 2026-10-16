@@ -41,6 +41,17 @@ test('staged Read every summaries follow the same case table as the Mac runtime 
 		assert.equal(model.hwModel.connectionSummary(globals),`Mac sensors · read every ${shown}`,entry.label);assert.deepEqual(globals,before,entry.label);
 	}
 }));
+test('Read every has its own help directly under its select, and the select points to it',()=>withStaged((read)=>{
+	for(const name of ['sensor-reading.html','sensor-dial.html']) {
+		const text=read(name);
+		assert.equal(text.split('aria-describedby="poll-help"').length-1,1,name);assert.equal(text.split('id="poll-help"').length-1,1,name);
+		assert.match(text,/<select id="shared-poll"[^>]* aria-describedby="poll-help">/,name);
+		const select=text.indexOf('id="shared-poll"'),help=text.indexOf('id="poll-help"'),source=text.indexOf('id="source-help"');
+		assert.ok(select<help&&help<source,`${name}: the Read every help sits between its select and the availability help`);
+		assert.match(text.slice(select,help),/<\/select>\s*<\/div>\s*<\/div>\s*<p class="hw-help" $/,`${name}: nothing between the select row and its help`);
+		assert.match(text,/<p class="hw-help" id="poll-help">Every reading key and dial updates from one shared read at this interval\. Changing it clears sparkline history\.[^<]*<\/p>/,name);
+	}
+}));
 test('missing staging anchors fail before an output is packaged',()=>{
 	const source='core-patches/panel-stage.json';const saved=fs.readFileSync(source);const temp=fs.mkdtempSync(path.join(os.tmpdir(),'mac-panel-negative-'));
 	try {

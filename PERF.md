@@ -22,6 +22,18 @@ The release toolchain is Xcode 26.6 with SDK 26.5 and pinned Node 24.13.1headers
 
 The first window's slow one-second reads occurred near the same wall-clock second once per minute. Their cause is unknown. Both windows are retained; the later pass does not erase the earlier failure. These are native-component timings under background development activity, not a promise of constant latency or the total cost of rendering a deck.
 
+### 2026-10-16 UTC: Plugin CPU time by Read every, mock host
+
+The repository mock host (`scripts/lib/mock-host.mjs`) ran the 1.0.1 candidate bundle with the 1.0.0 release native addons (arm64 SHA-256 3968022b3f9146fb979202c7e8ab5ebf27a3405070c700bfa1d33c5cd2175bcd) under Node 24.13.1 on the M5 Pro, macOS 27.0.1. The layout was six contexts: a sparkline key, an SMC key, a dual and a quad key mixing public and SMC readings, and two dials. After 5 seconds of warm-up, the development process observer (`npm run build:observer`) read the plugin process CPU time at the start and end of a 40-second window. Two rounds ran in alternating order.
+
+| Read every | Plugin CPU time per second (two runs) | Frames per second, all six contexts |
+| --- | --- | --- |
+| 250 ms | 18.1 ms, 19.1 ms | 16.9, 17.1 |
+| 1 second | 5.2 ms, 5.4 ms | 5.5, 5.0 |
+| 5 seconds | 1.1 ms, 1.2 ms | 1.2, 1.2 |
+
+This supports the panel help line that shorter intervals use more processor time. It is mock-host evidence with the real read-only native reader, not the Stream Deck app: the app's rasterization and device transfer cost is not included. Background development activity was present.
+
 ### 2026-10-12: Installed Mac candidate, 24-hour observation
 
 Harness: `npm run soak -- --hours 24 --interval-ms 60000`, with the frozen development directory and a separate private evidence destination. CI package SHA-256: d8db87c270d5803a7fe0e769326acc5b2142d15bb4918cfe564757386c1f6c89 (316713 bytes). Development bundle SHA-256: 9a2f9133d43927ced59fff82d0b3ec7874502cd356d4afb598d3a83c5dd6ad43.
