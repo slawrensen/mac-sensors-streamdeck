@@ -121,6 +121,18 @@ test('release.yml checks CI first, with read-only permissions and the same actio
 	assert.doesNotMatch(lines.join('\n'), /--draft=false|gh release edit|workflow_run|gh run rerun|gh workflow run/);
 });
 
+test('ci.yml runs the release core check on the pinned upstream as its own step before qualification', () => {
+	const verify = block(workflow('ci.yml'), '  verify:');
+	const starts = verify.flatMap((line, index) => (line.startsWith('      - ') ? [index] : []));
+	const steps = starts.map((start, index) => verify.slice(start, starts[index + 1]).join('\n'));
+	const at = (pattern) => steps.findIndex((step) => pattern.test(step));
+	const core = at(/^ {8}run: npm run core:check -- --release$/m);
+	assert.notEqual(core, -1, 'ci.yml verify has no core:check --release step');
+	assert.match(steps[core], /^ {10}MACSENSORS_UPSTREAM_DIR: \$\{\{ github\.workspace \}\}\/upstream$/m);
+	assert.ok(at(/^ {10}path: upstream$/m) < core, 'the pinned upstream is checked out first');
+	assert.ok(core < at(/npm run release:validate/), 'the release core check runs before qualification');
+});
+
 test('a push run on main for the exact commit passes only when every job passed', () => {
 	assert.equal(decide({runs: [pushRun()]}).state, 'pass');
 	const failing = [
