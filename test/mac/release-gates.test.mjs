@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {test} from 'node:test';
+import {pathToFileURL} from 'node:url';
 const root=process.cwd(),run=(script,args=[],cwd=root,env={})=>spawnSync(process.execPath,[path.join(root,'scripts',script),...args],{cwd,env:{...process.env,...env},encoding:'utf8',timeout:30_000});
 test('qualification preserves ordered stages and refuses invalid input before work',()=>{
 	const listed=run('qualify.mjs',['--list']);assert.equal(listed.status,0);
@@ -30,4 +31,40 @@ test('asynchronous failures stay nonzero even when another exception listener ha
 	const guard=path.join(root,'scripts/lib/script-failures.mjs');
 	const result=spawnSync(process.execPath,['--input-type=module','-e',`import ${JSON.stringify(guard)}; process.on('uncaughtException',()=>{}); setImmediate(()=>{throw new Error('EXPECTED_SCRIPT_FAILURE')});`],{encoding:'utf8'});
 	assert.equal(result.status,1);assert.match(result.stderr,/EXPECTED_SCRIPT_FAILURE/);
+});
+test('upload kit takes the update notes for its own version and stops before any download when they are missing',t=>{
+	const listing=fs.readFileSync(path.join(root,'test/mac/fixtures/stage-upload-listing.md'),'utf8');
+	const dir=fs.mkdtempSync(path.join(os.tmpdir(),'mac-stage-upload-test-'));t.after(()=>fs.rmSync(dir,{recursive:true,force:true}));
+	// A stand-in gh that records every call and answers the release lookup as published, so only the listing check can stop the run.
+	const calls=path.join(dir,'gh-calls.txt');fs.mkdirSync(path.join(dir,'bin'));
+	fs.writeFileSync(path.join(dir,'bin','gh'),`#!${process.execPath}\nrequire('node:fs').appendFileSync(${JSON.stringify(calls)},process.argv.slice(2).join(' ')+'\\n');\nif(process.argv[2]==='api')process.stdout.write(JSON.stringify({draft:false,published_at:'2026-10-13T13:25:34Z',html_url:'https://example.invalid/release'}));\n`,{mode:0o755});
+	fs.mkdirSync(path.join(dir,'docs/release'),{recursive:true});fs.writeFileSync(path.join(dir,'docs/release/STREAM_DECK_MARKETPLACE.md'),listing);
+	const stage=tag=>run('stage-upload.mjs',[tag],dir,{PATH:path.join(dir,'bin')+path.delimiter+process.env.PATH});
+	const missing=stage('v1.0.2');
+	assert.notEqual(missing.status,0);assert.match(missing.stderr,/Missing listing section "## Update notes 1\.0\.2\.0" in docs\/release\/STREAM_DECK_MARKETPLACE\.md; add the Marketplace update notes for v1\.0\.2/);
+	assert.equal(fs.existsSync(calls),false,'no gh call before the listing check');assert.equal(fs.existsSync(path.join(dir,'release')),false,'no upload folder left behind');
+});
+test('upload kit listing sections map to their portal files with the versioned notes',async()=>{
+	const {listingFiles,updateNotesHeading}=await import(pathToFileURL(path.join(root,'scripts/stage-upload.mjs')).href);
+	const listing=fs.readFileSync(path.join(root,'test/mac/fixtures/stage-upload-listing.md'),'utf8');
+	assert.equal(updateNotesHeading('v1.0.1'),'Update notes 1.0.1.0');
+	const files=Object.fromEntries(listingFiles(listing,'v1.0.1'));
+	assert.deepEqual(Object.keys(files),['name-and-tagline.txt','description.txt','release-notes.txt','features.txt','portal-fields.txt']);
+	assert.equal(files['release-notes.txt'],'Fixture notes for 1.0.1.0.\n\n- One fixture change.\n');assert.doesNotMatch(files['release-notes.txt'],/FIRST RELEASE/);
+	assert.equal(files['name-and-tagline.txt'],'Fixture name\nFixture tagline\n');
+	assert.throws(()=>listingFiles(listing.replace(/## Update notes 1\.0\.1\.0\n[\s\S]*?(?=## Feature bullets)/,'## Update notes 1.0.1.0\n\n'),'v1.0.1'),/Missing listing section "## Update notes 1\.0\.1\.0"/);
+	assert.throws(()=>listingFiles(listing.replace('## Portal fields','## Portal'),'v1.0.1'),/Missing listing section "## Portal fields"/);
+});
+test('panel suites keep the guard\'s nonzero exit when every check passed but an uncaught error happened',()=>{
+	// The suites end with an explicit process.exit; run their real closing statements after a handled asynchronous error.
+	const guard=path.join(root,'scripts/lib/script-failures.mjs');
+	// Long enough for the setImmediate throw to land first; the tail is synchronous.
+	const TAIL_DELAY_MS=20;
+	for(const suite of ['e2e-pi-panels.mjs','e2e-pi-persistence.mjs']){
+		const source=fs.readFileSync(path.join(root,'scripts',suite),'utf8'),tail=source.slice(source.lastIndexOf('\n}\n')+3);
+		assert.match(tail,/^process\.exit\(/m,suite);assert.doesNotMatch(tail,/\bawait\b/,suite);
+		const exitOf=failing=>spawnSync(process.execPath,['--input-type=module','-e',`import ${JSON.stringify(guard)}; process.on('uncaughtException',()=>{}); const failures=[]; const results={errors:[]}; ${failing?"setImmediate(()=>{throw new Error('EXPECTED_SUITE_FAILURE')});":''} setTimeout(()=>{${tail}},${TAIL_DELAY_MS});`],{encoding:'utf8'});
+		assert.equal(exitOf(false).status,0,suite);
+		const failed=exitOf(true);assert.equal(failed.status,1,suite);assert.match(failed.stderr,/EXPECTED_SUITE_FAILURE/);
+	}
 });

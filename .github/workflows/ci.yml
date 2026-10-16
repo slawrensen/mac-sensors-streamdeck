@@ -36,6 +36,12 @@ jobs:
           ref: ${{ steps.core.outputs.sha }}
           path: upstream
           persist-credentials: false
+      # The qualification core stage runs core:check without --release; this
+      # step fails CI on an open port review instead of only the tag build.
+      - name: Check copied core for release
+        env:
+          MACSENSORS_UPSTREAM_DIR: ${{ github.workspace }}/upstream
+        run: npm run core:check -- --release
       - run: npm ci --ignore-scripts
       - name: Software qualification
         env:
