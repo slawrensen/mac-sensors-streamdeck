@@ -29,10 +29,24 @@ const pending = (): PollerStatus => ({ state: 'unavailable', reason: 'pending', 
  * context that shows both gets one publication per read. Below the 250 ms minimum interval.
  * Evidence (PERF.md, 2026-10-12 CI native benchmark on the M5 Pro, SMC read time at 1 s): p50
  * 11.10 ms in the second window, slowest of 1,000 reads 66.39 ms in the first. Intel SMC
- * duration is unknown; a read slower than this window publishes twice (bounded), and public
- * readings are never held longer than this window.
+ * duration is unknown; a timed read slower than this window publishes twice (bounded).
  */
 const SETTLE_WINDOW_MS = 100;
+/**
+ * A read is fast when its last source settles within this long of the first: half the settle window.
+ * Evidence (2026-10-16 actual-app traces on the M5 Pro, 4,418 reads at 250 ms and 1 s): public to SMC
+ * p50 11.2 ms, p99 39.1 ms, slowest 47.6 ms, none over 50 ms. A Mac whose reads are slower keeps the
+ * timer on every read.
+ */
+const FAST_SETTLE_MS = 50;
+/**
+ * Fast reads in a row after which a read waits for its last source without a timer. Node wakes at a
+ * timer's deadline even when the timer was cleared first: about two interrupt wakeups per read, measured
+ * in the app and in Node alone (2026-10-16). Such a read holds the settled source until the other
+ * settles or the next read starts, at most one Read every, and only once: a read that is not fast
+ * brings the timer back. Trust starts over each time keys appear.
+ */
+const TRUSTED_READS = 8;
 export class MacPoller extends EventEmitter {
 	private readonly logger = streamDeck.logger.createScope('MacSensors');
 	private provider: MacSnapshotProvider | null = null;
@@ -40,6 +54,10 @@ export class MacPoller extends EventEmitter {
 	private expiry: NodeJS.Timeout | null = null;
 	/** The open settle window of the current read; cleared when the last source settles or the last consumer leaves. */
 	private settle: NodeJS.Timeout | null = null;
+	/** When the current read's first source settled while another was still out; null while no read waits. */
+	private waitingSince: number | null = null;
+	/** Fast reads in a row, up to TRUSTED_READS. */
+	private fastReads = 0;
 	private refs = 0;
 	private intervalMs = POLL_INTERVAL_DEFAULT_MS;
 	private status = pending();
@@ -69,6 +87,7 @@ export class MacPoller extends EventEmitter {
 		if (this.expiry) clearTimeout(this.expiry);
 		if (this.settle) clearTimeout(this.settle);
 		this.timer = this.expiry = this.settle = null;
+		this.waitingSince = null; this.fastReads = 0;
 		this.provider?.close(); this.provider = null;
 		this.status = pending();
 		this.observations.clear();
@@ -135,18 +154,28 @@ export class MacPoller extends EventEmitter {
 		this.armExpiry();
 		if (emit && this.refs) this.emit('tick', this.status);
 	}
-	/** One publication per read: a source that settles while another is still out waits for it, at most SETTLE_WINDOW_MS. */
+	/** One publication per read: a source that settles while another is still out waits for it, timed by SETTLE_WINDOW_MS until reads prove fast. */
 	private settled(): void {
 		if (!this.provider) return;
+		const now = this.provider.now?.() ?? NaN;
 		if ((this.provider.inFlight?.() ?? 0) > 0) {
-			this.settle ??= setTimeout(() => { this.settle = null; this.refresh(true); }, SETTLE_WINDOW_MS).unref();
+			this.waitingSince ??= now;
+			if (this.fastReads < TRUSTED_READS) this.settle ??= setTimeout(() => { this.settle = null; this.fastReads = 0; this.refresh(true); }, SETTLE_WINDOW_MS).unref();
 			return;
 		}
+		if (this.waitingSince !== null) { this.fastReads = this.waited(now) <= FAST_SETTLE_MS ? Math.min(TRUSTED_READS, this.fastReads + 1) : 0; this.waitingSince = null; }
 		if (this.settle) { clearTimeout(this.settle); this.settle = null; }
 		this.refresh(true);
 	}
+	/** How long the current read has waited; NaN (never fast) when the clock is missing or ran backwards. */
+	private waited(now: number): number {
+		const ms = now - (this.waitingSince ?? NaN);
+		return Number.isFinite(ms) && ms >= 0 ? ms : NaN;
+	}
 	private tick(): void {
 		if (!this.refs) return;
+		// A read still waiting when the next one starts was slow: the timer bounds the reads that follow.
+		if (this.waitingSince !== null && !(this.waited(this.provider?.now?.() ?? NaN) <= FAST_SETTLE_MS)) this.fastReads = 0;
 		try {
 			if (!this.provider) this.provider = this.factory(() => this.settled());
 			const snapshot = this.provider.read(); if (snapshot) this.accept(snapshot);

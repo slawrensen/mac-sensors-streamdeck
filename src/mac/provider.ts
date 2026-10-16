@@ -99,6 +99,8 @@ export class MacProvider implements SnapshotProvider {
 	facts():ProviderFacts{return structuredClone(this.factsValue);}
 	/** Reads requested and not yet settled; the poller publishes a read once none remain. */
 	inFlight():number{return this.closed?0:this.pending.size;}
+	/** The reads' own monotonic clock in ms, so the poller can tell how long a read's sources settle apart. */
+	now():number{return this.closed?NaN:this.native.now();}
 	notices():string[]{const messages=this.noticesQueue;this.noticesQueue=[];return messages;}
 	private notice(message:string):void {if(this.seenNotices.has(message))return;if(this.seenNotices.size>=32)return;this.seenNotices.add(message);this.noticesQueue.push(message);}
 	private removeSource(source:NativeSource):void {for(const [key,item] of this.rows)if(item.source===source){this.rows.delete(key);this.dirty=true;this.catalogDirty=true;}}

@@ -27,13 +27,17 @@ const CPU_TICK_MS = 10;
 const COUNTER_REBASELINE_MS = 250;
 /** Mirrors MIN_COUNTER_WINDOW_MS in src/mac/provider.ts: the rebaseline read starts at least this long after the first read completed, and a tick reads public unless a kept rebaseline sample started less than this long ago. */
 const MIN_COUNTER_WINDOW_MS = 200;
+/** Mirrors SETTLE_WINDOW_MS in src/mac/poller.ts: the longest a timed read holds its settled source. No fake read in this file lasts exactly this long, so a setTimeout of this length is the settle timer. */
+const SETTLE_WINDOW_MS = 100;
+/** Mirrors TRUSTED_READS in src/mac/poller.ts: fast reads in a row after which a read waits without a timer. */
+const TRUSTED_READS = 8;
 
 type Emit = { at: number; signature: string; smc: boolean; mem: boolean; cpu: boolean; status: PollerStatus };
 interface Rig { poller: MacPoller; emits: Emit[]; reads: Record<NativeSource, number[]> }
 /** Read duration in ms: fixed, or by the 1-based count of that source's reads (the first read of a session is the slow cold one). */
 type Delay = number | ((n: number) => number);
 /** Real MacPoller and MacProvider over a fake bridge whose reads settle after a delay per source. */
-function rig(delay: Record<NativeSource, Delay>, options: { smcError?: boolean; publicError?: (n: number) => boolean; cpu?: boolean; intervalMs?: number } = {}): Rig {
+function rig(delay: Record<NativeSource, Delay>, options: { smcError?: boolean; publicError?: (n: number) => boolean; cpu?: boolean; intervalMs?: number; clock?: false } = {}): Rig {
 	const reads: Record<NativeSource, number[]> = { public: [], smc: [] };
 	const row = (key: string, kind: string, unit: string, value: number, at: number): NativeRow => ({ key, label: key, group: kind === 'temperature' ? 'Battery' : 'Memory', kind, unit, value, valid: true, continuousMs: at, wallSeconds: 1.7e9 + at / 1000, error: 0, systemCode: 0 });
 	const packet = (source: NativeSource, n: number, at: number): NativePacket => ({
@@ -47,7 +51,11 @@ function rig(delay: Record<NativeSource, Delay>, options: { smcError?: boolean; 
 		now: () => Date.now(),
 		open: () => ({ read: (source) => { const at = Date.now(); const n = reads[source].push(at - START_MS); return new Promise((resolve) => { const ms = delay[source]; setTimeout(() => resolve(packet(source, n, at)), typeof ms === 'number' ? ms : ms(n)); }); }, close: () => {} })
 	};
-	const poller = new MacPoller((ready) => new MacProvider(bridge, ready));
+	const poller = new MacPoller((ready) => {
+		const provider = new MacProvider(bridge, ready);
+		// clock false: a provider that cannot time its reads.
+		return options.clock === false ? { read: () => provider.read(), current: () => provider.current(), untilExpiry: () => provider.untilExpiry(), age: () => provider.age(), close: () => provider.close(), notices: () => provider.notices(), inFlight: () => provider.inFlight() } : provider;
+	});
 	poller.setIntervalMs(options.intervalMs ?? INTERVAL_MS);
 	const emits: Emit[] = [];
 	poller.onTick((status: PollerStatus) => emits.push({ at: Date.now() - START_MS, signature: tickSignature(status), smc: status.state === 'ok' && status.snapshot.byKey.has(SMC), mem: status.state === 'ok' && status.snapshot.byKey.has(MEM), cpu: status.state === 'ok' && status.snapshot.byKey.has(CPU), status }));
@@ -68,6 +76,29 @@ function offsets(emits: Emit[]): number[][] {
 	const byInterval: number[][] = [];
 	for (const emit of emits) (byInterval[Math.floor(emit.at / INTERVAL_MS)] ??= []).push(emit.at % INTERVAL_MS);
 	return byInterval;
+}
+const range = (from: number, to: number): number[] => Array.from({ length: to - from }, (_, i) => from + i);
+/**
+ * Arm times of settle timers, seen through setTimeout. Node wakes at a timer's deadline even when it was
+ * cleared first (measured 2026-10-16), so arming none is what saves the wakeups. Call inside a test and
+ * restore before afterEach resets the mock clock.
+ */
+function settleTimers(): { at: number[]; restore: () => void } {
+	const at: number[] = [];
+	const mocked = globalThis.setTimeout;
+	const spy = mock.method(globalThis, 'setTimeout', ((callback: () => void, ms?: number) => { if (ms === SETTLE_WINDOW_MS) at.push(Date.now() - START_MS); return mocked(callback, ms); }) as typeof setTimeout);
+	return { at, restore: () => spy.mock.restore() };
+}
+/** Read intervals in which a settle timer was armed. */
+const timedReads = (at: number[]): number[] => at.map((offset) => Math.floor(offset / INTERVAL_MS));
+/** When each public observation, by its acquisition time, was first published. */
+function firstPublished(emits: Emit[]): Map<number, number> {
+	const first = new Map<number, number>();
+	for (const { at, status } of emits) {
+		const reading = status.state === 'ok' ? status.snapshot.byKey.get(MEM) : undefined;
+		if (reading && !first.has(reading.observationTime! - START_MS)) first.set(reading.observationTime! - START_MS, at);
+	}
+	return first;
 }
 
 beforeEach(() => mock.timers.enable({ apis: ['setInterval', 'setTimeout', 'Date'], now: START_MS }));
@@ -108,12 +139,77 @@ test('a failed SMC read publishes the public readings once, when it settles', as
 	for (let k = 1; k < 4; k++) assert.deepEqual(changes(emits)[k], [40], `interval ${k}`);
 });
 
+test('after eight fast reads in a row a read waits for its last source without a timer and still publishes once', async () => {
+	const READS = 20;
+	const timers = settleTimers();
+	try {
+		const { poller, emits } = rig({ public: 5, smc: 40 });
+		poller.retain();
+		await advance(READS * INTERVAL_MS);
+		poller.release();
+		assert.deepEqual(timedReads(timers.at), range(0, TRUSTED_READS), 'one settle timer for each of the first reads, then none');
+		for (let k = 1; k < READS; k++) assert.deepEqual(offsets(emits)[k], [0, 40], `interval ${k}: the timer tick, then one publication when the last source settles`);
+		for (let k = 1; k < READS; k++) assert.deepEqual(changes(emits)[k], [40], `interval ${k}`);
+	} finally { timers.restore(); }
+});
+
+test('the first slow SMC read after a fast run holds public readings at most until the next read, and the timer returns until reads are fast again', async () => {
+	const READS = 30;
+	const SLOW_READ = 11; // 1-based: the SMC read at 10 s, after ten fast ones
+	const SLOW_MS = 2500; // still out at the next two ticks
+	const timers = settleTimers();
+	try {
+		const { poller, emits, reads } = rig({ public: 5, smc: (n) => (n === SLOW_READ ? SLOW_MS : 40) });
+		poller.retain();
+		await advance(READS * INTERVAL_MS);
+		poller.release();
+		const slowAt = reads.smc[SLOW_READ - 1]!, published = firstPublished(emits);
+		assert.ok(published.get(slowAt)! <= slowAt + INTERVAL_MS, `public read at ${slowAt} ms published at ${published.get(slowAt)} ms, after the next read started`);
+		for (const at of [slowAt + INTERVAL_MS, slowAt + 2 * INTERVAL_MS]) assert.ok(published.get(at)! - at <= 5 + SETTLE_WINDOW_MS, `with the slow SMC read still out, public read at ${at} ms published at ${published.get(at)} ms`);
+		const slowInterval = slowAt / INTERVAL_MS;
+		assert.deepEqual(timedReads(timers.at), [...range(0, TRUSTED_READS), ...range(slowInterval + 1, slowInterval + 3 + TRUSTED_READS)], 'timed for the two reads the slow one overlaps and the fast ones that rebuild trust, then untimed');
+		for (let k = slowInterval + 3; k < READS; k++) assert.deepEqual(offsets(emits)[k], [0, 40], `interval ${k}: one publication per read again`);
+	} finally { timers.restore(); }
+});
+
+test('reads start timed again every time keys come back', async () => {
+	const READS = 12;
+	const timers = settleTimers();
+	try {
+		const { poller } = rig({ public: 5, smc: 40 });
+		poller.retain();
+		await advance(READS * INTERVAL_MS);
+		poller.release();
+		await advance(INTERVAL_MS);
+		const back = Date.now() - START_MS;
+		poller.retain();
+		await advance(READS * INTERVAL_MS);
+		poller.release();
+		assert.deepEqual(timers.at.filter((at) => at >= back).map((at) => Math.floor((at - back) / INTERVAL_MS)), range(0, TRUSTED_READS), 'trust from the last time keys were shown is not reused');
+	} finally { timers.restore(); }
+});
+
+test('a provider that cannot time its reads keeps the settle timer on every read', async () => {
+	const READS = 12;
+	const timers = settleTimers();
+	try {
+		const { poller, emits } = rig({ public: 5, smc: 40 }, { clock: false });
+		poller.retain();
+		await advance(READS * INTERVAL_MS);
+		poller.release();
+		assert.deepEqual(timedReads(timers.at), range(0, READS));
+		for (let k = 1; k < READS; k++) assert.deepEqual(offsets(emits)[k], [0, 40], `interval ${k}`);
+	} finally { timers.restore(); }
+});
+
 test('coalescing changes no measurement: own acquisition times, one sample and one dial observation per read', async () => {
 	const { poller, emits, reads } = rig({ public: 5, smc: 40 });
 	poller.subscribeSeries(MEM); poller.subscribeSeries(SMC);
 	poller.retain();
-	await advance(10 * INTERVAL_MS + 100);
-	const starts = Array.from({ length: 11 }, (_, k) => k * INTERVAL_MS);
+	// Past TRUSTED_READS, so reads that wait with and without the settle timer both count.
+	const READS = 2 * TRUSTED_READS;
+	await advance(READS * INTERVAL_MS + 100);
+	const starts = Array.from({ length: READS + 1 }, (_, k) => k * INTERVAL_MS);
 	// The provider's one counter rebaseline read (250 ms after the first public request) is a genuine extra public observation.
 	const publicStarts = [0, 250, ...starts.slice(1)];
 	assert.deepEqual(reads, { public: publicStarts, smc: starts });
