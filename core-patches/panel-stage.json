@@ -143,7 +143,7 @@
       },
       {
         "before": "\t\t\t\tsearchEl.placeholder = \"Saved reading kept (no HWiNFO data to show it)\";",
-        "after": "\t\t\t\tsearchEl.placeholder = \"Saved reading kept (no Mac Sensors data to show it)\";",
+        "after": "\t\t\t\tsearchEl.placeholder = \"Saved reading kept (no sensor data to show it)\";",
         "count": 1
       },
       {
@@ -200,7 +200,7 @@
       },
       {
         "before": "\t\tif (preview?.missing === true || (name === null && preview?.state === \"ok\")) return \"Saved reading not found in HWiNFO\";",
-        "after": "\t\tif (preview?.missing === true || (name === null && preview?.state === \"ok\")) return \"Saved reading not found in Mac Sensors\";",
+        "after": "\t\tif (preview?.missing === true || (name === null && preview?.state === \"ok\")) return \"Saved reading not found on this Mac\";",
         "count": 1
       },
       {
@@ -262,7 +262,7 @@
       },
       {
         "before": "\t\tif (p.state === \"unavailable\") return { text: \"No HWiNFO data\", tone: \"danger\" };",
-        "after": "\t\tif (p.state === \"unavailable\") return { text: \"No Mac Sensors data\", tone: \"danger\" };",
+        "after": "\t\tif (p.state === \"unavailable\") return { text: \"No sensor data\", tone: \"danger\" };",
         "count": 1
       },
       {
@@ -297,7 +297,7 @@
       },
       {
         "before": "\t\t\tlines.push(configured ? \"Your reading and every setting stay saved. Display settings can still be changed; they apply when data returns.\" : \"Readings appear under Reading once HWiNFO publishes data.\");",
-        "after": "\t\t\tlines.push(configured ? \"Your reading and every setting stay saved. Display settings can still be changed; they apply when data returns.\" : \"Readings appear under Reading once Mac Sensors publishes data.\");",
+        "after": "\t\t\tlines.push(configured ? \"Your reading and every setting stay saved. Display settings can still be changed; they apply when data returns.\" : \"Readings appear under Reading once this Mac reports data.\");",
         "count": 1
       },
       {
@@ -312,7 +312,7 @@
       },
       {
         "before": "\t\t\t\t\t`The saved reading is not in HWiNFO's current sensor list${tree !== null && Array.isArray(tree.groups) && tree.groups.length === 0 ? \" (HWiNFO publishes no readings right now)\" : \"\"}. It stays saved with its label and colors, and shows again if HWiNFO publishes it (for example after a sensor wakes or HWiNFO restarts).`",
-        "after": "\t\t\t\t\t`The saved reading is not in the sensor source's current sensor list${tree !== null && Array.isArray(tree.groups) && tree.groups.length === 0 ? \" (Mac Sensors publishes no readings right now)\" : \"\"}. It stays saved with its label and colors, and shows again if Mac Sensors publishes it (for example after a sensor wakes or Mac Sensors restarts).`",
+        "after": "\t\t\t\t\t`The ${kind === \"dial\" ? \"dial\" : \"key\"} keeps the saved reading with its label and colors. This Mac does not report it right now${tree !== null && Array.isArray(tree.groups) && tree.groups.length === 0 ? \" (it reports no readings at all)\" : \"\"}; it shows again when this Mac reports it.`",
         "count": 1
       },
       {

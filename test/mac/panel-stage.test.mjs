@@ -60,6 +60,15 @@ test('the fixed text font line uses the field label style, not a bare paragraph'
 	}
 	assert.match(read('pi.css'),/\.hw-field > label,\n\.hw-label \{/);
 }));
+test('panel status copy names this Mac as the source, never the plugin, and promises no restart',()=>withStaged((read)=>{
+	const shell=read('pi-shell.js'),common=read('pi-common.js'),model=read('pi-model.js');
+	assert.match(shell,/return \{ text: "No sensor data", tone: "danger" \};/);
+	assert.match(common,/"Saved reading kept \(no sensor data to show it\)"/);
+	assert.match(model,/return "Saved reading not found on this Mac";/);
+	assert.match(shell,/"Readings appear under Reading once this Mac reports data\."/);
+	assert.match(shell,/keeps the saved reading with its label and colors\. This Mac does not report it right now/);
+	for(const [name,text] of [['pi-shell.js',shell],['pi-common.js',common],['pi-model.js',model]])assert.doesNotMatch(text,/No Mac Sensors data|no Mac Sensors data|not found in Mac Sensors|once Mac Sensors publishes|Mac Sensors restarts|sensor source's current sensor list/,name);
+}));
 test('missing staging anchors fail before an output is packaged',()=>{
 	const source='core-patches/panel-stage.json';const saved=fs.readFileSync(source);const temp=fs.mkdtempSync(path.join(os.tmpdir(),'mac-panel-negative-'));
 	try {
