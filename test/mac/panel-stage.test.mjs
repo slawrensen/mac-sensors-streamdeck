@@ -52,6 +52,14 @@ test('Read every has its own help directly under its select, and the select poin
 		assert.match(text,/<p class="hw-help" id="poll-help">Every reading key and dial updates from one shared read at this interval\. Changing it clears sparkline history\.[^<]*<\/p>/,name);
 	}
 }));
+test('the fixed text font line uses the field label style, not a bare paragraph',()=>withStaged((read)=>{
+	for(const name of ['sensor-reading.html','sensor-dial.html']) {
+		const text=read(name);
+		assert.match(text,/<div class="hw-field"><div class="hw-label">Text font: Tahoma Bold<\/div><p class="hw-help" id="mac-font-status">Saved font settings are kept\.<\/p><\/div>/,name);
+		assert.doesNotMatch(text,/<p>Text font/,name);
+	}
+	assert.match(read('pi.css'),/\.hw-field > label,\n\.hw-label \{/);
+}));
 test('missing staging anchors fail before an output is packaged',()=>{
 	const source='core-patches/panel-stage.json';const saved=fs.readFileSync(source);const temp=fs.mkdtempSync(path.join(os.tmpdir(),'mac-panel-negative-'));
 	try {

@@ -371,7 +371,7 @@
     "sensor-dial.html": [
       {
         "before": "<div class=\"hw-field\">\n\t\t\t\t\t\t\t<label for=\"shared-font\">Text font</label>\n\t\t\t\t\t\t\t<select id=\"shared-font\" data-setting=\"textFont\" data-global data-default=\"tahoma\" aria-describedby=\"font-help\">\n\t\t\t\t\t\t\t\t<option value=\"tahoma\">Tahoma</option>\n\t\t\t\t\t\t\t\t<option value=\"segoe-ui\">Segoe UI</option>\n\t\t\t\t\t\t\t</select>\n\t\t\t\t\t\t\t<p class=\"hw-help\" id=\"font-help\">Tahoma is the original look. Segoe UI is lighter and narrower.</p>\n\t\t\t\t\t\t</div>",
-        "after": "<div class=\"hw-field\"><p>Text font: Tahoma Bold</p><p class=\"hw-help\" id=\"mac-font-status\">Saved font settings are kept.</p></div>",
+        "after": "<div class=\"hw-field\"><div class=\"hw-label\">Text font: Tahoma Bold</div><p class=\"hw-help\" id=\"mac-font-status\">Saved font settings are kept.</p></div>",
         "count": 1
       },
       {
@@ -418,7 +418,7 @@
     "sensor-reading.html": [
       {
         "before": "<div class=\"hw-field\">\n\t\t\t\t\t\t\t<label for=\"shared-font\">Text font</label>\n\t\t\t\t\t\t\t<select id=\"shared-font\" data-setting=\"textFont\" data-global data-default=\"tahoma\" aria-describedby=\"font-help\">\n\t\t\t\t\t\t\t\t<option value=\"tahoma\">Tahoma</option>\n\t\t\t\t\t\t\t\t<option value=\"segoe-ui\">Segoe UI</option>\n\t\t\t\t\t\t\t</select>\n\t\t\t\t\t\t\t<p class=\"hw-help\" id=\"font-help\">Tahoma is the original look. Segoe UI is lighter and narrower.</p>\n\t\t\t\t\t\t</div>",
-        "after": "<div class=\"hw-field\"><p>Text font: Tahoma Bold</p><p class=\"hw-help\" id=\"mac-font-status\">Saved font settings are kept.</p></div>",
+        "after": "<div class=\"hw-field\"><div class=\"hw-label\">Text font: Tahoma Bold</div><p class=\"hw-help\" id=\"mac-font-status\">Saved font settings are kept.</p></div>",
         "count": 1
       },
       {
