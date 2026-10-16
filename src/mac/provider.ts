@@ -80,6 +80,8 @@ export class MacProvider implements SnapshotProvider {
 	private factsValue:ProviderFacts={model:'unknown',chip:'unknown',appleSilicon:null,translation:'unknown',translationError:0,sourceRows:{public:0,smc:0},sourceErrors:{}};
 	constructor(private readonly native:NativeBridge,private readonly ready:()=>void,private readonly report:(facts:ProviderFacts)=>void=()=>{}) {this.startedAt=native.now();this.session=native.open();}
 	facts():ProviderFacts{return structuredClone(this.factsValue);}
+	/** Reads requested and not yet settled; the poller publishes a read once none remain. */
+	inFlight():number{return this.closed?0:this.pending.size;}
 	notices():string[]{const messages=this.noticesQueue;this.noticesQueue=[];return messages;}
 	private notice(message:string):void {if(this.seenNotices.has(message))return;if(this.seenNotices.size>=32)return;this.seenNotices.add(message);this.noticesQueue.push(message);}
 	private removeSource(source:NativeSource):void {for(const [key,item] of this.rows)if(item.source===source){this.rows.delete(key);this.dirty=true;this.catalogDirty=true;}}

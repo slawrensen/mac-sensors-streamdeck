@@ -22,11 +22,21 @@ export function parsePollInterval(raw: unknown): number {
 export function parseSourceMode(_raw: unknown): 'auto' { void _raw; return 'auto'; }
 type Factory = (ready: () => void) => MacSnapshotProvider;
 const pending = (): PollerStatus => ({ state: 'unavailable', reason: 'pending', message: 'Readings appear after the first successful sample.' });
+/**
+ * Longest a settled source's readings wait for the other source of the same read, so a
+ * context that shows both gets one publication per read. Below the 250 ms minimum interval.
+ * Evidence (PERF.md, 2026-10-12 CI native benchmark on the M5 Pro): SMC read p50 11.10 ms
+ * (second window at 1 s), slowest of 1,000 reads 66.39 ms (first window at 1 s). Intel SMC
+ * duration is unknown; a read slower than this window publishes twice (bounded), and public
+ * readings are never held longer than this window.
+ */
+const SETTLE_WINDOW_MS = 100;
 export class MacPoller extends EventEmitter {
 	private readonly logger = streamDeck.logger.createScope('MacSensors');
 	private provider: MacSnapshotProvider | null = null;
 	private timer: NodeJS.Timeout | null = null;
 	private expiry: NodeJS.Timeout | null = null;
+	private settle: NodeJS.Timeout | null = null;
 	private refs = 0;
 	private intervalMs = POLL_INTERVAL_DEFAULT_MS;
 	private status = pending();
@@ -54,7 +64,8 @@ export class MacPoller extends EventEmitter {
 		if (this.refs !== 0) return;
 		if (this.timer) clearInterval(this.timer);
 		if (this.expiry) clearTimeout(this.expiry);
-		this.timer = this.expiry = null;
+		if (this.settle) clearTimeout(this.settle);
+		this.timer = this.expiry = this.settle = null;
 		this.provider?.close(); this.provider = null;
 		this.status = pending();
 		this.observations.clear();
@@ -118,10 +129,20 @@ export class MacPoller extends EventEmitter {
 		this.armExpiry();
 		if (emit && this.refs) this.emit('tick', this.status);
 	}
+	/** One publication per read: a source that settles while another is still out waits for it, at most SETTLE_WINDOW_MS. */
+	private settled(): void {
+		if (!this.provider) return;
+		if ((this.provider.inFlight?.() ?? 0) > 0) {
+			this.settle ??= setTimeout(() => { this.settle = null; this.refresh(true); }, SETTLE_WINDOW_MS).unref();
+			return;
+		}
+		if (this.settle) { clearTimeout(this.settle); this.settle = null; }
+		this.refresh(true);
+	}
 	private tick(): void {
 		if (!this.refs) return;
 		try {
-			if (!this.provider) this.provider = this.factory(() => this.refresh(true));
+			if (!this.provider) this.provider = this.factory(() => this.settled());
 			const snapshot = this.provider.read(); if (snapshot) this.accept(snapshot);
 		} catch (error) { this.failure(error); }
 		this.refresh(false); this.armExpiry(); this.emit('tick', this.status);
