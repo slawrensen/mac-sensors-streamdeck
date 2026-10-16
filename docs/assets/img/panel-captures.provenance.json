@@ -1,19 +1,19 @@
 {
-  "version": "1.0.0",
+  "version": "1.0.1",
   "scope": "Staged Mac panel in Chromium, simulated host; not the app webview",
   "sourceSha256": {
-    "ui/control.html": "0eea918520440cd6f023d19c8cb42fdcb43f054a6f31f5037515777ed14d94bc",
-    "ui/detail-slot.html": "00e0855fcf42ed9801c38685d3f51be48945ff5d4e1bd5dafc02108a54446581",
+    "ui/control.html": "c69b98d0f915b26694a406ac6e77793676225ddbf870aa3aeefb2ca10d1eefee",
+    "ui/detail-slot.html": "3c19a5e481b20a5da60db4f476facc34d83113ce0fbd07417ef5d68e0b4471b9",
     "ui/pi-command.js": "a672b467fa4d6950bbae85ea59006c0a0185f6b2c9b366ad6e29340c19d6b62a",
-    "ui/pi-common.js": "2c96611a3c64dce467e8bb1f0bdc801b543e516f81a0049742a92974eccb06e5",
+    "ui/pi-common.js": "6ee3fb0eddf5ed8f914a25389785bc3f8856e3a442d2f3d62146fe5d62964823",
     "ui/pi-control.js": "2a83b53d7c0f4cf6aca9216c5f0fc4001327f05b05e3c2b4282a0ad7083df18a",
     "ui/pi-model.js": "c9732cb2d91c9cfef8f6552eaecc0a72f4efff9fd6e25e2922b18f3decb39632",
     "ui/pi-shell.js": "6c6e51dbd5b8f153ba4d49a98056053056d3b6699cdb3476e790da99f8adb285",
     "ui/pi-slot.js": "c07cd26a8d46a824c5440bb487d731bef0426f14d76ccea034b0669cab931337",
     "ui/pi.css": "51f44aeed25c6c0b56940a2079da5692547b48212f0d60efb820e885eb80d165",
     "ui/sdpi-components.js": "f6c0dfd2ed68e18084b9952842b86e3850cf837d674704700c2a0718e0a24f6b",
-    "ui/sensor-dial.html": "148e41225538cb902c9339deeec2a6e6626a925776297a871690c7edd307a3bb",
-    "ui/sensor-reading.html": "50f42287c20c1bc15871d4138e8e2fcd070f53e9c74124ea1d0e2fa18824ef85"
+    "ui/sensor-dial.html": "cdcf184026cea268c4f7d072174e65bbfdb4d4ef52698b202950af70e69618df",
+    "ui/sensor-reading.html": "43a2a64f89099dc0460957a6bb934e7f577b5a47522a0c988a45623f488bf1f2"
   },
   "captures": [
     {
@@ -28,7 +28,7 @@
         "warnValue": "75",
         "critValue": "90"
       },
-      "build": "1.0.0.0-mac7",
+      "build": "1.0.1.0-mac7",
       "width": 378,
       "dpr": 2,
       "overflow": 0
@@ -48,7 +48,7 @@
         "dialView": "overview",
         "theme": "void"
       },
-      "build": "1.0.0.0-mac7",
+      "build": "1.0.1.0-mac7",
       "width": 378,
       "dpr": 2,
       "overflow": 0
@@ -73,7 +73,7 @@
           "mac:v1:smc:Mac17%2C9:46304163:rpm.v1": "#38CD89"
         }
       },
-      "build": "1.0.0.0-mac7",
+      "build": "1.0.1.0-mac7",
       "width": 378,
       "dpr": 2,
       "overflow": 0
