@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.1.0 - 2026-10-15
+
+- Keys and dials that show both system and SMC readings change once per read instead of twice in quick succession.
+- **Read every** has its own help: one shared read updates every reading key and dial, changing it clears sparkline history, and shorter intervals use more processor time.
+- A blank **Read every** value means the 1 second default. A stored value above 5 seconds is read as 5 seconds, so readings no longer expire between reads.
+- CPU usage and transfer rates appear about a quarter second after a key appears or a page returns, instead of one full read interval later.
+- A reading that lapses before the other sensor source has ever answered leaves the key instead of staying on it as live.
+- Support reports from Intel Macs say the plugin runs natively instead of unknown.
+- Status text in the settings panel names this Mac as the source of sensor data, and the Text font line uses the same spacing as other fields.
+
 ## 1.0.0.0 - 2026-10-13
 
 - Read selected Mac temperature, fan and power measurements, plus CPU activity, memory, storage and transfer counters, without changing hardware settings.
