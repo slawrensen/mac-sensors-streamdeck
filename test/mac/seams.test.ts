@@ -1,10 +1,12 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
-import { test } from 'node:test';
+import { mock, test } from 'node:test';
 import { runtime, environment } from '#platform/runtime';
 import { poller as selected } from '#platform/poller';
 import { MacPoller, parseSourceMode } from '../../src/mac/poller';
+import { MacProvider } from '../../src/mac/provider';
+import type { NativeBridge, NativePacket, NativeRow, NativeSource } from '../../src/mac/native-api';
 import { bareReadingKey } from '../../src/detail/detail-settings';
 import { HwinfoError, SensorType, type Reading, type SensorSnapshot } from '../../src/hwinfo/types';
 import { SessionStatsStore } from '../../src/stats';
@@ -40,11 +42,28 @@ test('Mac poller revalidates cached rows before redraw and closes generations on
 	expired=true;assert.equal(subject.getStatus().state,'unavailable');assert.equal(subject.getSeries(key)?.length,0);
 	subject.release();assert.equal(closed,1);assert.equal(subject.getStatus().state,'unavailable');ready();assert.equal(subject.getStatus().state,'unavailable');
 });
-test('expiry timer invalidates within its deadline even at a sixty-second read cadence',async()=>{
-	let expired=false;
-	const subject=new MacPoller(()=>({read:()=>snapshot(),current:()=>{if(expired)throw new HwinfoError('no-readable-sensors','Expired');return snapshot();},untilExpiry:()=>expired?null:5,age:()=>0,close:()=>{}}));
-	subject.setIntervalMs(60000);const states:string[]=[];subject.onTick((s)=>states.push(s.state));subject.retain();expired=true;
-	await new Promise(resolve=>setTimeout(resolve,25));assert.ok(states.includes('unavailable'));subject.release();
+test('a source that stops completing expires at the 15 s TTL while reads continue at the clamped longest interval',async()=>{
+	mock.timers.enable({apis:['setInterval','setTimeout','Date'],now:0});
+	try {
+		const reads:Record<NativeSource,number[]>={public:[],smc:[]};
+		const row=(source:NativeSource,at:number):NativeRow=>({key:source==='smc'?'TB1T':'memory-total',label:source,group:source==='smc'?'Battery':'Memory',kind:source==='smc'?'temperature':'other',unit:source==='smc'?'°C':'B',value:source==='smc'?30:1024,valid:true,continuousMs:at,wallSeconds:1.7e9+at/1000,error:0,systemCode:0});
+		const packet=(source:NativeSource,at:number):NativePacket=>({source,rows:[row(source,at)],continuousMs:at,awakeMs:at,wallSeconds:1.7e9+at/1000,durationMs:1,error:0,systemCode:0,operation:'fixture',model:'Mac17,9',chip:'t6050',appleSilicon:1,translated:0,translationError:0,fontAvailable:true,cpuValid:false,cpuTicks:[[0,0,0,0]],networkValid:false,networkIn:'0',networkOut:'0',networkMembers:'1',storageValid:false,storageRead:'0',storageWrite:'0',storageMembers:'1'});
+		// Public completes its first two reads (the second from Check again at 2.5 s), then never again; SMC always completes.
+		const native:NativeBridge={getBuildInfo:()=>({protocol:1,napi:8,version:'t',sourceId:'t',arch:process.arch,platform:'darwin',testHooks:true}),now:()=>Date.now(),open:()=>({read:(source)=>{const at=Date.now();reads[source].push(at);return new Promise(resolve=>{if(source==='smc'||reads.public.length<=2)setTimeout(()=>resolve(packet(source,at)),5);});},close:()=>{}})};
+		const subject=new MacPoller((ready)=>new MacProvider(native,ready));
+		subject.setIntervalMs(60000);assert.equal(subject.diagnostics().intervalMs,5000);
+		const memory='mac:v1:system:memory-total';const seen:{at:number;memory:boolean;state:string}[]=[];
+		subject.onTick((s)=>seen.push({at:Date.now(),memory:s.state==='ok'&&s.snapshot.byKey.has(memory),state:s.state}));
+		const advance=async(ms:number):Promise<void>=>{for(let i=0;i<ms;i++){mock.timers.tick(1);await new Promise(resolve=>setImmediate(resolve));}};
+		subject.retain();await advance(2500);subject.checkAgain();await advance(14999);
+		assert.equal(seen.at(-1)?.memory,true,'the public reading is still within its TTL at 17.499 s');
+		await advance(2);
+		const expiry=seen.find(item=>item.at>=17500&&!item.memory);
+		assert.equal(expiry?.at,17500,'the public reading leaves at its own 15 s deadline, not at the next read');assert.equal(expiry?.state,'ok');
+		await advance(5000);
+		assert.deepEqual(reads.smc,[0,2500,5000,10000,15000,20000]);assert.deepEqual(reads.public,[0,2500,5000]);
+		subject.release();
+	}finally{mock.timers.reset();}
 });
 test('missing-font status uses fixed pixels and keeps the Back mark without text rasterization',()=>{
 	const status={state:'unavailable',reason:'font-missing',message:'Missing'} as const;

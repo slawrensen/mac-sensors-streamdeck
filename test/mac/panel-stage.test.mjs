@@ -20,6 +20,27 @@ test('staged panels use one build token, Mac guidance, no source or font setting
 		assert.match(model.hwModel.sharedDefaultsSummary(globals),/saved font kept/);assert.match(model.hwModel.connectionSummary(globals),/Mac sensors/);assert.deepEqual(globals,before);
 	}finally{fs.rmSync(temp,{recursive:true,force:true});}
 });
+/** Stages the panels into a temporary folder and hands each test the staged text. */
+function withStaged(check){
+	const temp=fs.mkdtempSync(path.join(os.tmpdir(),'mac-panel-stage-'));
+	try {stagePanels(temp,'0.9.90.0-mac1');return check((name)=>fs.readFileSync(path.join(temp,name),'utf8'));}
+	finally{fs.rmSync(temp,{recursive:true,force:true});}
+}
+/** Values JSON cannot carry are named in the shared fixture and rebuilt here. */
+const SPECIAL={undefined:undefined,NaN:Number.NaN,Infinity:Number.POSITIVE_INFINITY,'-Infinity':Number.NEGATIVE_INFINITY};
+test('staged Read every summaries follow the same case table as the Mac runtime parse',()=>withStaged((read)=>{
+	const table=JSON.parse(fs.readFileSync(new URL('./fixtures/poll-interval-cases.json',import.meta.url),'utf8'));
+	const text=read('pi-model.js');assert.match(text,/mirroring parsePollInterval\n\t \* \(src\/mac\/poller\.ts\)/);assert.doesNotMatch(text,/60_000/);
+	const model={};model.self=model;vm.runInNewContext(text,model);
+	assert.ok(table.cases.length>40);
+	for(const entry of table.cases) {
+		const raw=entry.special?SPECIAL[entry.special]:entry.raw;
+		assert.equal(model.hwModel.pollIntervalOf(raw),entry.expected,entry.label);
+		const globals=entry.special==='undefined'?{}:{pollIntervalMs:raw};const before=structuredClone(globals);
+		const shown=entry.expected>=1000?`${entry.expected/1000} s`:`${entry.expected} ms`;
+		assert.equal(model.hwModel.connectionSummary(globals),`Mac sensors · read every ${shown}`,entry.label);assert.deepEqual(globals,before,entry.label);
+	}
+}));
 test('missing staging anchors fail before an output is packaged',()=>{
 	const source='core-patches/panel-stage.json';const saved=fs.readFileSync(source);const temp=fs.mkdtempSync(path.join(os.tmpdir(),'mac-panel-negative-'));
 	try {

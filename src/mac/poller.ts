@@ -8,9 +8,16 @@ import {trace,traceEnabled} from '../recorder';
 import type { PollerStatus } from '../poller';
 import { openMacProvider, type MacSnapshotProvider } from './native-loader';
 export type { PollerStatus } from '../poller';
+/** Read every default: what an absent, blank or malformed stored value means. */
+export const POLL_INTERVAL_DEFAULT_MS = 1000;
+/** Shortest offered Read every option. */
+export const POLL_INTERVAL_MIN_MS = 250;
+/** Longest offered Read every option; kept well inside the 15 s reading TTL so readings never expire between reads. */
+export const POLL_INTERVAL_MAX_MS = 5000;
+/** One supported range for runtime and panel (staged pollIntervalOf mirrors this; test/mac/fixtures/poll-interval-cases.json pins both). A blank string is not a number. */
 export function parsePollInterval(raw: unknown): number {
-	const value = typeof raw === 'string' || typeof raw === 'number' ? Number(raw) : NaN;
-	return Number.isFinite(value) ? Math.min(60_000, Math.max(250, Math.round(value))) : 1000;
+	const value = typeof raw === 'number' ? raw : typeof raw === 'string' && raw.trim() !== '' ? Number(raw) : NaN;
+	return Number.isFinite(value) ? Math.min(POLL_INTERVAL_MAX_MS, Math.max(POLL_INTERVAL_MIN_MS, Math.round(value))) : POLL_INTERVAL_DEFAULT_MS;
 }
 export function parseSourceMode(_raw: unknown): 'auto' { void _raw; return 'auto'; }
 type Factory = (ready: () => void) => MacSnapshotProvider;
@@ -21,7 +28,7 @@ export class MacPoller extends EventEmitter {
 	private timer: NodeJS.Timeout | null = null;
 	private expiry: NodeJS.Timeout | null = null;
 	private refs = 0;
-	private intervalMs = 1000;
+	private intervalMs = POLL_INTERVAL_DEFAULT_MS;
 	private status = pending();
 	private readonly series = new Map<string, number[]>();
 	private readonly observations = new Map<string, string>();

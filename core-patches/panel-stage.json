@@ -1,5 +1,6 @@
 {
   "seams": [
+    "S1",
     "S2",
     "S5",
     "S8"
@@ -200,6 +201,11 @@
       {
         "before": "\t\tif (preview?.missing === true || (name === null && preview?.state === \"ok\")) return \"Saved reading not found in HWiNFO\";",
         "after": "\t\tif (preview?.missing === true || (name === null && preview?.state === \"ok\")) return \"Saved reading not found in Mac Sensors\";",
+        "count": 1
+      },
+      {
+        "before": "\t/** The read interval the runtime uses, mirroring parsePollInterval\n\t * (src/poller.ts): a finite number is rounded and clamped to 250 ms..60 s,\n\t * anything else is the 1 s default. */\n\tfunction pollIntervalOf(raw) {\n\t\tconst n = typeof raw === \"string\" ? Number(raw) : typeof raw === \"number\" ? raw : Number.NaN;\n\t\treturn Number.isFinite(n) ? Math.min(60_000, Math.max(250, Math.round(n))) : 1000;\n\t}",
+        "after": "\t/** The read interval the Mac runtime uses, mirroring parsePollInterval\n\t * (src/mac/poller.ts): a finite number is rounded and clamped to 250 ms..5 s;\n\t * a blank string, like anything else, is the 1 s default. */\n\tfunction pollIntervalOf(raw) {\n\t\tconst n = typeof raw === \"string\" ? (raw.trim() === \"\" ? Number.NaN : Number(raw)) : typeof raw === \"number\" ? raw : Number.NaN;\n\t\treturn Number.isFinite(n) ? Math.min(5_000, Math.max(250, Math.round(n))) : 1000;\n\t}",
         "count": 1
       }
     ],
