@@ -6,6 +6,8 @@ import { MacSensorError } from './bridge';
 const TTL=15_000;
 /** Shortest offered Read every: the first counter window after a provider opens, so CPU usage and rates appear this soon instead of one full interval later. */
 const COUNTER_REBASELINE_MS=250;
+/** Shortest counter window a tick may start after the rebaseline read. The kernel counts CPU time in 10 ms ticks (kern.clockrate hz 100), so 200 ms holds about twenty; it stays below the roughly 245 ms between the rebaseline read and the regular tick at the 500 ms setting, so that tick keeps its read. */
+const MIN_COUNTER_WINDOW_MS=200;
 /** sysctl.proc_translated is absent (ENOENT) on Intel Macs; Apple's Rosetta documentation treats that as a native process. */
 const TRANSLATION_ABSENT_ERRNO=constants.errno.ENOENT;
 /** Native when the sysctl says 0 or does not exist; translated only on 1; anything else, including other errors, stays unknown. */
@@ -78,7 +80,7 @@ export class MacProvider implements SnapshotProvider {
 	private rebaseline:NodeJS.Timeout|null=null;
 	/** Set once the rebaseline is armed, so a generation gets at most one extra read even after a public failure resets the baseline. */
 	private rebaselined=false;
-	/** When the rebaseline read started; the next tick skips its public read if it would follow within COUNTER_REBASELINE_MS of a successful one. */
+	/** When the rebaseline read started; the next tick skips its public read if it would follow within MIN_COUNTER_WINDOW_MS of a successful one. */
 	private rebaselineStartedAt:number|null=null;
 	private fontKnown=false;
 	private fontAvailable=false;
@@ -150,7 +152,7 @@ export class MacProvider implements SnapshotProvider {
 		// So a tick read due before the rebaseline replaces it, and a tick just after a rebaseline read that kept a baseline (a Read every change restarted the timer) keeps that sample.
 		if(this.rebaseline){clearTimeout(this.rebaseline);this.rebaseline=null;}
 		const sinceRebaseline=this.rebaselineStartedAt===null?Infinity:this.native.now()-this.rebaselineStartedAt;this.rebaselineStartedAt=null;
-		if(!(sinceRebaseline<COUNTER_REBASELINE_MS&&this.previousPublic!==null))this.request('public');
+		if(!(sinceRebaseline<MIN_COUNTER_WINDOW_MS&&this.previousPublic!==null))this.request('public');
 		this.request('smc');return this.current();
 	}
 	private rebuild():void {

@@ -25,6 +25,8 @@ const INTERVAL_MS = 1000;
 const CPU_TICK_MS = 10;
 /** Mirrors COUNTER_REBASELINE_MS in src/mac/provider.ts: the shortest counter window a public read may follow its predecessor by. */
 const COUNTER_REBASELINE_MS = 250;
+/** Mirrors MIN_COUNTER_WINDOW_MS in src/mac/provider.ts: a tick reads public unless a kept rebaseline sample started less than this long ago. */
+const MIN_COUNTER_WINDOW_MS = 200;
 
 type Emit = { at: number; signature: string; smc: boolean; mem: boolean; cpu: boolean; status: PollerStatus };
 interface Rig { poller: MacPoller; emits: Emit[]; reads: Record<NativeSource, number[]> }
@@ -188,6 +190,18 @@ test('at Read every 250 ms a due tick replaces the counter rebaseline read', asy
 	assert.deepEqual(it.reads.public, [0, 250, 500, 750, 1000], 'no extra public read next to a tick');
 	assertCounterWindows(it, '250 ms');
 	assert.ok((it.emits.find((emit) => emit.cpu)?.at ?? Infinity) <= 262, 'CPU usage still appears with the 250 ms tick read');
+});
+
+test('at Read every 500 ms the regular tick after the rebaseline read still reads public', async () => {
+	// Rebaseline at about 255 ms, regular tick at 500 ms: about 245 ms later, a real counter window, so the tick keeps its read.
+	const HALF_SECOND_MS = 500;
+	const it = rig({ public: (n) => (n === 1 ? 5 : 1), smc: 11 }, { cpu: true, intervalMs: HALF_SECOND_MS });
+	it.poller.retain();
+	await advance(4 * HALF_SECOND_MS + 20);
+	it.poller.release();
+	assert.deepEqual(it.reads.public, [0, 255, 500, 1000, 1500, 2000], 'one rebaseline read, and every 500 ms tick reads public');
+	assert.deepEqual(it.reads.smc, [0, 500, 1000, 1500, 2000]);
+	for (let i = 1; i < it.reads.public.length; i++) assert.ok(it.reads.public[i]! - it.reads.public[i - 1]! >= MIN_COUNTER_WINDOW_MS, `public reads ${JSON.stringify(it.reads.public)} start less than ${MIN_COUNTER_WINDOW_MS} ms apart`);
 });
 
 test('a Read every change to 250 ms just after a key appears never leaves two public reads moments apart', async () => {
