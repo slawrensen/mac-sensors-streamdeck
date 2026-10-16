@@ -1,10 +1,15 @@
 import { SensorType, type Reading, type SensorSnapshot, type SensorSource } from '../hwinfo/types';
 import type { SnapshotProvider } from '../hwinfo/provider';
 import type { NativeBridge, NativePacket, NativeRow, NativeSession, NativeSource } from './native-api';
+import { constants } from 'node:os';
 import { MacSensorError } from './bridge';
 const TTL=15_000;
 /** Shortest offered Read every: the first counter window after a provider opens, so CPU usage and rates appear this soon instead of one full interval later. */
 const COUNTER_REBASELINE_MS=250;
+/** sysctl.proc_translated is absent (ENOENT) on Intel Macs; Apple's Rosetta documentation treats that as a native process. */
+const TRANSLATION_ABSENT_ERRNO=constants.errno.ENOENT;
+/** Native when the sysctl says 0 or does not exist; translated only on 1; anything else, including other errors, stays unknown. */
+export function translationOf(translated:number,translationError:number):ProviderFacts['translation'] {return translated===0||(translated<0&&translationError===TRANSLATION_ABSENT_ERRNO)?'native':translated===1?'translated':'unknown';}
 const GROUPS:Record<string,number>={CPU:1,GPU:2,Memory:3,Storage:4,Network:5,Battery:6,Fans:7,System:8};
 const KIND:Record<string,{type:SensorType;meaning:string;minimum:number;maximum:number}>={
 	temperature:{type:SensorType.Temperature,meaning:'temp.v1',minimum:-50,maximum:150},
@@ -119,7 +124,7 @@ export class MacProvider implements SnapshotProvider {
 		}
 		for(const [key,item] of this.rows)if(item.source===source&&!accepted.has(key)){this.rows.delete(key);this.dirty=true;this.catalogDirty=true;}
 		for(const [key,item] of accepted)this.rows.set(key,item);
-		this.factsValue={model:packet.model||'unknown',chip:packet.chip||'unknown',appleSilicon:packet.appleSilicon<0?null:packet.appleSilicon===1,translation:packet.translated===0?'native':packet.translated===1?'translated':'unknown',translationError:packet.translationError,sourceErrors:this.factsValue.sourceErrors,sourceRows:{...this.factsValue.sourceRows,[source]:accepted.size}};
+		this.factsValue={model:packet.model||'unknown',chip:packet.chip||'unknown',appleSilicon:packet.appleSilicon<0?null:packet.appleSilicon===1,translation:translationOf(packet.translated,packet.translationError),translationError:packet.translationError,sourceErrors:this.factsValue.sourceErrors,sourceRows:{...this.factsValue.sourceRows,[source]:accepted.size}};
 		if(packet.translated===1)this.notice('Node is running under translation; sensor interfaces follow the detected hardware.');
 		if(source==='smc'&&(packet.model!=='Mac17,9'||packet.chip!=='t6050'))this.notice('This model uses common typed sensors; its generation-specific catalog is not qualified.');
 		this.rebuild();
