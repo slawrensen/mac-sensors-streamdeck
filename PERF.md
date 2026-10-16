@@ -25,7 +25,7 @@ The first window's slow one-second reads occurred near the same wall-clock secon
 
 ### 2026-10-16 UTC: Plugin CPU time by Read every, mock host
 
-The repository mock host (`scripts/lib/mock-host.mjs`) ran the 1.0.1 candidate bundle with the 1.0.0 release native addons (arm64 SHA-256 3968022b3f9146fb979202c7e8ab5ebf27a3405070c700bfa1d33c5cd2175bcd) under Node 24.13.1 on the M5 Pro, macOS 27.0.1. The layout was six contexts: a sparkline key, an SMC key, a dual and a quad key mixing public and SMC readings, and two dials. After 5 seconds of warm-up, the development process observer (`npm run build:observer`) read the plugin process CPU time at the start and end of a 40-second window. Two rounds ran in alternating order.
+The repository mock host (`scripts/lib/mock-host.mjs`) ran the 1.0.1 candidate bundle with the 1.0.0 release native addons (arm64 SHA-256 3968022b3f9146fb979202c7e8ab5ebf27a3405070c700bfa1d33c5cd2175bcd) under Node 24.13.1 on the M5 Pro, macOS 27.0.1. The layout was six contexts: a sparkline key, an SMC key, a dual and a quad key mixing public and SMC readings, and two dials. After 5 seconds of warm-up, the development process observer (`npm run build:observer`) read the plugin process CPU time at the start and end of a 40-second window. Two rounds ran in alternating order. The script that set up the six contexts and timed the windows is an uncommitted development harness, so this entry cannot be reproduced from the repository alone.
 
 | Read every | Plugin CPU time per second (two runs) | Frames per second, all six contexts |
 | --- | --- | --- |
