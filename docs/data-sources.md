@@ -6,7 +6,7 @@ nav_order: 10
 
 # Data sources
 
-Mac Sensors reads local macOS interfaces. Each read publishes once, when its public system counters and optional SMC readings have both settled. Public counters wait at most 100 ms for SMC, so a slow or missing sensor group cannot hold them back or make an old value look new.
+Mac Sensors reads local macOS interfaces. Each read publishes its new readings once, after its public system counters and optional SMC readings have both settled. Public counters wait at most 100 ms for SMC. If SMC takes longer, the public counters publish first and the SMC readings follow when they arrive, so a slow or missing sensor group cannot stall them or make an old value look new.
 
 | Reading family | What it means |
 | --- | --- |
