@@ -114,8 +114,8 @@ test('coalescing changes no measurement: own acquisition times, one sample and o
 	poller.retain();
 	await advance(10 * INTERVAL_MS + 100);
 	const starts = Array.from({ length: 11 }, (_, k) => k * INTERVAL_MS);
-	// The provider's one counter rebaseline read (250 ms after the first public packet) is a genuine extra public observation.
-	const publicStarts = [0, 255, ...starts.slice(1)];
+	// The provider's one counter rebaseline read (250 ms after the first public request) is a genuine extra public observation.
+	const publicStarts = [0, 250, ...starts.slice(1)];
 	assert.deepEqual(reads, { public: publicStarts, smc: starts });
 	assert.equal(poller.getSeries(MEM)?.length, publicStarts.length);
 	assert.equal(poller.getSeries(SMC)?.length, starts.length);
@@ -164,7 +164,7 @@ test('counter readings appear about 250 ms after a key appears or returns, with 
 	await advance(SLOW_INTERVAL_MS - 1);
 	assert.ok((firstCpu(back) ?? Infinity) - back <= 260, `return: CPU usage ${(firstCpu(back) ?? Infinity) - back} ms after the key returned`);
 	poller.release();
-	assert.deepEqual(reads.public, [0, 255, 5000, 10000, 15000, back, back + 255], 'one extra public read per provider generation, none while hidden');
+	assert.deepEqual(reads.public, [0, 250, 5000, 10000, 15000, back, back + 250], 'one extra public read per provider generation, none while hidden');
 	assert.deepEqual(reads.smc, [0, 5000, 10000, 15000, back]);
 });
 
@@ -193,15 +193,26 @@ test('at Read every 250 ms a due tick replaces the counter rebaseline read', asy
 });
 
 test('at Read every 500 ms the regular tick after the rebaseline read still reads public', async () => {
-	// Rebaseline at about 255 ms, regular tick at 500 ms: about 245 ms later, a real counter window, so the tick keeps its read.
+	// Rebaseline at 250 ms (counted from the first request), regular tick at 500 ms: 250 ms later, a real counter window, so the tick keeps its read.
 	const HALF_SECOND_MS = 500;
 	const it = rig({ public: (n) => (n === 1 ? 5 : 1), smc: 11 }, { cpu: true, intervalMs: HALF_SECOND_MS });
 	it.poller.retain();
 	await advance(4 * HALF_SECOND_MS + 20);
 	it.poller.release();
-	assert.deepEqual(it.reads.public, [0, 255, 500, 1000, 1500, 2000], 'one rebaseline read, and every 500 ms tick reads public');
+	assert.deepEqual(it.reads.public, [0, 250, 500, 1000, 1500, 2000], 'one rebaseline read, and every 500 ms tick reads public');
 	assert.deepEqual(it.reads.smc, [0, 500, 1000, 1500, 2000]);
 	for (let i = 1; i < it.reads.public.length; i++) assert.ok(it.reads.public[i]! - it.reads.public[i - 1]! >= MIN_COUNTER_WINDOW_MS, `public reads ${JSON.stringify(it.reads.public)} start less than ${MIN_COUNTER_WINDOW_MS} ms apart`);
+});
+
+test('at Read every 500 ms a slow first read still leaves the next tick its public read', async () => {
+	// A cold first read of 60 ms (Intel public read time is unknown): the rebaseline still starts 250 ms after the first request.
+	const HALF_SECOND_MS = 500;
+	const SLOW_COLD_READ_MS = 60;
+	const it = rig({ public: (n) => (n === 1 ? SLOW_COLD_READ_MS : 1), smc: 11 }, { cpu: true, intervalMs: HALF_SECOND_MS });
+	it.poller.retain();
+	await advance(4 * HALF_SECOND_MS + 20);
+	it.poller.release();
+	assert.deepEqual(it.reads.public, [0, 250, 500, 1000, 1500, 2000], 'the rebaseline counts from the first request and the 500 ms tick keeps its read');
 });
 
 test('a Read every change to 250 ms just after a key appears never leaves two public reads moments apart', async () => {
@@ -212,7 +223,7 @@ test('a Read every change to 250 ms just after a key appears never leaves two pu
 	it.poller.setIntervalMs(COUNTER_REBASELINE_MS);
 	await advance(4 * COUNTER_REBASELINE_MS + 15);
 	it.poller.release();
-	assert.deepEqual(it.reads.public, [0, 255, 520, 770, 1020], 'the rebaseline read stands in for the public half of the tick 15 ms after it');
+	assert.deepEqual(it.reads.public, [0, 250, 520, 770, 1020], 'the rebaseline read stands in for the public half of the tick 20 ms after it');
 	assert.deepEqual(it.reads.smc, [0, 270, 520, 770, 1020], 'SMC keeps its tick cadence');
 	assertCounterWindows(it, 'interval change');
 });
@@ -235,7 +246,7 @@ test('a public failure after the first packet never earns a generation a second 
 	poller.retain();
 	await advance(2 * 5000 + 100);
 	poller.release();
-	assert.deepEqual(reads.public, [0, 255, 5000, 10000], 'the failed rebaseline read resets the baseline, but the recovery at 5000 ms is not followed by another extra read');
+	assert.deepEqual(reads.public, [0, 250, 5000, 10000], 'the failed rebaseline read resets the baseline, but the recovery at 5000 ms is not followed by another extra read');
 });
 
 test('a tick just after a failed rebaseline read still reads public', async () => {
@@ -245,5 +256,5 @@ test('a tick just after a failed rebaseline read still reads public', async () =
 	poller.setIntervalMs(COUNTER_REBASELINE_MS);
 	await advance(4 * COUNTER_REBASELINE_MS + 15);
 	poller.release();
-	assert.deepEqual(reads.public, [0, 255, 270, 520, 770, 1020], 'with no baseline kept there is no sample to stand in for the tick at 270 ms');
+	assert.deepEqual(reads.public, [0, 250, 270, 520, 770, 1020], 'with no baseline kept there is no sample to stand in for the tick at 270 ms');
 });

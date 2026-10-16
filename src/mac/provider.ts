@@ -4,9 +4,9 @@ import type { NativeBridge, NativePacket, NativeRow, NativeSession, NativeSource
 import { constants } from 'node:os';
 import { MacSensorError } from './bridge';
 const TTL=15_000;
-/** Shortest offered Read every: the first counter window after a provider opens, so CPU usage and rates appear this soon instead of one full interval later. */
+/** Shortest offered Read every: the first counter window after a provider opens, counted from the first read's request, so CPU usage and rates appear this soon instead of one full interval later. */
 const COUNTER_REBASELINE_MS=250;
-/** Shortest counter window a tick may start after the rebaseline read. The kernel counts CPU time in 10 ms ticks (kern.clockrate hz 100), so 200 ms holds about twenty; it stays below the roughly 245 ms between the rebaseline read and the regular tick at the 500 ms setting, so that tick keeps its read. */
+/** Shortest counter window a tick may start after the rebaseline read. The kernel counts CPU time in 10 ms ticks (kern.clockrate hz 100), so 200 ms holds about twenty. The rebaseline read starts 250 ms after the first read was requested, so at the 500 ms setting the regular tick follows it by 250 ms and keeps its read, however long the first read took. */
 const MIN_COUNTER_WINDOW_MS=200;
 /** sysctl.proc_translated is absent (ENOENT) on Intel Macs; Apple's Rosetta documentation treats that as a native process. */
 const TRANSLATION_ABSENT_ERRNO=constants.errno.ENOENT;
@@ -82,6 +82,8 @@ export class MacProvider implements SnapshotProvider {
 	private rebaselined=false;
 	/** When the rebaseline read started; the next tick skips its public read if it would follow within MIN_COUNTER_WINDOW_MS of a successful one. */
 	private rebaselineStartedAt:number|null=null;
+	/** When the in-flight public read was requested, so the rebaseline window counts from the first read's start, not its completion. */
+	private publicRequestedAt:number|null=null;
 	private fontKnown=false;
 	private fontAvailable=false;
 	private readonly completed=new Set<NativeSource>();
@@ -111,7 +113,7 @@ export class MacProvider implements SnapshotProvider {
 		const rows=[...packet.rows,...(source==='public'?counterRows(this.previousPublic,packet):[])];
 		if(source==='public'){
 			// Once per generation: the first accepted packet only sets the counter baseline, so read public again after the shortest interval.
-			if(this.previousPublic===null&&!this.rebaselined){this.rebaselined=true;this.rebaseline=setTimeout(()=>{this.rebaseline=null;this.request('public');if(this.pending.has('public'))this.rebaselineStartedAt=this.native.now();},COUNTER_REBASELINE_MS).unref();}
+			if(this.previousPublic===null&&!this.rebaselined){this.rebaselined=true;const elapsed=this.publicRequestedAt===null?0:Math.max(0,this.native.now()-this.publicRequestedAt);this.rebaseline=setTimeout(()=>{this.rebaseline=null;this.request('public');if(this.pending.has('public'))this.rebaselineStartedAt=this.native.now();},Math.max(0,COUNTER_REBASELINE_MS-elapsed)).unref();}
 			this.previousPublic=packet;
 		}
 		const counts=new Map<string,number>();
@@ -138,7 +140,7 @@ export class MacProvider implements SnapshotProvider {
 	private request(source:NativeSource):void {
 		if(this.closed||this.pending.has(source)||this.retries.has(source))return;
 		try {
-			const promise=this.session.read(source);this.pending.add(source);
+			const promise=this.session.read(source);this.pending.add(source);if(source==='public')this.publicRequestedAt=this.native.now();
 			void promise.then(packet=>{if(!this.closed)this.accept(source,packet);}).catch(()=>{if(!this.closed){this.completed.add(source);this.removeSource(source);if(source==='public')this.previousPublic=null;this.notice(`${source} read failed; retrying.`);}}).finally(()=>{this.pending.delete(source);if(!this.closed)this.ready();}).catch(()=>{if(!this.closed)this.notice('A sensor update could not be delivered.');});
 		} catch(error) {
 			if((error as {code?:string}).code==='HWMAC_BUSY') {
