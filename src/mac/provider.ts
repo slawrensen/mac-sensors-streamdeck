@@ -6,7 +6,7 @@ import { MacSensorError } from './bridge';
 const TTL=15_000;
 /** Shortest offered Read every, and the target start of the rebaseline read counted from the first read's request, so CPU usage and rates appear this soon instead of one full interval later. */
 const COUNTER_REBASELINE_MS=250;
-/** Shortest counter window around the rebaseline read. The kernel counts CPU time in 10 ms ticks (kern.clockrate hz 100), so 200 ms holds about twenty. The native read samples its counters at the end, so the rebaseline read never starts sooner than this after the first read completed, and a tick that would follow a kept rebaseline sample by less than this reads only SMC. At the 500 ms setting the regular tick keeps its read when the first read finishes within 100 ms. */
+/** Shortest counter window around the rebaseline read. The kernel counts CPU time in 10 ms ticks (kern.clockrate hz 100), so 200 ms holds about twenty. The native read takes CPU ticks after its font check and network and storage counters last, so the rebaseline read never starts sooner than this after the first read completed, and a tick that would follow a kept rebaseline sample by less than this reads only SMC. At the 500 ms setting the regular tick keeps its read when the first read finishes within 100 ms. */
 const MIN_COUNTER_WINDOW_MS=200;
 /** sysctl.proc_translated is absent (ENOENT) on Intel Macs; Apple's Rosetta documentation treats that as a native process. */
 const TRANSLATION_ABSENT_ERRNO=constants.errno.ENOENT;

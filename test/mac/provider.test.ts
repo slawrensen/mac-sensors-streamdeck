@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { test } from 'node:test';
+import { mock, test } from 'node:test';
 import { MacProvider, counterRows, encodeModel, measurementKey } from '../../src/mac/provider';
 import type { NativeBridge, NativePacket, NativeRow, NativeSource } from '../../src/mac/native-api';
 function packet(source:NativeSource,at=100):NativePacket {
@@ -74,4 +74,18 @@ test('support facts call a Mac without sysctl.proc_translated (ENOENT, as on Int
 		const r=rig();r.provider.read();const value=packet('public');value.translated=translated;value.translationError=translationError;await publish(r,'public',value);
 		assert.equal(r.provider.facts().translation,expected,`translated ${translated}, errno ${translationError}`);assert.equal(r.provider.facts().translationError,translationError);r.provider.close();
 	}
+});
+test('a non-finite clock at the first request still leaves the rebaseline its full delay',async()=>{
+	// mach_timebase_info can fail and make the native clock NaN; a NaN delay would fire the rebaseline about 1 ms later, over no counter window.
+	const START_MS=1_000_000,READ_MS=5;
+	mock.timers.enable({apis:['setTimeout','Date'],now:START_MS});
+	try {
+		const reads:number[]=[];let poisonNext=false;
+		const packet=(source:NativeSource,at:number):NativePacket=>({source,rows:[],continuousMs:at,awakeMs:at,wallSeconds:1.7e9,durationMs:1,error:source==='smc'?12:0,systemCode:0,operation:'fixture',model:'Mac17,9',chip:'t6050',appleSilicon:1,translated:0,translationError:0,fontAvailable:true,cpuValid:false,cpuTicks:[],networkValid:false,networkIn:'0',networkOut:'0',networkMembers:'1',storageValid:false,storageRead:'0',storageWrite:'0',storageMembers:'1'});
+		const bridge:NativeBridge={getBuildInfo:()=>({protocol:1,napi:8,version:'t',sourceId:'t',arch:process.arch,platform:'darwin',testHooks:true}),now:()=>{if(poisonNext){poisonNext=false;return NaN;}return Date.now();},open:()=>({read:(source)=>{const at=Date.now();if(source==='public'){reads.push(at-START_MS);poisonNext=reads.length===1;}return new Promise(resolve=>setTimeout(()=>resolve(packet(source,at)),READ_MS));},close:()=>{}})};
+		const provider=new MacProvider(bridge,()=>{});provider.read();
+		for(let i=0;i<400;i++){mock.timers.tick(1);await new Promise(resolve=>setImmediate(resolve));}
+		assert.deepEqual(reads,[0,READ_MS+250],'the rebaseline waits its full 250 ms after the first read completes when the request time is unknown');
+		provider.close();
+	} finally { mock.timers.reset(); }
 });
