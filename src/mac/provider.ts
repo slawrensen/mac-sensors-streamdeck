@@ -1,8 +1,15 @@
 import { SensorType, type Reading, type SensorSnapshot, type SensorSource } from '../hwinfo/types';
 import type { SnapshotProvider } from '../hwinfo/provider';
 import type { NativeBridge, NativePacket, NativeRow, NativeSession, NativeSource } from './native-api';
+import { constants } from 'node:os';
 import { MacSensorError } from './bridge';
 const TTL=15_000;
+/** Shortest offered Read every: the first counter window after a provider opens, so CPU usage and rates appear this soon instead of one full interval later. */
+const COUNTER_REBASELINE_MS=250;
+/** sysctl.proc_translated is absent (ENOENT) on Intel Macs; Apple's Rosetta documentation treats that as a native process. */
+const TRANSLATION_ABSENT_ERRNO=constants.errno.ENOENT;
+/** Native when the sysctl says 0 or does not exist; translated only on 1; anything else, including other errors, stays unknown. */
+function translationOf(translated:number,translationError:number):ProviderFacts['translation'] {return translated===0||(translated<0&&translationError===TRANSLATION_ABSENT_ERRNO)?'native':translated===1?'translated':'unknown';}
 const GROUPS:Record<string,number>={CPU:1,GPU:2,Memory:3,Storage:4,Network:5,Battery:6,Fans:7,System:8};
 const KIND:Record<string,{type:SensorType;meaning:string;minimum:number;maximum:number}>={
 	temperature:{type:SensorType.Temperature,meaning:'temp.v1',minimum:-50,maximum:150},
@@ -67,6 +74,12 @@ export class MacProvider implements SnapshotProvider {
 	private readonly seenNotices=new Set<string>();
 	private noticesQueue:string[]=[];
 	private previousPublic:NativePacket|null=null;
+	/** The pending counter rebaseline read; a tick read that comes first replaces it. */
+	private rebaseline:NodeJS.Timeout|null=null;
+	/** Set once the rebaseline is armed, so a generation gets at most one extra read even after a public failure resets the baseline. */
+	private rebaselined=false;
+	/** When the rebaseline read started; the next tick skips its public read if it would follow within COUNTER_REBASELINE_MS of a successful one. */
+	private rebaselineStartedAt:number|null=null;
 	private fontKnown=false;
 	private fontAvailable=false;
 	private readonly completed=new Set<NativeSource>();
@@ -80,6 +93,8 @@ export class MacProvider implements SnapshotProvider {
 	private factsValue:ProviderFacts={model:'unknown',chip:'unknown',appleSilicon:null,translation:'unknown',translationError:0,sourceRows:{public:0,smc:0},sourceErrors:{}};
 	constructor(private readonly native:NativeBridge,private readonly ready:()=>void,private readonly report:(facts:ProviderFacts)=>void=()=>{}) {this.startedAt=native.now();this.session=native.open();}
 	facts():ProviderFacts{return structuredClone(this.factsValue);}
+	/** Reads requested and not yet settled; the poller publishes a read once none remain. */
+	inFlight():number{return this.closed?0:this.pending.size;}
 	notices():string[]{const messages=this.noticesQueue;this.noticesQueue=[];return messages;}
 	private notice(message:string):void {if(this.seenNotices.has(message))return;if(this.seenNotices.size>=32)return;this.seenNotices.add(message);this.noticesQueue.push(message);}
 	private removeSource(source:NativeSource):void {for(const [key,item] of this.rows)if(item.source===source){this.rows.delete(key);this.dirty=true;this.catalogDirty=true;}}
@@ -92,7 +107,11 @@ export class MacProvider implements SnapshotProvider {
 		if(packet.source!==source||packet.error!==0||!Number.isFinite(now)||!Number.isFinite(packet.continuousMs)||packet.continuousMs>now||now-packet.continuousMs>=TTL||packet.rows.length>128){this.removeSource(source);if(source==='public')this.previousPublic=null;this.notice(`${source} readings unavailable; other sources continue.`);return;}
 		if(source==='public'){this.fontKnown=true;this.fontAvailable=packet.fontAvailable===true;}
 		const rows=[...packet.rows,...(source==='public'?counterRows(this.previousPublic,packet):[])];
-		if(source==='public')this.previousPublic=packet;
+		if(source==='public'){
+			// Once per generation: the first accepted packet only sets the counter baseline, so read public again after the shortest interval.
+			if(this.previousPublic===null&&!this.rebaselined){this.rebaselined=true;this.rebaseline=setTimeout(()=>{this.rebaseline=null;this.request('public');if(this.pending.has('public'))this.rebaselineStartedAt=this.native.now();},COUNTER_REBASELINE_MS).unref();}
+			this.previousPublic=packet;
+		}
 		const counts=new Map<string,number>();
 		for(const row of rows){const key=measurementKey(source,row,packet.model);if(key)counts.set(key,(counts.get(key)??0)+1);}
 		const accepted=new Map<string,Accepted>();
@@ -109,7 +128,7 @@ export class MacProvider implements SnapshotProvider {
 		}
 		for(const [key,item] of this.rows)if(item.source===source&&!accepted.has(key)){this.rows.delete(key);this.dirty=true;this.catalogDirty=true;}
 		for(const [key,item] of accepted)this.rows.set(key,item);
-		this.factsValue={model:packet.model||'unknown',chip:packet.chip||'unknown',appleSilicon:packet.appleSilicon<0?null:packet.appleSilicon===1,translation:packet.translated===0?'native':packet.translated===1?'translated':'unknown',translationError:packet.translationError,sourceErrors:this.factsValue.sourceErrors,sourceRows:{...this.factsValue.sourceRows,[source]:accepted.size}};
+		this.factsValue={model:packet.model||'unknown',chip:packet.chip||'unknown',appleSilicon:packet.appleSilicon<0?null:packet.appleSilicon===1,translation:translationOf(packet.translated,packet.translationError),translationError:packet.translationError,sourceErrors:this.factsValue.sourceErrors,sourceRows:{...this.factsValue.sourceRows,[source]:accepted.size}};
 		if(packet.translated===1)this.notice('Node is running under translation; sensor interfaces follow the detected hardware.');
 		if(source==='smc'&&(packet.model!=='Mac17,9'||packet.chip!=='t6050'))this.notice('This model uses common typed sensors; its generation-specific catalog is not qualified.');
 		this.rebuild();
@@ -125,7 +144,15 @@ export class MacProvider implements SnapshotProvider {
 			} else {this.completed.add(source);this.removeSource(source);this.notice(`${source} could not start; retrying.`);}
 		}
 	}
-	read():SensorSnapshot|null {if(this.closed)throw new MacSensorError('pending','Readings appear after the first successful sample.');this.request('public');this.request('smc');return this.current();}
+	read():SensorSnapshot|null {
+		if(this.closed)throw new MacSensorError('pending','Readings appear after the first successful sample.');
+		// Counters are only meaningful over a real window: two public reads a few ms apart give CPU usage and rates from almost no ticks or bytes.
+		// So a tick read due before the rebaseline replaces it, and a tick just after a rebaseline read that kept a baseline (a Read every change restarted the timer) keeps that sample.
+		if(this.rebaseline){clearTimeout(this.rebaseline);this.rebaseline=null;}
+		const sinceRebaseline=this.rebaselineStartedAt===null?Infinity:this.native.now()-this.rebaselineStartedAt;this.rebaselineStartedAt=null;
+		if(!(sinceRebaseline<COUNTER_REBASELINE_MS&&this.previousPublic!==null))this.request('public');
+		this.request('smc');return this.current();
+	}
 	private rebuild():void {
 		if(this.catalogDirty){this.catalogRevision++;this.catalogDirty=false;}
 		this.factsValue.sourceRows={public:0,smc:0};for(const item of this.rows.values())this.factsValue.sourceRows[item.source]++;
@@ -151,5 +178,5 @@ export class MacProvider implements SnapshotProvider {
 	}
 	untilExpiry():number|null {if(this.closed)return null;const now=this.native.now();if(!Number.isFinite(now))return 0;if(!this.rows.size)return !this.fontKnown&&this.completed.size<2&&now-this.startedAt<TTL?this.startedAt+TTL-now:null;return Math.max(0,Math.min(...[...this.rows.values()].map(item=>item.row.continuousMs+TTL-now)));}
 	age():number|null {if(this.closed||!this.rows.size)return null;const now=this.native.now();return Number.isFinite(now)?Math.max(...[...this.rows.values()].map(item=>now-item.row.continuousMs)):null;}
-	close():void {if(this.closed)return;this.closed=true;for(const retry of this.retries.values())clearTimeout(retry);this.retries.clear();this.rows.clear();this.snapshot=null;this.previousPublic=null;this.factsValue.sourceRows={public:0,smc:0};this.report(this.facts());this.session.close();}
+	close():void {if(this.closed)return;this.closed=true;for(const retry of this.retries.values())clearTimeout(retry);this.retries.clear();if(this.rebaseline)clearTimeout(this.rebaseline);this.rebaseline=null;this.rows.clear();this.snapshot=null;this.previousPublic=null;this.factsValue.sourceRows={public:0,smc:0};this.report(this.facts());this.session.close();}
 }

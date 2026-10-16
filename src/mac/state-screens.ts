@@ -9,7 +9,7 @@ const COPY: Record<string, { lines: [string,string]; hint: string; accent: strin
 	'access-denied': { lines: ['Access denied','copy report'], hint: 'macOS denied a read. Choose Copy support report under Advanced, Support.', accent:'#ff5d52', icon:'lock' },
 	'unsupported-platform': { lines: ['Needs macOS','check requirements'], hint: 'This build needs a supported Mac and app version. Open Installation and requirements in the docs.', accent:'#ff5d52', icon:'warning' },
 	'bridge-failed': { lines: ['Bridge failed','reinstall'], hint: 'The native reader could not load. Reinstall Mac Sensors, then choose Copy support report if it still fails.', accent:'#ff5d52', icon:'warning' },
-	'font-missing': { lines: ['Tahoma needed','Open Font Book'], hint: 'Install Tahoma Bold in Font Book, then choose Check again. Saved settings are kept.', accent:'#4cc2ff', icon:'warning' },
+	'font-missing': { lines: ['Tahoma needed','Open Font Book'], hint: 'Install Tahoma Bold in Font Book, then choose Check again.', accent:'#4cc2ff', icon:'warning' },
 	'source-error': { lines: ['Source error','copy report'], hint: 'The sensor source could not be read. Choose Copy support report under Advanced, Support.', accent:'#ff5d52', icon:'warning' },
 	stale: { lines: ['Not updating','check again'], hint: 'No recent measurement is available. Choose Check again.', accent:'#f5a623', icon:'clock' }
 };

@@ -6,7 +6,7 @@ nav_order: 10
 
 # Data sources
 
-Mac Sensors reads local macOS interfaces. Public system counters publish independently of optional SMC readings, so a slow or missing sensor group cannot make an old value look new.
+Mac Sensors reads local macOS interfaces. Each read publishes its new readings once, after its public system counters and optional SMC readings have both settled. Public counters wait at most 100 ms for SMC. If SMC takes longer, the public counters publish first and the SMC readings follow when they arrive, so a slow or missing sensor group cannot stall them or make an old value look new.
 
 | Reading family | What it means |
 | --- | --- |
@@ -17,7 +17,7 @@ Mac Sensors reads local macOS interfaces. Public system counters publish indepen
 | Storage | Aggregate byte-rate deltas from eligible block-storage drivers |
 | SMC | Bounded, typed read-only temperature, fan, power and related keys |
 
-On the measured Mac17,9 with an M5 Pro, the current catalog contains 38 SMC readings and 14 public/derived readings after baselines are established. Another Mac may expose a different set. The first sample, counter resets, interface membership changes and sleep gaps withhold rates until there is a new baseline.
+On the measured Mac17,9 with an M5 Pro, the current catalog contains 38 SMC readings and 14 public/derived readings after baselines are established. Another Mac may expose a different set. The first sample, counter resets, interface membership changes and sleep gaps withhold rates until there is a new baseline. When a key or dial appears with no other Mac Sensors action visible, a second read follows 250 ms after the first sample, unless the next scheduled read comes sooner, so CPU usage and rates appear without waiting a full **Read every** interval.
 
 Memory categories are the named kernel counters. Their sum is not presented as Activity Monitor's Memory Used. Aggregate storage and network rates are not per-application traffic.
 

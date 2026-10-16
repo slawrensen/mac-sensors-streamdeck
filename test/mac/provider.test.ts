@@ -69,3 +69,9 @@ test('counter deltas reset on member changes, resets, zero denominator and sleep
 test('initial work that never returns becomes busy without claiming a measurement',()=>{
 	const r=rig();assert.equal(r.provider.read(),null);assert.equal(r.provider.untilExpiry(),15000);r.clock.now=15100;assert.throws(()=>r.provider.current(),{reason:'busy'});assert.equal(r.provider.age(),null);assert.equal(r.provider.untilExpiry(),null);r.provider.close();
 });
+test('support facts call a Mac without sysctl.proc_translated (ENOENT, as on Intel) native, and other failures unknown',async()=>{
+	for(const [translated,translationError,expected] of [[0,0,'native'],[1,0,'translated'],[-1,2,'native'],[-1,1,'unknown'],[-1,5,'unknown']] as const) {
+		const r=rig();r.provider.read();const value=packet('public');value.translated=translated;value.translationError=translationError;await publish(r,'public',value);
+		assert.equal(r.provider.facts().translation,expected,`translated ${translated}, errno ${translationError}`);assert.equal(r.provider.facts().translationError,translationError);r.provider.close();
+	}
+});

@@ -2294,7 +2294,7 @@ try {
 	// ---- truth: data states --------------------------------------------------
 	await open("key-unavailable");
 	const down = await b.evaluate(`({ ph: document.getElementById("picker-search").placeholder, missing: document.getElementById("picker-search").classList.contains("missing"), tone: document.getElementById("reading-status").dataset.tone, state: document.getElementById("head-state").textContent })`);
-	check("truth: an unavailable source never reads as a missing reading", !/not found/i.test(down.ph) && !down.missing && down.tone === "danger" && down.state === "No Mac Sensors data", JSON.stringify(down));
+	check("truth: an unavailable source never reads as a missing reading", !/not found/i.test(down.ph) && !down.missing && down.tone === "danger" && down.state === "No sensor data", JSON.stringify(down));
 	await b.click('#reading-status [data-status-action="setup"]');
 	await sleep(150);
 	const setup = await b.evaluate(`({ open: document.getElementById("setup-help").open, focus: document.activeElement === document.querySelector("#setup-help > summary") })`);

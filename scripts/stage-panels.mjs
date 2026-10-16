@@ -1,4 +1,4 @@
-// S2/S5/S8: exact, counted transformations around the copied panel source.
+// S1/S2/S5/S8: exact, counted transformations around the copied panel source.
 import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
