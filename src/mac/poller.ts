@@ -77,6 +77,8 @@ export class MacPoller extends EventEmitter {
 	setIntervalMs(ms: number): void {
 		const next = parsePollInterval(ms); if (next === this.intervalMs) return;
 		this.intervalMs = next;
+		// The startup line can predate the stored setting, so the log records every effective change.
+		this.logger.info(`Read interval set to ${next} ms`);
 		for (const ring of this.series.values()) ring.length = 0;
 		this.observations.clear();
 		if (this.timer) { clearInterval(this.timer); this.timer = setInterval(() => this.tick(), next).unref(); }

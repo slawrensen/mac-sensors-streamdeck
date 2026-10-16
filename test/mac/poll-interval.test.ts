@@ -30,3 +30,11 @@ test('a stored interval outside the range runs, and reports, the clamped interva
 		assert.equal(subject.diagnostics().intervalMs, effective, String(stored));
 	}
 });
+
+test('the log records each effective Read every change once, and nothing for a repeat', () => {
+	const subject = new MacPoller(() => ({ read: () => null, current: () => null, untilExpiry: () => null, age: () => null, close: () => {} }));
+	const lines: string[] = [];
+	Object.defineProperty(subject, 'logger', { value: { info: (line: string) => lines.push(line), warn: (line: string) => lines.push(line) } });
+	subject.setIntervalMs(2000); subject.setIntervalMs(2000); subject.setIntervalMs(60000); subject.setIntervalMs(5000); subject.setIntervalMs(1000);
+	assert.deepEqual(lines, ['Read interval set to 2000 ms', 'Read interval set to 5000 ms', 'Read interval set to 1000 ms']);
+});
