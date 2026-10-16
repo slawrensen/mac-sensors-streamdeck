@@ -9,7 +9,7 @@ const COUNTER_REBASELINE_MS=250;
 /** sysctl.proc_translated is absent (ENOENT) on Intel Macs; Apple's Rosetta documentation treats that as a native process. */
 const TRANSLATION_ABSENT_ERRNO=constants.errno.ENOENT;
 /** Native when the sysctl says 0 or does not exist; translated only on 1; anything else, including other errors, stays unknown. */
-export function translationOf(translated:number,translationError:number):ProviderFacts['translation'] {return translated===0||(translated<0&&translationError===TRANSLATION_ABSENT_ERRNO)?'native':translated===1?'translated':'unknown';}
+function translationOf(translated:number,translationError:number):ProviderFacts['translation'] {return translated===0||(translated<0&&translationError===TRANSLATION_ABSENT_ERRNO)?'native':translated===1?'translated':'unknown';}
 const GROUPS:Record<string,number>={CPU:1,GPU:2,Memory:3,Storage:4,Network:5,Battery:6,Fans:7,System:8};
 const KIND:Record<string,{type:SensorType;meaning:string;minimum:number;maximum:number}>={
 	temperature:{type:SensorType.Temperature,meaning:'temp.v1',minimum:-50,maximum:150},

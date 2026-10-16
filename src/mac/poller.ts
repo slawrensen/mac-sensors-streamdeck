@@ -38,6 +38,7 @@ export class MacPoller extends EventEmitter {
 	private provider: MacSnapshotProvider | null = null;
 	private timer: NodeJS.Timeout | null = null;
 	private expiry: NodeJS.Timeout | null = null;
+	/** The open settle window of the current read; cleared when the last source settles or the last consumer leaves. */
 	private settle: NodeJS.Timeout | null = null;
 	private refs = 0;
 	private intervalMs = POLL_INTERVAL_DEFAULT_MS;
