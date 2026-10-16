@@ -74,8 +74,12 @@ export class MacProvider implements SnapshotProvider {
 	private readonly seenNotices=new Set<string>();
 	private noticesQueue:string[]=[];
 	private previousPublic:NativePacket|null=null;
+	/** The pending counter rebaseline read; a tick read that comes first replaces it. */
 	private rebaseline:NodeJS.Timeout|null=null;
+	/** Set once the rebaseline is armed, so a generation gets at most one extra read even after a public failure resets the baseline. */
 	private rebaselined=false;
+	/** When the rebaseline read started; the next tick skips its public read if it would follow within COUNTER_REBASELINE_MS of a successful one. */
+	private rebaselineStartedAt:number|null=null;
 	private fontKnown=false;
 	private fontAvailable=false;
 	private readonly completed=new Set<NativeSource>();
@@ -105,7 +109,7 @@ export class MacProvider implements SnapshotProvider {
 		const rows=[...packet.rows,...(source==='public'?counterRows(this.previousPublic,packet):[])];
 		if(source==='public'){
 			// Once per generation: the first accepted packet only sets the counter baseline, so read public again after the shortest interval.
-			if(this.previousPublic===null&&!this.rebaselined){this.rebaselined=true;this.rebaseline=setTimeout(()=>{this.rebaseline=null;this.request('public');},COUNTER_REBASELINE_MS).unref();}
+			if(this.previousPublic===null&&!this.rebaselined){this.rebaselined=true;this.rebaseline=setTimeout(()=>{this.rebaseline=null;this.request('public');if(this.pending.has('public'))this.rebaselineStartedAt=this.native.now();},COUNTER_REBASELINE_MS).unref();}
 			this.previousPublic=packet;
 		}
 		const counts=new Map<string,number>();
@@ -140,7 +144,15 @@ export class MacProvider implements SnapshotProvider {
 			} else {this.completed.add(source);this.removeSource(source);this.notice(`${source} could not start; retrying.`);}
 		}
 	}
-	read():SensorSnapshot|null {if(this.closed)throw new MacSensorError('pending','Readings appear after the first successful sample.');this.request('public');this.request('smc');return this.current();}
+	read():SensorSnapshot|null {
+		if(this.closed)throw new MacSensorError('pending','Readings appear after the first successful sample.');
+		// Counters are only meaningful over a real window: two public reads a few ms apart give CPU usage and rates from almost no ticks or bytes.
+		// So a tick read due before the rebaseline replaces it, and a tick just after a rebaseline read that kept a baseline (a Read every change restarted the timer) keeps that sample.
+		if(this.rebaseline){clearTimeout(this.rebaseline);this.rebaseline=null;}
+		const sinceRebaseline=this.rebaselineStartedAt===null?Infinity:this.native.now()-this.rebaselineStartedAt;this.rebaselineStartedAt=null;
+		if(!(sinceRebaseline<COUNTER_REBASELINE_MS&&this.previousPublic!==null))this.request('public');
+		this.request('smc');return this.current();
+	}
 	private rebuild():void {
 		if(this.catalogDirty){this.catalogRevision++;this.catalogDirty=false;}
 		this.factsValue.sourceRows={public:0,smc:0};for(const item of this.rows.values())this.factsValue.sourceRows[item.source]++;
