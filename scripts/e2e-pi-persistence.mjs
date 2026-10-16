@@ -2887,7 +2887,7 @@ try {
 	// (pi-shell.js renderStatus and dataState); the header paints on the
 	// next animation frame, which every sleep below outlasts.
 	const NOT_PRESENT = "Saved reading not found. Search to pick another";
-	const KEPT = "Saved reading kept (no Mac Sensors data to show it)";
+	const KEPT = "Saved reading kept (no sensor data to show it)";
 	const HEAD_MISSING = "Saved reading not found";
 	const pickerState = `JSON.stringify({
 		placeholder: document.getElementById("picker-search").placeholder,
@@ -2901,7 +2901,7 @@ try {
 	const downTruth = JSON.parse((await evaluate(pickerState)).result?.value ?? "{}");
 	check("down: the picker stays neutral while HWiNFO is not running", downTruth.placeholder === KEPT && downTruth.title === "" && downTruth.missing === false, JSON.stringify({ placeholder: downTruth.placeholder, title: downTruth.title, missing: downTruth.missing }));
 	check("down: no saved chip is accused of being gone", downTruth.chips?.length === 3 && downTruth.chips.every((m) => m === false), JSON.stringify(downTruth.chips));
-	check("down: the hint names the real problem instead", String(downTruth.status).includes("No readable sensor data") && downTruth.state === "No Mac Sensors data", JSON.stringify({ state: downTruth.state, status: downTruth.status }));
+	check("down: the hint names the real problem instead", String(downTruth.status).includes("No readable sensor data") && downTruth.state === "No sensor data", JSON.stringify({ state: downTruth.state, status: downTruth.status }));
 	// HWiNFO comes up; the live tree genuinely does not list ghost:0:0.
 	await fetch(`http://127.0.0.1:${HTTP_PORT}/tree/up`);
 	await evaluate(`document.getElementById("picker-refresh").click()`);
