@@ -2498,6 +2498,9 @@ try {
 	await sim.stop();
 }
 
+// scripts/lib/script-failures.mjs sets process.exitCode for an uncaught error
+// that no check saw; the explicit exit below must never turn that into a pass.
+if (process.exitCode) failures.push("run: an uncaught error was reported above");
 console.log(`\n${failures.length === 0 ? "ALL GREEN" : `${failures.length} FAILED`}`);
 for (const f of failures) console.log(`  - ${f}`);
-process.exit(failures.length === 0 ? 0 : 1);
+process.exit(failures.length === 0 && !process.exitCode ? 0 : 1);

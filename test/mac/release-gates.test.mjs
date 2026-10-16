@@ -31,3 +31,16 @@ test('asynchronous failures stay nonzero even when another exception listener ha
 	const result=spawnSync(process.execPath,['--input-type=module','-e',`import ${JSON.stringify(guard)}; process.on('uncaughtException',()=>{}); setImmediate(()=>{throw new Error('EXPECTED_SCRIPT_FAILURE')});`],{encoding:'utf8'});
 	assert.equal(result.status,1);assert.match(result.stderr,/EXPECTED_SCRIPT_FAILURE/);
 });
+test('panel suites keep the guard\'s nonzero exit when every check passed but an uncaught error happened',()=>{
+	// The suites end with an explicit process.exit; run their real closing statements after a handled asynchronous error.
+	const guard=path.join(root,'scripts/lib/script-failures.mjs');
+	// Long enough for the setImmediate throw to land first; the tail is synchronous.
+	const TAIL_DELAY_MS=20;
+	for(const suite of ['e2e-pi-panels.mjs','e2e-pi-persistence.mjs']){
+		const source=fs.readFileSync(path.join(root,'scripts',suite),'utf8'),tail=source.slice(source.lastIndexOf('\n}\n')+3);
+		assert.match(tail,/^process\.exit\(/m,suite);assert.doesNotMatch(tail,/\bawait\b/,suite);
+		const exitOf=failing=>spawnSync(process.execPath,['--input-type=module','-e',`import ${JSON.stringify(guard)}; process.on('uncaughtException',()=>{}); const failures=[]; const results={errors:[]}; ${failing?"setImmediate(()=>{throw new Error('EXPECTED_SUITE_FAILURE')});":''} setTimeout(()=>{${tail}},${TAIL_DELAY_MS});`],{encoding:'utf8'});
+		assert.equal(exitOf(false).status,0,suite);
+		const failed=exitOf(true);assert.equal(failed.status,1,suite);assert.match(failed.stderr,/EXPECTED_SUITE_FAILURE/);
+	}
+});

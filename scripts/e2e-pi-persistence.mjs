@@ -3013,5 +3013,8 @@ try {
 	wss.close();
 }
 
+// scripts/lib/script-failures.mjs sets process.exitCode for an uncaught error
+// that no check saw; the explicit exit below must never turn that into a pass.
+if (process.exitCode) results.errors.push("an uncaught error was reported above");
 console.log(results.errors.length === 0 ? "\nPI PERSISTENCE E2E: ALL CHECKS PASSED" : `\nPI PERSISTENCE E2E: ${results.errors.length} FAILURES`);
-process.exit(results.errors.length === 0 ? 0 : 1);
+process.exit(results.errors.length === 0 && !process.exitCode ? 0 : 1);
