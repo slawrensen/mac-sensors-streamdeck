@@ -23,9 +23,9 @@ const START_MS = 1_000_000;
 const INTERVAL_MS = 1000;
 /** host_processor_info counts CPU ticks at 100 Hz (kern.clockrate hz = 100), so a window of a few ms can hold no tick at all. */
 const CPU_TICK_MS = 10;
-/** Mirrors COUNTER_REBASELINE_MS in src/mac/provider.ts: the shortest counter window a public read may follow its predecessor by. */
+/** Mirrors COUNTER_REBASELINE_MS in src/mac/provider.ts: the rebaseline read's target start after the first request, and the read spacing these tests expect when reads are fast. */
 const COUNTER_REBASELINE_MS = 250;
-/** Mirrors MIN_COUNTER_WINDOW_MS in src/mac/provider.ts: a tick reads public unless a kept rebaseline sample started less than this long ago. */
+/** Mirrors MIN_COUNTER_WINDOW_MS in src/mac/provider.ts: the rebaseline read starts at least this long after the first read completed, and a tick reads public unless a kept rebaseline sample started less than this long ago. */
 const MIN_COUNTER_WINDOW_MS = 200;
 
 type Emit = { at: number; signature: string; smc: boolean; mem: boolean; cpu: boolean; status: PollerStatus };
@@ -205,14 +205,26 @@ test('at Read every 500 ms the regular tick after the rebaseline read still read
 });
 
 test('at Read every 500 ms a slow first read still leaves the next tick its public read', async () => {
-	// A cold first read of 60 ms (Intel public read time is unknown): the rebaseline still starts 250 ms after the first request.
+	// A cold first read of 60 ms (Intel public read time is unknown): the rebaseline waits the 200 ms counter window after it completes,
+	// at 260 ms, and the 500 ms tick 240 ms later keeps its read.
 	const HALF_SECOND_MS = 500;
 	const SLOW_COLD_READ_MS = 60;
 	const it = rig({ public: (n) => (n === 1 ? SLOW_COLD_READ_MS : 1), smc: 11 }, { cpu: true, intervalMs: HALF_SECOND_MS });
 	it.poller.retain();
 	await advance(4 * HALF_SECOND_MS + 20);
 	it.poller.release();
-	assert.deepEqual(it.reads.public, [0, 250, 500, 1000, 1500, 2000], 'the rebaseline counts from the first request and the 500 ms tick keeps its read');
+	assert.deepEqual(it.reads.public, [0, 260, 500, 1000, 1500, 2000], 'the rebaseline keeps a 200 ms counter window and the 500 ms tick keeps its read');
+});
+
+test('a first read slower than the rebaseline delay still leaves the rebaseline a full counter window', async () => {
+	// The native read samples its counters at the end, so the window runs from the first read's completion to the next read.
+	const VERY_SLOW_COLD_READ_MS = 300;
+	const it = rig({ public: (n) => (n === 1 ? VERY_SLOW_COLD_READ_MS : 1), smc: 11 }, { cpu: true });
+	it.poller.retain();
+	await advance(INTERVAL_MS + 20);
+	it.poller.release();
+	assert.ok(it.reads.public[1]! - VERY_SLOW_COLD_READ_MS >= MIN_COUNTER_WINDOW_MS, `public reads ${JSON.stringify(it.reads.public)}: the rebaseline starts ${it.reads.public[1]! - VERY_SLOW_COLD_READ_MS} ms after the first read completed`);
+	assert.deepEqual(it.reads.public, [0, 500, 1000], 'one rebaseline read 200 ms after the slow first read completed, then the regular tick');
 });
 
 test('a Read every change to 250 ms just after a key appears never leaves two public reads moments apart', async () => {

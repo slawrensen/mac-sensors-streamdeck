@@ -4,9 +4,9 @@ import type { NativeBridge, NativePacket, NativeRow, NativeSession, NativeSource
 import { constants } from 'node:os';
 import { MacSensorError } from './bridge';
 const TTL=15_000;
-/** Shortest offered Read every: the first counter window after a provider opens, counted from the first read's request, so CPU usage and rates appear this soon instead of one full interval later. */
+/** Shortest offered Read every, and the target start of the rebaseline read counted from the first read's request, so CPU usage and rates appear this soon instead of one full interval later. */
 const COUNTER_REBASELINE_MS=250;
-/** Shortest counter window a tick may start after the rebaseline read. The kernel counts CPU time in 10 ms ticks (kern.clockrate hz 100), so 200 ms holds about twenty. The rebaseline read starts 250 ms after the first read was requested, so at the 500 ms setting the regular tick follows it by 250 ms and keeps its read, however long the first read took. */
+/** Shortest counter window around the rebaseline read. The kernel counts CPU time in 10 ms ticks (kern.clockrate hz 100), so 200 ms holds about twenty. The native read samples its counters at the end, so the rebaseline read never starts sooner than this after the first read completed, and a tick that would follow a kept rebaseline sample by less than this reads only SMC. At the 500 ms setting the regular tick keeps its read when the first read finishes within 100 ms. */
 const MIN_COUNTER_WINDOW_MS=200;
 /** sysctl.proc_translated is absent (ENOENT) on Intel Macs; Apple's Rosetta documentation treats that as a native process. */
 const TRANSLATION_ABSENT_ERRNO=constants.errno.ENOENT;
@@ -113,7 +113,7 @@ export class MacProvider implements SnapshotProvider {
 		const rows=[...packet.rows,...(source==='public'?counterRows(this.previousPublic,packet):[])];
 		if(source==='public'){
 			// Once per generation: the first accepted packet only sets the counter baseline, so read public again after the shortest interval.
-			if(this.previousPublic===null&&!this.rebaselined){this.rebaselined=true;const elapsed=this.publicRequestedAt===null?0:Math.max(0,this.native.now()-this.publicRequestedAt);this.rebaseline=setTimeout(()=>{this.rebaseline=null;this.request('public');if(this.pending.has('public'))this.rebaselineStartedAt=this.native.now();},Math.max(0,COUNTER_REBASELINE_MS-elapsed)).unref();}
+			if(this.previousPublic===null&&!this.rebaselined){this.rebaselined=true;const sinceRequest=this.publicRequestedAt===null?0:this.native.now()-this.publicRequestedAt,elapsed=Number.isFinite(sinceRequest)?Math.max(0,sinceRequest):0;this.rebaseline=setTimeout(()=>{this.rebaseline=null;this.request('public');if(this.pending.has('public'))this.rebaselineStartedAt=this.native.now();},Math.max(MIN_COUNTER_WINDOW_MS,COUNTER_REBASELINE_MS-elapsed)).unref();}
 			this.previousPublic=packet;
 		}
 		const counts=new Map<string,number>();
