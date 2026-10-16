@@ -190,6 +190,7 @@ test('the newest completed run on the tree decides, so an older green run cannot
 	const blocked = decide({runs: [pushRun({conclusion: 'failure'}), prRun({conclusion: 'failure'})], jobs: {2: [{id: 7, name: 'verify (macos-26, arm64)', status: 'completed', conclusion: 'failure'}, {id: 8, name: 'verify (macos-26-intel, x64)', status: 'completed', conclusion: 'failure'}, {id: 9, name: 'abi', status: 'completed', conclusion: 'skipped'}]}});
 	assert.equal(blocked.state, 'fail');
 	assert.deepEqual(blocked.runs.map((row) => row.verdict), ['fail', 'unverified']);
+	assert.match(blocked.runs[1].reason, /verify job logs are not readable/);
 });
 
 test('only runs still in progress, or a rerun in progress, mean pending; no run at all fails', () => {

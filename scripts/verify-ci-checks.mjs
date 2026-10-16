@@ -98,7 +98,9 @@ function judgeRun({repo, sha, tree, run, api, apiText}) {
 	if (run.event === 'pull_request') {
 		const verify = VERIFY_JOBS.map((name) => jobs.find((job) => job.name === name));
 		if (verify.some((job) => !job)) return {...row, verdict: 'unverified', reason: `run ${run.id} lacks a verify job, so its tested commit is unknown`};
-		const found = verify.map((job) => mergeCommitsInLog(attempt(() => apiText(`repos/${repo}/actions/jobs/${job.id}/logs`))));
+		const texts = verify.map((job) => attempt(() => apiText(`repos/${repo}/actions/jobs/${job.id}/logs`)));
+		if (texts.some((text) => text === null)) return {...row, verdict: 'unverified', reason: `run ${run.id} verify job logs are not readable (expired, never written, or no actions: read permission)`};
+		const found = texts.map(mergeCommitsInLog);
 		const merges = new Set(found.flat());
 		if (found.some((list) => list.length !== 1) || merges.size !== 1) return {...row, verdict: 'unverified', reason: `run ${run.id} verify logs do not name exactly one merge commit`};
 		tested = [...merges][0];
