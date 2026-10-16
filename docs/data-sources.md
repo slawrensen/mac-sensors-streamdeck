@@ -17,7 +17,7 @@ Mac Sensors reads local macOS interfaces. Each read publishes once, when its pub
 | Storage | Aggregate byte-rate deltas from eligible block-storage drivers |
 | SMC | Bounded, typed read-only temperature, fan, power and related keys |
 
-On the measured Mac17,9 with an M5 Pro, the current catalog contains 38 SMC readings and 14 public/derived readings after baselines are established. Another Mac may expose a different set. The first sample, counter resets, interface membership changes and sleep gaps withhold rates until there is a new baseline.
+On the measured Mac17,9 with an M5 Pro, the current catalog contains 38 SMC readings and 14 public/derived readings after baselines are established. Another Mac may expose a different set. The first sample, counter resets, interface membership changes and sleep gaps withhold rates until there is a new baseline. When a key or dial appears with no other Mac Sensors action visible, a second read follows 250 ms after the first sample, so CPU usage and rates appear without waiting a full **Read every** interval.
 
 Memory categories are the named kernel counters. Their sum is not presented as Activity Monitor's Memory Used. Aggregate storage and network rates are not per-application traffic.
 

@@ -3,6 +3,8 @@ import type { SnapshotProvider } from '../hwinfo/provider';
 import type { NativeBridge, NativePacket, NativeRow, NativeSession, NativeSource } from './native-api';
 import { MacSensorError } from './bridge';
 const TTL=15_000;
+/** Shortest offered Read every: the first counter window after a provider opens, so CPU usage and rates appear this soon instead of one full interval later. */
+const COUNTER_REBASELINE_MS=250;
 const GROUPS:Record<string,number>={CPU:1,GPU:2,Memory:3,Storage:4,Network:5,Battery:6,Fans:7,System:8};
 const KIND:Record<string,{type:SensorType;meaning:string;minimum:number;maximum:number}>={
 	temperature:{type:SensorType.Temperature,meaning:'temp.v1',minimum:-50,maximum:150},
@@ -67,6 +69,8 @@ export class MacProvider implements SnapshotProvider {
 	private readonly seenNotices=new Set<string>();
 	private noticesQueue:string[]=[];
 	private previousPublic:NativePacket|null=null;
+	private rebaseline:NodeJS.Timeout|null=null;
+	private rebaselined=false;
 	private fontKnown=false;
 	private fontAvailable=false;
 	private readonly completed=new Set<NativeSource>();
@@ -94,7 +98,11 @@ export class MacProvider implements SnapshotProvider {
 		if(packet.source!==source||packet.error!==0||!Number.isFinite(now)||!Number.isFinite(packet.continuousMs)||packet.continuousMs>now||now-packet.continuousMs>=TTL||packet.rows.length>128){this.removeSource(source);if(source==='public')this.previousPublic=null;this.notice(`${source} readings unavailable; other sources continue.`);return;}
 		if(source==='public'){this.fontKnown=true;this.fontAvailable=packet.fontAvailable===true;}
 		const rows=[...packet.rows,...(source==='public'?counterRows(this.previousPublic,packet):[])];
-		if(source==='public')this.previousPublic=packet;
+		if(source==='public'){
+			// Once per generation: the first accepted packet only sets the counter baseline, so read public again after the shortest interval.
+			if(this.previousPublic===null&&!this.rebaselined){this.rebaselined=true;this.rebaseline=setTimeout(()=>{this.rebaseline=null;this.request('public');},COUNTER_REBASELINE_MS).unref();}
+			this.previousPublic=packet;
+		}
 		const counts=new Map<string,number>();
 		for(const row of rows){const key=measurementKey(source,row,packet.model);if(key)counts.set(key,(counts.get(key)??0)+1);}
 		const accepted=new Map<string,Accepted>();
@@ -153,5 +161,5 @@ export class MacProvider implements SnapshotProvider {
 	}
 	untilExpiry():number|null {if(this.closed)return null;const now=this.native.now();if(!Number.isFinite(now))return 0;if(!this.rows.size)return !this.fontKnown&&this.completed.size<2&&now-this.startedAt<TTL?this.startedAt+TTL-now:null;return Math.max(0,Math.min(...[...this.rows.values()].map(item=>item.row.continuousMs+TTL-now)));}
 	age():number|null {if(this.closed||!this.rows.size)return null;const now=this.native.now();return Number.isFinite(now)?Math.max(...[...this.rows.values()].map(item=>now-item.row.continuousMs)):null;}
-	close():void {if(this.closed)return;this.closed=true;for(const retry of this.retries.values())clearTimeout(retry);this.retries.clear();this.rows.clear();this.snapshot=null;this.previousPublic=null;this.factsValue.sourceRows={public:0,smc:0};this.report(this.facts());this.session.close();}
+	close():void {if(this.closed)return;this.closed=true;for(const retry of this.retries.values())clearTimeout(retry);this.retries.clear();if(this.rebaseline)clearTimeout(this.rebaseline);this.rebaseline=null;this.rows.clear();this.snapshot=null;this.previousPublic=null;this.factsValue.sourceRows={public:0,smc:0};this.report(this.facts());this.session.close();}
 }
