@@ -873,8 +873,13 @@ try {
 	await b.click("#sec-alerts > summary");
 	await waitForFoldTraffic(1);
 	check("folds: the first toggle reaches the plugin before the second click", sim.folds.get("key")["sec-alerts"] === false);
+	// Waiting for a count stops at the second message, so a late duplicate
+	// would go unseen; an absence window longer than the 120 ms pause the
+	// check used before keeps a late extra frame failing the exact count.
+	const FOLD_ABSENCE_WINDOW_MS = 150;
 	await b.click("#sec-alerts > summary");
 	await waitForFoldTraffic(2);
+	await sleep(FOLD_ABSENCE_WINDOW_MS);
 	const foldTraffic = sim.piMessages.filter((m) => m.payload?.event === "setPanelFolds");
 	const webStorage = await b.evaluate(`Object.keys(localStorage).concat(Object.keys(sessionStorage)).filter((k) => /fold/i.test(k))`);
 	check("folds: a toggle reaches the plugin's memory, not settings or web storage", foldTraffic.length === 2 && foldTraffic.at(-1).payload.folds["sec-alerts"] === true && same(sim.folds.get("key"), { "sec-alerts": true }) && sim.writes.length === 0 && webStorage.length === 0, JSON.stringify({ sent: foldTraffic.length, plugin: sim.folds.get("key"), webStorage }));
