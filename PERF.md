@@ -35,6 +35,28 @@ The repository mock host (`scripts/lib/mock-host.mjs`) ran the 1.0.1 candidate b
 
 This supports the panel help line that shorter intervals use more processor time. It is mock-host evidence with the real read-only native reader, not the Stream Deck app: the app's rasterization and device transfer cost is not included. Background development activity was present.
 
+### 2026-10-16 UTC: Actual app, 1.0.0 and 1.0.1 development clones
+
+Host: Mac17,9, M5 Pro, macOS 27.0.1, Stream Deck 7.5.0.22885, app Node 24.13.1. Both builds ran as the development identity with the 1.0.0 release native addons on the 32-key Mac Sensors Dev Bench (an 8 by 4 Virtual Stream Deck, 20 system and 12 SMC single-reading keys). The development process observer sampled every 5 seconds. "Quiet" arms ran without any trace switch; the interval was forced by a measurement-only switch that is not part of either release build. Other development test runs were active during parts of both sessions (load average about 2 to 5).
+
+| Read every | Plugin CPU, one core: 1.0.0 / 1.0.1 | Interrupt wakeups per second: 1.0.0 / 1.0.1 | Bytes sent to the app per second: 1.0.0 / 1.0.1 |
+| --- | --- | --- | --- |
+| 250 ms | 2.53% / 2.92% | 17.9 / 25.6 | 126,054 / 104,394 |
+| 500 ms | 1.52% / 1.56% | 9.6 / 13.3 | 65,951 / 55,434 |
+| 1 second | 0.72% / 0.82% | 5.1 / 6.9 | 37,458 / 30,650 |
+| 2 seconds | 0.44% / 0.44% | 2.9 / 3.9 | 18,488 / 15,271 |
+| 5 seconds | 0.20% / 0.21% | 1.2 / 1.6 | 7,041 / 5,888 |
+| 1 second, back to back | 0.97% / 0.85% | 5.0 / 7.1 | 30,360 / 31,369 |
+
+- The same 1.0.0 build measured 0.72% in the first session and 0.97% in the second, a 35% swing between sessions. CPU differences between the builds are within that drift and are not attributed to either build. Bytes sent follow how often the shown values changed in each session.
+- 1.0.1 adds about two interrupt wakeups per read at every interval. The cause is the 100 ms settle timer that lets system and SMC readings publish together: Node still wakes for the cleared timer. This was reproduced in Node alone, without Stream Deck or hardware.
+- With the traced variant at 1 second, 1.0.1 composed faces about half as often (19,360 against 38,976 attempts in 10 minutes), and in both builds no key received more than one frame per read or two identical frames in a row. The settle window never reached its 100 ms limit; it waited a median 11.8 ms and at most 48 ms.
+- After a key appeared, CPU usage showed a value after a median 253.6 ms with 1.0.1 (range 251.7 to 255.1 ms over 40 appearances) against about one second with 1.0.0.
+- Threads stayed at 12 and file descriptors at 49 in every arm, including ten show and hide cycles; no reads, ticks or frames occurred while the bench was hidden. RSS ranged from about 78 to 111 MiB. With 1.0.0 at 250 ms it rose from 90.7 to 111.1 MiB in five minutes and then held; 1.0.1 at 250 ms peaked at 109.3 MiB.
+- Production 1.0.0.0 itself, on the 32-key Mac Sensors Bench at its saved 1 second interval, used 0.82% of one core, 5.3 interrupt wakeups and 37,397 bytes per second over five minutes, with 12 threads and 49 file descriptors.
+
+Not measured in the app: keys that mix system and SMC readings (the profiles that hold them could not be created without the app's editor), dials, the detail view, key presses and settings edits. The mock host covers mixed keys: 2 frames per read before and 1 after at every interval.
+
 ### 2026-10-12: Installed Mac candidate, 24-hour observation
 
 Harness: `npm run soak -- --hours 24 --interval-ms 60000`, with the frozen development directory and a separate private evidence destination. CI package SHA-256: d8db87c270d5803a7fe0e769326acc5b2142d15bb4918cfe564757386c1f6c89 (316713 bytes). Development bundle SHA-256: 9a2f9133d43927ced59fff82d0b3ec7874502cd356d4afb598d3a83c5dd6ad43.
