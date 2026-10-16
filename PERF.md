@@ -16,6 +16,7 @@ The release toolchain is Xcode 26.6 with SDK 26.5 and pinned Node 24.13.1headers
 | First, 1,000 reads at 250 ms | p99 total 12.88 ms |
 | Second, 1,000 reads at 1 s | p99 total 12.52 ms |
 | Second, 1,000 reads at 250 ms | p99 total 12.67 ms |
+| SMC read time at 1 s | First window: p50 11.52 ms, slowest 66.39 ms. Second window: p50 11.10 ms, slowest 12.46 ms |
 | Source observations | Every sample had at least 9 direct system and 38 SMC rows; zero source errors |
 | Maximum RSS | About 63.3 MB in each full window |
 | Event-loop p99 | About 2.2 ms |

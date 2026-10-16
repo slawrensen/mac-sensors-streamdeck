@@ -27,8 +27,8 @@ const pending = (): PollerStatus => ({ state: 'unavailable', reason: 'pending', 
 /**
  * Longest a settled source's readings wait for the other source of the same read, so a
  * context that shows both gets one publication per read. Below the 250 ms minimum interval.
- * Evidence (PERF.md, 2026-10-12 CI native benchmark on the M5 Pro): SMC read p50 11.10 ms
- * (second window at 1 s), slowest of 1,000 reads 66.39 ms (first window at 1 s). Intel SMC
+ * Evidence (PERF.md, 2026-10-12 CI native benchmark on the M5 Pro, SMC read time at 1 s): p50
+ * 11.10 ms in the second window, slowest of 1,000 reads 66.39 ms in the first. Intel SMC
  * duration is unknown; a read slower than this window publishes twice (bounded), and public
  * readings are never held longer than this window.
  */
