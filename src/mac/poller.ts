@@ -44,7 +44,9 @@ const FAST_SETTLE_MS = 50;
  * timer's deadline even when the timer was cleared first: about two interrupt wakeups per read, measured
  * in the app and in Node alone (2026-10-16). Such a read holds the settled source until the other
  * settles or the next read starts, at most one Read every, and only once: a read that is not fast
- * brings the timer back. Trust starts over each time keys appear.
+ * brings the timer back. Trust starts over each time keys appear. A read whose status is not ok when its
+ * first source settles is always timed, so a status screen (for example every reading expired across a
+ * sleep longer than the TTL) never waits on a slow source.
  */
 const TRUSTED_READS = 8;
 export class MacPoller extends EventEmitter {
@@ -154,13 +156,13 @@ export class MacPoller extends EventEmitter {
 		this.armExpiry();
 		if (emit && this.refs) this.emit('tick', this.status);
 	}
-	/** One publication per read: a source that settles while another is still out waits for it, timed by SETTLE_WINDOW_MS until reads prove fast. */
+	/** One publication per read: a source that settles while another is still out waits for it, timed by SETTLE_WINDOW_MS until reads prove fast and whenever the status is not ok. */
 	private settled(): void {
 		if (!this.provider) return;
 		const now = this.provider.now?.() ?? NaN;
 		if ((this.provider.inFlight?.() ?? 0) > 0) {
 			this.waitingSince ??= now;
-			if (this.fastReads < TRUSTED_READS) this.settle ??= setTimeout(() => { this.settle = null; this.fastReads = 0; this.refresh(true); }, SETTLE_WINDOW_MS).unref();
+			if (this.fastReads < TRUSTED_READS || this.status.state !== 'ok') this.settle ??= setTimeout(() => { this.settle = null; this.fastReads = 0; this.refresh(true); }, SETTLE_WINDOW_MS).unref();
 			return;
 		}
 		if (this.waitingSince !== null) { this.fastReads = this.waited(now) <= FAST_SETTLE_MS ? Math.min(TRUSTED_READS, this.fastReads + 1) : 0; this.waitingSince = null; }

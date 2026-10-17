@@ -37,19 +37,21 @@ interface Rig { poller: MacPoller; emits: Emit[]; reads: Record<NativeSource, nu
 /** Read duration in ms: fixed, or by the 1-based count of that source's reads (the first read of a session is the slow cold one). */
 type Delay = number | ((n: number) => number);
 /** Real MacPoller and MacProvider over a fake bridge whose reads settle after a delay per source. */
-function rig(delay: Record<NativeSource, Delay>, options: { smcError?: boolean; publicError?: (n: number) => boolean; cpu?: boolean; intervalMs?: number; clock?: false } = {}): Rig {
+function rig(delay: Record<NativeSource, Delay>, options: { smcError?: boolean; publicError?: (n: number) => boolean; cpu?: boolean; intervalMs?: number; clock?: false; asleepMs?: () => number } = {}): Rig {
 	const reads: Record<NativeSource, number[]> = { public: [], smc: [] };
+	// asleepMs: time the Mac spent asleep so far. The native continuous clock counts it; the awake clock and Node timers do not.
+	const continuous = (): number => Date.now() + (options.asleepMs?.() ?? 0);
 	const row = (key: string, kind: string, unit: string, value: number, at: number): NativeRow => ({ key, label: key, group: kind === 'temperature' ? 'Battery' : 'Memory', kind, unit, value, valid: true, continuousMs: at, wallSeconds: 1.7e9 + at / 1000, error: 0, systemCode: 0 });
 	const packet = (source: NativeSource, n: number, at: number): NativePacket => ({
-		source, continuousMs: at, awakeMs: at, wallSeconds: 1.7e9 + at / 1000, durationMs: 1, error: (source === 'smc' && options.smcError) || (source === 'public' && options.publicError?.(n)) ? 12 : 0, systemCode: 0, operation: 'fixture',
+		source, continuousMs: at, awakeMs: at - (options.asleepMs?.() ?? 0), wallSeconds: 1.7e9 + at / 1000, durationMs: 1, error: (source === 'smc' && options.smcError) || (source === 'public' && options.publicError?.(n)) ? 12 : 0, systemCode: 0, operation: 'fixture',
 		rows: source === 'public' ? [row('memory-free', 'other', 'B', 1e9 + n * 4096, at)] : options.smcError ? [] : [row('TB1T', 'temperature', '°C', 40 + (n % 9), at)],
 		model: 'Mac17,9', chip: 't6050', appleSilicon: 1, translated: 0, translationError: 0, fontAvailable: true, cpuValid: options.cpu === true, cpuTicks: [[Math.floor(at / CPU_TICK_MS) * 3, 0, Math.floor(at / CPU_TICK_MS) * 7, 0]],
 		networkValid: false, networkIn: '0', networkOut: '0', networkMembers: '1', storageValid: false, storageRead: '0', storageWrite: '0', storageMembers: '1'
 	});
 	const bridge: NativeBridge = {
 		getBuildInfo: () => ({ protocol: 1, napi: 8, version: 'test', sourceId: 'test', arch: process.arch, platform: 'darwin', testHooks: true }),
-		now: () => Date.now(),
-		open: () => ({ read: (source) => { const at = Date.now(); const n = reads[source].push(at - START_MS); return new Promise((resolve) => { const ms = delay[source]; setTimeout(() => resolve(packet(source, n, at)), typeof ms === 'number' ? ms : ms(n)); }); }, close: () => {} })
+		now: continuous,
+		open: () => ({ read: (source) => { const at = continuous(); const n = reads[source].push(Date.now() - START_MS); return new Promise((resolve) => { const ms = delay[source]; setTimeout(() => resolve(packet(source, n, at)), typeof ms === 'number' ? ms : ms(n)); }); }, close: () => {} })
 	};
 	const poller = new MacPoller((ready) => {
 		const provider = new MacProvider(bridge, ready);
@@ -365,4 +367,32 @@ test('a tick just after a failed rebaseline read still reads public', async () =
 	await advance(4 * COUNTER_REBASELINE_MS + 15);
 	poller.release();
 	assert.deepEqual(reads.public, [0, 250, 270, 520, 770, 1020], 'with no baseline kept there is no sample to stand in for the tick at 270 ms');
+});
+
+test('a read that starts from a status screen is always timed, so a slow SMC read after a sleep past the TTL holds system readings at most the settle window', async () => {
+	// Review T8: a trusted run, then a sleep longer than the 15 s TTL expires every reading, and the first SMC read after the wake is slow.
+	const SLEEP_MS = 60_000;
+	const SLOW_AFTER_WAKE_MS = 1500;
+	const PUBLIC_MS = 5;
+	const FAST_READS = 12;
+	for (const intervalMs of [INTERVAL_MS, 5000]) {
+		let asleep = 0;
+		const timers = settleTimers();
+		try {
+			const { poller, emits } = rig({ public: PUBLIC_MS, smc: () => (asleep ? SLOW_AFTER_WAKE_MS : 40) }, { intervalMs, asleepMs: () => asleep });
+			const start = Date.now() - START_MS;
+			poller.retain();
+			await advance(FAST_READS * intervalMs + intervalMs / 2);
+			assert.deepEqual(timers.at.filter((at) => at >= start + TRUSTED_READS * intervalMs), [], `${intervalMs} ms: the reads before the sleep were trusted (untimed)`);
+			asleep = SLEEP_MS;
+			const woke = Date.now() - START_MS;
+			await advance(2 * intervalMs + SLOW_AFTER_WAKE_MS);
+			poller.release();
+			const after = emits.filter((emit) => emit.at >= woke);
+			const screen = after.find((emit) => emit.status.state !== 'ok'), back = after.find((emit) => emit.status.state === 'ok');
+			assert.ok(screen && back, `${intervalMs} ms: ${JSON.stringify(after.map((emit) => [emit.at, emit.status.state]))}`);
+			assert.ok(back.at - screen.at <= PUBLIC_MS + SETTLE_WINDOW_MS, `${intervalMs} ms: the status screen stayed ${back.at - screen.at} ms while system readings were ready`);
+			assert.equal(back.mem, true, `${intervalMs} ms: system readings come back first`);
+		} finally { timers.restore(); }
+	}
 });
