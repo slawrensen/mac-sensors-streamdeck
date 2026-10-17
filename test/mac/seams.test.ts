@@ -22,6 +22,16 @@ test('Mac test aliases select the same declared platform modules as the bundle',
 	process.env.MACSENSORS_LOG_LEVEL='debug';assert.equal(environment('LOG_LEVEL'),'debug');delete process.env.MACSENSORS_LOG_LEVEL;delete process.env.HWINFO_LOG_LEVEL;
 	assert.equal(parseSourceMode('gadget'),'auto');setFaceFont('segoe-ui');assert.equal(faceFont().id,'tahoma');
 });
+test('ws server-only modules are side-effect free to tree shaking, so server code the SDK client never runs stays out of the bundle',async()=>{
+	// A computed specifier, because the rollup config is plain JS without type declarations.
+	const configUrl=new URL('../../rollup.config.mjs',import.meta.url).href;
+	const {default:config}=await import(configUrl) as {default:{treeshake:{moduleSideEffects:(id:string)=>boolean}}};
+	const sideEffects=config.treeshake.moduleSideEffects,ws=(file:string):string=>`/repo/node_modules/ws/lib/${file}.js`;
+	for(const file of ['websocket-server','stream','subprotocol'])assert.equal(sideEffects(ws(file)),false,file);
+	for(const file of ['websocket','receiver','sender','permessage-deflate','extension','validation','constants'])assert.equal(sideEffects(ws(file)),true,file);
+	assert.equal(sideEffects('/repo/node_modules/@elgato/utils/dist/lists/index.js'),false);
+	assert.equal(sideEffects('/repo/src/plugin.ts'),true);
+});
 test('canonical Mac keys survive both copied key parsers unchanged',()=>{
 	const text=readFileSync('com.lawrensen.mac.sdPlugin/ui/pi-common.js','utf8');
 	const body=text.match(/function bareKey\(value\) \{([\s\S]*?)\n\t\}/)?.[1];assert.ok(body);
