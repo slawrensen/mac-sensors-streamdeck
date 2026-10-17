@@ -69,3 +69,19 @@ test('panel suites keep the guard\'s nonzero exit when every check passed but an
 		const failed=exitOf(true);assert.equal(failed.status,1,suite);assert.match(failed.stderr,/EXPECTED_SUITE_FAILURE/);
 	}
 });
+test('native drift fails moved addon bytes without a native source change, even when the toolchain changed',t=>{
+	const dir=fs.mkdtempSync(path.join(os.tmpdir(),'mac-native-drift-test-'));t.after(()=>fs.rmSync(dir,{recursive:true,force:true}));
+	// Shaped like the published v1.0.0 native-manifest.json fields native-drift.mjs reads.
+	const previous={sourceId:'a'.repeat(64),compiler:'Apple clang version 21.0.0 (clang-2100.1.1.101)',sdk:'26.5',entries:[{architecture:'arm64',sha256:'1'.repeat(64)},{architecture:'x86_64',sha256:'2'.repeat(64)}]};
+	const write=(name,manifest)=>{const file=path.join(dir,name);fs.writeFileSync(file,JSON.stringify(manifest));return file;};
+	const before=write('previous.json',previous),drift=manifest=>run('native-drift.mjs',[write('current.json',manifest),before]);
+	const moved={...previous,entries:[{architecture:'arm64',sha256:'3'.repeat(64)},previous.entries[1]]};
+	const same=drift(previous);assert.equal(same.status,0,same.stderr);assert.deepEqual(JSON.parse(same.stdout).moved,[]);
+	assert.equal(drift({...moved,sourceId:'b'.repeat(64)}).status,0,'a native source change explains new bytes');
+	for(const toolchain of [{compiler:'Apple clang version 21.0.0 (clang-2100.9.9.9)'},{sdk:'26.6'}]){
+		const result=drift({...moved,...toolchain});
+		assert.notEqual(result.status,0,`a toolchain change alone must not pass moved bytes: ${JSON.stringify(toolchain)}`);assert.match(result.stderr,/Unexplained native byte drift for arm64.*toolchainChanged true/);
+	}
+	const bare=drift(moved);assert.notEqual(bare.status,0);assert.match(bare.stderr,/Unexplained native byte drift for arm64.*toolchainChanged false/);
+	const first=run('native-drift.mjs',[before]);assert.equal(first.status,0);assert.match(first.stdout,/establishes the baseline/);
+});
