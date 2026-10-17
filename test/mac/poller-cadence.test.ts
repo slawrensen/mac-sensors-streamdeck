@@ -37,10 +37,11 @@ interface Rig { poller: MacPoller; emits: Emit[]; reads: Record<NativeSource, nu
 /** Read duration in ms: fixed, or by the 1-based count of that source's reads (the first read of a session is the slow cold one). */
 type Delay = number | ((n: number) => number);
 /** Real MacPoller and MacProvider over a fake bridge whose reads settle after a delay per source. */
-function rig(delay: Record<NativeSource, Delay>, options: { smcError?: boolean; publicError?: (n: number) => boolean; cpu?: boolean; intervalMs?: number; clock?: false; asleepMs?: () => number } = {}): Rig {
+function rig(delay: Record<NativeSource, Delay>, options: { smcError?: boolean; publicError?: (n: number) => boolean; cpu?: boolean; intervalMs?: number; clock?: false; asleepMs?: () => number; clockFails?: () => boolean } = {}): Rig {
 	const reads: Record<NativeSource, number[]> = { public: [], smc: [] };
 	// asleepMs: time the Mac spent asleep so far. The native continuous clock counts it; the awake clock and Node timers do not.
-	const continuous = (): number => Date.now() + (options.asleepMs?.() ?? 0);
+	// clockFails: the native clock reads NaN, as when mach_timebase_info fails.
+	const continuous = (): number => (options.clockFails?.() ? NaN : Date.now() + (options.asleepMs?.() ?? 0));
 	const row = (key: string, kind: string, unit: string, value: number, at: number): NativeRow => ({ key, label: key, group: kind === 'temperature' ? 'Battery' : 'Memory', kind, unit, value, valid: true, continuousMs: at, wallSeconds: 1.7e9 + at / 1000, error: 0, systemCode: 0 });
 	const packet = (source: NativeSource, n: number, at: number): NativePacket => ({
 		source, continuousMs: at, awakeMs: at - (options.asleepMs?.() ?? 0), wallSeconds: 1.7e9 + at / 1000, durationMs: 1, error: (source === 'smc' && options.smcError) || (source === 'public' && options.publicError?.(n)) ? 12 : 0, systemCode: 0, operation: 'fixture',
@@ -435,4 +436,27 @@ test('a Read every change starts trust over', async () => {
 		// The restarted timer's first read starts one new interval after the change.
 		assert.deepEqual(timers.at.filter((at) => at >= changedAt).map((at) => Math.floor((at - changedAt) / NEW_INTERVAL_MS)), range(1, TRUSTED_READS + 1), 'the reads after the change are timed until they prove fast again');
 	} finally { timers.restore(); }
+});
+
+test('a clock that reads NaN publishes about once per read, not on a 1 ms expiry loop, and readings return when it recovers', async () => {
+	// Review T7a: the native clock reads NaN for three reads. untilExpiry used to answer 0, and the poller re-armed a 1 ms expiry timer forever.
+	const FAILS_FROM_MS = 10_500, FAILS_FOR_MS = 3000;
+	let fails = false;
+	const { poller, emits, reads } = rig({ public: 5, smc: 40 }, { clockFails: () => fails });
+	poller.retain();
+	await advance(FAILS_FROM_MS);
+	fails = true;
+	await advance(FAILS_FOR_MS);
+	fails = false;
+	await advance(2 * INTERVAL_MS);
+	poller.release();
+	const during = emits.filter((emit) => emit.at >= FAILS_FROM_MS && emit.at < FAILS_FROM_MS + FAILS_FOR_MS);
+	const readsDuring = reads.smc.filter((at) => at >= FAILS_FROM_MS && at < FAILS_FROM_MS + FAILS_FOR_MS).length;
+	assert.equal(readsDuring, FAILS_FOR_MS / INTERVAL_MS);
+	// Each read publishes at its tick and once more when its sources settle.
+	assert.ok(during.length <= 2 * readsDuring, `${during.length} publications during ${readsDuring} reads`);
+	assert.deepEqual([...new Set(during.map((emit) => emit.status.state === 'unavailable' ? emit.status.reason : emit.status.state))], ['source-error']);
+	const recovered = emits.find((emit) => emit.at >= FAILS_FROM_MS + FAILS_FOR_MS && emit.mem && emit.smc);
+	assert.ok(recovered && recovered.at <= FAILS_FROM_MS + FAILS_FOR_MS + INTERVAL_MS, `readings back at ${recovered?.at} ms`);
+	assert.equal(emits.at(-1)?.status.state, 'ok');
 });

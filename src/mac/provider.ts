@@ -182,7 +182,8 @@ export class MacProvider implements SnapshotProvider {
 		if(this.rows.size===0&&this.completed.size===2)throw new MacSensorError('no-readable-sensors','No recent readable sensors were found. Choose Copy support report.');
 		return this.rows.size?this.snapshot:null;
 	}
-	untilExpiry():number|null {if(this.closed)return null;const now=this.native.now();if(!Number.isFinite(now))return 0;if(!this.rows.size)return !this.fontKnown&&this.completed.size<2&&now-this.startedAt<TTL?this.startedAt+TTL-now:null;return Math.max(0,Math.min(...[...this.rows.values()].map(item=>item.row.continuousMs+TTL-now)));}
+	/** Ms until the next row expires. No deadline while the clock is not finite: current() has already cleared the rows, and the interval tick rechecks, so a NaN clock cannot drive a 1 ms expiry loop. */
+	untilExpiry():number|null {if(this.closed)return null;const now=this.native.now();if(!Number.isFinite(now))return null;if(!this.rows.size)return !this.fontKnown&&this.completed.size<2&&now-this.startedAt<TTL?this.startedAt+TTL-now:null;return Math.max(0,Math.min(...[...this.rows.values()].map(item=>item.row.continuousMs+TTL-now)));}
 	age():number|null {if(this.closed||!this.rows.size)return null;const now=this.native.now();return Number.isFinite(now)?Math.max(...[...this.rows.values()].map(item=>now-item.row.continuousMs)):null;}
 	close():void {if(this.closed)return;this.closed=true;for(const retry of this.retries.values())clearTimeout(retry);this.retries.clear();if(this.rebaseline)clearTimeout(this.rebaseline);this.rebaseline=null;this.rows.clear();this.snapshot=null;this.previousPublic=null;this.factsValue.sourceRows={public:0,smc:0};this.report(this.facts());this.session.close();}
 }
