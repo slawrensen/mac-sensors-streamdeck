@@ -75,6 +75,15 @@ test('explicit rechecks read only while an action is visible',()=>{
 	let reads=0;const subject=new MacPoller(()=>({read:()=>{reads++;return snapshot();},current:()=>snapshot(),untilExpiry:()=>null,age:()=>0,close:()=>{}}));
 	subject.checkAgain();assert.equal(reads,0);subject.retain();assert.equal(reads,1);subject.checkAgain();assert.equal(reads,2);subject.release();subject.checkAgain();assert.equal(reads,2);
 });
+test('a read checks the snapshot and arms expiry once, and a read that throws still ends in its failure',()=>{
+	const calls={current:0,untilExpiry:0};
+	const subject=new MacPoller(()=>({read:()=>snapshot(),current:()=>{calls.current++;return snapshot();},untilExpiry:()=>{calls.untilExpiry++;return null;},age:()=>0,close:()=>{}}));
+	subject.retain();assert.deepEqual(calls,{current:1,untilExpiry:1});subject.checkAgain();assert.deepEqual(calls,{current:2,untilExpiry:2});subject.release();
+	const reasons=(poller:MacPoller):string[]=>{const seen:string[]=[];poller.onTick(status=>seen.push(status.state==='unavailable'?status.reason:status.state));poller.retain();poller.release();return seen;};
+	const denied=new HwinfoError('access-denied','Denied');
+	assert.deepEqual(reasons(new MacPoller(()=>({read:()=>{throw denied;},current:()=>{throw denied;},untilExpiry:()=>null,age:()=>null,close:()=>{}}))),['access-denied']);
+	assert.deepEqual(reasons(new MacPoller(()=>{throw new HwinfoError('bridge-failed','No bridge');})),['bridge-failed']);
+});
 test('readings that lapse before SMC ever completes are not kept live, whether public then fails, stalls or both sources had completed',async()=>{
 	const memory='mac:v1:system:memory-total';
 	const row=(source:NativeSource,at:number):NativeRow=>({key:source==='smc'?'TB1T':'memory-total',label:source,group:source==='smc'?'Battery':'Memory',kind:source==='smc'?'temperature':'other',unit:source==='smc'?'°C':'B',value:source==='smc'?30:1024,valid:true,continuousMs:at,wallSeconds:1.7e9+at/1000,error:0,systemCode:0});

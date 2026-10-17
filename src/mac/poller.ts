@@ -184,9 +184,10 @@ export class MacPoller extends EventEmitter {
 		if (this.waitingSince !== null && !(this.waited(this.provider?.now?.() ?? NaN) <= FAST_SETTLE_MS)) this.fastReads = 0;
 		try {
 			if (!this.provider) this.provider = this.factory(() => this.settled());
-			const snapshot = this.provider.read(); if (snapshot) this.accept(snapshot);
+			this.provider.read();
 		} catch (error) { this.failure(error); }
-		this.refresh(false); this.armExpiry(); this.emit('tick', this.status);
+		// refresh accepts current() and arms expiry once; a read() that threw fails again there, or stays failed without a provider.
+		this.refresh(false); this.emit('tick', this.status);
 	}
 }
 export const poller = new MacPoller();
