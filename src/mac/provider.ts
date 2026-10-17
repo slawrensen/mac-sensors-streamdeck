@@ -29,9 +29,12 @@ export function encodeModel(model:string): string | null {
 	if(!model||model.length>128||[...model].some(character=>character.charCodeAt(0)<32||character.charCodeAt(0)===127)||Buffer.from(model,'utf8').toString('utf8')!==model)return null;
 	return [...Buffer.from(model,'utf8')].map(byte=>/[A-Za-z0-9._~-]/.test(String.fromCharCode(byte))?String.fromCharCode(byte):'%'+byte.toString(16).toUpperCase().padStart(2,'0')).join('');
 }
+/** encodeModel's answer for the last model seen: every SMC row of a packet, and every packet on one Mac, carries the same model, and encoding it per row was about half of the provider's per-read CPU and allocation (2026-10-17 review bench). */
+let lastModel:{model:string;encoded:string|null}|null=null;
 export function measurementKey(source:NativeSource,row:NativeRow,model:string):string|null {
 	if(source==='public')return SYSTEM_KEYS.has(row.key)?`mac:v1:system:${row.key}`:null;
-	const encoded=encodeModel(model),kind=KIND[row.kind];
+	if(lastModel?.model!==model)lastModel={model,encoded:encodeModel(model)};
+	const encoded=lastModel.encoded,kind=KIND[row.kind];
 	if(encoded===null||!/^[\x20-\x7e]{4}$/.test(row.key)||!kind)return null;
 	return `mac:v1:smc:${encoded}:${Buffer.from(row.key,'ascii').toString('hex')}:${kind.meaning}`;
 }
@@ -118,11 +121,13 @@ export class MacProvider implements SnapshotProvider {
 			if(this.previousPublic===null&&!this.rebaselined){this.rebaselined=true;const sinceRequest=this.publicRequestedAt===null?0:this.native.now()-this.publicRequestedAt,elapsed=Number.isFinite(sinceRequest)?Math.max(0,sinceRequest):0;this.rebaseline=setTimeout(()=>{this.rebaseline=null;this.request('public');if(this.pending.has('public'))this.rebaselineStartedAt=this.native.now();},Math.max(MIN_COUNTER_WINDOW_MS,COUNTER_REBASELINE_MS-elapsed)).unref();}
 			this.previousPublic=packet;
 		}
+		// One key per row, shared by the duplicate count and the acceptance pass.
+		const keys=rows.map(row=>measurementKey(source,row,packet.model));
 		const counts=new Map<string,number>();
-		for(const row of rows){const key=measurementKey(source,row,packet.model);if(key)counts.set(key,(counts.get(key)??0)+1);}
+		for(const key of keys)if(key)counts.set(key,(counts.get(key)??0)+1);
 		const accepted=new Map<string,Accepted>();
-		for(const row of rows) {
-			const key=measurementKey(source,row,packet.model),kind=KIND[row.kind];
+		for(let index=0;index<rows.length;index++) {
+			const row=rows[index]!,key=keys[index],kind=KIND[row.kind];
 			if(!key||counts.get(key)!==1||!kind||!row.valid||!Number.isFinite(row.value)||row.value<kind.minimum||row.value>kind.maximum||!Number.isFinite(row.continuousMs)||row.continuousMs<0||row.continuousMs>now||now-row.continuousMs>=TTL||!Number.isFinite(row.wallSeconds))continue;
 			const reading:Reading={key,type:kind.type,sensorIndex:0,id:0,label:row.label,unit:row.unit,value:row.value,valueMin:NaN,valueMax:NaN,valueAvg:NaN,statistics:'unavailable',observationTime:row.continuousMs,observationRevision:++this.observation};
 			const previous=this.rows.get(key);

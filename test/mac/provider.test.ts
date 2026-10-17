@@ -55,6 +55,10 @@ test('measurement identity is canonical, case preserving and independent of buil
 	assert.equal(encodeModel('Mac17,9'),'Mac17%2C9');assert.equal(encodeModel('A!B é'),'A%21B%20%C3%A9');assert.equal(encodeModel(''),null);assert.equal(encodeModel('\ud800'),null);
 	const row=packet('smc').rows[0]!;const key=measurementKey('smc',row,'Mac17,9');assert.equal(measurementKey('smc',{...row,label:'Renamed'},'Mac17,9'),key);assert.notEqual(measurementKey('smc',{...row,key:'Tb1T'},'Mac17,9'),key);assert.equal(measurementKey('public',{...row,key:'unknown'},'Mac17,9'),null);
 });
+test('measurement keys follow the model of each call, so the kept model encoding never goes stale',()=>{
+	const row=packet('smc').rows[0]!;
+	for(const [model,expected] of [['Mac17,9','mac:v1:smc:Mac17%2C9:54423154:temp.v1'],['A!B é','mac:v1:smc:A%21B%20%C3%A9:54423154:temp.v1'],['',null],['Mac17,9','mac:v1:smc:Mac17%2C9:54423154:temp.v1'],['\ud800',null],['Mac16,1','mac:v1:smc:Mac16%2C1:54423154:temp.v1']] as const)assert.equal(measurementKey('smc',row,model),expected,JSON.stringify(model));
+});
 test('counter deltas reset on member changes, resets, zero denominator and sleep',()=>{
 	const before=packet('public',100),after=packet('public',1100);for(const p of [before,after])p.cpuValid=p.networkValid=p.storageValid=true;after.cpuTicks=[[20,20,40,0]];after.networkIn='2000';after.networkOut='1000';after.storageRead='4000';after.storageWrite='2000';
 	const rows=counterRows(before,after);assert.equal(rows.length,5);assert.equal(rows.find(row=>row.key==='cpu-total')?.value,50);assert.equal(rows.find(row=>row.key==='network-receive')?.value,1000);
