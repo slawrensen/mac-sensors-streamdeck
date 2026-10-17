@@ -88,7 +88,7 @@
       },
       {
         "before": "\t\treturn missing === 1 ? \"the missing one is skipped until HWiNFO lists it again\" : `the ${missing} missing ones are skipped until HWiNFO lists them again`;",
-        "after": "\t\treturn missing === 1 ? \"the missing one is skipped until Mac Sensors lists it again\" : `the ${missing} missing ones are skipped until Mac Sensors lists them again`;",
+        "after": "\t\treturn missing === 1 ? \"the missing one is skipped until this Mac reports it again\" : `the ${missing} missing ones are skipped until this Mac reports them again`;",
         "count": 1
       },
       {
@@ -98,7 +98,7 @@
       },
       {
         "before": "\t\t\t\t\t? \"Nothing moves the dial until HWiNFO data returns.\"",
-        "after": "\t\t\t\t\t? \"Nothing moves the dial until Mac Sensors data returns.\"",
+        "after": "\t\t\t\t\t? \"Nothing moves the dial until this Mac reports readings again.\"",
         "count": 1
       },
       {
@@ -108,7 +108,7 @@
       },
       {
         "before": "\t\t\tconst skipped = missing === 0 ? \"\" : ` ${missing === 1 ? \"One missing reading is\" : `${missing} missing readings are`} skipped until HWiNFO lists ${missing === 1 ? \"it\" : \"them\"} again.`;",
-        "after": "\t\t\tconst skipped = missing === 0 ? \"\" : ` ${missing === 1 ? \"One missing reading is\" : `${missing} missing readings are`} skipped until Mac Sensors lists ${missing === 1 ? \"it\" : \"them\"} again.`;",
+        "after": "\t\t\tconst skipped = missing === 0 ? \"\" : ` ${missing === 1 ? \"One missing reading is\" : `${missing} missing readings are`} skipped until this Mac reports ${missing === 1 ? \"it\" : \"them\"} again.`;",
         "count": 1
       },
       {
@@ -148,7 +148,7 @@
       },
       {
         "before": "\t\t\tconst noneText = shown > 0 ? \"\" : tokens.length > 0 ? `No readings match \"${raw.trim()}\".` : \"HWiNFO publishes no readings right now.\";",
-        "after": "\t\t\tconst noneText = shown > 0 ? \"\" : tokens.length > 0 ? `No readings match \"${raw.trim()}\".` : \"Mac Sensors publishes no readings right now.\";",
+        "after": "\t\t\tconst noneText = shown > 0 ? \"\" : tokens.length > 0 ? `No readings match \"${raw.trim()}\".` : \"This Mac reports no readings right now.\";",
         "count": 1
       },
       {
@@ -292,7 +292,7 @@
       },
       {
         "before": "\t\t\tlines = [p.hint || \"HWiNFO data is unavailable.\"];",
-        "after": "\t\t\tlines = [p.hint || \"Mac Sensors data is unavailable.\"];",
+        "after": "\t\t\tlines = [p.hint || \"Sensor data from this Mac is unavailable.\"];",
         "count": 1
       },
       {
@@ -317,7 +317,7 @@
       },
       {
         "before": "\t\t\tlines = [\"HWiNFO is running but publishes no readings.\"];",
-        "after": "\t\t\tlines = [\"Mac Sensors is running but publishes no readings.\"];",
+        "after": "\t\t\tlines = [\"This Mac reports no readings right now.\"];",
         "count": 1
       },
       {
