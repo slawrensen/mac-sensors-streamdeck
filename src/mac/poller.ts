@@ -169,19 +169,19 @@ export class MacPoller extends EventEmitter {
 			if (this.fastReads < TRUSTED_READS || this.status.state !== 'ok') this.settle ??= setTimeout(() => { this.settle = null; this.fastReads = 0; this.refresh(true); }, SETTLE_WINDOW_MS).unref();
 			return;
 		}
-		if (this.waitingSince !== null) { this.fastReads = this.waited(now) <= FAST_SETTLE_MS ? Math.min(TRUSTED_READS, this.fastReads + 1) : 0; this.waitingSince = null; }
+		if (this.waitingSince !== null) { this.fastReads = this.waitIsFast(now) ? Math.min(TRUSTED_READS, this.fastReads + 1) : 0; this.waitingSince = null; }
 		if (this.settle) { clearTimeout(this.settle); this.settle = null; }
 		this.refresh(true);
 	}
-	/** How long the current read has waited; NaN (never fast) when the clock is missing or ran backwards. */
-	private waited(now: number): number {
+	/** Whether the current read has waited at most FAST_SETTLE_MS; never fast when the clock is missing (NaN) or ran backwards. */
+	private waitIsFast(now: number): boolean {
 		const ms = now - (this.waitingSince ?? NaN);
-		return Number.isFinite(ms) && ms >= 0 ? ms : NaN;
+		return ms >= 0 && ms <= FAST_SETTLE_MS;
 	}
 	private tick(): void {
 		if (!this.refs) return;
-		// A read still waiting when the next one starts was slow: the timer bounds the reads that follow.
-		if (this.waitingSince !== null && !(this.waited(this.provider?.now?.() ?? NaN) <= FAST_SETTLE_MS)) this.fastReads = 0;
+		// A read that has already waited longer than FAST_SETTLE_MS when the next one starts was slow: the timer bounds the reads that follow.
+		if (this.waitingSince !== null && !this.waitIsFast(this.provider?.now?.() ?? NaN)) this.fastReads = 0;
 		try {
 			if (!this.provider) this.provider = this.factory(() => this.settled());
 			this.provider.read();
