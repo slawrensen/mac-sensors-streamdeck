@@ -396,3 +396,43 @@ test('a read that starts from a status screen is always timed, so a slow SMC rea
 		} finally { timers.restore(); }
 	}
 });
+
+test('a Read every change publishes a waiting read at once instead of holding it into the new interval', async () => {
+	// Review T4: trusted, SMC read 11 hangs, public settles 5 ms after the tick, and the setting changes 15 ms before the next tick.
+	const HUNG_SMC_READ = 11; // 1-based, after ten fast reads
+	const HUNG_MS = 600_000;
+	const CHANGE_LEAD_MS = 15;
+	const PUBLIC_MS = 5;
+	for (const [fromMs, toMs] of [[INTERVAL_MS, 5000], [INTERVAL_MS, COUNTER_REBASELINE_MS], [5000, COUNTER_REBASELINE_MS]] as const) {
+		const { poller, emits, reads } = rig({ public: PUBLIC_MS, smc: (n) => (n === HUNG_SMC_READ ? HUNG_MS : 40) }, { intervalMs: fromMs });
+		const start = Date.now() - START_MS;
+		poller.retain();
+		await advance(HUNG_SMC_READ * fromMs - CHANGE_LEAD_MS);
+		const changedAt = Date.now() - START_MS;
+		poller.setIntervalMs(toMs);
+		await advance(2 * toMs + 2 * SETTLE_WINDOW_MS);
+		poller.release();
+		const hungAt = reads.smc[HUNG_SMC_READ - 1]!, published = firstPublished(emits);
+		assert.equal(hungAt, start + (HUNG_SMC_READ - 1) * fromMs, `${fromMs}->${toMs} ms: the hung SMC read`);
+		assert.ok(published.get(hungAt)! <= changedAt, `${fromMs}->${toMs} ms: public read at ${hungAt} ms (settled ${hungAt + PUBLIC_MS}) published at ${published.get(hungAt)} ms, after the change at ${changedAt} ms`);
+		const nextAt = reads.public.find((at) => at > changedAt)!;
+		assert.ok(published.get(nextAt)! - nextAt <= PUBLIC_MS + SETTLE_WINDOW_MS, `${fromMs}->${toMs} ms: with SMC still out, public read at ${nextAt} ms published at ${published.get(nextAt)} ms`);
+	}
+});
+
+test('a Read every change starts trust over', async () => {
+	const FAST_READS = 12;
+	const NEW_INTERVAL_MS = 2000;
+	const timers = settleTimers();
+	try {
+		const { poller } = rig({ public: 5, smc: 40 });
+		poller.retain();
+		await advance(FAST_READS * INTERVAL_MS + INTERVAL_MS / 2);
+		const changedAt = Date.now() - START_MS;
+		poller.setIntervalMs(NEW_INTERVAL_MS);
+		await advance(FAST_READS * NEW_INTERVAL_MS);
+		poller.release();
+		// The restarted timer's first read starts one new interval after the change.
+		assert.deepEqual(timers.at.filter((at) => at >= changedAt).map((at) => Math.floor((at - changedAt) / NEW_INTERVAL_MS)), range(1, TRUSTED_READS + 1), 'the reads after the change are timed until they prove fast again');
+	} finally { timers.restore(); }
+});

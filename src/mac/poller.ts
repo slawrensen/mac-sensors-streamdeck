@@ -44,7 +44,7 @@ const FAST_SETTLE_MS = 50;
  * timer's deadline even when the timer was cleared first: about two interrupt wakeups per read, measured
  * in the app and in Node alone (2026-10-16). Such a read holds the settled source until the other
  * settles or the next read starts, at most one Read every, and only once: a read that is not fast
- * brings the timer back. Trust starts over each time keys appear. A read whose status is not ok when its
+ * brings the timer back. Trust starts over each time keys appear or Read every changes. A read whose status is not ok when its
  * first source settles is always timed, so a status screen (for example every reading expired across a
  * sleep longer than the TTL) never waits on a slow source.
  */
@@ -104,6 +104,10 @@ export class MacPoller extends EventEmitter {
 		for (const ring of this.series.values()) ring.length = 0;
 		this.observations.clear();
 		if (this.timer) { clearInterval(this.timer); this.timer = setInterval(() => this.tick(), next).unref(); }
+		// The restarted timer can push the next read up to a full new interval away: trust starts over, and a read
+		// still waiting publishes what has settled now instead of holding it into the new interval.
+		this.fastReads = 0;
+		if (this.waitingSince !== null) this.refresh(true);
 	}
 	diagnostics(): Record<string, string | number | boolean | null> {
 		const status = this.getStatus();
