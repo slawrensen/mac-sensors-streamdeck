@@ -7,12 +7,13 @@ import { pushSample } from '../series';
 import {trace,traceEnabled} from '../recorder';
 import type { PollerStatus } from '../poller';
 import { openMacProvider, type MacSnapshotProvider } from './native-loader';
+import { PENDING_MESSAGE, TTL_MS } from './provider';
 export type { PollerStatus } from '../poller';
 /** Read every default: what an absent, blank or malformed stored value means. */
 export const POLL_INTERVAL_DEFAULT_MS = 1000;
 /** Shortest offered Read every option. */
 export const POLL_INTERVAL_MIN_MS = 250;
-/** Longest offered Read every option; kept well inside the 15 s reading TTL so readings never expire between reads. */
+/** Longest offered Read every option; kept well inside the 15 s reading TTL (TTL_MS) so readings never expire between reads. */
 export const POLL_INTERVAL_MAX_MS = 5000;
 /** One supported range for runtime and panel (staged pollIntervalOf mirrors this; test/mac/fixtures/poll-interval-cases.json pins both). A blank string is not a number. */
 export function parsePollInterval(raw: unknown): number {
@@ -21,8 +22,6 @@ export function parsePollInterval(raw: unknown): number {
 }
 export function parseSourceMode(_raw: unknown): 'auto' { void _raw; return 'auto'; }
 type Factory = (ready: () => void) => MacSnapshotProvider;
-/** Shown while no reading is live yet, and again when every live reading lapsed before a full read completed. */
-const PENDING_MESSAGE = 'Readings appear after the first successful sample.';
 const pending = (): PollerStatus => ({ state: 'unavailable', reason: 'pending', message: PENDING_MESSAGE });
 /**
  * Longest a settled source's readings wait for the other source of the same read, so a
@@ -149,7 +148,7 @@ export class MacPoller extends EventEmitter {
 		if (this.expiry) clearTimeout(this.expiry); this.expiry = null;
 		if (!this.refs) return;
 		const delay = this.provider?.untilExpiry();
-		if (delay !== null && delay !== undefined) this.expiry = setTimeout(() => this.refresh(true), Math.max(1, Math.min(delay, 15_000))).unref();
+		if (delay !== null && delay !== undefined) this.expiry = setTimeout(() => this.refresh(true), Math.max(1, Math.min(delay, TTL_MS))).unref();
 	}
 	private refresh(emit: boolean): void {
 		if (!this.provider) return;
