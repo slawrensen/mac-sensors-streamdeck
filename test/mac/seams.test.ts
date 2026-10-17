@@ -11,7 +11,7 @@ import { bareReadingKey } from '../../src/detail/detail-settings';
 import { HwinfoError, SensorType, type Reading, type SensorSnapshot } from '../../src/hwinfo/types';
 import { SessionStatsStore } from '../../src/stats';
 import { setFaceFont, faceFont } from '../../src/ui/face-font';
-import { statusScreen, statusDialText, statusSentence } from '#platform/status';
+import { missingReadingScreen, statusScreen, statusDialText, statusSentence } from '#platform/status';
 import { renderStatusKey } from '../../src/ui/key-renderer';
 const key='mac:v1:smc:Mac17%2C9:54703030:temp.v1';
 function row(revision=1): Reading { return {key,type:SensorType.Temperature,sensorIndex:0,id:1,label:'CPU',unit:'°C',value:40,valueMin:NaN,valueMax:NaN,valueAvg:NaN,statistics:'unavailable',observationTime:revision*10,observationRevision:revision}; }
@@ -117,4 +117,8 @@ test('readings that lapse before SMC ever completes are not kept live, whether p
 test('the font-missing hint states the repair once; the panel already says saved settings stay',()=>{
 	assert.equal(statusSentence({state:'unavailable',reason:'font-missing',message:'Missing'}),'Install Tahoma Bold in Font Book, then choose Check again.');
 	const shell=readFileSync('com.lawrensen.mac.sdPlugin/ui/pi-shell.js','utf8');assert.match(shell,/Your reading and every setting stay saved\./);
+});
+test('the missing-reading face names the panel remedy, a new pick, as the shared copy does',()=>{
+	assert.deepEqual(missingReadingScreen().lines,['Sensor missing','pick again']);
+	const svg=renderStatusKey(missingReadingScreen());assert.match(svg,/pick again/);assert.doesNotMatch(svg,/check again/);
 });

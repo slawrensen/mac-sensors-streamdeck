@@ -346,7 +346,7 @@
       "id": "status-missing",
       "kind": "key",
       "description": "Saved sensor missing",
-      "svgSha256": "9101b8a10cc1cc11e7e7186f859e7b651029431671833cc608328fab9c921125"
+      "svgSha256": "1aa7b37db36ec4bcaa650924f72a40b28bb01412e3ce530dfa27585ff4476098"
     },
     {
       "id": "detail-title",
