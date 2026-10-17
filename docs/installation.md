@@ -8,12 +8,10 @@ nav_order: 2
 
 You need macOS 13.5 or later and Stream Deck 7.1 or later. The package includes arm64 and x86_64 readers and requests the app's Node 24 runtime. No separate sensor application is required.
 
-1. Download the `.streamDeckPlugin` file from the [GitHub releases page](https://github.com/slawrensen/mac-sensors-streamdeck/releases).
+1. Get the `.streamDeckPlugin` file from the project's GitHub releases. Version 1.0.1.0 downloads require repository access. Marketplace submission and availability are separate.
 2. Open the downloaded file in Finder and choose **Install** in Stream Deck.
 3. Find **Mac Sensors** in the Actions list and drag **Sensor Reading** onto a key.
 4. Pick a reading in the settings panel.
-
-Version 1.0.1.0 downloads require repository access. Marketplace submission and availability are separate.
 
 Tahoma Bold must be available in Font Book. If a key says **Tahoma needed**, open Font Book, install or download the available Tahoma family, and choose **Check again** in the panel. The plugin includes rendered setup artwork, not a font file.
 

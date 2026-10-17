@@ -24,4 +24,4 @@ Sensor availability varies by model. A fanless Mac need not have fan rows. Discr
 
 The app's Qt 6.11.1 renderer was used for the face census. Physical photograph calibration remains pending, so device-equivalence and legibility claims are marked INFERRED. The hardware photograph will be added after the owner captures the prepared scene.
 
-See [performance evidence](https://github.com/slawrensen/mac-sensors-streamdeck/blob/main/PERF.md) for measured windows and their limits.
+Measured performance windows and their limits are recorded in PERF.md in the source repository, which requires repository access.
