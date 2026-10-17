@@ -117,8 +117,7 @@ export class MacProvider implements SnapshotProvider {
 		if(source==='public'){this.fontKnown=true;this.fontAvailable=packet.fontAvailable===true;}
 		const rows=[...packet.rows,...(source==='public'?counterRows(this.previousPublic,packet):[])];
 		if(source==='public'){
-			// Once per generation: the first accepted packet only sets the counter baseline, so read public again after the shortest interval.
-			if(this.previousPublic===null&&!this.rebaselined){this.rebaselined=true;const sinceRequest=this.publicRequestedAt===null?0:this.native.now()-this.publicRequestedAt,elapsed=Number.isFinite(sinceRequest)?Math.max(0,sinceRequest):0;this.rebaseline=setTimeout(()=>{this.rebaseline=null;this.request('public');if(this.pending.has('public'))this.rebaselineStartedAt=this.native.now();},Math.max(MIN_COUNTER_WINDOW_MS,COUNTER_REBASELINE_MS-elapsed)).unref();}
+			if(this.previousPublic===null&&!this.rebaselined)this.armRebaseline(now);
 			this.previousPublic=packet;
 		}
 		// One key per row, shared by the duplicate count and the acceptance pass.
@@ -143,6 +142,16 @@ export class MacProvider implements SnapshotProvider {
 		if(packet.translated===1)this.notice('Node is running under translation; sensor interfaces follow the detected hardware.');
 		if(source==='smc'&&(packet.model!=='Mac17,9'||packet.chip!=='t6050'))this.notice('This model uses common typed sensors; its generation-specific catalog is not qualified.');
 		this.rebuild();
+	}
+	/**
+	 * Once per generation: the first accepted public packet only sets the counter baseline, so read public again
+	 * COUNTER_REBASELINE_MS after its request, never sooner than MIN_COUNTER_WINDOW_MS after it completed (now).
+	 * A missing or non-finite request time leaves the full delay. The rebaseline read's start is the request time that request() stamps.
+	 */
+	private armRebaseline(now:number):void {
+		this.rebaselined=true;
+		const sinceRequest=now-(this.publicRequestedAt??NaN),elapsed=Number.isFinite(sinceRequest)?Math.max(0,sinceRequest):0;
+		this.rebaseline=setTimeout(()=>{this.rebaseline=null;this.request('public');if(this.pending.has('public'))this.rebaselineStartedAt=this.publicRequestedAt;},Math.max(MIN_COUNTER_WINDOW_MS,COUNTER_REBASELINE_MS-elapsed)).unref();
 	}
 	private request(source:NativeSource):void {
 		if(this.closed||this.pending.has(source)||this.retries.has(source))return;
