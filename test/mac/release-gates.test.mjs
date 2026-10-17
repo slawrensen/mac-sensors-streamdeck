@@ -85,3 +85,12 @@ test('native drift fails moved addon bytes without a native source change, even 
 	const bare=drift(moved);assert.notEqual(bare.status,0);assert.match(bare.stderr,/Unexplained native byte drift for arm64.*toolchainChanged false/);
 	const first=run('native-drift.mjs',[before]);assert.equal(first.status,0);assert.match(first.stdout,/establishes the baseline/);
 });
+test('every ci and release job sets its own timeout, so a hung job cannot bill the 360-minute default',()=>{
+	for(const name of ['ci.yml','release.yml']){
+		const text=fs.readFileSync(path.join(root,'.github/workflows',name),'utf8'),jobs=text.slice(text.indexOf('\njobs:\n')+7);
+		// Each job is a two-space key; its own keys sit four spaces in.
+		const blocks=jobs.split(/^(?= {2}[\w-]+:\n)/m).filter(block=>/^ {2}[\w-]+:\n/.test(block));
+		assert.ok(blocks.length>=2,name);
+		for(const block of blocks)assert.match(block,/^ {4}timeout-minutes: \d+$/m,`${name} ${block.split(':')[0].trim()}`);
+	}
+});
