@@ -352,6 +352,23 @@ test('a release inside the settle window leaves no stale publication for the nex
 	assert.equal(emits.find((emit) => emit.at > 90 && emit.mem)?.smc, true, 'the new read publishes once, with SMC');
 });
 
+test('a release while a read waits leaves the next generation no stale wait to score', async () => {
+	const READS = 12;
+	const timers = settleTimers();
+	try {
+		const { poller } = rig({ public: 5, smc: 40 });
+		poller.retain();
+		await advance(6); // public settled at 5 ms, SMC still out
+		poller.release();
+		await advance(INTERVAL_MS);
+		const back = Date.now() - START_MS;
+		poller.retain();
+		await advance(READS * INTERVAL_MS);
+		poller.release();
+		assert.deepEqual(timers.at.filter((at) => at >= back).map((at) => Math.floor((at - back) / INTERVAL_MS)), range(0, TRUSTED_READS), 'the first read after the return counts toward trust');
+	} finally { timers.restore(); }
+});
+
 test('a public failure after the first packet never earns a generation a second rebaseline read', async () => {
 	const { poller, reads } = rig({ public: 5, smc: 40 }, { intervalMs: 5000, publicError: (n) => n === 2 });
 	poller.retain();
