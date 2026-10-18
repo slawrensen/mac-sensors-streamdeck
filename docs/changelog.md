@@ -13,6 +13,7 @@ nav_order: 15
 - A blank **Read every** value means the 1 second default. A stored value above 5 seconds is read as 5 seconds, so readings no longer expire between reads.
 - CPU usage and transfer rates appear about a quarter second after a key appears or a page returns, instead of one full read interval later.
 - Keys and dials show Reading sensors, instead of keeping old values as live, when every reading lapses or fails before the first SMC read completes.
+- A key whose saved reading is missing says Sensor missing, pick again, naming the remedy in its settings, instead of check again.
 - Support reports from Intel Macs say the plugin runs natively instead of unknown.
 - Status text in the settings panel no longer names the plugin as the source of sensor data, and the Text font line uses the same spacing as other fields.
 
