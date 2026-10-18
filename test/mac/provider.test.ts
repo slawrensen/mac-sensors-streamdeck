@@ -104,8 +104,11 @@ test('each SMC row keeps its own measurement key when a packet carries several r
 	assert.equal(byLabel.get(first.label)?.key,measurementKey('smc',first,'Mac17,9'));
 	r.provider.close();
 });
-test('a missing model on the first SMC row withholds it instead of throwing',()=>{
+test('a missing model on the first SMC row withholds it instead of throwing',async()=>{
 	const row=packet('smc').rows[0]!;
+	// A query string gives a fresh module copy whose model memo is still empty, the only state in which the old memo threw.
+	const fresh=await import(`../../src/mac/provider.ts?${'first-model'}`) as typeof import('../../src/mac/provider');
+	assert.equal(fresh.measurementKey('smc',row,undefined as unknown as string),null);
 	assert.equal(measurementKey('smc',row,undefined as unknown as string),null);
 	assert.equal(measurementKey('smc',row,''),null);
 	assert.ok(measurementKey('smc',row,'Mac17,9')?.startsWith('mac:v1:smc:Mac17%2C9:'));
