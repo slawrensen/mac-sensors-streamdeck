@@ -83,6 +83,9 @@ test('native drift fails moved addon bytes without a native source change, even 
 		assert.notEqual(result.status,0,`a toolchain change alone must not pass moved bytes: ${JSON.stringify(toolchain)}`);assert.match(result.stderr,/Unexplained native byte drift for arm64.*toolchainChanged true/);
 	}
 	const bare=drift(moved);assert.notEqual(bare.status,0);assert.match(bare.stderr,/Unexplained native byte drift for arm64.*toolchainChanged false/);
+	// A toolchain move that leaves the addon bytes alone has nothing to explain.
+	const rebuilt=drift({...previous,compiler:'Apple clang version 21.0.0 (clang-2100.9.9.9)',sdk:'26.6'});assert.equal(rebuilt.status,0,rebuilt.stderr);
+	assert.deepEqual(JSON.parse(rebuilt.stdout).moved,[]);assert.equal(JSON.parse(rebuilt.stdout).toolchainChanged,true);
 	const first=run('native-drift.mjs',[before]);assert.equal(first.status,0);assert.match(first.stdout,/establishes the baseline/);
 });
 test('every ci and release job sets its own timeout, so a hung job cannot bill the 360-minute default',()=>{
