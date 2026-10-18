@@ -89,10 +89,12 @@ test('native drift fails moved addon bytes without a native source change, even 
 	const first=run('native-drift.mjs',[before]);assert.equal(first.status,0);assert.match(first.stdout,/establishes the baseline/);
 });
 test('every ci and release job sets its own timeout, so a hung job cannot bill the 360-minute default',()=>{
+	// Each job is a two-space key, which may carry trailing spaces or a comment; its own keys sit four spaces in.
+	const jobBlocks=text=>text.slice(text.indexOf('\njobs:\n')+7).split(/^(?= {2}[\w-]+:[ \t]*(?:#.*)?$)/m).filter(block=>/^ {2}[\w-]+:[ \t]*(?:#.*)?$/.test(block.split('\n')[0]));
+	// A commented job key must start its own block, or the job before it would lend it its timeout.
+	assert.deepEqual(jobBlocks('on: push\njobs:\n  a:\n    timeout-minutes: 5\n  b: # note\n    runs-on: x\n').map(block=>/timeout-minutes/.test(block)),[true,false]);
 	for(const name of ['ci.yml','release.yml']){
-		const text=fs.readFileSync(path.join(root,'.github/workflows',name),'utf8'),jobs=text.slice(text.indexOf('\njobs:\n')+7);
-		// Each job is a two-space key; its own keys sit four spaces in.
-		const blocks=jobs.split(/^(?= {2}[\w-]+:\n)/m).filter(block=>/^ {2}[\w-]+:\n/.test(block));
+		const blocks=jobBlocks(fs.readFileSync(path.join(root,'.github/workflows',name),'utf8'));
 		assert.ok(blocks.length>=2,name);
 		for(const block of blocks)assert.match(block,/^ {4}timeout-minutes: \d+$/m,`${name} ${block.split(':')[0].trim()}`);
 	}
