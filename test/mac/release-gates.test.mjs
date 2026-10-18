@@ -69,3 +69,33 @@ test('panel suites keep the guard\'s nonzero exit when every check passed but an
 		const failed=exitOf(true);assert.equal(failed.status,1,suite);assert.match(failed.stderr,/EXPECTED_SUITE_FAILURE/);
 	}
 });
+test('native drift fails moved addon bytes without a native source change, even when the toolchain changed',t=>{
+	const dir=fs.mkdtempSync(path.join(os.tmpdir(),'mac-native-drift-test-'));t.after(()=>fs.rmSync(dir,{recursive:true,force:true}));
+	// Shaped like the published v1.0.0 native-manifest.json fields native-drift.mjs reads.
+	const previous={sourceId:'a'.repeat(64),compiler:'Apple clang version 21.0.0 (clang-2100.1.1.101)',sdk:'26.5',entries:[{architecture:'arm64',sha256:'1'.repeat(64)},{architecture:'x86_64',sha256:'2'.repeat(64)}]};
+	const write=(name,manifest)=>{const file=path.join(dir,name);fs.writeFileSync(file,JSON.stringify(manifest));return file;};
+	const before=write('previous.json',previous),drift=manifest=>run('native-drift.mjs',[write('current.json',manifest),before]);
+	const moved={...previous,entries:[{architecture:'arm64',sha256:'3'.repeat(64)},previous.entries[1]]};
+	const same=drift(previous);assert.equal(same.status,0,same.stderr);assert.deepEqual(JSON.parse(same.stdout).moved,[]);
+	assert.equal(drift({...moved,sourceId:'b'.repeat(64)}).status,0,'a native source change explains new bytes');
+	for(const toolchain of [{compiler:'Apple clang version 21.0.0 (clang-2100.9.9.9)'},{sdk:'26.6'}]){
+		const result=drift({...moved,...toolchain});
+		assert.notEqual(result.status,0,`a toolchain change alone must not pass moved bytes: ${JSON.stringify(toolchain)}`);assert.match(result.stderr,/Unexplained native byte drift for arm64.*toolchainChanged true/);
+	}
+	const bare=drift(moved);assert.notEqual(bare.status,0);assert.match(bare.stderr,/Unexplained native byte drift for arm64.*toolchainChanged false/);
+	// A toolchain move that leaves the addon bytes alone has nothing to explain.
+	const rebuilt=drift({...previous,compiler:'Apple clang version 21.0.0 (clang-2100.9.9.9)',sdk:'26.6'});assert.equal(rebuilt.status,0,rebuilt.stderr);
+	assert.deepEqual(JSON.parse(rebuilt.stdout).moved,[]);assert.equal(JSON.parse(rebuilt.stdout).toolchainChanged,true);
+	const first=run('native-drift.mjs',[before]);assert.equal(first.status,0);assert.match(first.stdout,/establishes the baseline/);
+});
+test('every ci and release job sets its own timeout, so a hung job cannot bill the 360-minute default',()=>{
+	// Each job is a two-space key, which may carry trailing spaces or a comment; its own keys sit four spaces in.
+	const jobBlocks=text=>text.slice(text.indexOf('\njobs:\n')+7).split(/^(?= {2}[\w-]+:[ \t]*(?:#.*)?$)/m).filter(block=>/^ {2}[\w-]+:[ \t]*(?:#.*)?$/.test(block.split('\n')[0]));
+	// A commented job key must start its own block, or the job before it would lend it its timeout.
+	assert.deepEqual(jobBlocks('on: push\njobs:\n  a:\n    timeout-minutes: 5\n  b: # note\n    runs-on: x\n').map(block=>/timeout-minutes/.test(block)),[true,false]);
+	for(const name of ['ci.yml','release.yml']){
+		const blocks=jobBlocks(fs.readFileSync(path.join(root,'.github/workflows',name),'utf8'));
+		assert.ok(blocks.length>=2,name);
+		for(const block of blocks)assert.match(block,/^ {4}timeout-minutes: \d+$/m,`${name} ${block.split(':')[0].trim()}`);
+	}
+});

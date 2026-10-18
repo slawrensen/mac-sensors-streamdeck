@@ -1413,7 +1413,7 @@ try {
 		const gone = "f00dead0:0:1000001";
 		await open("dial-configured", { settings: { ...dialFx.settings, rotationKeys: [K.gpu, gone, K.hot] } });
 		const miss = await b.evaluate(`(() => { const o = document.querySelector('#rotation-set [role="option"][data-key="${gone}"]'); const pill = o?.querySelector(".hw-chip-missing"); return { pill: pill?.textContent ?? null, shown: pill !== null && pill !== undefined && pill.getClientRects().length > 0, name: o?.textContent ?? null, note: document.querySelector("#rotation-set .hw-set-note")?.textContent ?? null }; })()`);
-		check("R05: a member HWiNFO does not list shows a visible 'missing' pill, and the note counts the two the dial steps through", miss.pill === "missing" && miss.shown && miss.note === "Rotation moves through 2 of these 3 readings, in this order; the missing one is skipped until Mac Sensors lists it again." && sim.writes.length === 0, JSON.stringify(miss));
+		check("R05: a member HWiNFO does not list shows a visible 'missing' pill, and the note counts the two the dial steps through", miss.pill === "missing" && miss.shown && miss.note === "Rotation moves through 2 of these 3 readings, in this order; the missing one is skipped until this Mac reports it again." && sim.writes.length === 0, JSON.stringify(miss));
 		// R07: two drives' "Drive Temperature" are told apart on the chip,
 		// in the toolbar's names and in what is spoken.
 		await open("dial-configured", { settings: { ...dialFx.settings, readingKey: K.drive0, rotationKeys: [K.drive0, K.drive1, K.cpu] } });

@@ -83,6 +83,19 @@ describe("docs crawler inspects every reachable page and proves private 404s", (
 		assert.match(result.stderr, /target\.html: leaks/);
 	});
 
+	it("fails a page that links the private product repository, in any letter case, and passes the public docs repository", async (t) => {
+		const { root } = await fixture(t, {
+			"/": { html: '<a href="https://github.com/slawrensen/slawrensen.github.io/issues">Public issues</a><a href="bugs.html">Bugs</a><a href="nav.html">Nav</a>' },
+			"/bugs.html": { html: '<a href="https://github.com/slawrensen/mac-sensors-streamdeck/issues">Report a bug</a>' },
+			"/nav.html": { html: '<a href="https://GitHub.com/Slawrensen/Mac-Sensors-StreamDeck/releases">Releases</a>' }
+		});
+		const result = await crawl(root);
+		assert.equal(result.code, 1, `a private repository link must fail the crawl: ${result.stdout}`);
+		assert.match(result.stderr, /bugs\.html: leaks .*mac-sensors-streamdeck/);
+		assert.match(result.stderr, /nav\.html: leaks .*mac-sensors-streamdeck/);
+		assert.doesNotMatch(result.stderr, /:\d+\/: leaks/, "the public documentation repository is not a leak");
+	});
+
 	for (const status of [200, 500]) {
 		it(`rejects a private path returning HTTP ${status}`, async (t) => {
 			const { root } = await fixture(t, {
