@@ -30,4 +30,4 @@ A support report contains runtime versions, model/chip information and catalog s
 
 ## How do updates arrive?
 
-Through the GitHub release page or the Elgato Marketplace when available. The plugin does not download its own updates.
+Through the project's GitHub releases, which require repository access, or the Elgato Marketplace when available. The plugin does not download its own updates.
