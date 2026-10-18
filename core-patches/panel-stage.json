@@ -98,7 +98,7 @@
       },
       {
         "before": "\t\t\t\t\t? \"Nothing moves the dial until HWiNFO data returns.\"",
-        "after": "\t\t\t\t\t? \"Nothing moves the dial until this Mac reports readings again.\"",
+        "after": "\t\t\t\t\t? \"Nothing moves the dial until readings return.\"",
         "count": 1
       },
       {
@@ -148,7 +148,7 @@
       },
       {
         "before": "\t\t\tconst noneText = shown > 0 ? \"\" : tokens.length > 0 ? `No readings match \"${raw.trim()}\".` : \"HWiNFO publishes no readings right now.\";",
-        "after": "\t\t\tconst noneText = shown > 0 ? \"\" : tokens.length > 0 ? `No readings match \"${raw.trim()}\".` : \"This Mac reports no readings right now.\";",
+        "after": "\t\t\tconst noneText = shown > 0 ? \"\" : tokens.length > 0 ? `No readings match \"${raw.trim()}\".` : \"No readings to show right now.\";",
         "count": 1
       },
       {

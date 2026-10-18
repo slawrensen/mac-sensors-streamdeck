@@ -67,11 +67,13 @@ test('panel status copy names this Mac as the source, never the plugin, and prom
 	assert.match(model,/return "Saved reading not found on this Mac";/);
 	assert.match(shell,/"Readings appear under Reading once this Mac reports data\."/);
 	assert.match(shell,/keeps the saved reading with its label and colors\. This Mac does not report it right now/);
-	// Skipped rotation members, the held dial, the empty picker and the two fallback lines name this Mac too.
+	// Skipped rotation members and the two fallback lines name this Mac too.
 	assert.match(common,/"the missing one is skipped until this Mac reports it again" : `the \$\{missing\} missing ones are skipped until this Mac reports them again`/);
-	assert.match(common,/\? "Nothing moves the dial until this Mac reports readings again\."/);
 	assert.match(common,/skipped until this Mac reports \$\{missing === 1 \? "it" : "them"\} again\.`;/);
-	assert.match(common,/`No readings match "\$\{raw\.trim\(\)\}"\.` : "This Mac reports no readings right now\.";/);
+	// The held dial and the empty picker show for every unavailable status, Tahoma missing included, where this Mac still reports readings: they name no cause.
+	assert.match(common,/\? "Nothing moves the dial until readings return\."/);
+	assert.match(common,/`No readings match "\$\{raw\.trim\(\)\}"\.` : "No readings to show right now\.";/);
+	assert.doesNotMatch(common,/until this Mac reports readings|This Mac reports no readings/);
 	assert.match(shell,/lines = \[p\.hint \|\| "Sensor data from this Mac is unavailable\."\];/);
 	assert.match(shell,/lines = \["This Mac reports no readings right now\."\];/);
 	for(const [name,text] of [['pi-shell.js',shell],['pi-common.js',common],['pi-model.js',model]])assert.doesNotMatch(text,/No Mac Sensors data|no Mac Sensors data|not found in Mac Sensors|once Mac Sensors publishes|Mac Sensors restarts|sensor source's current sensor list|Mac Sensors (?:publishes|lists|data returns|data is unavailable|is running but)/,name);
