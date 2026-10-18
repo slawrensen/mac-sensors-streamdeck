@@ -327,7 +327,7 @@
       },
       {
         "before": "\t\t\tannounce(\"check\", picked ? \"HWiNFO answered: the reading is live again.\" : \"HWiNFO is answering again.\", { repeat: true });",
-        "after": "\t\t\tannounce(\"check\", picked ? \"Checked again: the reading is live again.\" : \"Checked again: readings are available again.\", { repeat: true });",
+        "after": "\t\t\tannounce(\"check\", picked ? \"The reading is live again.\" : \"Readings are available again.\", { repeat: true });",
         "count": 1
       },
       {

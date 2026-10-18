@@ -78,8 +78,8 @@ test('panel status copy never names the plugin as the source of sensor data and 
 	assert.doesNotMatch(common,/until this Mac reports readings|This Mac reports no readings/);
 	assert.match(shell,/lines = \[p\.hint \|\| "Sensor data from this Mac is unavailable\."\];/);
 	assert.match(shell,/lines = \["This Mac reports no readings right now\."\];/);
-	// The Check again recovery announcement names no source: the plugin answered the whole time.
-	assert.match(shell,/announce\("check", picked \? "Checked again: the reading is live again\." : "Checked again: readings are available again\.", \{ repeat: true \}\);/);
+	// The recovery announcement leads with the result and names no source: the plugin answered the whole time, and it also fires when a problem clears without a press.
+	assert.match(shell,/announce\("check", picked \? "The reading is live again\." : "Readings are available again\.", \{ repeat: true \}\);/);
 	for(const [name,text] of [['pi-shell.js',shell],['pi-common.js',common],['pi-model.js',model]])assert.doesNotMatch(text,/No Mac Sensors data|no Mac Sensors data|not found in Mac Sensors|once Mac Sensors publishes|Mac Sensors restarts|Mac Sensors answered:|Mac Sensors is answering again|sensor source's current sensor list|Mac Sensors (?:publishes|lists|data returns|data is unavailable|is running but)/,name);
 }));
 test('missing staging anchors fail before an output is packaged',()=>{
