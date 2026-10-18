@@ -65,7 +65,9 @@ test('panel status copy names this Mac as the source, never the plugin, and prom
 	assert.match(shell,/return \{ text: "No sensor data", tone: "danger" \};/);
 	assert.match(common,/"Saved reading kept \(no sensor data to show it\)"/);
 	assert.match(model,/return "Saved reading not found on this Mac";/);
-	assert.match(shell,/"Readings appear under Reading once this Mac reports data\."/);
+	// Shown for every unavailable status of an unconfigured panel, Tahoma missing included: it names no cause.
+	assert.match(shell,/: "Readings appear under Reading once data returns\."\);/);
+	assert.doesNotMatch(shell,/once this Mac reports data/);
 	assert.match(shell,/keeps the saved reading with its label and colors\. This Mac does not report it right now/);
 	// Skipped rotation members and the two fallback lines name this Mac too.
 	assert.match(common,/"the missing one is skipped until this Mac reports it again" : `the \$\{missing\} missing ones are skipped until this Mac reports them again`/);

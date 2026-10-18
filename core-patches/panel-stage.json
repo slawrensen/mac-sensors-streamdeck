@@ -297,7 +297,7 @@
       },
       {
         "before": "\t\t\tlines.push(configured ? \"Your reading and every setting stay saved. Display settings can still be changed; they apply when data returns.\" : \"Readings appear under Reading once HWiNFO publishes data.\");",
-        "after": "\t\t\tlines.push(configured ? \"Your reading and every setting stay saved. Display settings can still be changed; they apply when data returns.\" : \"Readings appear under Reading once this Mac reports data.\");",
+        "after": "\t\t\tlines.push(configured ? \"Your reading and every setting stay saved. Display settings can still be changed; they apply when data returns.\" : \"Readings appear under Reading once data returns.\");",
         "count": 1
       },
       {
