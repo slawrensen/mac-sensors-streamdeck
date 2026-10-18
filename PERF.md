@@ -35,6 +35,21 @@ The repository mock host (`scripts/lib/mock-host.mjs`) ran the 1.0.1 candidate b
 
 This supports the panel help line that shorter intervals use more processor time. It is mock-host evidence with the real read-only native reader, not the Stream Deck app: the app's rasterization and device transfer cost is not included. Background development activity was present.
 
+### 2026-10-18 UTC: Actual app, final 1.0.1 against 1.0.0, back to back
+
+Host and method as in the 2026-10-16 entry below: development clones on the 32-key Mac Sensors Dev Bench, 1.0.0 release addons, quiet arms without trace switches, interval forced by the measurement-only switch. The 1.0.1 build is the final candidate 088ad51 (release bundle bin/plugin.js SHA-256 fe905d3f494bb31ba079aa24c9d88a97448a690d387a397c03f274ebff494c82); the 1.0.0 build was rebuilt from tag v1.0.0 and its unpatched plugin.js equals the installed production file. Each interval ran two back-to-back pairs in opposite order, so drift between sessions cancels.
+
+| Read every | Plugin CPU, one core: 1.0.0 / 1.0.1 (means of two arms) | Paired difference | Interrupt wakeups per second: 1.0.0 / 1.0.1 | RSS maximum, MiB: 1.0.0 / 1.0.1 |
+| --- | --- | --- | --- | --- |
+| 1 second | 0.855% / 0.668% | -0.187 points (-21.9%), pairs within 0.001 | 5.11 / 5.14 | 97.7 and 90.2 / 88.2 and 89.3 |
+| 250 ms | 3.164% / 2.478% | -0.686 points (-21.7%), pairs within 0.076 | 18.07 / 17.78 | 109.6 and 107.8 / 95.9 and 94.6 |
+
+- Threads stayed at 12 and file descriptors at 49 in every arm.
+- The traced arm at 1 second showed the settle timer armed for the first eight reads after keys appeared and skipped on all 631 later reads; the wait between sources had a median of 11.5 ms and a maximum of 40.2 ms. No key received two frames for one read after the first read, and no identical frame twice in a row. In the first read after keys appear, keys with counter readings get a second frame when the rebaseline read brings CPU usage or a rate.
+- Ten show and hide cycles balanced poller start and stop, did no work while hidden, and restarted the fast-read count each time.
+- The arms cannot separate the causes of the CPU saving: one publication per read, measurement keys built once per packet and one snapshot accept per tick all changed together.
+- Not covered here: a slow read after a fast run, a status screen during reads and a Read every change during a wait (unit and mock-host tests only), keys that mix system and SMC readings (no app editor access), dials and the detail view.
+
 ### 2026-10-16 UTC: Actual app, 1.0.0 and 1.0.1 development clones
 
 Host: Mac17,9, M5 Pro, macOS 27.0.1, Stream Deck 7.5.0.22885, app Node 24.13.1. Both builds ran as the development identity with the 1.0.0 release native addons on the 32-key Mac Sensors Dev Bench (an 8 by 4 Virtual Stream Deck, 20 system and 12 SMC single-reading keys). The development process observer sampled every 5 seconds. "Quiet" arms ran without any trace switch; the interval was forced by a measurement-only switch that is not part of either release build. Other development test runs were active during parts of both sessions (load average about 2 to 5). The 1.0.1 columns are measurement builds of the 1.0.1 candidate at 16c21a7, whose release bundle is bin/plugin.js SHA-256 ef3ae8666320435e286940c96a668c08494c94c8088e446af445ee33d0ab07e4; the candidate armed a 100 ms settle timer on every read. The final 1.0.1 build waits for fast reads without that timer and has not been measured in the app yet; the next section has mock-host figures for that change.
