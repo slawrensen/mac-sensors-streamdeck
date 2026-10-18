@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "command": "npm run docs:assets",
   "renderer": {
     "name": "Installed app QtSvg through a measured local adapter",
@@ -503,7 +503,7 @@
       "file": "status.png",
       "width": 1280,
       "height": 720,
-      "sha256": "db47a2afc2d99a6a4177147b84af0ccbe05fd4e4bac51fb5e61de153feb4e6af",
+      "sha256": "8c5edfb300fd45d2c8f23b76e590d066be90628ab21f864593aaf9445c7b81c1",
       "sceneIds": [
         "status-pending",
         "status-busy",
