@@ -93,3 +93,20 @@ test('a non-finite clock at the first request still leaves the rebaseline its fu
 		provider.close();
 	} finally { mock.timers.reset(); }
 });
+test('each SMC row keeps its own measurement key when a packet carries several rows',async()=>{
+	const r=rig();r.provider.read();await publish(r,'public');
+	const smc=packet('smc');const first=smc.rows[0]!;
+	smc.rows=[first,{...first,key:'F0Ac',label:'Fan 1',group:'Fans',kind:'fan',unit:'RPM',value:1234},{...first,key:'PSTR',label:'System power',group:'System',kind:'power',unit:'W',value:7.5}];
+	await publish(r,'smc',smc);const snapshot=r.provider.current()!;
+	const byLabel=new Map(snapshot.readings.map(reading=>[reading.label,reading]));
+	assert.equal(byLabel.get('Fan 1')?.key,'mac:v1:smc:Mac17%2C9:46304163:rpm.v1');assert.equal(byLabel.get('Fan 1')?.value,1234);
+	assert.equal(byLabel.get('System power')?.key,'mac:v1:smc:Mac17%2C9:50535452:power.v1');assert.equal(byLabel.get('System power')?.value,7.5);
+	assert.equal(byLabel.get(first.label)?.key,measurementKey('smc',first,'Mac17,9'));
+	r.provider.close();
+});
+test('a missing model on the first SMC row withholds it instead of throwing',()=>{
+	const row=packet('smc').rows[0]!;
+	assert.equal(measurementKey('smc',row,undefined as unknown as string),null);
+	assert.equal(measurementKey('smc',row,''),null);
+	assert.ok(measurementKey('smc',row,'Mac17,9')?.startsWith('mac:v1:smc:Mac17%2C9:'));
+});

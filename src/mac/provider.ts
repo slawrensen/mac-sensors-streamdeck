@@ -36,7 +36,7 @@ export function encodeModel(model:string): string | null {
 let lastModel:{model:string;encoded:string|null}|null=null;
 export function measurementKey(source:NativeSource,row:NativeRow,model:string):string|null {
 	if(source==='public')return SYSTEM_KEYS.has(row.key)?`mac:v1:system:${row.key}`:null;
-	if(lastModel?.model!==model)lastModel={model,encoded:encodeModel(model)};
+	if(lastModel===null||lastModel.model!==model)lastModel={model,encoded:encodeModel(model)};
 	const encoded=lastModel.encoded,kind=KIND[row.kind];
 	if(encoded===null||!/^[\x20-\x7e]{4}$/.test(row.key)||!kind)return null;
 	return `mac:v1:smc:${encoded}:${Buffer.from(row.key,'ascii').toString('hex')}:${kind.meaning}`;
