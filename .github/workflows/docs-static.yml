@@ -38,7 +38,7 @@ jobs:
                   text = p.read_text()
                   if re.search(r'/Users/|C:\\Users\\|-----BEGIN [A-Z ]*PRIVATE KEY-----|\bgh[pousr]_[A-Za-z0-9]{20,}|RELEASE_RUNBOOK|COPY_RULES|STREAM_DECK_MARKETPLACE|\.private\b', text):
                       raise SystemExit('Private material in static export: ' + name)
-                  if re.search(r'github\.com/slawrensen/mac-sensors-streamdeck', text):
+                  if re.search(r'github\.com[/:]slawrensen/mac-(?:sensors-)?streamdeck', text, re.I):
                       raise SystemExit('Link to the private product repository in static export: ' + name)
           if {p.stem for p in root.glob('*.html')} != pages: raise SystemExit('Documentation page inventory differs')
           print('Validated', len(files), 'static documentation files; no product source or release package.')
