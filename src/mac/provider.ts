@@ -3,7 +3,10 @@ import type { SnapshotProvider } from '../hwinfo/provider';
 import type { NativeBridge, NativePacket, NativeRow, NativeSession, NativeSource } from './native-api';
 import { constants } from 'node:os';
 import { MacSensorError } from './bridge';
-const TTL=15_000;
+/** How long a reading stays live after its own acquisition; past it the reading is removed, never shown as current. */
+export const TTL_MS=15_000;
+/** Shown while no reading is live yet, and again when every live reading lapsed before a full read completed. */
+export const PENDING_MESSAGE='Readings appear after the first successful sample.';
 /** Shortest offered Read every, and the target start of the rebaseline read counted from the first read's request, so CPU usage and rates appear this soon instead of one full interval later. */
 const COUNTER_REBASELINE_MS=250;
 /** Shortest counter window around the rebaseline read. The kernel counts CPU time in 10 ms ticks (kern.clockrate hz 100), so 200 ms holds about twenty. The native read takes CPU ticks after its font check and network and storage counters last, so the rebaseline read never starts sooner than this after the first read completed, and a tick that would follow a kept rebaseline sample by less than this reads only SMC. At the 500 ms setting the regular tick keeps its read when the first read finishes within 100 ms. */
@@ -29,9 +32,12 @@ export function encodeModel(model:string): string | null {
 	if(!model||model.length>128||[...model].some(character=>character.charCodeAt(0)<32||character.charCodeAt(0)===127)||Buffer.from(model,'utf8').toString('utf8')!==model)return null;
 	return [...Buffer.from(model,'utf8')].map(byte=>/[A-Za-z0-9._~-]/.test(String.fromCharCode(byte))?String.fromCharCode(byte):'%'+byte.toString(16).toUpperCase().padStart(2,'0')).join('');
 }
+/** encodeModel's answer for the last model seen: every SMC row of a packet, and every packet on one Mac, carries the same model, and encoding it per row was about half of the provider's per-read CPU and allocation (2026-10-17 review bench). */
+let lastModel:{model:string;encoded:string|null}|null=null;
 export function measurementKey(source:NativeSource,row:NativeRow,model:string):string|null {
 	if(source==='public')return SYSTEM_KEYS.has(row.key)?`mac:v1:system:${row.key}`:null;
-	const encoded=encodeModel(model),kind=KIND[row.kind];
+	if(lastModel?.model!==model)lastModel={model,encoded:encodeModel(model)};
+	const encoded=lastModel.encoded,kind=KIND[row.kind];
 	if(encoded===null||!/^[\x20-\x7e]{4}$/.test(row.key)||!kind)return null;
 	return `mac:v1:smc:${encoded}:${Buffer.from(row.key,'ascii').toString('hex')}:${kind.meaning}`;
 }
@@ -110,20 +116,21 @@ export class MacProvider implements SnapshotProvider {
 		if(packet.error!==0)this.factsValue.sourceErrors[source]={code:packet.error===10?'HWMAC_NO_SERVICE':packet.error===11?'HWMAC_OPEN':'HWMAC_SOURCE',operation:packet.error===10?'smc.matchService':packet.error===11?'smc.open':`${source}.read`,systemCode:packet.systemCode};
 		else delete this.factsValue.sourceErrors[source];
 		const now=this.native.now();
-		if(packet.source!==source||packet.error!==0||!Number.isFinite(now)||!Number.isFinite(packet.continuousMs)||packet.continuousMs>now||now-packet.continuousMs>=TTL||packet.rows.length>128){this.removeSource(source);if(source==='public')this.previousPublic=null;this.notice(`${source} readings unavailable; other sources continue.`);return;}
+		if(packet.source!==source||packet.error!==0||!Number.isFinite(now)||!Number.isFinite(packet.continuousMs)||packet.continuousMs>now||now-packet.continuousMs>=TTL_MS||packet.rows.length>128){this.removeSource(source);if(source==='public')this.previousPublic=null;this.notice(`${source} readings unavailable; other sources continue.`);return;}
 		if(source==='public'){this.fontKnown=true;this.fontAvailable=packet.fontAvailable===true;}
 		const rows=[...packet.rows,...(source==='public'?counterRows(this.previousPublic,packet):[])];
 		if(source==='public'){
-			// Once per generation: the first accepted packet only sets the counter baseline, so read public again after the shortest interval.
-			if(this.previousPublic===null&&!this.rebaselined){this.rebaselined=true;const sinceRequest=this.publicRequestedAt===null?0:this.native.now()-this.publicRequestedAt,elapsed=Number.isFinite(sinceRequest)?Math.max(0,sinceRequest):0;this.rebaseline=setTimeout(()=>{this.rebaseline=null;this.request('public');if(this.pending.has('public'))this.rebaselineStartedAt=this.native.now();},Math.max(MIN_COUNTER_WINDOW_MS,COUNTER_REBASELINE_MS-elapsed)).unref();}
+			if(this.previousPublic===null&&!this.rebaselined)this.armRebaseline(now);
 			this.previousPublic=packet;
 		}
+		// One key per row, shared by the duplicate count and the acceptance pass.
+		const keys=rows.map(row=>measurementKey(source,row,packet.model));
 		const counts=new Map<string,number>();
-		for(const row of rows){const key=measurementKey(source,row,packet.model);if(key)counts.set(key,(counts.get(key)??0)+1);}
+		for(const key of keys)if(key)counts.set(key,(counts.get(key)??0)+1);
 		const accepted=new Map<string,Accepted>();
-		for(const row of rows) {
-			const key=measurementKey(source,row,packet.model),kind=KIND[row.kind];
-			if(!key||counts.get(key)!==1||!kind||!row.valid||!Number.isFinite(row.value)||row.value<kind.minimum||row.value>kind.maximum||!Number.isFinite(row.continuousMs)||row.continuousMs<0||row.continuousMs>now||now-row.continuousMs>=TTL||!Number.isFinite(row.wallSeconds))continue;
+		for(let index=0;index<rows.length;index++) {
+			const row=rows[index]!,key=keys[index],kind=KIND[row.kind];
+			if(!key||counts.get(key)!==1||!kind||!row.valid||!Number.isFinite(row.value)||row.value<kind.minimum||row.value>kind.maximum||!Number.isFinite(row.continuousMs)||row.continuousMs<0||row.continuousMs>now||now-row.continuousMs>=TTL_MS||!Number.isFinite(row.wallSeconds))continue;
 			const reading:Reading={key,type:kind.type,sensorIndex:0,id:0,label:row.label,unit:row.unit,value:row.value,valueMin:NaN,valueMax:NaN,valueAvg:NaN,statistics:'unavailable',observationTime:row.continuousMs,observationRevision:++this.observation};
 			const previous=this.rows.get(key);
 			if(previous&&previous.reading.value!==reading.value)this.freshnessRevision++;
@@ -139,6 +146,16 @@ export class MacProvider implements SnapshotProvider {
 		if(source==='smc'&&(packet.model!=='Mac17,9'||packet.chip!=='t6050'))this.notice('This model uses common typed sensors; its generation-specific catalog is not qualified.');
 		this.rebuild();
 	}
+	/**
+	 * Once per generation: the first accepted public packet only sets the counter baseline, so read public again
+	 * COUNTER_REBASELINE_MS after its request, never sooner than MIN_COUNTER_WINDOW_MS after it completed (now).
+	 * A missing or non-finite request time leaves the full delay. The rebaseline read's start is the request time that request() stamps.
+	 */
+	private armRebaseline(now:number):void {
+		this.rebaselined=true;
+		const sinceRequest=now-(this.publicRequestedAt??NaN),elapsed=Number.isFinite(sinceRequest)?Math.max(0,sinceRequest):0;
+		this.rebaseline=setTimeout(()=>{this.rebaseline=null;this.request('public');if(this.pending.has('public'))this.rebaselineStartedAt=this.publicRequestedAt;},Math.max(MIN_COUNTER_WINDOW_MS,COUNTER_REBASELINE_MS-elapsed)).unref();
+	}
 	private request(source:NativeSource):void {
 		if(this.closed||this.pending.has(source)||this.retries.has(source))return;
 		try {
@@ -151,7 +168,7 @@ export class MacProvider implements SnapshotProvider {
 		}
 	}
 	read():SensorSnapshot|null {
-		if(this.closed)throw new MacSensorError('pending','Readings appear after the first successful sample.');
+		if(this.closed)throw new MacSensorError('pending',PENDING_MESSAGE);
 		// Counters are only meaningful over a real window: two public reads a few ms apart give CPU usage and rates from almost no ticks or bytes.
 		// So a tick read due before the rebaseline replaces it, and a tick just after a rebaseline read that kept a baseline (a Read every change restarted the timer) keeps that sample.
 		if(this.rebaseline){clearTimeout(this.rebaseline);this.rebaseline=null;}
@@ -171,18 +188,19 @@ export class MacProvider implements SnapshotProvider {
 		this.snapshot={catalogRevision:this.catalogRevision,pollTime:latest?.row.wallSeconds??0,valueRevision:this.valueRevision,freshnessRevision:this.freshnessRevision,version:1,revision:1,sensors,readings,byKey:new Map(readings.map(reading=>[reading.key,reading]))};
 	}
 	current():SensorSnapshot|null {
-		if(this.closed)throw new MacSensorError('pending','Readings appear after the first successful sample.');
+		if(this.closed)throw new MacSensorError('pending',PENDING_MESSAGE);
 		const now=this.native.now();
 		if(!Number.isFinite(now)){this.rows.clear();this.dirty=true;this.catalogDirty=true;this.rebuild();throw new MacSensorError('source-error','The measurement clock is unavailable.');}
-		for(const [key,item] of this.rows)if(now-item.row.continuousMs>=TTL||now<item.row.continuousMs){this.rows.delete(key);this.dirty=true;this.catalogDirty=true;}
+		for(const [key,item] of this.rows)if(now-item.row.continuousMs>=TTL_MS||now<item.row.continuousMs){this.rows.delete(key);this.dirty=true;this.catalogDirty=true;}
 		if(this.dirty)this.rebuild();
 		if(this.fontKnown&&!this.fontAvailable)throw new MacSensorError('font-missing','Install Tahoma Bold in Font Book, then choose Check again.');
-		if(!this.fontKnown&&this.completed.size<2){if(now-this.startedAt>=TTL)throw new MacSensorError('busy','The sensor source is still busy. Choose Check again.');return null;}
+		if(!this.fontKnown&&this.completed.size<2){if(now-this.startedAt>=TTL_MS)throw new MacSensorError('busy','The sensor source is still busy. Choose Check again.');return null;}
 		if(!this.fontKnown)throw new MacSensorError('source-error','The font prerequisite could not be checked. Choose Check again.');
 		if(this.rows.size===0&&this.completed.size===2)throw new MacSensorError('no-readable-sensors','No recent readable sensors were found. Choose Copy support report.');
 		return this.rows.size?this.snapshot:null;
 	}
-	untilExpiry():number|null {if(this.closed)return null;const now=this.native.now();if(!Number.isFinite(now))return 0;if(!this.rows.size)return !this.fontKnown&&this.completed.size<2&&now-this.startedAt<TTL?this.startedAt+TTL-now:null;return Math.max(0,Math.min(...[...this.rows.values()].map(item=>item.row.continuousMs+TTL-now)));}
+	/** Ms until the next row expires. No deadline while the clock is not finite: current() has already cleared the rows, and the interval tick rechecks, so a NaN clock cannot drive a 1 ms expiry loop. */
+	untilExpiry():number|null {if(this.closed)return null;const now=this.native.now();if(!Number.isFinite(now))return null;if(!this.rows.size)return !this.fontKnown&&this.completed.size<2&&now-this.startedAt<TTL_MS?this.startedAt+TTL_MS-now:null;return Math.max(0,Math.min(...[...this.rows.values()].map(item=>item.row.continuousMs+TTL_MS-now)));}
 	age():number|null {if(this.closed||!this.rows.size)return null;const now=this.native.now();return Number.isFinite(now)?Math.max(...[...this.rows.values()].map(item=>now-item.row.continuousMs)):null;}
 	close():void {if(this.closed)return;this.closed=true;for(const retry of this.retries.values())clearTimeout(retry);this.retries.clear();if(this.rebaseline)clearTimeout(this.rebaseline);this.rebaseline=null;this.rows.clear();this.snapshot=null;this.previousPublic=null;this.factsValue.sourceRows={public:0,smc:0};this.report(this.facts());this.session.close();}
 }

@@ -11,7 +11,7 @@ import { bareReadingKey } from '../../src/detail/detail-settings';
 import { HwinfoError, SensorType, type Reading, type SensorSnapshot } from '../../src/hwinfo/types';
 import { SessionStatsStore } from '../../src/stats';
 import { setFaceFont, faceFont } from '../../src/ui/face-font';
-import { statusScreen, statusDialText, statusSentence } from '#platform/status';
+import { missingReadingScreen, statusScreen, statusDialText, statusSentence } from '#platform/status';
 import { renderStatusKey } from '../../src/ui/key-renderer';
 const key='mac:v1:smc:Mac17%2C9:54703030:temp.v1';
 function row(revision=1): Reading { return {key,type:SensorType.Temperature,sensorIndex:0,id:1,label:'CPU',unit:'°C',value:40,valueMin:NaN,valueMax:NaN,valueAvg:NaN,statistics:'unavailable',observationTime:revision*10,observationRevision:revision}; }
@@ -21,6 +21,16 @@ test('Mac test aliases select the same declared platform modules as the bundle',
 	process.env.HWINFO_LOG_LEVEL='trace';delete process.env.MACSENSORS_LOG_LEVEL;assert.equal(environment('LOG_LEVEL'),undefined);
 	process.env.MACSENSORS_LOG_LEVEL='debug';assert.equal(environment('LOG_LEVEL'),'debug');delete process.env.MACSENSORS_LOG_LEVEL;delete process.env.HWINFO_LOG_LEVEL;
 	assert.equal(parseSourceMode('gadget'),'auto');setFaceFont('segoe-ui');assert.equal(faceFont().id,'tahoma');
+});
+test('ws server-only modules are side-effect free to tree shaking, so server code the SDK client never runs stays out of the bundle',async()=>{
+	// A computed specifier, because the rollup config is plain JS without type declarations.
+	const configUrl=new URL('../../rollup.config.mjs',import.meta.url).href;
+	const {default:config}=await import(configUrl) as {default:{treeshake:{moduleSideEffects:(id:string)=>boolean}}};
+	const sideEffects=config.treeshake.moduleSideEffects,ws=(file:string):string=>`/repo/node_modules/ws/lib/${file}.js`;
+	for(const file of ['websocket-server','stream','subprotocol'])assert.equal(sideEffects(ws(file)),false,file);
+	for(const file of ['websocket','receiver','sender','permessage-deflate','extension','validation','constants'])assert.equal(sideEffects(ws(file)),true,file);
+	assert.equal(sideEffects('/repo/node_modules/@elgato/utils/dist/lists/index.js'),false);
+	assert.equal(sideEffects('/repo/src/plugin.ts'),true);
 });
 test('canonical Mac keys survive both copied key parsers unchanged',()=>{
 	const text=readFileSync('com.lawrensen.mac.sdPlugin/ui/pi-common.js','utf8');
@@ -75,6 +85,15 @@ test('explicit rechecks read only while an action is visible',()=>{
 	let reads=0;const subject=new MacPoller(()=>({read:()=>{reads++;return snapshot();},current:()=>snapshot(),untilExpiry:()=>null,age:()=>0,close:()=>{}}));
 	subject.checkAgain();assert.equal(reads,0);subject.retain();assert.equal(reads,1);subject.checkAgain();assert.equal(reads,2);subject.release();subject.checkAgain();assert.equal(reads,2);
 });
+test('a read checks the snapshot and arms expiry once, and a read that throws still ends in its failure',()=>{
+	const calls={current:0,untilExpiry:0};
+	const subject=new MacPoller(()=>({read:()=>snapshot(),current:()=>{calls.current++;return snapshot();},untilExpiry:()=>{calls.untilExpiry++;return null;},age:()=>0,close:()=>{}}));
+	subject.retain();assert.deepEqual(calls,{current:1,untilExpiry:1});subject.checkAgain();assert.deepEqual(calls,{current:2,untilExpiry:2});subject.release();
+	const reasons=(poller:MacPoller):string[]=>{const seen:string[]=[];poller.onTick(status=>seen.push(status.state==='unavailable'?status.reason:status.state));poller.retain();poller.release();return seen;};
+	const denied=new HwinfoError('access-denied','Denied');
+	assert.deepEqual(reasons(new MacPoller(()=>({read:()=>{throw denied;},current:()=>{throw denied;},untilExpiry:()=>null,age:()=>null,close:()=>{}}))),['access-denied']);
+	assert.deepEqual(reasons(new MacPoller(()=>{throw new HwinfoError('bridge-failed','No bridge');})),['bridge-failed']);
+});
 test('readings that lapse before SMC ever completes are not kept live, whether public then fails, stalls or both sources had completed',async()=>{
 	const memory='mac:v1:system:memory-total';
 	const row=(source:NativeSource,at:number):NativeRow=>({key:source==='smc'?'TB1T':'memory-total',label:source,group:source==='smc'?'Battery':'Memory',kind:source==='smc'?'temperature':'other',unit:source==='smc'?'°C':'B',value:source==='smc'?30:1024,valid:true,continuousMs:at,wallSeconds:1.7e9+at/1000,error:0,systemCode:0});
@@ -98,4 +117,8 @@ test('readings that lapse before SMC ever completes are not kept live, whether p
 test('the font-missing hint states the repair once; the panel already says saved settings stay',()=>{
 	assert.equal(statusSentence({state:'unavailable',reason:'font-missing',message:'Missing'}),'Install Tahoma Bold in Font Book, then choose Check again.');
 	const shell=readFileSync('com.lawrensen.mac.sdPlugin/ui/pi-shell.js','utf8');assert.match(shell,/Your reading and every setting stay saved\./);
+});
+test('the missing-reading face names the panel remedy, a new pick, as the shared copy does',()=>{
+	assert.deepEqual(missingReadingScreen().lines,['Sensor missing','pick again']);
+	const svg=renderStatusKey(missingReadingScreen());assert.match(svg,/pick again/);assert.doesNotMatch(svg,/check again/);
 });

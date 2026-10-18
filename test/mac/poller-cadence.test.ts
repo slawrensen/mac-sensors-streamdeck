@@ -37,19 +37,22 @@ interface Rig { poller: MacPoller; emits: Emit[]; reads: Record<NativeSource, nu
 /** Read duration in ms: fixed, or by the 1-based count of that source's reads (the first read of a session is the slow cold one). */
 type Delay = number | ((n: number) => number);
 /** Real MacPoller and MacProvider over a fake bridge whose reads settle after a delay per source. */
-function rig(delay: Record<NativeSource, Delay>, options: { smcError?: boolean; publicError?: (n: number) => boolean; cpu?: boolean; intervalMs?: number; clock?: false } = {}): Rig {
+function rig(delay: Record<NativeSource, Delay>, options: { smcError?: boolean; publicError?: (n: number) => boolean; cpu?: boolean; intervalMs?: number; clock?: false; asleepMs?: () => number; clockFails?: () => boolean } = {}): Rig {
 	const reads: Record<NativeSource, number[]> = { public: [], smc: [] };
+	// asleepMs: time the Mac spent asleep so far. The native continuous clock counts it; the awake clock and Node timers do not.
+	// clockFails: the native clock reads NaN, as when mach_timebase_info fails.
+	const continuous = (): number => (options.clockFails?.() ? NaN : Date.now() + (options.asleepMs?.() ?? 0));
 	const row = (key: string, kind: string, unit: string, value: number, at: number): NativeRow => ({ key, label: key, group: kind === 'temperature' ? 'Battery' : 'Memory', kind, unit, value, valid: true, continuousMs: at, wallSeconds: 1.7e9 + at / 1000, error: 0, systemCode: 0 });
 	const packet = (source: NativeSource, n: number, at: number): NativePacket => ({
-		source, continuousMs: at, awakeMs: at, wallSeconds: 1.7e9 + at / 1000, durationMs: 1, error: (source === 'smc' && options.smcError) || (source === 'public' && options.publicError?.(n)) ? 12 : 0, systemCode: 0, operation: 'fixture',
+		source, continuousMs: at, awakeMs: at - (options.asleepMs?.() ?? 0), wallSeconds: 1.7e9 + at / 1000, durationMs: 1, error: (source === 'smc' && options.smcError) || (source === 'public' && options.publicError?.(n)) ? 12 : 0, systemCode: 0, operation: 'fixture',
 		rows: source === 'public' ? [row('memory-free', 'other', 'B', 1e9 + n * 4096, at)] : options.smcError ? [] : [row('TB1T', 'temperature', '°C', 40 + (n % 9), at)],
 		model: 'Mac17,9', chip: 't6050', appleSilicon: 1, translated: 0, translationError: 0, fontAvailable: true, cpuValid: options.cpu === true, cpuTicks: [[Math.floor(at / CPU_TICK_MS) * 3, 0, Math.floor(at / CPU_TICK_MS) * 7, 0]],
 		networkValid: false, networkIn: '0', networkOut: '0', networkMembers: '1', storageValid: false, storageRead: '0', storageWrite: '0', storageMembers: '1'
 	});
 	const bridge: NativeBridge = {
 		getBuildInfo: () => ({ protocol: 1, napi: 8, version: 'test', sourceId: 'test', arch: process.arch, platform: 'darwin', testHooks: true }),
-		now: () => Date.now(),
-		open: () => ({ read: (source) => { const at = Date.now(); const n = reads[source].push(at - START_MS); return new Promise((resolve) => { const ms = delay[source]; setTimeout(() => resolve(packet(source, n, at)), typeof ms === 'number' ? ms : ms(n)); }); }, close: () => {} })
+		now: continuous,
+		open: () => ({ read: (source) => { const at = continuous(); const n = reads[source].push(Date.now() - START_MS); return new Promise((resolve) => { const ms = delay[source]; setTimeout(() => resolve(packet(source, n, at)), typeof ms === 'number' ? ms : ms(n)); }); }, close: () => {} })
 	};
 	const poller = new MacPoller((ready) => {
 		const provider = new MacProvider(bridge, ready);
@@ -349,6 +352,23 @@ test('a release inside the settle window leaves no stale publication for the nex
 	assert.equal(emits.find((emit) => emit.at > 90 && emit.mem)?.smc, true, 'the new read publishes once, with SMC');
 });
 
+test('a release while a read waits leaves the next generation no stale wait to score', async () => {
+	const READS = 12;
+	const timers = settleTimers();
+	try {
+		const { poller } = rig({ public: 5, smc: 40 });
+		poller.retain();
+		await advance(6); // public settled at 5 ms, SMC still out
+		poller.release();
+		await advance(INTERVAL_MS);
+		const back = Date.now() - START_MS;
+		poller.retain();
+		await advance(READS * INTERVAL_MS);
+		poller.release();
+		assert.deepEqual(timers.at.filter((at) => at >= back).map((at) => Math.floor((at - back) / INTERVAL_MS)), range(0, TRUSTED_READS), 'the first read after the return counts toward trust');
+	} finally { timers.restore(); }
+});
+
 test('a public failure after the first packet never earns a generation a second rebaseline read', async () => {
 	const { poller, reads } = rig({ public: 5, smc: 40 }, { intervalMs: 5000, publicError: (n) => n === 2 });
 	poller.retain();
@@ -365,4 +385,95 @@ test('a tick just after a failed rebaseline read still reads public', async () =
 	await advance(4 * COUNTER_REBASELINE_MS + 15);
 	poller.release();
 	assert.deepEqual(reads.public, [0, 250, 270, 520, 770, 1020], 'with no baseline kept there is no sample to stand in for the tick at 270 ms');
+});
+
+test('a read that starts from a status screen is always timed, so a slow SMC read after a sleep past the TTL holds system readings at most the settle window', async () => {
+	// Review T8: a trusted run, then a sleep longer than the 15 s TTL expires every reading, and the first SMC read after the wake is slow.
+	const SLEEP_MS = 60_000;
+	const SLOW_AFTER_WAKE_MS = 1500;
+	const PUBLIC_MS = 5;
+	const FAST_READS = 12;
+	for (const intervalMs of [INTERVAL_MS, 5000]) {
+		let asleep = 0;
+		const timers = settleTimers();
+		try {
+			const { poller, emits } = rig({ public: PUBLIC_MS, smc: () => (asleep ? SLOW_AFTER_WAKE_MS : 40) }, { intervalMs, asleepMs: () => asleep });
+			const start = Date.now() - START_MS;
+			poller.retain();
+			await advance(FAST_READS * intervalMs + intervalMs / 2);
+			assert.deepEqual(timers.at.filter((at) => at >= start + TRUSTED_READS * intervalMs), [], `${intervalMs} ms: the reads before the sleep were trusted (untimed)`);
+			asleep = SLEEP_MS;
+			const woke = Date.now() - START_MS;
+			await advance(2 * intervalMs + SLOW_AFTER_WAKE_MS);
+			poller.release();
+			const after = emits.filter((emit) => emit.at >= woke);
+			const screen = after.find((emit) => emit.status.state !== 'ok'), back = after.find((emit) => emit.status.state === 'ok');
+			assert.ok(screen && back, `${intervalMs} ms: ${JSON.stringify(after.map((emit) => [emit.at, emit.status.state]))}`);
+			assert.ok(back.at - screen.at <= PUBLIC_MS + SETTLE_WINDOW_MS, `${intervalMs} ms: the status screen stayed ${back.at - screen.at} ms while system readings were ready`);
+			assert.equal(back.mem, true, `${intervalMs} ms: system readings come back first`);
+		} finally { timers.restore(); }
+	}
+});
+
+test('a Read every change publishes a waiting read at once instead of holding it into the new interval', async () => {
+	// Review T4: trusted, SMC read 11 hangs, public settles 5 ms after the tick, and the setting changes 15 ms before the next tick.
+	const HUNG_SMC_READ = 11; // 1-based, after ten fast reads
+	const HUNG_MS = 600_000;
+	const CHANGE_LEAD_MS = 15;
+	const PUBLIC_MS = 5;
+	for (const [fromMs, toMs] of [[INTERVAL_MS, 5000], [INTERVAL_MS, COUNTER_REBASELINE_MS], [5000, COUNTER_REBASELINE_MS]] as const) {
+		const { poller, emits, reads } = rig({ public: PUBLIC_MS, smc: (n) => (n === HUNG_SMC_READ ? HUNG_MS : 40) }, { intervalMs: fromMs });
+		const start = Date.now() - START_MS;
+		poller.retain();
+		await advance(HUNG_SMC_READ * fromMs - CHANGE_LEAD_MS);
+		const changedAt = Date.now() - START_MS;
+		poller.setIntervalMs(toMs);
+		await advance(2 * toMs + 2 * SETTLE_WINDOW_MS);
+		poller.release();
+		const hungAt = reads.smc[HUNG_SMC_READ - 1]!, published = firstPublished(emits);
+		assert.equal(hungAt, start + (HUNG_SMC_READ - 1) * fromMs, `${fromMs}->${toMs} ms: the hung SMC read`);
+		assert.ok(published.get(hungAt)! <= changedAt, `${fromMs}->${toMs} ms: public read at ${hungAt} ms (settled ${hungAt + PUBLIC_MS}) published at ${published.get(hungAt)} ms, after the change at ${changedAt} ms`);
+		const nextAt = reads.public.find((at) => at > changedAt)!;
+		assert.ok(published.get(nextAt)! - nextAt <= PUBLIC_MS + SETTLE_WINDOW_MS, `${fromMs}->${toMs} ms: with SMC still out, public read at ${nextAt} ms published at ${published.get(nextAt)} ms`);
+	}
+});
+
+test('a Read every change starts trust over', async () => {
+	const FAST_READS = 12;
+	const NEW_INTERVAL_MS = 2000;
+	const timers = settleTimers();
+	try {
+		const { poller } = rig({ public: 5, smc: 40 });
+		poller.retain();
+		await advance(FAST_READS * INTERVAL_MS + INTERVAL_MS / 2);
+		const changedAt = Date.now() - START_MS;
+		poller.setIntervalMs(NEW_INTERVAL_MS);
+		await advance(FAST_READS * NEW_INTERVAL_MS);
+		poller.release();
+		// The restarted timer's first read starts one new interval after the change.
+		assert.deepEqual(timers.at.filter((at) => at >= changedAt).map((at) => Math.floor((at - changedAt) / NEW_INTERVAL_MS)), range(1, TRUSTED_READS + 1), 'the reads after the change are timed until they prove fast again');
+	} finally { timers.restore(); }
+});
+
+test('a clock that reads NaN publishes about once per read, not on a 1 ms expiry loop, and readings return when it recovers', async () => {
+	// Review T7a: the native clock reads NaN for three reads. untilExpiry used to answer 0, and the poller re-armed a 1 ms expiry timer forever.
+	const FAILS_FROM_MS = 10_500, FAILS_FOR_MS = 3000;
+	let fails = false;
+	const { poller, emits, reads } = rig({ public: 5, smc: 40 }, { clockFails: () => fails });
+	poller.retain();
+	await advance(FAILS_FROM_MS);
+	fails = true;
+	await advance(FAILS_FOR_MS);
+	fails = false;
+	await advance(2 * INTERVAL_MS);
+	poller.release();
+	const during = emits.filter((emit) => emit.at >= FAILS_FROM_MS && emit.at < FAILS_FROM_MS + FAILS_FOR_MS);
+	const readsDuring = reads.smc.filter((at) => at >= FAILS_FROM_MS && at < FAILS_FROM_MS + FAILS_FOR_MS).length;
+	assert.equal(readsDuring, FAILS_FOR_MS / INTERVAL_MS);
+	// Each read publishes at its tick and once more when its sources settle.
+	assert.ok(during.length <= 2 * readsDuring, `${during.length} publications during ${readsDuring} reads`);
+	assert.deepEqual([...new Set(during.map((emit) => emit.status.state === 'unavailable' ? emit.status.reason : emit.status.state))], ['source-error']);
+	const recovered = emits.find((emit) => emit.at >= FAILS_FROM_MS + FAILS_FOR_MS && emit.mem && emit.smc);
+	assert.ok(recovered && recovered.at <= FAILS_FROM_MS + FAILS_FOR_MS + INTERVAL_MS, `readings back at ${recovered?.at} ms`);
+	assert.equal(emits.at(-1)?.status.state, 'ok');
 });

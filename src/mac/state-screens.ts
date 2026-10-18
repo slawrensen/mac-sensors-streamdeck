@@ -17,4 +17,5 @@ function copy(status: PollerStatus): typeof COPY[string] { return COPY[status.st
 export function statusScreen(status: PollerStatus): StatusKeyOptions | null { return status.state === 'ok' ? null : { ...copy(status), ...(status.state === 'unavailable' && status.reason === 'font-missing' ? {bitmapDataURI:setupArt.key} : {}) }; }
 export function statusDialText(status: PollerStatus): {title:string;value:string;rasterSVG?:string} | null { const lines=copy(status).lines; return status.state === 'ok' ? null : {title:lines[0],value:lines[1],...(status.state === 'unavailable' && status.reason === 'font-missing' ? {rasterSVG:`<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="100"><image width="200" height="100" xlink:href="${setupArt.dial}"/></svg>`}: {})}; }
 export function statusSentence(status: PollerStatus): string { return status.state === 'ok' ? '' : copy(status).hint; }
-export function missingReadingScreen(): StatusKeyOptions { return {icon:'question',accent:'#f5a623',lines:['Sensor missing','check again']}; }
+/** The saved reading is absent on this Mac: checking again cannot bring it back, so the face names the panel remedy (the shared copy's words). */
+export function missingReadingScreen(): StatusKeyOptions { return {icon:'question',accent:'#f5a623',lines:['Sensor missing','pick again']}; }
