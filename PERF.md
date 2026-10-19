@@ -35,6 +35,36 @@ The repository mock host (`scripts/lib/mock-host.mjs`) ran the 1.0.1 candidate b
 
 This supports the panel help line that shorter intervals use more processor time. It is mock-host evidence with the real read-only native reader, not the Stream Deck app: the app's rasterization and device transfer cost is not included. Background development activity was present.
 
+### 2026-10-18 to 2026-10-19: Final 1.0.1 candidate, 24-hour observation
+
+Command: `npm run soak -- --plugin <frozen dev directory> --out <evidence directory> --hours 24 --interval-ms 60000`. Package SHA-256: 7129b0adc980a89a9f2ab863fbd3b7e3f663cdbe0679913f8bfbf5e0e8d3e414 (316324 bytes). Development bundle SHA-256: 7c24b65d78d8dc53e053190d924338614e30cc7fe4a0a3ce10e3a4151f0fd6b1.
+
+| Measure | Result |
+| --- | --- |
+| Window | 2026-10-18T04:05:25.047Z to 2026-10-19T04:06:25.391Z; 24.017 hours, 1442 samples |
+| Maximum measured RSS slope | -0.011 MiB per 30 minutes |
+| RSS start / close | 76.94 MiB / 82.08 MiB |
+| Maximum RSS | 89.25 MiB |
+| Maximum footprint | 42.82 MiB |
+| File descriptors start / close / maximum | 49 / 49 / 50 |
+| Maximum threads | 12 |
+| CPU time across measured process segments | 574.97 seconds |
+| Observed process identity changes | 0 |
+| WARN / ERROR lines | 0 / 0 |
+| Sampling gaps / freshness flags | 0 / 0 |
+| Unexplained flags | 0 |
+| Resource/freshness gate | PASS |
+
+Each observed process segment is kept, including warm-up. A segment shorter than 30 minutes has no fitted slope.
+
+| Segment | Samples | Hours | RSS start / close | MiB per 30 minutes |
+| --- | --- | --- | --- | --- |
+| 1 | 1442 | 24.017 | 76.94 MiB / 82.08 MiB | -0.011 |
+
+Scope: actual app development identity. Physical gestures, Intel hardware and owner-only events require separate evidence. Event records: 0; their presence alone does not verify recovery. New diagnostic reports: 0; scan errors: 0; review: No new report filenames found in both inspected directories. The observer completed its requested window.
+
+Host: Mac17,9, M5 Pro, macOS 27.0.1, Stream Deck 7.5.0.22885, app Node 24.13.1, 32 single-reading keys on the 8 by 4 Virtual Stream Deck at the default 1 second interval. The development bundle is the 088ad51 release bundle with the development identity and trace switch. For comparison, the 1.0.0 observation on 2026-10-12 recorded RSS start, close and maximum of 83.47, 191.48 and 197.59 MiB under the same harness in a different session; this run stayed between 76.94 and 89.25 MiB. The earlier 16c21a7 observation stopped at 22.25 hours when its launching session ended and is not counted.
+
 ### 2026-10-18 UTC: Actual app, final 1.0.1 against 1.0.0, back to back
 
 Host and method as in the 2026-10-16 entry below: development clones on the 32-key Mac Sensors Dev Bench, 1.0.0 release addons, quiet arms without trace switches, interval forced by the measurement-only switch. The 1.0.1 build is the final candidate 088ad51 (release bundle bin/plugin.js SHA-256 fe905d3f494bb31ba079aa24c9d88a97448a690d387a397c03f274ebff494c82); the 1.0.0 build was rebuilt from tag v1.0.0 and its unpatched plugin.js equals the installed production file. Each interval ran two back-to-back pairs in opposite order, so drift between sessions cancels.
