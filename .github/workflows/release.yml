@@ -5,7 +5,28 @@ on:
 permissions:
   contents: read
 jobs:
+  # A tag builds only when ci.yml already passed every job on the tagged tree
+  # (scripts/verify-ci-checks.mjs). It checks once and never waits or triggers CI.
+  ci-gate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24.13.1
+      - name: Require a passing ci run on the tagged tree
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: node scripts/verify-ci-checks.mjs --once
   build:
+    needs: ci-gate
     runs-on: macos-26
     timeout-minutes: 40
     env:
@@ -57,6 +78,7 @@ jobs:
   draft:
     needs: build
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     permissions:
       contents: write
     steps:

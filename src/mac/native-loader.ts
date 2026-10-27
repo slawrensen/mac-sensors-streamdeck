@@ -5,6 +5,10 @@ import { MacProvider, type ProviderFacts } from './provider';
 import type { SensorSnapshot } from '../hwinfo/types';
 export interface MacSnapshotProvider {
 	read():SensorSnapshot|null;current():SensorSnapshot|null;untilExpiry():number|null;age():number|null;close():void;notices?():string[];
+	/** Reads still out; optional so a provider without it publishes on every completion. */
+	inFlight?():number;
+	/** Monotonic ms; optional so a provider without it keeps the settle timer on every read. */
+	now?():number;
 }
 let facts:ProviderFacts|null=null;
 /** The copied entry uses this binding name; its Mac target never loads the Windows reader. */

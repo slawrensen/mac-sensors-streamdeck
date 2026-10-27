@@ -1,12 +1,12 @@
 {
-  "version": "1.0.0",
+  "version": "1.0.1",
   "assets": [
     {
       "file": "thumbnail.png",
       "kind": "production-rendered sample data",
       "width": 1920,
       "height": 960,
-      "sha256": "3aa28e1e49768e275a1c9f44c6329eddd70120bfb2ae0714f853eb905e4536c1",
+      "sha256": "cae25a3d63c78fb3554c9a4cd4cd3e1093e9641c58d9400925dc1b940ce50dd3",
       "inputs": [
         {
           "file": "docs/assets/img/hero.png",
@@ -19,7 +19,7 @@
       "kind": "production-rendered sample data",
       "width": 1920,
       "height": 960,
-      "sha256": "3aa28e1e49768e275a1c9f44c6329eddd70120bfb2ae0714f853eb905e4536c1",
+      "sha256": "cae25a3d63c78fb3554c9a4cd4cd3e1093e9641c58d9400925dc1b940ce50dd3",
       "inputs": [
         {
           "file": "docs/assets/img/hero.png",
@@ -32,7 +32,7 @@
       "kind": "production-rendered sample data",
       "width": 1920,
       "height": 960,
-      "sha256": "24128266de05123aa607933297c8fc258db43b14671fb56ad0044be37e77b81c",
+      "sha256": "ee7af8578527de2e977b5d7a0a189dcab359cb2830715a27a7c4f83b49d434a6",
       "inputs": [
         {
           "file": "docs/assets/img/themes.png",
@@ -45,7 +45,7 @@
       "kind": "production-rendered sample data",
       "width": 1920,
       "height": 960,
-      "sha256": "45fd8da5ecc60a778aeb4cbfb9ce177869fc84aba26d6f14455d07bfbc71a020",
+      "sha256": "607e6288d9bcbac260ed0772d5494404c51f12e3ec22fc5600289585a805cb1c",
       "inputs": [
         {
           "file": "docs/assets/img/dials.png",
@@ -58,7 +58,7 @@
       "kind": "production-rendered sample data",
       "width": 1920,
       "height": 960,
-      "sha256": "84315122eab21a16cdbe8f73fd27380aae5c7a1c8e61895df97f14845eddd1ba",
+      "sha256": "412f58153544b6a82457ab78a080265b808b5942ac312680c538c9c35d451fad",
       "inputs": [
         {
           "file": "docs/assets/img/key-layouts.png",
@@ -71,7 +71,7 @@
       "kind": "production-rendered sample data",
       "width": 1920,
       "height": 960,
-      "sha256": "45fd8da5ecc60a778aeb4cbfb9ce177869fc84aba26d6f14455d07bfbc71a020",
+      "sha256": "607e6288d9bcbac260ed0772d5494404c51f12e3ec22fc5600289585a805cb1c",
       "inputs": [
         {
           "file": "docs/assets/img/dials.png",
@@ -84,11 +84,11 @@
       "kind": "production-rendered sample data",
       "width": 1920,
       "height": 960,
-      "sha256": "4a7944d3bb665d92318e5d2958855e8e8eef25a1dedc5750218dc9efd0ccba1b",
+      "sha256": "4d246192a63916362bddca3ff8fc9c8f5e3019a6e66f00237019843c826e8dad",
       "inputs": [
         {
           "file": "docs/assets/img/details.png",
-          "sha256": "76d1d369b9dc4ac436872a390c8ec4c7a4d944cd8bb619a83a6898a4966b4f56"
+          "sha256": "23eecc91d7d359bc455cc71d228cc989264cb2eba0f69ff99d8c390363c4fc1c"
         }
       ]
     },
@@ -97,15 +97,15 @@
       "kind": "settings-panel capture, simulated host",
       "width": 1920,
       "height": 960,
-      "sha256": "ccb0819d04d48694514d6c6a531627f02ea8b8660818d017311b80ae789ae890",
+      "sha256": "3f47e3f28dde59af3a9dc129f850c2ba92bc221f468a3a0ca36f4f7fd68322b9",
       "inputs": [
         {
           "file": "docs/assets/img/settings-key.png",
-          "sha256": "2cb000e235224a20e694ceb3e4be7633df7b6740bec819b444ccd751e0c5074f"
+          "sha256": "62aa7f1c18218b4e13aaddd36bc440deeda0fa3b899f9289fb20110282113eb3"
         },
         {
           "file": "docs/assets/img/settings-dial.png",
-          "sha256": "0f115f5243a653c69fd579b7dfa56fd64946f6a14a220bcfb55470afb345eb82"
+          "sha256": "6260235b2669d79a1877cfffc30350219241f82a6048ffbb089c35137b841fbd"
         }
       ]
     },

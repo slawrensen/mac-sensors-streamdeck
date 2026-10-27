@@ -873,8 +873,13 @@ try {
 	await b.click("#sec-alerts > summary");
 	await waitForFoldTraffic(1);
 	check("folds: the first toggle reaches the plugin before the second click", sim.folds.get("key")["sec-alerts"] === false);
+	// Waiting for a count stops at the second message, so a late duplicate
+	// would go unseen; an absence window longer than the 120 ms pause the
+	// check used before keeps a late extra frame failing the exact count.
+	const FOLD_ABSENCE_WINDOW_MS = 150;
 	await b.click("#sec-alerts > summary");
 	await waitForFoldTraffic(2);
+	await sleep(FOLD_ABSENCE_WINDOW_MS);
 	const foldTraffic = sim.piMessages.filter((m) => m.payload?.event === "setPanelFolds");
 	const webStorage = await b.evaluate(`Object.keys(localStorage).concat(Object.keys(sessionStorage)).filter((k) => /fold/i.test(k))`);
 	check("folds: a toggle reaches the plugin's memory, not settings or web storage", foldTraffic.length === 2 && foldTraffic.at(-1).payload.folds["sec-alerts"] === true && same(sim.folds.get("key"), { "sec-alerts": true }) && sim.writes.length === 0 && webStorage.length === 0, JSON.stringify({ sent: foldTraffic.length, plugin: sim.folds.get("key"), webStorage }));
@@ -1408,7 +1413,7 @@ try {
 		const gone = "f00dead0:0:1000001";
 		await open("dial-configured", { settings: { ...dialFx.settings, rotationKeys: [K.gpu, gone, K.hot] } });
 		const miss = await b.evaluate(`(() => { const o = document.querySelector('#rotation-set [role="option"][data-key="${gone}"]'); const pill = o?.querySelector(".hw-chip-missing"); return { pill: pill?.textContent ?? null, shown: pill !== null && pill !== undefined && pill.getClientRects().length > 0, name: o?.textContent ?? null, note: document.querySelector("#rotation-set .hw-set-note")?.textContent ?? null }; })()`);
-		check("R05: a member HWiNFO does not list shows a visible 'missing' pill, and the note counts the two the dial steps through", miss.pill === "missing" && miss.shown && miss.note === "Rotation moves through 2 of these 3 readings, in this order; the missing one is skipped until Mac Sensors lists it again." && sim.writes.length === 0, JSON.stringify(miss));
+		check("R05: a member HWiNFO does not list shows a visible 'missing' pill, and the note counts the two the dial steps through", miss.pill === "missing" && miss.shown && miss.note === "Rotation moves through 2 of these 3 readings, in this order; the missing one is skipped until this Mac reports it again." && sim.writes.length === 0, JSON.stringify(miss));
 		// R07: two drives' "Drive Temperature" are told apart on the chip,
 		// in the toolbar's names and in what is spoken.
 		await open("dial-configured", { settings: { ...dialFx.settings, readingKey: K.drive0, rotationKeys: [K.drive0, K.drive1, K.cpu] } });
@@ -2294,7 +2299,7 @@ try {
 	// ---- truth: data states --------------------------------------------------
 	await open("key-unavailable");
 	const down = await b.evaluate(`({ ph: document.getElementById("picker-search").placeholder, missing: document.getElementById("picker-search").classList.contains("missing"), tone: document.getElementById("reading-status").dataset.tone, state: document.getElementById("head-state").textContent })`);
-	check("truth: an unavailable source never reads as a missing reading", !/not found/i.test(down.ph) && !down.missing && down.tone === "danger" && down.state === "No Mac Sensors data", JSON.stringify(down));
+	check("truth: an unavailable source never reads as a missing reading", !/not found/i.test(down.ph) && !down.missing && down.tone === "danger" && down.state === "No sensor data", JSON.stringify(down));
 	await b.click('#reading-status [data-status-action="setup"]');
 	await sleep(150);
 	const setup = await b.evaluate(`({ open: document.getElementById("setup-help").open, focus: document.activeElement === document.querySelector("#setup-help > summary") })`);
@@ -2493,6 +2498,9 @@ try {
 	await sim.stop();
 }
 
+// scripts/lib/script-failures.mjs sets process.exitCode for an uncaught error
+// that no check saw; the explicit exit below must never turn that into a pass.
+if (process.exitCode) failures.push("run: an uncaught error was reported above");
 console.log(`\n${failures.length === 0 ? "ALL GREEN" : `${failures.length} FAILED`}`);
 for (const f of failures) console.log(`  - ${f}`);
-process.exit(failures.length === 0 ? 0 : 1);
+process.exit(failures.length === 0 && !process.exitCode ? 0 : 1);

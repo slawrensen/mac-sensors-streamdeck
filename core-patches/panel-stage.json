@@ -1,5 +1,6 @@
 {
   "seams": [
+    "S1",
     "S2",
     "S5",
     "S8"
@@ -87,7 +88,7 @@
       },
       {
         "before": "\t\treturn missing === 1 ? \"the missing one is skipped until HWiNFO lists it again\" : `the ${missing} missing ones are skipped until HWiNFO lists them again`;",
-        "after": "\t\treturn missing === 1 ? \"the missing one is skipped until Mac Sensors lists it again\" : `the ${missing} missing ones are skipped until Mac Sensors lists them again`;",
+        "after": "\t\treturn missing === 1 ? \"the missing one is skipped until this Mac reports it again\" : `the ${missing} missing ones are skipped until this Mac reports them again`;",
         "count": 1
       },
       {
@@ -97,7 +98,7 @@
       },
       {
         "before": "\t\t\t\t\t? \"Nothing moves the dial until HWiNFO data returns.\"",
-        "after": "\t\t\t\t\t? \"Nothing moves the dial until Mac Sensors data returns.\"",
+        "after": "\t\t\t\t\t? \"Nothing moves the dial until readings return.\"",
         "count": 1
       },
       {
@@ -107,7 +108,7 @@
       },
       {
         "before": "\t\t\tconst skipped = missing === 0 ? \"\" : ` ${missing === 1 ? \"One missing reading is\" : `${missing} missing readings are`} skipped until HWiNFO lists ${missing === 1 ? \"it\" : \"them\"} again.`;",
-        "after": "\t\t\tconst skipped = missing === 0 ? \"\" : ` ${missing === 1 ? \"One missing reading is\" : `${missing} missing readings are`} skipped until Mac Sensors lists ${missing === 1 ? \"it\" : \"them\"} again.`;",
+        "after": "\t\t\tconst skipped = missing === 0 ? \"\" : ` ${missing === 1 ? \"One missing reading is\" : `${missing} missing readings are`} skipped until this Mac reports ${missing === 1 ? \"it\" : \"them\"} again.`;",
         "count": 1
       },
       {
@@ -142,12 +143,12 @@
       },
       {
         "before": "\t\t\t\tsearchEl.placeholder = \"Saved reading kept (no HWiNFO data to show it)\";",
-        "after": "\t\t\t\tsearchEl.placeholder = \"Saved reading kept (no Mac Sensors data to show it)\";",
+        "after": "\t\t\t\tsearchEl.placeholder = \"Saved reading kept (no sensor data to show it)\";",
         "count": 1
       },
       {
         "before": "\t\t\tconst noneText = shown > 0 ? \"\" : tokens.length > 0 ? `No readings match \"${raw.trim()}\".` : \"HWiNFO publishes no readings right now.\";",
-        "after": "\t\t\tconst noneText = shown > 0 ? \"\" : tokens.length > 0 ? `No readings match \"${raw.trim()}\".` : \"Mac Sensors publishes no readings right now.\";",
+        "after": "\t\t\tconst noneText = shown > 0 ? \"\" : tokens.length > 0 ? `No readings match \"${raw.trim()}\".` : \"No readings to show right now.\";",
         "count": 1
       },
       {
@@ -199,7 +200,12 @@
       },
       {
         "before": "\t\tif (preview?.missing === true || (name === null && preview?.state === \"ok\")) return \"Saved reading not found in HWiNFO\";",
-        "after": "\t\tif (preview?.missing === true || (name === null && preview?.state === \"ok\")) return \"Saved reading not found in Mac Sensors\";",
+        "after": "\t\tif (preview?.missing === true || (name === null && preview?.state === \"ok\")) return \"Saved reading not found on this Mac\";",
+        "count": 1
+      },
+      {
+        "before": "\t/** The read interval the runtime uses, mirroring parsePollInterval\n\t * (src/poller.ts): a finite number is rounded and clamped to 250 ms..60 s,\n\t * anything else is the 1 s default. */\n\tfunction pollIntervalOf(raw) {\n\t\tconst n = typeof raw === \"string\" ? Number(raw) : typeof raw === \"number\" ? raw : Number.NaN;\n\t\treturn Number.isFinite(n) ? Math.min(60_000, Math.max(250, Math.round(n))) : 1000;\n\t}",
+        "after": "\t/** The read interval the Mac runtime uses, mirroring parsePollInterval\n\t * (src/mac/poller.ts): a finite number is rounded and clamped to 250 ms..5 s;\n\t * a blank string, like anything else, is the 1 s default. */\n\tfunction pollIntervalOf(raw) {\n\t\tconst n = typeof raw === \"string\" ? (raw.trim() === \"\" ? Number.NaN : Number(raw)) : typeof raw === \"number\" ? raw : Number.NaN;\n\t\treturn Number.isFinite(n) ? Math.min(5_000, Math.max(250, Math.round(n))) : 1000;\n\t}",
         "count": 1
       }
     ],
@@ -256,7 +262,7 @@
       },
       {
         "before": "\t\tif (p.state === \"unavailable\") return { text: \"No HWiNFO data\", tone: \"danger\" };",
-        "after": "\t\tif (p.state === \"unavailable\") return { text: \"No Mac Sensors data\", tone: \"danger\" };",
+        "after": "\t\tif (p.state === \"unavailable\") return { text: \"No sensor data\", tone: \"danger\" };",
         "count": 1
       },
       {
@@ -286,12 +292,12 @@
       },
       {
         "before": "\t\t\tlines = [p.hint || \"HWiNFO data is unavailable.\"];",
-        "after": "\t\t\tlines = [p.hint || \"Mac Sensors data is unavailable.\"];",
+        "after": "\t\t\tlines = [p.hint || \"Sensor data from this Mac is unavailable.\"];",
         "count": 1
       },
       {
         "before": "\t\t\tlines.push(configured ? \"Your reading and every setting stay saved. Display settings can still be changed; they apply when data returns.\" : \"Readings appear under Reading once HWiNFO publishes data.\");",
-        "after": "\t\t\tlines.push(configured ? \"Your reading and every setting stay saved. Display settings can still be changed; they apply when data returns.\" : \"Readings appear under Reading once Mac Sensors publishes data.\");",
+        "after": "\t\t\tlines.push(configured ? \"Your reading and every setting stay saved. Display settings can still be changed; they apply when data returns.\" : \"Readings appear under Reading once data returns.\");",
         "count": 1
       },
       {
@@ -306,12 +312,12 @@
       },
       {
         "before": "\t\t\t\t\t`The saved reading is not in HWiNFO's current sensor list${tree !== null && Array.isArray(tree.groups) && tree.groups.length === 0 ? \" (HWiNFO publishes no readings right now)\" : \"\"}. It stays saved with its label and colors, and shows again if HWiNFO publishes it (for example after a sensor wakes or HWiNFO restarts).`",
-        "after": "\t\t\t\t\t`The saved reading is not in the sensor source's current sensor list${tree !== null && Array.isArray(tree.groups) && tree.groups.length === 0 ? \" (Mac Sensors publishes no readings right now)\" : \"\"}. It stays saved with its label and colors, and shows again if Mac Sensors publishes it (for example after a sensor wakes or Mac Sensors restarts).`",
+        "after": "\t\t\t\t\t`The ${kind === \"dial\" ? \"dial\" : \"key\"} keeps the saved reading with its label and colors. This Mac does not report it right now${tree !== null && Array.isArray(tree.groups) && tree.groups.length === 0 ? \" (it reports no readings at all)\" : \"\"}; it shows again when this Mac reports it.`",
         "count": 1
       },
       {
         "before": "\t\t\tlines = [\"HWiNFO is running but publishes no readings.\"];",
-        "after": "\t\t\tlines = [\"Mac Sensors is running but publishes no readings.\"];",
+        "after": "\t\t\tlines = [\"This Mac reports no readings right now.\"];",
         "count": 1
       },
       {
@@ -321,7 +327,7 @@
       },
       {
         "before": "\t\t\tannounce(\"check\", picked ? \"HWiNFO answered: the reading is live again.\" : \"HWiNFO is answering again.\", { repeat: true });",
-        "after": "\t\t\tannounce(\"check\", picked ? \"Mac Sensors answered: the reading is live again.\" : \"Mac Sensors is answering again.\", { repeat: true });",
+        "after": "\t\t\tannounce(\"check\", picked ? \"The reading is live again.\" : \"Readings are available again.\", { repeat: true });",
         "count": 1
       },
       {
@@ -365,7 +371,7 @@
     "sensor-dial.html": [
       {
         "before": "<div class=\"hw-field\">\n\t\t\t\t\t\t\t<label for=\"shared-font\">Text font</label>\n\t\t\t\t\t\t\t<select id=\"shared-font\" data-setting=\"textFont\" data-global data-default=\"tahoma\" aria-describedby=\"font-help\">\n\t\t\t\t\t\t\t\t<option value=\"tahoma\">Tahoma</option>\n\t\t\t\t\t\t\t\t<option value=\"segoe-ui\">Segoe UI</option>\n\t\t\t\t\t\t\t</select>\n\t\t\t\t\t\t\t<p class=\"hw-help\" id=\"font-help\">Tahoma is the original look. Segoe UI is lighter and narrower.</p>\n\t\t\t\t\t\t</div>",
-        "after": "<div class=\"hw-field\"><p>Text font: Tahoma Bold</p><p class=\"hw-help\" id=\"mac-font-status\">Saved font settings are kept.</p></div>",
+        "after": "<div class=\"hw-field\"><div class=\"hw-label\">Text font: Tahoma Bold</div><p class=\"hw-help\" id=\"mac-font-status\">Saved font settings are kept.</p></div>",
         "count": 1
       },
       {
@@ -375,7 +381,7 @@
       },
       {
         "before": "\t\t\t\t\t\t<p class=\"hw-help\" id=\"source-help\">Auto switches providers. To keep a selection working on both, link its Shared Memory and Gadget keys in the shared Config document; see <a href=\"https://docs.slawrensen.com/hwinfo-streamdeck/data-sources.html#link-readings-across-providers\" target=\"_blank\" rel=\"noopener\">reading links</a>.</p>",
-        "after": "\t\t\t\t\t\t<p class=\"hw-help\" id=\"source-help\">Available readings depend on this Mac and macOS version. A saved reading stays selected when it is unavailable. See <a href=\"https://docs.slawrensen.com/mac-streamdeck/data-sources.html\" target=\"_blank\" rel=\"noopener\">available data sources</a>.</p>",
+        "after": "\t\t\t\t\t\t<p class=\"hw-help\" id=\"poll-help\">Every reading key and dial updates from one shared read at this interval. Changing it clears sparkline history. Shorter intervals read the sensors more often and use more processor time.</p>\n\t\t\t\t\t\t<p class=\"hw-help\" id=\"source-help\">Available readings depend on this Mac and macOS version. A saved reading stays selected when it is unavailable. See <a href=\"https://docs.slawrensen.com/mac-streamdeck/data-sources.html\" target=\"_blank\" rel=\"noopener\">available data sources</a>.</p>",
         "count": 1
       },
       {
@@ -402,12 +408,17 @@
         "before": "\t\t\t\t\t\t<p class=\"hw-help\">The exact settings as JSON: Copy one to back a dial up, paste a saved one and Replace to restore or clone it. Replace swaps the whole document, reloads this panel and keeps fields this version does not know. Replacing shared settings changes every HWiNFO key and dial and asks for a second click.</p>",
         "after": "\t\t\t\t\t\t<p class=\"hw-help\">The exact settings as JSON: Copy one to back a dial up, paste a saved one and Replace to restore or clone it. Replace swaps the whole document, reloads this panel and keeps fields this version does not know. Replacing shared settings changes every Mac Sensors key and dial and asks for a second click.</p>",
         "count": 1
+      },
+      {
+        "before": "<select id=\"shared-poll\" data-setting=\"pollIntervalMs\" data-global data-default=\"1000\">",
+        "after": "<select id=\"shared-poll\" data-setting=\"pollIntervalMs\" data-global data-default=\"1000\" aria-describedby=\"poll-help\">",
+        "count": 1
       }
     ],
     "sensor-reading.html": [
       {
         "before": "<div class=\"hw-field\">\n\t\t\t\t\t\t\t<label for=\"shared-font\">Text font</label>\n\t\t\t\t\t\t\t<select id=\"shared-font\" data-setting=\"textFont\" data-global data-default=\"tahoma\" aria-describedby=\"font-help\">\n\t\t\t\t\t\t\t\t<option value=\"tahoma\">Tahoma</option>\n\t\t\t\t\t\t\t\t<option value=\"segoe-ui\">Segoe UI</option>\n\t\t\t\t\t\t\t</select>\n\t\t\t\t\t\t\t<p class=\"hw-help\" id=\"font-help\">Tahoma is the original look. Segoe UI is lighter and narrower.</p>\n\t\t\t\t\t\t</div>",
-        "after": "<div class=\"hw-field\"><p>Text font: Tahoma Bold</p><p class=\"hw-help\" id=\"mac-font-status\">Saved font settings are kept.</p></div>",
+        "after": "<div class=\"hw-field\"><div class=\"hw-label\">Text font: Tahoma Bold</div><p class=\"hw-help\" id=\"mac-font-status\">Saved font settings are kept.</p></div>",
         "count": 1
       },
       {
@@ -417,7 +428,7 @@
       },
       {
         "before": "\t\t\t\t\t\t<p class=\"hw-help\" id=\"source-help\">Auto switches providers. To keep a selection working on both, link its Shared Memory and Gadget keys in the shared Config document; see <a href=\"https://docs.slawrensen.com/hwinfo-streamdeck/data-sources.html#link-readings-across-providers\" target=\"_blank\" rel=\"noopener\">reading links</a>.</p>",
-        "after": "\t\t\t\t\t\t<p class=\"hw-help\" id=\"source-help\">Available readings depend on this Mac and macOS version. A saved reading stays selected when it is unavailable. See <a href=\"https://docs.slawrensen.com/mac-streamdeck/data-sources.html\" target=\"_blank\" rel=\"noopener\">available data sources</a>.</p>",
+        "after": "\t\t\t\t\t\t<p class=\"hw-help\" id=\"poll-help\">Every reading key and dial updates from one shared read at this interval. Changing it clears sparkline history. Shorter intervals read the sensors more often and use more processor time.</p>\n\t\t\t\t\t\t<p class=\"hw-help\" id=\"source-help\">Available readings depend on this Mac and macOS version. A saved reading stays selected when it is unavailable. See <a href=\"https://docs.slawrensen.com/mac-streamdeck/data-sources.html\" target=\"_blank\" rel=\"noopener\">available data sources</a>.</p>",
         "count": 1
       },
       {
@@ -448,6 +459,11 @@
       {
         "before": "\t\t\t\t\t\t<p class=\"hw-help\">The exact settings as JSON: Copy one to back a layout up, paste a saved one and Replace to restore or clone it. Replace swaps the whole document, reloads this panel and keeps fields this version does not know. Replacing shared settings changes every HWiNFO key and dial and asks for a second click.</p>",
         "after": "\t\t\t\t\t\t<p class=\"hw-help\">The exact settings as JSON: Copy one to back a layout up, paste a saved one and Replace to restore or clone it. Replace swaps the whole document, reloads this panel and keeps fields this version does not know. Replacing shared settings changes every Mac Sensors key and dial and asks for a second click.</p>",
+        "count": 1
+      },
+      {
+        "before": "<select id=\"shared-poll\" data-setting=\"pollIntervalMs\" data-global data-default=\"1000\">",
+        "after": "<select id=\"shared-poll\" data-setting=\"pollIntervalMs\" data-global data-default=\"1000\" aria-describedby=\"poll-help\">",
         "count": 1
       }
     ]

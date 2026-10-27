@@ -20,8 +20,8 @@ const base = new URL(root.endsWith("/") ? root : `${root}/`);
 
 /** Paths that the site's _config.yml excludes; each must answer 404. */
 const PRIVATE = ["release/RELEASE_RUNBOOK.html", "release/COPY_RULES.html", "release/STREAM_DECK_MARKETPLACE.html", "release/", "release/evidence/", "README.html"];
-/** Strings that never belong in a public page. */
-const LEAK = [/\/Users\//, /HWiNFO|REALiX/, /C:\\Users\\/i, /RELEASE_RUNBOOK/, /STREAM_DECK_MARKETPLACE/, /\.private\b/, /hwinfoden|hwinfospk/, /ghp_[A-Za-z0-9]{20,}/];
+/** Strings that never belong in a public page. The product repository is private, so any link into it is a 404 for public readers. */
+const LEAK = [/\/Users\//, /HWiNFO|REALiX/, /C:\\Users\\/i, /RELEASE_RUNBOOK/, /STREAM_DECK_MARKETPLACE/, /\.private\b/, /hwinfoden|hwinfospk/, /ghp_[A-Za-z0-9]{20,}/, /github\.com\/slawrensen\/mac-sensors-streamdeck/i];
 
 const seen = new Map(); // url -> { status, html }
 const processed = new Set(); // fetched for an anchor does not mean inspected

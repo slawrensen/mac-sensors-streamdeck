@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { test } from 'node:test';
+import { mock, test } from 'node:test';
 import { MacProvider, counterRows, encodeModel, measurementKey } from '../../src/mac/provider';
 import type { NativeBridge, NativePacket, NativeRow, NativeSource } from '../../src/mac/native-api';
 function packet(source:NativeSource,at=100):NativePacket {
@@ -55,6 +55,10 @@ test('measurement identity is canonical, case preserving and independent of buil
 	assert.equal(encodeModel('Mac17,9'),'Mac17%2C9');assert.equal(encodeModel('A!B é'),'A%21B%20%C3%A9');assert.equal(encodeModel(''),null);assert.equal(encodeModel('\ud800'),null);
 	const row=packet('smc').rows[0]!;const key=measurementKey('smc',row,'Mac17,9');assert.equal(measurementKey('smc',{...row,label:'Renamed'},'Mac17,9'),key);assert.notEqual(measurementKey('smc',{...row,key:'Tb1T'},'Mac17,9'),key);assert.equal(measurementKey('public',{...row,key:'unknown'},'Mac17,9'),null);
 });
+test('measurement keys follow the model of each call, so the kept model encoding never goes stale',()=>{
+	const row=packet('smc').rows[0]!;
+	for(const [model,expected] of [['Mac17,9','mac:v1:smc:Mac17%2C9:54423154:temp.v1'],['A!B é','mac:v1:smc:A%21B%20%C3%A9:54423154:temp.v1'],['',null],['Mac17,9','mac:v1:smc:Mac17%2C9:54423154:temp.v1'],['\ud800',null],['Mac16,1','mac:v1:smc:Mac16%2C1:54423154:temp.v1']] as const)assert.equal(measurementKey('smc',row,model),expected,JSON.stringify(model));
+});
 test('counter deltas reset on member changes, resets, zero denominator and sleep',()=>{
 	const before=packet('public',100),after=packet('public',1100);for(const p of [before,after])p.cpuValid=p.networkValid=p.storageValid=true;after.cpuTicks=[[20,20,40,0]];after.networkIn='2000';after.networkOut='1000';after.storageRead='4000';after.storageWrite='2000';
 	const rows=counterRows(before,after);assert.equal(rows.length,5);assert.equal(rows.find(row=>row.key==='cpu-total')?.value,50);assert.equal(rows.find(row=>row.key==='network-receive')?.value,1000);
@@ -68,4 +72,44 @@ test('counter deltas reset on member changes, resets, zero denominator and sleep
 
 test('initial work that never returns becomes busy without claiming a measurement',()=>{
 	const r=rig();assert.equal(r.provider.read(),null);assert.equal(r.provider.untilExpiry(),15000);r.clock.now=15100;assert.throws(()=>r.provider.current(),{reason:'busy'});assert.equal(r.provider.age(),null);assert.equal(r.provider.untilExpiry(),null);r.provider.close();
+});
+test('support facts call a Mac without sysctl.proc_translated (ENOENT, as on Intel) native, and other failures unknown',async()=>{
+	for(const [translated,translationError,expected] of [[0,0,'native'],[1,0,'translated'],[-1,2,'native'],[-1,1,'unknown'],[-1,5,'unknown']] as const) {
+		const r=rig();r.provider.read();const value=packet('public');value.translated=translated;value.translationError=translationError;await publish(r,'public',value);
+		assert.equal(r.provider.facts().translation,expected,`translated ${translated}, errno ${translationError}`);assert.equal(r.provider.facts().translationError,translationError);r.provider.close();
+	}
+});
+test('a non-finite clock at the first request still leaves the rebaseline its full delay',async()=>{
+	// mach_timebase_info can fail and make the native clock NaN; a NaN delay would fire the rebaseline about 1 ms later, over no counter window.
+	const START_MS=1_000_000,READ_MS=5;
+	mock.timers.enable({apis:['setTimeout','Date'],now:START_MS});
+	try {
+		const reads:number[]=[];let poisonNext=false;
+		const packet=(source:NativeSource,at:number):NativePacket=>({source,rows:[],continuousMs:at,awakeMs:at,wallSeconds:1.7e9,durationMs:1,error:source==='smc'?12:0,systemCode:0,operation:'fixture',model:'Mac17,9',chip:'t6050',appleSilicon:1,translated:0,translationError:0,fontAvailable:true,cpuValid:false,cpuTicks:[],networkValid:false,networkIn:'0',networkOut:'0',networkMembers:'1',storageValid:false,storageRead:'0',storageWrite:'0',storageMembers:'1'});
+		const bridge:NativeBridge={getBuildInfo:()=>({protocol:1,napi:8,version:'t',sourceId:'t',arch:process.arch,platform:'darwin',testHooks:true}),now:()=>{if(poisonNext){poisonNext=false;return NaN;}return Date.now();},open:()=>({read:(source)=>{const at=Date.now();if(source==='public'){reads.push(at-START_MS);poisonNext=reads.length===1;}return new Promise(resolve=>setTimeout(()=>resolve(packet(source,at)),READ_MS));},close:()=>{}})};
+		const provider=new MacProvider(bridge,()=>{});provider.read();
+		for(let i=0;i<400;i++){mock.timers.tick(1);await new Promise(resolve=>setImmediate(resolve));}
+		assert.deepEqual(reads,[0,READ_MS+250],'the rebaseline waits its full 250 ms after the first read completes when the request time is unknown');
+		provider.close();
+	} finally { mock.timers.reset(); }
+});
+test('each SMC row keeps its own measurement key when a packet carries several rows',async()=>{
+	const r=rig();r.provider.read();await publish(r,'public');
+	const smc=packet('smc');const first=smc.rows[0]!;
+	smc.rows=[first,{...first,key:'F0Ac',label:'Fan 1',group:'Fans',kind:'fan',unit:'RPM',value:1234},{...first,key:'PSTR',label:'System power',group:'System',kind:'power',unit:'W',value:7.5}];
+	await publish(r,'smc',smc);const snapshot=r.provider.current()!;
+	const byLabel=new Map(snapshot.readings.map(reading=>[reading.label,reading]));
+	assert.equal(byLabel.get('Fan 1')?.key,'mac:v1:smc:Mac17%2C9:46304163:rpm.v1');assert.equal(byLabel.get('Fan 1')?.value,1234);
+	assert.equal(byLabel.get('System power')?.key,'mac:v1:smc:Mac17%2C9:50535452:power.v1');assert.equal(byLabel.get('System power')?.value,7.5);
+	assert.equal(byLabel.get(first.label)?.key,measurementKey('smc',first,'Mac17,9'));
+	r.provider.close();
+});
+test('a missing model on the first SMC row withholds it instead of throwing',async()=>{
+	const row=packet('smc').rows[0]!;
+	// A query string gives a fresh module copy whose model memo is still empty, the only state in which the old memo threw.
+	const fresh=await import(`../../src/mac/provider.ts?${'first-model'}`) as typeof import('../../src/mac/provider');
+	assert.equal(fresh.measurementKey('smc',row,undefined as unknown as string),null);
+	assert.equal(measurementKey('smc',row,undefined as unknown as string),null);
+	assert.equal(measurementKey('smc',row,''),null);
+	assert.ok(measurementKey('smc',row,'Mac17,9')?.startsWith('mac:v1:smc:Mac17%2C9:'));
 });
