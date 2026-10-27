@@ -51,7 +51,7 @@ Before loading a reader, the plugin compares the file's SHA-256 with the record 
 
 ### Elgato Marketplace
 
-Mac Sensors is not on the Elgato Marketplace yet. Elgato repackages Marketplace copies, so a Marketplace package checksum can differ from the GitHub package checksum. Do not compare the two.
+Mac Sensors is not on the Elgato Marketplace yet. Elgato repackages Marketplace copies, so a Marketplace package checksum can differ from the GitHub package checksum. Do not compare the two. Opening a Marketplace copy of the same version as the one already installed changes nothing, as for any equal version ([Updating](#updating)); remove Mac Sensors first if you want the Marketplace copy in its place.
 
 ### Updating
 

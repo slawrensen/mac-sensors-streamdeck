@@ -154,10 +154,6 @@ Mac readings carry no stored minimum, maximum or average, so a Sensor Reading ke
 
 The panel groups settings under **Reading**, **Display**, **Alerts**, **Controls** and **Advanced**. Its header shows the current face, the reading's name and the data state, for example *Live · Mac sensors*. When something needs fixing, a status message under the header names the repair. The theme strip sits below the header.
 
-![The Sensor Reading settings panel with cpu typed in the Reading search and the results open under the CPU group: CPU super core 1, 62.4 °C, highlighted, and CPU usage, 37.5 %](assets/img/settings-picker.png)
-
-*Settings-panel capture of the staged 1.0.1.0 panel on a simulated host with sample readings and **Accent colors** set to **Theme accent everywhere**. It is not the Stream Deck app's own window.*
-
 The theme strip, **Reading** and **Display** start open; the other sections start folded. A folded section summarizes its settings on its title line. **Open all sections** and **Fold all sections** in the header, or Option-click a section title (the panel's tooltip says Alt-click), change them together. The plugin remembers which sections you left open for every Sensor Dial panel until the plugin restarts.
 
 | Section | Setting | What it does |
