@@ -19,10 +19,10 @@ For requirements and the Tahoma Bold prerequisite, see [Installation and require
 | Picker groups | CPU, Memory, Storage, Network | CPU, GPU, Battery, Fans, System |
 | On the measured M5 Pro | 14 readings: 9 read directly, 5 worked out from two reads | 38 readings |
 | On another Mac | The same collectors run; a counter macOS does not return is left out | Depends on the model and chip (see [SMC readings](#smc-readings)) |
-| Minimum, maximum, average | Not provided | Not provided |
+| Minimum, maximum, average | Not provided; Mac Sensors keeps its own from its reads | Not provided; Mac Sensors keeps its own from its reads |
 | Access needed | No administrator access | No administrator access, privileged helper or driver |
 
-Neither source keeps a history. A key with **Value shown** on **Minimum**, **Maximum** or **Average**, or a press that cycles to them, shows **N/A**; the plugin never substitutes the current value. See [Why do MIN, MAX and AVG show N/A on a key?](faq.html#why-do-min-max-and-avg-show-na-on-a-key) Dial statistics are separate local observations; see [Sensor Dial](sensor-dial.html).
+Neither source keeps a history, so Mac Sensors keeps statistics for every reading itself. A key with **Value shown** on **Minimum**, **Maximum** or **Average**, or a press that cycles to them, shows the lowest, highest or average value accepted for that reading since the plugin last started reading sensors. They start over after a gap in that reading; see [How are MIN, MAX and AVG calculated on a key?](faq.html#how-are-min-max-and-avg-calculated-on-a-key) Dial statistics are separate local observations; see [Sensor Dial](sensor-dial.html#session-stats-are-the-dials-own-per-reading).
 
 The plugin only reads. The native reader has no command that writes an SMC key or changes a fan, and it exposes no hardware handle to the rest of the plugin.
 
@@ -44,7 +44,7 @@ Network and storage rates are totals for the Mac. They are not split by applicat
 
 The five worked-out readings (CPU usage and the four rates) need two reads, so they are left out of a read when there is no valid pair:
 
-- the first read after keys appear (see [Counter rebaseline](#counter-rebaseline));
+- the first read after reading starts (see [Counter rebaseline](#counter-rebaseline));
 - the first system counter read after one that failed or arrived too old, which starts a new pair;
 - a counter that went down, which means it was reset or started over;
 - a change in which interfaces or storage drivers are counted;
@@ -99,7 +99,7 @@ The settings panel's picker shows the readings of the latest read, grouped as CP
 
 ## How a read works
 
-One reader serves every Sensor Reading key (including the Back tile), Sensor Dial and detail tile on every connected deck. It starts when the first of them appears and stops when the last one disappears, and the plugin log says, for example, `Started (1000 ms interval)` and `Stopped (no visible actions)`. Sensor Control keys do not keep it running.
+One reader serves every Sensor Reading key (including the Back tile), Sensor Dial and detail tile on every connected deck. It starts when the first of them appears and stops 2 seconds after the last one disappears, unless one appears again within those 2 seconds. The plugin log says, for example, `Started (1000 ms interval)` and `Stopped (no visible actions)`. Sensor Control keys do not keep it running. See [When reading starts and stops](#when-reading-starts-and-stops).
 
 Each read asks both sources. Each source runs its hardware calls on its own background slot, so a slow SMC read never blocks the system counters. If a source's previous read has not returned yet, it is not asked again until it has.
 
@@ -113,7 +113,7 @@ When a key or dial shows readings from both sources, the source that answers fir
 - After eight reads in a row in which both sources answered within 50 ms of each other, the plugin stops applying the 100 ms limit.
 - On the next slow read it waits once for the second source, for up to one **Read every** interval, then applies the 100 ms limit again until there are eight fast reads in a row.
 - The 100 ms limit always applies while keys and dials show a status screen, for example **Reading sensors** or **No sensor data**, so a slow source never holds a recovery back.
-- The count of fast reads starts over when keys and dials appear after none were visible and when **Read every** changes. A **Read every** change also shows any readings still waiting at once.
+- The count of fast reads starts over when reading starts and when **Read every** changes. A page change inside the 2 seconds keeps it. A **Read every** change also shows any readings still waiting at once.
 
 Waiting changes only when the face is drawn. It never changes a reading's acquisition time, and each read still adds one sparkline point and one dial observation.
 
@@ -121,14 +121,14 @@ In a traced run of the final 1.0.1 release candidate, measured as a development 
 
 ### Counter rebaseline
 
-The first system counter read after keys appear only sets the starting point for CPU usage and the rates. About a quarter second later the plugin reads the system counters once more, so those readings appear without waiting a full **Read every** interval:
+The first system counter read after reading starts only sets the starting point for CPU usage and the rates. About a quarter second later the plugin reads the system counters once more, so those readings appear without waiting a full **Read every** interval:
 
 - The extra read starts 250 ms after the first read started, and never sooner than 200 ms after the first read finished. The kernel counts processor time in 10 ms ticks, so 200 ms covers about twenty.
-- It happens once each time keys appear after none were visible, for example when you return to a page or come back from another profile.
+- It happens once each time reading starts: when a key, dial or detail tile appears and none was visible for the last 2 seconds, for example the first one after the plugin starts, or a page you return to after that long. A page change, opening sensor details or pressing Back inside the 2 seconds keeps the baseline, so CPU usage and the rates carry on without this read.
 - If the regular read is due first, as at **Read every** 250 ms, the regular read takes its place.
 - A regular read that starts within 200 ms after the extra read started reads only the SMC, so CPU usage and the rates are never computed over a gap of only a few milliseconds.
 
-Until the extra read, a key that shows only CPU usage or a rate shows **Sensor missing**. In an earlier 1.0.1 release candidate, measured as a development copy in the Stream Deck app on the M5 Pro, CPU usage showed a value a median 253.6 ms after a key appeared, over 40 appearances (PERF.md, 2026-10-16 actual-app entry).
+Until the extra read, a key that shows only CPU usage or a rate shows **Sensor missing**. In an earlier 1.0.1 release candidate, measured as a development copy in the Stream Deck app on the M5 Pro, CPU usage showed a value a median 253.6 ms after a key appeared, over 40 appearances (PERF.md, 2026-10-16 actual-app entry). That candidate had no 2 second hold, so each of those appearances started reading.
 
 **Check again** in a settings panel reads at once, so CPU usage and rates from that read cover the time since the read before it, which can be a fraction of a second.
 
@@ -149,23 +149,35 @@ Until the extra read, a key that shows only CPU usage or a rate shows **Sensor m
 The Connection summary shows the effective value, for example "Mac sensors · read every 1 s".
 
 - One read serves every key, dial and detail tile, so this is the plugin's total read rate. Adding keys does not add reads.
-- Changing it clears the sparkline history of every key and dial. The plugin log records each change, for example `Read interval set to 500 ms`.
+- Changing it clears the sparkline history of every key and dial. It keeps every reading's MIN, MAX and AVG and every dial's session statistics. The plugin log records each change, for example `Read interval set to 500 ms`.
 - A blank or non-numeric stored value means 1 second. A stored number outside the range is read as the nearest end, so a value above 5 seconds, for example from a configuration document, runs at 5 seconds, and one below 250 ms runs at 250 ms. A number inside the range that the menu does not offer, such as 1500, is used as stored. The stored setting itself is never rewritten.
 - Each read asks both sources for new measurements. How often the SMC itself refreshes a key is unknown, so an SMC value can repeat between reads.
 
 Shorter intervals use more processor time. The final 1.0.1 release candidate, measured as a development copy in the Stream Deck app on the M5 Pro with the development process observer and 32 single-reading keys on a Virtual Stream Deck, used 0.668% of one core at 1 second and 2.478% at 250 ms (PERF.md). An earlier 1.0.1 release candidate in the repository mock host (`scripts/lib/mock-host.mjs`) with six actions used 18 to 19 ms of plugin CPU time per second at 250 ms, about 5 ms at 1 second and about 1 ms at 5 seconds; the app's own drawing cost is not included (PERF.md).
 
+## When reading starts and stops
+
+The plugin reads sensors while at least one Sensor Reading key (the Back tile of a detail page included), Sensor Dial or detail tile is visible on any deck. Sensor Control keys do not count.
+
+- **Reading starts** when one of them appears while reading is stopped: the first time after the plugin starts, or after none has been visible for 2 seconds. Keys show **Reading sensors** until the first read returns, CPU usage and the transfer rates follow about a quarter second later ([Counter rebaseline](#counter-rebaseline)), and the plugin log says `Started (… ms interval)`.
+- **When the last one disappears**, the plugin makes no new regular reads but keeps the reading for 2 seconds. The Stream Deck app removes the old page's actions before it shows the new page's, so changing pages, opening sensor details and pressing Back leave a moment with nothing visible. If one appears again within the 2 seconds, the same reading continues: key MIN, MAX and AVG, sparklines, the counter baseline, the count of fast reads and dial sessions are kept, keys show readings at once instead of **Reading sensors**, CPU usage and the rates do not wait for a new pair, the log shows no new `Started` line, and the next read comes on the next **Read every** tick.
+- **Reading stops** 2 seconds after the last one disappeared, if none has appeared since. The plugin closes its reader, clears every sparkline, ends every reading's MIN, MAX and AVG, and logs `Stopped (no visible actions)`. The next appearance starts reading as above, and a dial that returns then shows `stats reset: data gap` once.
+
+The 2 seconds is fixed. This comes from the code and its software tests; how long a page change takes on a physical deck has not been measured.
+
 ## Freshness and local history
 
 Each reading expires 15 seconds after its own acquisition time and is then removed, at that moment rather than at the next read. Ages are measured on a clock that keeps counting while the Mac sleeps, so changing the system clock cannot extend a reading's life. With **Read every** at most 5 seconds, a source that keeps answering replaces its readings long before they expire.
 
-- A read that fails removes that source's readings at once. The other source keeps serving, with one exception: until a system counter read has succeeded since keys appeared, the font is unchecked, and keys show **Source error**, or **Source busy** after 15 seconds while a read is still out, instead of SMC readings.
+- A read that fails removes that source's readings at once. The other source keeps serving, with one exception: until a system counter read has succeeded since reading started, the font is unchecked, and keys show **Source error**, or **Source busy** after 15 seconds while a read is still out, instead of SMC readings.
 - A row that is invalid, out of range, not a finite number or duplicated is withheld.
 - An expired or failed reading is never shown as live. The plugin has no held-value state: a reading is current or it is absent, and an absent reading shows **Sensor missing** on its key or **Sensor missing** / **waiting** on its dial (see [Status screens](status-screens.html#key-screens)).
 - An unchanged value can be a genuine new measurement. A hardware register that stopped changing internally cannot be told apart from a steady one by reading it.
 - Nothing is shown before the first successful read: keys and dials show **Reading sensors** until then.
 
-Sparklines add one point for each new acquisition, not for each redraw, and keep up to 36 points spaced by reads, not by time. A sparkline starts again when its reading is absent or not a finite number, when the reading's unit or type changes, when keys show a status screen, when **Read every** changes, and when the reader stops because no Sensor Reading key, Sensor Dial or detail tile is visible. Returning to a page after no Sensor Reading key, Sensor Dial or detail tile was visible anywhere therefore starts its sparklines over; while one stays visible, a hidden key's sparkline keeps filling.
+Sparklines add one point for each new acquisition, not for each redraw, and keep up to 36 points spaced by reads, not by time. A sparkline starts again when its reading is absent or not a finite number, when the reading's unit or type changes, when keys show a status screen, when **Read every** changes, and when reading stops, 2 seconds after the last Sensor Reading key, Sensor Dial or detail tile disappears. Returning to a page after none was visible anywhere for 2 seconds therefore starts its sparklines over. A page change, opening sensor details or pressing Back inside the 2 seconds keeps every sparkline, and while one stays visible, a hidden key's sparkline keeps filling.
+
+Each reading's MIN, MAX and AVG take one sample from each accepted read of it. A reading that is withheld, removed by a failed read or expired, or whose unit or type changes, starts its statistics over at its next accepted read, and every reading starts over when reading stops, 2 seconds after the last Sensor Reading key, Sensor Dial or detail tile disappears. A **Read every** change keeps them, and so does a page change inside those 2 seconds. See [Value shown](sensor-reading.html#value-shown-stat-mode).
 
 Dial minimum, maximum and average are local session statistics from genuine observations; a redraw of the same observation does not count again. See [Sensor Dial](sensor-dial.html).
 
@@ -173,9 +185,9 @@ Dial minimum, maximum and average are local session statistics from genuine obse
 
 This section describes the code and its software tests. Real sleep and wake on a Mac with a deck attached has not been checked yet; that check is pending.
 
-- **After a sleep longer than 15 seconds**, every reading is past its limit, and the plugin removes them at its first read or expiry check after the wake. Until then the deck can still show the face drawn before the sleep; how long that lasts on a physical deck is unknown. Until the first read after waking returns, keys and dials can then show **No sensor data**. A read that starts from a status screen always uses the 100 ms limit, so system readings return at most 100 ms after their read completes, even when the SMC read is slow. In software tests with a simulated 60-second sleep and a slow first SMC read, the status screen lasted at most 105 ms: a 5 ms system read plus the 100 ms limit. Whether that screen is visible on a physical deck is unknown.
-- **After any sleep**, the first system counter read detects the sleep and leaves out CPU usage and the rates for that read, so they return one **Read every** interval later. No extra rebaseline read is made.
-- **After a sleep shorter than 15 seconds**, readings taken before the sleep stay current until their own 15 seconds run out or the next read replaces them.
+- **After a sleep longer than 15 seconds**, every reading is past its limit, and the plugin removes them at its first read or expiry check after the wake. Every reading's MIN, MAX and AVG start over with its first read after the wake. Until then the deck can still show the face drawn before the sleep; how long that lasts on a physical deck is unknown. Until the first read after waking returns, keys and dials can then show **No sensor data**. A read that starts from a status screen always uses the 100 ms limit, so system readings return at most 100 ms after their read completes, even when the SMC read is slow. In software tests with a simulated 60-second sleep and a slow first SMC read, the status screen lasted at most 105 ms: a 5 ms system read plus the 100 ms limit. Whether that screen is visible on a physical deck is unknown.
+- **After any sleep**, the first system counter read detects the sleep and leaves out CPU usage and the rates for that read, so they return one **Read every** interval later, with their MIN, MAX and AVG started over. No extra rebaseline read is made.
+- **After a sleep shorter than 15 seconds**, readings taken before the sleep stay current until their own 15 seconds run out or the next read replaces them. A reading other than CPU usage and the rates that is read again before its 15 seconds run out keeps its MIN, MAX and AVG.
 
 If a screen stays after waking, see [Keys show No sensor data](troubleshooting.html#keys-show-no-sensor-data).
 

@@ -58,9 +58,11 @@ If values are shown but do not seem to change, see [Values do not seem to update
 
 ## Statistics
 
-### Why do MIN, MAX and AVG show N/A on a key?
+### How are MIN, MAX and AVG calculated on a key?
 
-Mac readings carry no stored minimum, maximum or average: every reading arrives as a current value only. When **Value shown** is **Minimum**, **Maximum** or **Average**, or a press cycles to one of them, the badge reads **N/A** and the value shows a placeholder. The plugin does not put the current value in its place. Detail tiles use the same faces. The panel says this under **Display**, **How Display works**.
+macOS reports current values only, so Mac Sensors keeps its own statistics for every reading. MIN and MAX are the lowest and highest value accepted for the reading since the plugin last started reading sensors, and AVG is the arithmetic mean of those reads: one sample per read, including a read that repeats the last value, not weighted by time. The plugin starts reading sensors when a Sensor Reading key, Sensor Dial or detail tile becomes visible while reading is stopped, and stops 2 seconds after the last one disappears if none appears again, so changing to a page that has one, opening sensor details or pressing Back keeps them.
+
+The statistics belong to the reading, so every key and detail tile that shows it shows the same numbers. They start over after a gap in that reading (a read where it is missing, withheld or failed, or the reading expiring 15 seconds after its last read), when its unit or type changes, and when the plugin stops reading sensors (2 seconds after the last one disappears) or restarts. After a sleep, CPU usage and the transfer rates skip one read, so theirs start over. Changing **Read every** keeps them. A key has no command that resets them. The full rules are under [Value shown](sensor-reading.html#value-shown-stat-mode).
 
 Alerts keep checking the current value whatever **Value shown** says.
 
@@ -68,7 +70,9 @@ Alerts keep checking the current value whatever **Value shown** says.
 
 A Sensor Dial keeps its own minimum, maximum and average for each reading, from the observations it accepted since the session started. Each new acquisition counts once, including one with an unchanged value; drawing the same acquisition again does not count. Each reading in a rotation keeps its own session, so turning away and back shows that reading's numbers.
 
-A session starts over when you reset it, when the reading goes missing, when its unit or type changes, or when a status screen replaces the readings. After a status screen, the first live frame shows **stats reset: data gap**. Sessions live in the plugin's memory only. See [Sensor Dial](sensor-dial.html).
+A session starts over when you reset it, when the reading goes missing, when its unit or type changes, or when a status screen replaces the readings. After a status screen, the first live frame shows **stats reset: data gap**. Sessions live in the plugin's memory only.
+
+A dial and a key showing the same reading can therefore show different numbers. A key's statistics cover every read since the plugin started reading sensors. A dial counts only the reads made while it follows the reading (the reading on the dial, its rotation set or an overview's list), from when it first followed it or was last reset, and any status screen ends its sessions. See [Sensor Dial](sensor-dial.html#session-stats-are-the-dials-own-per-reading).
 
 ## Sparklines
 
@@ -83,7 +87,7 @@ The line clears and starts again when:
 - **Read every** changes (Advanced, Connection).
 - A status screen replaces the readings, for example **Reading sensors** or **No sensor data**.
 - The reading goes missing or has no valid value, or its unit or type changes.
-- No Sensor Reading key, Sensor Dial or detail tile is visible anywhere, which stops reading.
+- No Sensor Reading key, Sensor Dial or detail tile has been visible anywhere for 2 seconds, which stops reading. A page change, opening sensor details or pressing Back inside those 2 seconds keeps the line.
 - The plugin restarts.
 
 Switching **°F** on or off does not clear it: samples are stored in the reading's own unit.
@@ -107,17 +111,17 @@ Limits: one build's CPU differed by 35% between two sessions in the same harness
 
 **Read every** (Advanced, Connection) sets how often the one shared read runs for every key and dial: 250 ms, 500 ms, 1 second (the default), 2 seconds or 5 seconds. Shorter intervals update sooner and use more processor time: in the table above, 250 ms used about 3.7 times the CPU of 1 second. An earlier 1.0.1 candidate in the same harness used 0.44% of one core at 2 seconds and 0.21% at 5 seconds.
 
-Changing **Read every** clears sparkline history. A blank value means 1 second, and a stored value outside 250 ms to 5 seconds runs at the nearest limit.
+Changing **Read every** clears sparkline history and keeps every MIN, MAX and AVG. A blank value means 1 second, and a stored value outside 250 ms to 5 seconds runs at the nearest limit.
 
 ### Does adding keys add more sensor reads?
 
-No. One shared read per interval serves every visible Sensor Reading key, Sensor Dial and detail tile, however many there are. Each extra key adds drawing work and messages to the Stream Deck app, not another read. When none of them is visible anywhere, reading stops until one appears; **Sensor Control** keys do not keep it running. With nothing visible, the plugin process keeps running and keeps its connection to the Stream Deck app. In the measured show and hide cycles it made no reads, ticks or frames while hidden; this is not a measurement of idle CPU.
+No. One shared read per interval serves every visible Sensor Reading key, Sensor Dial and detail tile, however many there are. Each extra key adds drawing work and messages to the Stream Deck app, not another read. When none of them is visible anywhere, the plugin makes no new reads, and 2 seconds later reading stops until one appears; **Sensor Control** keys do not keep it running. With nothing visible, the plugin process keeps running and keeps its connection to the Stream Deck app. In the measured show and hide cycles it made no reads, ticks or frames while hidden; those cycles ran on a build without the 2 second hold, and this is not a measurement of idle CPU. See [When reading starts and stops](data-sources.html#when-reading-starts-and-stops).
 
 A key can show up to four readings (**Readings on this key**), a dial can turn through a set of readings, and a key can open a detail page, so a deck can show more readings than it has keys. The measured bench above used 32 keys.
 
 ### Can several keys show the same reading?
 
-Yes. Each key keeps its own **Label on the key**, layout, theme, **Text color**, **Decimals**, **°F**, **Value shown**, **Graph under the value** and alert thresholds. They all use the same shared read and draw the same sparkline history for that reading.
+Yes. Each key keeps its own **Label on the key**, layout, theme, **Text color**, **Decimals**, **°F**, **Value shown**, **Graph under the value** and alert thresholds. They all use the same shared read, draw the same sparkline history for that reading and show the same MIN, MAX and AVG.
 
 ## Alerts, thresholds and colors
 
@@ -140,7 +144,7 @@ On a dial the face keeps its theme: the bar takes the alert color, or in an over
 - **Elite**: hold the push for at least half a second.
 - **Custom**: assign **Reset session stats** to **Short push**, **Long push**, **Touch tap** or **Long touch**.
 
-**A stats reset clears** (under **Controls**) sets the scope: **This reading only**, **The whole rotation set** or **Every dial, everywhere (use with care)**. A **Sensor Control** key set to **Reset session stats** sends the same command from any key, pedal or Multi Action, with its own **A reset clears**. The next accepted observation starts the new session. Keys have no session statistics to reset. See [Dial controls and presets](dial-controls.html).
+**A stats reset clears** (under **Controls**) sets the scope: **This reading only**, **The whole rotation set** or **Every dial, everywhere (use with care)**. A **Sensor Control** key set to **Reset session stats** sends the same command from any key, pedal or Multi Action, with its own **A reset clears**. The next accepted observation starts the new session. A Sensor Reading key has no reset: its MIN, MAX and AVG start over only as [How are MIN, MAX and AVG calculated on a key?](#how-are-min-max-and-avg-calculated-on-a-key) describes. See [Dial controls and presets](dial-controls.html).
 
 ## Themes
 
