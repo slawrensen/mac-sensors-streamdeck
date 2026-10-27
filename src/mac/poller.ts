@@ -48,6 +48,13 @@ const FAST_SETTLE_MS = 50;
  * sleep longer than the TTL) never waits on a slow source.
  */
 const TRUSTED_READS = 8;
+/**
+ * How long reading continues after the last Sensor Reading key, Sensor Dial or detail tile disappears. The app
+ * sends the old page's disappear before the new page's appear, so a page change, opening details or Back would
+ * otherwise stop reading for a moment and start every key's session statistics, sparkline and counter baseline
+ * over. Longer than an app page switch, short enough that a deck put away stops reading almost at once.
+ */
+export const RELEASE_GRACE_MS = 2000;
 export class MacPoller extends EventEmitter {
 	private readonly logger = streamDeck.logger.createScope('MacSensors');
 	private provider: MacSnapshotProvider | null = null;
@@ -65,7 +72,9 @@ export class MacPoller extends EventEmitter {
 	private readonly series = new Map<string, number[]>();
 	private readonly observations = new Map<string, string>();
 	private tracedObservation = -1;
-	constructor(private readonly factory: Factory = openMacProvider) { super(); }
+	/** Pending stop while no action is visible; a retain before it fires keeps reading going. */
+	private stopping: NodeJS.Timeout | null = null;
+	constructor(private readonly factory: Factory = openMacProvider, private readonly releaseGraceMs: number = RELEASE_GRACE_MS) { super(); }
 	onTick(listener: (status: PollerStatus) => void): void { this.on('tick', listener); }
 	checkAgain(): void { if (this.refs > 0) this.tick(); }
 	getStatus(): PollerStatus { this.refresh(false); return this.status; }
@@ -75,6 +84,8 @@ export class MacPoller extends EventEmitter {
 	subscribeSeries(key: string): void { if (!this.series.has(key)) this.series.set(key, []); }
 	getSeries(key: string): readonly number[] | undefined { return this.series.get(key); }
 	retain(): void {
+		// A page came back inside the grace: the same reading generation continues.
+		if (this.stopping) { clearTimeout(this.stopping); this.stopping = null; this.refs++; return; }
 		if (++this.refs !== 1) return;
 		this.status = pending();
 		this.timer = setInterval(() => this.tick(), this.intervalMs).unref();
@@ -83,7 +94,12 @@ export class MacPoller extends EventEmitter {
 	}
 	release(): void {
 		this.refs = Math.max(0, this.refs - 1);
-		if (this.refs !== 0) return;
+		if (this.refs !== 0 || this.stopping) return;
+		if (this.releaseGraceMs <= 0) { this.stop(); return; }
+		this.stopping = setTimeout(() => { this.stopping = null; if (this.refs === 0) this.stop(); }, this.releaseGraceMs).unref();
+	}
+	/** Ends the reading generation: no timer, no provider, cleared local history. */
+	private stop(): void {
 		if (this.timer) clearInterval(this.timer);
 		if (this.expiry) clearTimeout(this.expiry);
 		if (this.settle) clearTimeout(this.settle);

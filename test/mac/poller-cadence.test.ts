@@ -9,6 +9,8 @@ import { MacProvider } from '../../src/mac/provider';
 import type { NativeBridge, NativePacket, NativeRow, NativeSource } from '../../src/mac/native-api';
 import { tickSignature } from '../../src/detail/tick-signature';
 import { SessionStatsStore } from '../../src/stats';
+/** These tests pin what a real stop does, so they stop at once instead of after the production release grace. */
+const poller0 = (factory: ConstructorParameters<typeof MacPoller>[0]): MacPoller => new MacPoller(factory, 0);
 
 const realImmediate = setImmediate;
 const flush = (): Promise<void> => new Promise((resolve) => realImmediate(resolve));
@@ -54,7 +56,7 @@ function rig(delay: Record<NativeSource, Delay>, options: { smcError?: boolean; 
 		now: continuous,
 		open: () => ({ read: (source) => { const at = continuous(); const n = reads[source].push(Date.now() - START_MS); return new Promise((resolve) => { const ms = delay[source]; setTimeout(() => resolve(packet(source, n, at)), typeof ms === 'number' ? ms : ms(n)); }); }, close: () => {} })
 	};
-	const poller = new MacPoller((ready) => {
+	const poller = poller0((ready) => {
 		const provider = new MacProvider(bridge, ready);
 		// clock false: a provider that cannot time its reads.
 		return options.clock === false ? { read: () => provider.read(), current: () => provider.current(), untilExpiry: () => provider.untilExpiry(), age: () => provider.age(), close: () => provider.close(), notices: () => provider.notices(), inFlight: () => provider.inFlight() } : provider;
