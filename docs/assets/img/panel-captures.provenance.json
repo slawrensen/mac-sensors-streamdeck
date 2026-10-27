@@ -19,7 +19,7 @@
     {
       "file": "settings-key.png",
       "kind": "settings-panel capture, simulated host, sample data",
-      "sha256": "2cb000e235224a20e694ceb3e4be7633df7b6740bec819b444ccd751e0c5074f",
+      "sha256": "62aa7f1c18218b4e13aaddd36bc440deeda0fa3b899f9289fb20110282113eb3",
       "settings": {
         "readingKey": "mac:v1:smc:Mac17%2C9:54703030:temp.v1",
         "label": "CPU super 1",
@@ -36,7 +36,7 @@
     {
       "file": "settings-dial.png",
       "kind": "settings-panel capture, simulated host, sample data",
-      "sha256": "0f115f5243a653c69fd579b7dfa56fd64946f6a14a220bcfb55470afb345eb82",
+      "sha256": "6260235b2669d79a1877cfffc30350219241f82a6048ffbb089c35137b841fbd",
       "settings": {
         "readingKey": "mac:v1:smc:Mac17%2C9:54703030:temp.v1",
         "label": "CPU super 1",
@@ -56,7 +56,7 @@
     {
       "file": "settings-reading-colors.png",
       "kind": "settings-panel capture, simulated host, sample data",
-      "sha256": "84870d91ac65658583a6bea0ff751e98cad2a174f524e38a9b1d4574e062415d",
+      "sha256": "ec7f268d2a93e47db1698419aa668b87485cb745bc85ffee93d61a2f3753dc88",
       "settings": {
         "readingKey": "mac:v1:smc:Mac17%2C9:54703030:temp.v1",
         "label": "CPU super 1",
@@ -73,6 +73,82 @@
           "mac:v1:smc:Mac17%2C9:46304163:rpm.v1": "#38CD89"
         }
       },
+      "build": "1.0.1.0-mac7",
+      "width": 378,
+      "dpr": 2,
+      "overflow": 0
+    },
+    {
+      "file": "settings-picker.png",
+      "kind": "settings-panel capture, simulated host, sample data",
+      "sha256": "438ac8359737b9fc1a7eba3169e5e86523dee7984b1f950d0aef21ad286e6cd2",
+      "settings": {
+        "readingKey": "mac:v1:smc:Mac17%2C9:54703030:temp.v1",
+        "label": "CPU super 1",
+        "displayMode": "sparkline",
+        "theme": "void",
+        "warnValue": "75",
+        "critValue": "90"
+      },
+      "picker": "cpu",
+      "build": "1.0.1.0-mac7",
+      "width": 378,
+      "dpr": 2,
+      "overflow": 0
+    },
+    {
+      "file": "settings-dial-controls.png",
+      "kind": "settings-panel capture, simulated host, sample data",
+      "sha256": "82ce83188045194db104ed7c7843c294ecfa4f083c781ac2519ac0577ca568f4",
+      "settings": {
+        "readingKey": "mac:v1:smc:Mac17%2C9:54703030:temp.v1",
+        "label": "CPU super 1",
+        "rotationKeys": [
+          "mac:v1:smc:Mac17%2C9:54703030:temp.v1",
+          "mac:v1:smc:Mac17%2C9:54673055:temp.v1",
+          "mac:v1:smc:Mac17%2C9:46304163:rpm.v1"
+        ],
+        "dialView": "overview",
+        "theme": "void",
+        "controlPreset": "custom"
+      },
+      "open": [
+        "sec-interaction"
+      ],
+      "clip": "#sec-interaction",
+      "build": "1.0.1.0-mac7",
+      "width": 378,
+      "dpr": 2,
+      "overflow": 0
+    },
+    {
+      "file": "settings-control.png",
+      "kind": "settings-panel capture, simulated host, sample data",
+      "sha256": "2ab9838139ee40644a26744fae7bdba491abf615916eef66e7ba40243dd8f2ae",
+      "settings": {},
+      "clip": "body",
+      "build": "1.0.1.0-mac7",
+      "width": 378,
+      "dpr": 2,
+      "overflow": 0
+    },
+    {
+      "file": "settings-press-details.png",
+      "kind": "settings-panel capture, simulated host, sample data",
+      "sha256": "ec60a9b4361e995411add927f8247ea596de5f9b14884df42c65f3b553e020cd",
+      "settings": {
+        "readingKey": "mac:v1:smc:Mac17%2C9:54703030:temp.v1",
+        "label": "CPU super 1",
+        "displayMode": "sparkline",
+        "theme": "void",
+        "warnValue": "75",
+        "critValue": "90",
+        "pressBehavior": "open-details"
+      },
+      "open": [
+        "sec-interaction"
+      ],
+      "clip": "#sec-interaction",
       "build": "1.0.1.0-mac7",
       "width": 378,
       "dpr": 2,
