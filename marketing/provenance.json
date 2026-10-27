@@ -6,7 +6,7 @@
       "kind": "production-rendered sample data",
       "width": 1920,
       "height": 960,
-      "sha256": "3aa28e1e49768e275a1c9f44c6329eddd70120bfb2ae0714f853eb905e4536c1",
+      "sha256": "cae25a3d63c78fb3554c9a4cd4cd3e1093e9641c58d9400925dc1b940ce50dd3",
       "inputs": [
         {
           "file": "docs/assets/img/hero.png",
@@ -19,7 +19,7 @@
       "kind": "production-rendered sample data",
       "width": 1920,
       "height": 960,
-      "sha256": "3aa28e1e49768e275a1c9f44c6329eddd70120bfb2ae0714f853eb905e4536c1",
+      "sha256": "cae25a3d63c78fb3554c9a4cd4cd3e1093e9641c58d9400925dc1b940ce50dd3",
       "inputs": [
         {
           "file": "docs/assets/img/hero.png",
@@ -32,7 +32,7 @@
       "kind": "production-rendered sample data",
       "width": 1920,
       "height": 960,
-      "sha256": "24128266de05123aa607933297c8fc258db43b14671fb56ad0044be37e77b81c",
+      "sha256": "ee7af8578527de2e977b5d7a0a189dcab359cb2830715a27a7c4f83b49d434a6",
       "inputs": [
         {
           "file": "docs/assets/img/themes.png",
@@ -45,7 +45,7 @@
       "kind": "production-rendered sample data",
       "width": 1920,
       "height": 960,
-      "sha256": "45fd8da5ecc60a778aeb4cbfb9ce177869fc84aba26d6f14455d07bfbc71a020",
+      "sha256": "607e6288d9bcbac260ed0772d5494404c51f12e3ec22fc5600289585a805cb1c",
       "inputs": [
         {
           "file": "docs/assets/img/dials.png",
@@ -58,7 +58,7 @@
       "kind": "production-rendered sample data",
       "width": 1920,
       "height": 960,
-      "sha256": "84315122eab21a16cdbe8f73fd27380aae5c7a1c8e61895df97f14845eddd1ba",
+      "sha256": "412f58153544b6a82457ab78a080265b808b5942ac312680c538c9c35d451fad",
       "inputs": [
         {
           "file": "docs/assets/img/key-layouts.png",
@@ -71,7 +71,7 @@
       "kind": "production-rendered sample data",
       "width": 1920,
       "height": 960,
-      "sha256": "45fd8da5ecc60a778aeb4cbfb9ce177869fc84aba26d6f14455d07bfbc71a020",
+      "sha256": "607e6288d9bcbac260ed0772d5494404c51f12e3ec22fc5600289585a805cb1c",
       "inputs": [
         {
           "file": "docs/assets/img/dials.png",
@@ -84,7 +84,7 @@
       "kind": "production-rendered sample data",
       "width": 1920,
       "height": 960,
-      "sha256": "c9ed3ff22bd148e511d801bde2890193a59604c99cf74f98f02874fe71e45044",
+      "sha256": "4d246192a63916362bddca3ff8fc9c8f5e3019a6e66f00237019843c826e8dad",
       "inputs": [
         {
           "file": "docs/assets/img/details.png",

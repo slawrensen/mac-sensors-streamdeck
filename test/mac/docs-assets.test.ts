@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {createHash} from 'node:crypto';
 import {test} from 'node:test';
+import sharp from 'sharp';
 import {composeScenes,sampleReadings,sampleSnapshot,sampleGroups,PROVIDER_GROUPS,boardDefinitions} from '../../scripts/lib/mac-scenes';
 import {DETAIL_PROFILES} from '../../src/detail/managed-profiles';
 const hash=(bytes:Buffer|string)=>createHash('sha256').update(bytes).digest('hex');
@@ -68,4 +69,14 @@ test('sample readings sit in the groups the shipped Mac provider reports, in its
  assert.deepEqual(snapshot.sensors,present.map((name,index)=>({index,id:groups[name],instance:0,name})));
  for(const reading of snapshot.readings){assert.equal(reading.id,0);assert.equal(snapshot.sensors[reading.sensorIndex]?.name,sampleGroups[reading.key]);}
  assert.deepEqual(snapshot.readings.map(row=>row.key),[...snapshot.readings].sort((a,b)=>a.sensorIndex-b.sensorIndex||a.key.localeCompare(b.key)).map(row=>row.key));
+});
+
+test('every 1920 by 960 listing image is fully opaque',async()=>{
+ // A transparent pixel shows as a white crescent on a light listing page; the app icon keeps the package icon's own alpha.
+ const marketing=JSON.parse(fs.readFileSync('marketing/provenance.json','utf8')) as {assets:{file:string;width:number}[]};
+ for(const asset of marketing.assets.filter(row=>row.width===1920)){
+  const pixels=await sharp(path.join('marketing',asset.file)).ensureAlpha().raw().toBuffer();
+  let transparent=0;for(let i=3;i<pixels.length;i+=4)if(pixels[i]!<255)transparent++;
+  assert.equal(transparent,0,asset.file);
+ }
 });
