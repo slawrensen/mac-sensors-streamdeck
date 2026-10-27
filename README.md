@@ -16,7 +16,7 @@
 <p align="center">
   <a href="https://docs.slawrensen.com/mac-streamdeck/index.html">Documentation</a> ·
   <a href="https://github.com/slawrensen/mac-sensors-streamdeck/releases">Releases</a> ·
-  <a href="https://github.com/slawrensen/mac-sensors-streamdeck/issues">Report a bug</a>
+  <a href="https://github.com/slawrensen/slawrensen.github.io/issues">Report a bug</a>
 </p>
 
 <p align="center">
