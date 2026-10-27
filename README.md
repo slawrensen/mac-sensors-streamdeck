@@ -105,7 +105,7 @@ Warning and critical colors mark the limits you choose for a reading.
 
 *Production-rendered sample data. Alert colors are fixed.*
 
-- Warning is orange and critical is red across themes.
+- Warning is amber and critical is red in every theme.
 - Gauge zones stay muted the same way the device draws them.
 - Alerts change the display; hardware remains read-only.
 
@@ -157,7 +157,9 @@ Search this Mac's available readings, then adjust the layout, graph and colors i
 
 macOS 13.5 or later, Stream Deck 7.1 or later, and Tahoma Bold. The package includes separate arm64 and x86_64 readers and uses the app's Node 24 runtime. No privileged helper or separate sensor application is installed.
 
-Sensor availability varies by Mac. The measured M5 Pro catalog includes temperatures, fans, system power, CPU activity, named memory counters, storage space and aggregate transfer rates. CPU/GPU clocks and unqualified private GPU usage are not offered. Key provider statistics are unavailable; dial session statistics are local.
+Measured on Apple silicon: an M5 Pro with macOS 27.0.1 and Stream Deck 7.5.0 on the Virtual Stream Deck. The x86_64 reader in 1.0.1 is byte-identical to the one in 1.0.0. Hosted Intel CI runners (a virtual machine with an emulated SMC) loaded that exact file and read live system and SMC values for both 1.0.0 and the 1.0.1 release candidate. Physical Intel validation is in progress.
+
+Sensor availability varies by Mac. The measured M5 Pro catalog includes temperatures, fans, system power, DC input voltage and current, CPU activity, named memory counters, storage space and aggregate transfer rates. CPU/GPU clocks and unqualified private GPU usage are not offered. Key provider statistics are unavailable; dial session statistics are local.
 
 [Hardware compatibility](https://docs.slawrensen.com/mac-streamdeck/hardware.html) distinguishes actual app, hosted CI, Rosetta and physical-device evidence. [PERF.md](PERF.md) records timing windows and their limits. Images above use sample data and do not represent a hardware photograph.
 
