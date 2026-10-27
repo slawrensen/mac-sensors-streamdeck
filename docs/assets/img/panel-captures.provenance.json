@@ -5,7 +5,7 @@
     "ui/control.html": "c69b98d0f915b26694a406ac6e77793676225ddbf870aa3aeefb2ca10d1eefee",
     "ui/detail-slot.html": "3c19a5e481b20a5da60db4f476facc34d83113ce0fbd07417ef5d68e0b4471b9",
     "ui/pi-command.js": "a672b467fa4d6950bbae85ea59006c0a0185f6b2c9b366ad6e29340c19d6b62a",
-    "ui/pi-common.js": "1ac9bf42ca24aa4600bed4749088f4953e69b0667a863d7dc757a1195f6a060d",
+    "ui/pi-common.js": "97e429a2ff6b01d5d71c008ed8173d645650c83fdbc0dc35add358c42b4bfb86",
     "ui/pi-control.js": "2a83b53d7c0f4cf6aca9216c5f0fc4001327f05b05e3c2b4282a0ad7083df18a",
     "ui/pi-model.js": "c9732cb2d91c9cfef8f6552eaecc0a72f4efff9fd6e25e2922b18f3decb39632",
     "ui/pi-shell.js": "6427c97286c2a39463a5138af22d188b180940dfb6c04fa096ab24200d1e77d3",
@@ -13,7 +13,7 @@
     "ui/pi.css": "51f44aeed25c6c0b56940a2079da5692547b48212f0d60efb820e885eb80d165",
     "ui/sdpi-components.js": "f6c0dfd2ed68e18084b9952842b86e3850cf837d674704700c2a0718e0a24f6b",
     "ui/sensor-dial.html": "cdcf184026cea268c4f7d072174e65bbfdb4d4ef52698b202950af70e69618df",
-    "ui/sensor-reading.html": "43a2a64f89099dc0460957a6bb934e7f577b5a47522a0c988a45623f488bf1f2"
+    "ui/sensor-reading.html": "59e15c5676d25cc67ce4a16777aa2c8ea3769abe625eb98130a4352604f8d9e6"
   },
   "captures": [
     {
@@ -36,7 +36,7 @@
     {
       "file": "settings-dial.png",
       "kind": "settings-panel capture, simulated host, sample data",
-      "sha256": "6260235b2669d79a1877cfffc30350219241f82a6048ffbb089c35137b841fbd",
+      "sha256": "6014f4d5e090bc20736776c31a830ac6d39697b0666599ae9a2cf744ba603dbc",
       "settings": {
         "readingKey": "mac:v1:smc:Mac17%2C9:54703030:temp.v1",
         "label": "CPU super 1",
@@ -56,7 +56,7 @@
     {
       "file": "settings-reading-colors.png",
       "kind": "settings-panel capture, simulated host, sample data",
-      "sha256": "ec7f268d2a93e47db1698419aa668b87485cb745bc85ffee93d61a2f3753dc88",
+      "sha256": "d5d01780e22ac4551b13fb9e3dcbddcdb83eb58c54f5d46f7e0848130409d3ff",
       "settings": {
         "readingKey": "mac:v1:smc:Mac17%2C9:54703030:temp.v1",
         "label": "CPU super 1",

@@ -26,7 +26,9 @@ const KIND:Record<string,{type:SensorType;meaning:string;minimum:number;maximum:
 	other:{type:SensorType.Other,meaning:'other.v1',minimum:0,maximum:Number.MAX_SAFE_INTEGER}
 };
 const SYSTEM_KEYS=new Set(['cpu-total','memory-total','memory-free','memory-active','memory-inactive','memory-wired','memory-compressed','swap-used','disk-root-total','disk-root-available','network-receive','network-send','storage-read','storage-write']);
-interface Accepted { row: NativeRow; reading: Reading; source: NativeSource; }
+/** Minimum, maximum and running mean of one reading's accepted values since its row last appeared: every gap deletes the row, so it starts over. */
+interface Session { min: number; max: number; mean: number; count: number; }
+interface Accepted { row: NativeRow; reading: Reading; source: NativeSource; session: Session; }
 export interface ProviderFacts { model:string;chip:string;appleSilicon:boolean|null;translation:'native'|'translated'|'unknown';translationError:number;sourceRows:Record<NativeSource,number>; sourceErrors:Partial<Record<NativeSource,{code:string;operation:string;systemCode:number}>>; }
 export function encodeModel(model:string): string | null {
 	if(!model||model.length>128||[...model].some(character=>character.charCodeAt(0)<32||character.charCodeAt(0)===127)||Buffer.from(model,'utf8').toString('utf8')!==model)return null;
@@ -117,6 +119,8 @@ export class MacProvider implements SnapshotProvider {
 		else delete this.factsValue.sourceErrors[source];
 		const now=this.native.now();
 		if(packet.source!==source||packet.error!==0||!Number.isFinite(now)||!Number.isFinite(packet.continuousMs)||packet.continuousMs>now||now-packet.continuousMs>=TTL_MS||packet.rows.length>128){this.removeSource(source);if(source==='public')this.previousPublic=null;this.notice(`${source} readings unavailable; other sources continue.`);return;}
+		// A read that settles after a long sleep can land before current() has expired the rows it would continue: expire them first, so a gap always starts a new session.
+		for(const [key,item] of this.rows)if(now-item.row.continuousMs>=TTL_MS||now<item.row.continuousMs){this.rows.delete(key);this.dirty=true;this.catalogDirty=true;}
 		if(source==='public'){this.fontKnown=true;this.fontAvailable=packet.fontAvailable===true;}
 		const rows=[...packet.rows,...(source==='public'?counterRows(this.previousPublic,packet):[])];
 		if(source==='public'){
@@ -131,13 +135,17 @@ export class MacProvider implements SnapshotProvider {
 		for(let index=0;index<rows.length;index++) {
 			const row=rows[index]!,key=keys[index],kind=KIND[row.kind];
 			if(!key||counts.get(key)!==1||!kind||!row.valid||!Number.isFinite(row.value)||row.value<kind.minimum||row.value>kind.maximum||!Number.isFinite(row.continuousMs)||row.continuousMs<0||row.continuousMs>now||now-row.continuousMs>=TTL_MS||!Number.isFinite(row.wallSeconds))continue;
-			const reading:Reading={key,type:kind.type,sensorIndex:0,id:0,label:row.label,unit:row.unit,value:row.value,valueMin:NaN,valueMax:NaN,valueAvg:NaN,statistics:'unavailable',observationTime:row.continuousMs,observationRevision:++this.observation};
 			const previous=this.rows.get(key);
+			// macOS reports current values only, so the session statistics are this provider's own: a unit or kind change starts them over.
+			const prior=previous&&previous.reading.unit===row.unit&&previous.reading.type===kind.type?previous.session:null;
+			const count=(prior?.count??0)+1,session:Session={min:Math.min(prior?.min??row.value,row.value),max:Math.max(prior?.max??row.value,row.value),mean:prior?prior.mean+(row.value-prior.mean)/count:row.value,count};
+			const reading:Reading={key,type:kind.type,sensorIndex:0,id:0,label:row.label,unit:row.unit,value:row.value,valueMin:session.min,valueMax:session.max,valueAvg:session.mean,statistics:'producer',observationTime:row.continuousMs,observationRevision:++this.observation};
 			if(previous&&previous.reading.value!==reading.value)this.freshnessRevision++;
 			const changedCatalog=!previous||previous.reading.unit!==reading.unit||previous.reading.type!==reading.type||previous.reading.label!==reading.label||previous.row.group!==row.group;
 			if(changedCatalog)this.catalogDirty=true;
-			if(changedCatalog||previous?.reading.value!==reading.value)this.dirty=true;
-			accepted.set(key,{row,reading,source});
+			// A repeated value cannot move the minimum or maximum, but it can move the mean, which an AVG face shows.
+			if(changedCatalog||previous?.reading.value!==reading.value||previous.reading.valueAvg!==reading.valueAvg)this.dirty=true;
+			accepted.set(key,{row,reading,source,session});
 		}
 		for(const [key,item] of this.rows)if(item.source===source&&!accepted.has(key)){this.rows.delete(key);this.dirty=true;this.catalogDirty=true;}
 		for(const [key,item] of accepted)this.rows.set(key,item);

@@ -21,7 +21,7 @@ if(mode==='core')await withHost(async host=>{
 	host.pi('key');host.request('key',{event:'getSensorTree'});host.request('key',{event:'getPreview'});await until(()=>host.messages.some(message=>message.payload?.event==='sensorTree'));
 	assert.ok(host.messages.find(message=>message.payload?.event==='sensorTree').payload.groups.flatMap(group=>group.readings).some(reading=>reading.key===temperature));
 	assert.equal(host.messages.filter(message=>message.event==='setSettings').length,0,'opening panel wrote settings');
-	host.event('key','keyDown');host.event('key','keyUp');await until(()=>host.svg('key')?.includes('N/A'));
+	host.event('key','keyDown');host.event('key','keyUp');await until(()=>host.svg('key')?.includes('MIN')&&hasValue(host.svg('key'),30));assert.doesNotMatch(host.svg('key'),/N\/A/,'a pressed key shows its session minimum, never N/A');
 	host.event('dial','dialRotate',{ticks:1,pressed:false});await until(()=>host.messages.some(message=>message.event==='setSettings'&&message.context==='dial'));
 	const writes=host.messages.filter(message=>message.event==='setSettings'&&message.context==='dial');assert.equal(writes.length,1);assert.equal(writes[0].payload.readingKey,memory);assert.deepEqual(writes[0].payload.future,{keep:true});
 	for(let index=1;index<6;index++)host.appear('dial'+index,'dial',{readingKey:temperature,rotationKeys:[temperature,memory]},index);

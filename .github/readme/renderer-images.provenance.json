@@ -18,10 +18,10 @@
       "type": 1,
       "id": 0,
       "sensorIndex": 0,
-      "valueMin": null,
-      "valueMax": null,
-      "valueAvg": null,
-      "statistics": "unavailable",
+      "valueMin": 39.936,
+      "valueMax": 63.70518279611625,
+      "valueAvg": 51.29453427750151,
+      "statistics": "producer",
       "observationTime": 1000,
       "observationRevision": 1
     },
@@ -33,10 +33,10 @@
       "type": 1,
       "id": 0,
       "sensorIndex": 1,
-      "valueMin": null,
-      "valueMax": null,
-      "valueAvg": null,
-      "statistics": "unavailable",
+      "valueMin": 36.2,
+      "valueMax": 57.3,
+      "valueAvg": 46.1,
+      "statistics": "producer",
       "observationTime": 1000,
       "observationRevision": 2
     },
@@ -48,10 +48,10 @@
       "type": 3,
       "id": 0,
       "sensorIndex": 5,
-      "valueMin": null,
-      "valueMax": null,
-      "valueAvg": null,
-      "statistics": "unavailable",
+      "valueMin": 1190,
+      "valueMax": 2160,
+      "valueAvg": 1610,
+      "statistics": "producer",
       "observationTime": 1000,
       "observationRevision": 3
     },
@@ -63,10 +63,10 @@
       "type": 5,
       "id": 0,
       "sensorIndex": 6,
-      "valueMin": null,
-      "valueMax": null,
-      "valueAvg": null,
-      "statistics": "unavailable",
+      "valueMin": 9.8,
+      "valueMax": 64.2,
+      "valueAvg": 27.4,
+      "statistics": "producer",
       "observationTime": 1000,
       "observationRevision": 4
     },
@@ -78,10 +78,10 @@
       "type": 7,
       "id": 0,
       "sensorIndex": 0,
-      "valueMin": null,
-      "valueMax": null,
-      "valueAvg": null,
-      "statistics": "unavailable",
+      "valueMin": 2.6,
+      "valueMax": 91.4,
+      "valueAvg": 23.8,
+      "statistics": "producer",
       "observationTime": 1000,
       "observationRevision": 5
     },
@@ -93,10 +93,10 @@
       "type": 8,
       "id": 0,
       "sensorIndex": 2,
-      "valueMin": null,
-      "valueMax": null,
-      "valueAvg": null,
-      "statistics": "unavailable",
+      "valueMin": 15200000000,
+      "valueMax": 19300000000,
+      "valueAvg": 17400000000,
+      "statistics": "producer",
       "observationTime": 1000,
       "observationRevision": 6
     },
@@ -108,10 +108,10 @@
       "type": 8,
       "id": 0,
       "sensorIndex": 4,
-      "valueMin": null,
-      "valueMax": null,
-      "valueAvg": null,
-      "statistics": "unavailable",
+      "valueMin": 1200,
+      "valueMax": 46800000,
+      "valueAvg": 3900000,
+      "statistics": "producer",
       "observationTime": 1000,
       "observationRevision": 7
     },
@@ -123,10 +123,10 @@
       "type": 8,
       "id": 0,
       "sensorIndex": 3,
-      "valueMin": null,
-      "valueMax": null,
-      "valueAvg": null,
-      "statistics": "unavailable",
+      "valueMin": 853400000000,
+      "valueMax": 856200000000,
+      "valueAvg": 855100000000,
+      "statistics": "producer",
       "observationTime": 1000,
       "observationRevision": 8
     }
@@ -479,6 +479,54 @@
       "kind": "key",
       "description": "Startup volume available, accents by sensor type",
       "svgSha256": "04929251aeb3c195d6bf026bcd598f621e09e87414409961ba60d1e4154e7920"
+    },
+    {
+      "id": "stat-single-current",
+      "kind": "key",
+      "description": "CPU super 1, current",
+      "svgSha256": "c745c3c365e270c10cc4c831f96ef088424bb5f550619c75480e68660b2a1a1a"
+    },
+    {
+      "id": "stat-dual-current",
+      "kind": "key",
+      "description": "Dual layout, current",
+      "svgSha256": "41b4d40d867b8d1886735b408a01d7af249f2bd94343fafe1b816d4d5414e6d0"
+    },
+    {
+      "id": "stat-single-min",
+      "kind": "key",
+      "description": "CPU super 1, min",
+      "svgSha256": "684bf3d4287004df2fe981ca54ff3ed453dd0d0dab487fd8d142b1789f5c5662"
+    },
+    {
+      "id": "stat-dual-min",
+      "kind": "key",
+      "description": "Dual layout, min",
+      "svgSha256": "b890953253d45453548ed4b5c4e61e0301488a82dac58c14aa023ad64776c69a"
+    },
+    {
+      "id": "stat-single-max",
+      "kind": "key",
+      "description": "CPU super 1, max",
+      "svgSha256": "83db93a49ad4081d53af98fa96b8375e98bcf8f0233c248d1a8d5eb8d74940bc"
+    },
+    {
+      "id": "stat-dual-max",
+      "kind": "key",
+      "description": "Dual layout, max",
+      "svgSha256": "a1f450521040ecba0f3ebdcdb4929dff671ff8cb64aec0fc360f8d5c72b229bf"
+    },
+    {
+      "id": "stat-single-avg",
+      "kind": "key",
+      "description": "CPU super 1, avg",
+      "svgSha256": "61d0c2cf73c2072f3156dfe834a45732c0dea044f272bd13c2645f5ae96a8a87"
+    },
+    {
+      "id": "stat-dual-avg",
+      "kind": "key",
+      "description": "Dual layout, avg",
+      "svgSha256": "ec8d48d7141859d9fa59782d5022e8400b6d76def325e2db80c5c26704ac1325"
     }
   ],
   "assets": [
@@ -656,6 +704,23 @@
         "accent-reading-5",
         "accent-reading-6",
         "accent-reading-7"
+      ],
+      "kind": "production-rendered sample data"
+    },
+    {
+      "file": "stat-modes.png",
+      "width": 1280,
+      "height": 720,
+      "sha256": "49a226a3bcea695af78d580cf2322a63f726a6ae3b3509f6877191a297229974",
+      "sceneIds": [
+        "stat-single-current",
+        "stat-single-min",
+        "stat-single-max",
+        "stat-single-avg",
+        "stat-dual-current",
+        "stat-dual-min",
+        "stat-dual-max",
+        "stat-dual-avg"
       ],
       "kind": "production-rendered sample data"
     }

@@ -80,3 +80,13 @@ test('every 1920 by 960 listing image is fully opaque',async()=>{
   assert.equal(transparent,0,asset.file);
  }
 });
+
+test('sample readings carry session statistics, and the stat-modes board shows each step of a press',()=>{
+ for(const reading of sampleReadings){assert.equal(reading.statistics,'producer',reading.label);assert.ok(reading.valueMin<=reading.value&&reading.value<=reading.valueMax,reading.label);assert.ok(reading.valueMin<=reading.valueAvg&&reading.valueAvg<=reading.valueMax,reading.label);}
+ const scenes=composeScenes(),words=(id:string)=>[...scenes.find(scene=>scene.id===id)!.svg.matchAll(/<text[^>]*>([^<]*)<\/text>/g)].map(match=>match[1]);
+ const board=boardDefinitions.find(row=>row.id==='stat-modes')!;assert.deepEqual(board.scenes,['single','dual'].flatMap(layout=>['current','min','max','avg'].map(mode=>`stat-${layout}-${mode}`)));
+ // The one-reading faces show the session value with its badge; the dual faces share one badge; nothing reads N/A.
+ assert.deepEqual(words('stat-single-current'),['CPU super 1','62.4','°C']);
+ for(const [mode,badge,value] of [['min','MIN','39.9'],['max','MAX','63.7'],['avg','AVG','51.3']] as const){assert.deepEqual(words('stat-single-'+mode),['CPU super 1',badge,value,'°C']);assert.ok(words('stat-dual-'+mode).includes(badge),mode);}
+ for(const scene of scenes.filter(row=>row.id.startsWith('stat-')))assert.ok(!scene.svg.includes('N/A'),scene.id);
+});
