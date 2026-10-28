@@ -8,7 +8,7 @@ nav_order: 9
 
 Set **Warn at**, **Critical at** or both to change the display when the live value reaches a limit: amber for warning, red for critical.
 
-Open **Alerts** in the key or dial settings. Thresholds use the current value, even while a key shows N/A for MIN, MAX or AVG.
+Open **Alerts** in the key or dial settings. Thresholds use the current value, even while a key shows MIN, MAX or AVG.
 
 Both fields are optional and independent: set one, the other, or neither. A key with neither set shows its themed value.
 
@@ -49,7 +49,7 @@ One exception: **Data units** rescales bytes and transfer rates for display only
 | Memory total, free, active, inactive, wired and compressed; Swap used; Startup volume total and available | B (bytes) |
 | Network receive and send; Storage read and write | B/s (bytes per second), also when the key shows Mbps |
 
-> **Note:** Alert color always tracks the live value. A key whose press cycled to MIN, MAX or AVG shows N/A and still turns amber or red while the live value is past a limit.
+> **Note:** Alert color always tracks the live value. A key whose press cycled to MIN, MAX or AVG turns amber or red only while the live value is past a limit, so a MAX above **Critical at** draws on the normal face once the live value is back under **Warn at**.
 
 ### The trigger is at or past the limit
 

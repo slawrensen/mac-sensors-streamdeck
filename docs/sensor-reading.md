@@ -86,7 +86,7 @@ The key saves the reading's identity, so a change in the list's order never reta
 
 A reading can be absent briefly:
 
-- CPU usage and the network and storage rates need two reads to compute. They are missing for about a quarter second when reading starts, and for one read after the Mac sleeps.
+- CPU usage and the network and storage rates need two reads to compute. They are missing for about a quarter second when reading starts ([When reading starts and stops](data-sources.html#when-reading-starts-and-stops)), and for one read after the Mac sleeps.
 - The network or storage rates skip one read when the set of network interfaces or storage devices changes.
 - A failed SMC read removes that reading until a later read succeeds.
 
@@ -94,7 +94,7 @@ When the whole source is unavailable, the key shows a [status screen](#status-sc
 
 ### Label on the key
 
-Custom text for the key. Leave it blank, or only spaces, to use the reading's own name from the Mac catalog. A short label draws at the largest of three sizes, a longer one steps down, and only a label too wide for the smallest size is cut with an ellipsis. Label sizes come from measured Tahoma Bold glyph widths. A MIN, MAX, AVG or N/A badge sits in its own gap under the label, so it never takes label width.
+Custom text for the key. Leave it blank, or only spaces, to use the reading's own name from the Mac catalog. A short label draws at the largest of three sizes, a longer one steps down, and only a label too wide for the smallest size is cut with an ellipsis. Label sizes come from measured Tahoma Bold glyph widths. A MIN, MAX or AVG badge sits in its own gap under the label, so it never takes label width.
 
 In the quad grid with small labels turned on, each label becomes a cell label of at most four characters; see [the quad grid](#layout-four-readings-in-a-quad-grid).
 
@@ -123,16 +123,36 @@ Text color changes numbers, labels and units. Sparklines, bars, rings and their 
 
 What the number on the key shows:
 
-| Option | Shows on Mac |
+| Option | Shows |
 | --- | --- |
 | **Current value** *(default)* | The live reading. |
-| **Minimum** | An **N/A** badge and a dash with the unit. Mac readings carry no stored minimum. |
-| **Maximum** | N/A, as for Minimum. |
-| **Average** | N/A, as for Minimum. |
+| **Minimum** | The lowest value accepted for this reading since the plugin last started reading sensors, with a **MIN** badge. |
+| **Maximum** | The highest value accepted since then, with a **MAX** badge. |
+| **Average** | The arithmetic mean of the values accepted since then, with an **AVG** badge. |
 
-The key never puts the current value in place of a missing statistic. The **How Display works** fold says the same: *Mac Sensors has no provider history, so min, max and avg show N/A.* A Sensor Dial keeps its own local session minimum, maximum and average from readings it observed; see [Sensor Dial](sensor-dial.html).
+![Eight key faces. Top row: CPU super 1 with its sparkline at 62.4 °C, then the same key showing MIN 39.9 °C, MAX 63.7 °C and AVG 51.3 °C, each with a small badge. Bottom row: CPU super 1 over GPU 1 at 62.4 and 54.8 °C, then MIN 39.9 and 36.2, MAX 63.7 and 57.3, and AVG 51.3 and 46.1, one shared badge on each divider](assets/img/stat-modes.png)
 
-Alert colors and Bar and Ring fills follow the live value whatever **Value shown** says, so a key showing N/A still turns amber or red when the live value crosses a threshold.
+*Production-rendered sample data with sample session statistics, drawn with **Accent colors** set to **Theme accent everywhere**.*
+
+macOS reports current values only, so Mac Sensors keeps these statistics itself, for every reading this Mac reports. The plugin starts reading sensors when a Sensor Reading key (the Back tile of a detail page included), Sensor Dial or detail tile becomes visible while reading is stopped, and stops 2 seconds after the last one disappears, if none has appeared again; Sensor Control keys do not count. Changing to a page that has one, opening sensor details or pressing Back therefore keeps the statistics ([When reading starts and stops](data-sources.html#when-reading-starts-and-stops)). Each accepted read adds one sample, including a read that repeats the last value, so the average counts reads and is not weighted by time. On the first read after the plugin starts reading sensors, MIN, MAX and AVG all equal the current value. The statistics follow **Decimals**, **°F** and **Data units** the same way the live value does.
+
+The statistics belong to the reading, not the key. Every Sensor Reading key and detail tile that shows the same reading shows the same MIN, MAX and AVG. A key you add, or switch to another reading, shows that reading's statistics at once, including reads made before the change.
+
+A reading's statistics start over:
+
+- after a gap in that reading: a read where it is missing or withheld (invalid, out of range or duplicated), or a failed read of its source, which removes every reading from that source;
+- when the reading expires, 15 seconds after its last accepted read, for example across a sleep longer than that;
+- when the reading's unit or type changes;
+- for CPU usage and the network and storage rates, after any sleep, because they skip one read; the rates also skip one when the set of network interfaces or storage devices changes;
+- when the plugin stops reading sensors, 2 seconds after the last Sensor Reading key, Sensor Dial or detail tile disappears, which ends every reading's statistics. They are kept in memory only, so a plugin restart also starts them over.
+
+Changing **Read every** keeps them; it clears sparklines only. There is no reset for a key's statistics.
+
+With the default **A press**, the **How Display works** fold says: *Pressing the key cycles current, min, max and avg. Min, max and avg come from this session's reads; they start over after a gap in the reading, or when no Mac Sensors key, dial or detail tile has been shown for 2 seconds.* Sensor Control keys do not count as shown.
+
+A Sensor Dial keeps separate statistics of its own, which can differ from a key's for the same reading; see [Session stats are the dial's own, per reading](sensor-dial.html#session-stats-are-the-dials-own-per-reading).
+
+Alert colors and Bar and Ring fills follow the live value whatever **Value shown** says. A key showing MAX keeps its normal colors while the live value is back under **Warn at**, even when the maximum is past it.
 
 ### Layout: two readings on one key
 
@@ -143,7 +163,7 @@ Choose **Readings on this key → Two readings, stacked**, then pick **Reading 2
 - **The same stat as row 1** *(default)*: a press cycles both rows together, with one badge in the divider.
 - **Always the current value**, **Always the minimum**, **Always the maximum** or **Always the average**: row 2 stays put while a press cycles row 1. Each row that shows a statistic gets its own badge on its label line; matching statistics share the divider badge.
 
-On Mac every minimum, maximum and average is N/A, so pinning row 2 to one of them shows N/A on that row permanently. The panel's hint about pinning row 2 for a minimum and maximum pair does not apply on Mac: both rows would read N/A. **Always the current value** keeps row 2 live while a press cycles row 1. Useful pairs are CPU super core 1 above GPU 1, or Network receive above Network send.
+Each row shows its own reading's statistics. The panel's hint names a minimum and maximum pair: with **Value shown** on **Minimum** and **Row 2 shows** on **Always the maximum**, row 1 shows its reading's minimum and row 2 its reading's maximum. **Always the current value** keeps row 2 live while a press cycles row 1. Useful pairs are CPU super core 1 above GPU 1, or Network receive above Network send.
 
 **Rules for every multi-reading layout:**
 
@@ -201,19 +221,19 @@ The **°F** box under **Temperature** converts °C readings to Fahrenheit for di
 Bar and Ring find their range automatically, and there are no bounds to type:
 
 - **Percentages** run 0 to 100. On Mac that is CPU usage.
-- Every other reading spans the values seen: the live value and the recent samples the plugin holds for it, up to 36. Mac Sensors has no provider minimum or maximum. While every sample is the same value, the range has no width, and the fill sits at the halfway point unless a threshold widens it.
+- Every other reading spans the values seen: the reading's MIN and MAX since the plugin last started reading sensors (see [Value shown](#value-shown-stat-mode)), the live value, and the recent samples the plugin holds for it, up to 36. The range therefore keeps its width when a **Read every** change clears the samples. While MIN and MAX are still equal, the range has no width, and the fill sits at the halfway point unless a threshold widens it.
 - **Warn at** and **Critical at** draw amber and red zones toward the alarmed end: the high end normally, the low end when the direction box is ticked. The range widens to keep a zone visible, with a small margin when a threshold sits at or past the edge.
 
 The panel's range sentence also mentions Yes/No readings, which run 0 to 1; the current Mac catalog has none.
 
-Zones draw as muted shades: the alert color blended 45 percent toward the key background. They mark positions; the fill on top shows the live value in the accent color. While the key alerts, the whole key takes the alert palette, and the fill and zones follow it. The fill follows the live value even while the text shows N/A.
+Zones draw as muted shades: the alert color blended 45 percent toward the key background. They mark positions; the fill on top shows the live value in the accent color. While the key alerts, the whole key takes the alert palette, and the fill and zones follow it. The fill follows the live value even while the text shows MIN, MAX or AVG.
 
 Sparkline notes:
 
 - It holds the last **36 samples**, one for each new measurement of the reading. At **Read every** 1 second that covers about the last 36 seconds.
 - The line scales to its own lowest and highest sample, so its shape shows how the reading changed recently. Identical samples draw a level line across the middle. Two samples are needed before a line draws.
 - Samples keep collecting for a reading a key has shown while any Sensor Reading key, Sensor Dial or detail tile is visible, so a key on another page resumes its line when you return.
-- When no reading key, dial or detail tile is visible, reading stops and every sparkline is cleared.
+- When no reading key, dial or detail tile has been visible for 2 seconds, reading stops and every sparkline is cleared. A page change, opening sensor details or pressing Back inside those 2 seconds keeps every line.
 - A missing or failed reading, a change in the reading's type or unit, a status screen, a **Read every** change and a plugin restart clear the history.
 - Switching between °C and °F keeps the line unchanged.
 
@@ -233,7 +253,7 @@ See [Thresholds and alerts](thresholds.html) for the full behavior and worked ex
 
 ## Pressing the key
 
-By default a press cycles **Value shown**: current, MIN, MAX, AVG, then current again. The badge under the label follows, and the choice is saved to the key, the same as changing **Value shown**. On Mac the three statistics are N/A, so three presses out of four show N/A. If you never want that, set **A press** to **Opens sensor details**. With the default press, a key with no reading ignores it. Alert colors keep following the live value throughout.
+By default a press cycles **Value shown**: current, MIN, MAX, AVG, then current again. The badge under the label follows, and the choice is saved to the key, the same as changing **Value shown**. MIN, MAX and AVG are the reading's statistics since the plugin last started reading sensors, as [Value shown](#value-shown-stat-mode) describes; a press changes only which one the key shows and resets nothing. With the default press, a key with no reading ignores it. Alert colors keep following the live value throughout.
 
 On a two-reading key with **Row 2 shows** at its default, a press cycles both rows together. A row pinned to a fixed statistic stays put while the first row cycles. On the three-row and quad layouts a press cycles every reading together.
 
@@ -264,9 +284,9 @@ A two-line status replaces the value when the key cannot show a reading. The sav
 | Key shows | Meaning | What to do |
 | --- | --- | --- |
 | **Pick a sensor** / in settings | The key works, but no reading is selected yet. | Type in the **Reading** box and choose a reading. |
-| **Reading sensors** / please wait | No reading has arrived since keys appeared: the first read is still out. | Wait for the first read. |
+| **Reading sensors** / please wait | No reading has arrived since reading started: the first read is still out. | Wait for the first read. |
 | **Sensor missing** / pick again | A reading is selected, but this Mac does not report it right now. | Choose **Reload sensor list** or **Pick another reading**; see [Reading](#reading). |
-| **Source busy** / retrying | 15 seconds after keys appeared, the first read has still not finished. | Choose **Check again**. |
+| **Source busy** / retrying | 15 seconds after reading started, the first read has still not finished. | Choose **Check again**. |
 | **No sensor data** / copy report | Both sources answered, but no reading is current. | Choose **Check again**. If it stays, choose **Copy support report** under **Advanced → Support**. |
 | **Tahoma needed** / Open Font Book | The plugin could not find the font Tahoma Bold. | Install Tahoma Bold in Font Book, then choose **Check again**. |
 | **Bridge failed** / reinstall | The native reader for the Node runtime's architecture could not be used. | Quit and reopen Stream Deck. If it persists, remove Mac Sensors and install it again; opening the same version over itself changes nothing. See [Removing](installation.html#removing). |

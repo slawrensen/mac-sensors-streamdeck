@@ -2,5 +2,5 @@
 import fs from 'node:fs';
 import path from 'node:path';
 const target=process.argv[2]??'.github/readme';fs.mkdirSync(target,{recursive:true});
-for(const name of ['readme-hero','hero','key-layouts','details','dials','themes','alerts','status','reading-colors','accents'])fs.copyFileSync(path.join('docs/assets/img',name+'.png'),path.join(target,name+'.png'));
+for(const name of ['readme-hero','hero','key-layouts','details','dials','themes','alerts','status','reading-colors','accents','stat-modes'])fs.copyFileSync(path.join('docs/assets/img',name+'.png'),path.join(target,name+'.png'));
 fs.copyFileSync('docs/assets/img/renderer-images.provenance.json',path.join(target,'renderer-images.provenance.json'));

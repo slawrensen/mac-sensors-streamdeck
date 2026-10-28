@@ -35,7 +35,7 @@ When a key cannot show a current reading, it shows a two-line status screen. Dia
 
 | Key shows | Dial shows | Meaning |
 | --- | --- | --- |
-| **Reading sensors** / please wait | Reading sensors / please wait | The first read since keys appeared has not returned yet. |
+| **Reading sensors** / please wait | Reading sensors / please wait | The first read since reading started has not returned yet. |
 | **Source busy** / retrying | Source busy / retrying | The first read has not finished after 15 seconds. |
 | **No sensor data** / copy report | No sensor data / copy report | Both sources answered, but no reading is current. |
 | **Tahoma needed** / Open Font Book | Tahoma needed / Open Font Book | Tahoma Bold was not found. Fixed image. |
@@ -51,7 +51,7 @@ When a key cannot show a current reading, it shows a two-line status screen. Dia
 
 ## Keys show Reading sensors
 
-The first read after keys appeared has not returned yet. It clears when that read returns, with no action from you. A page you come back to after no Sensor Reading key, Sensor Dial or detail tile was visible starts here too.
+The first read after reading started has not returned yet. It clears when that read returns, with no action from you. Reading starts again when a page comes back after no Sensor Reading key, Sensor Dial or detail tile was visible for 2 seconds, so that page starts here too; a page change, opening details or Back inside those 2 seconds does not ([When reading starts and stops](data-sources.html#when-reading-starts-and-stops)).
 
 It can also return during use if every reading lapses or fails before the session's first SMC read has answered. If it stays for more than 15 seconds:
 
@@ -61,7 +61,7 @@ It can also return during use if every reading lapses or fails before the sessio
 
 ## Keys show Source busy
 
-15 seconds after keys appeared, the first read has still not finished: no system counter read has succeeded and at least one source has not answered. The plugin cannot even check the font yet.
+15 seconds after reading started, the first read has still not finished: no system counter read has succeeded and at least one source has not answered. The plugin cannot even check the font yet.
 
 1. Choose **Check again**. Each read asks the sources again; a source whose earlier call is still running is asked again once that call returns.
 2. If it stays, copy a support report before anything else: it describes the running plugin, and a restart replaces it. Its `dataSource` section shows the reason, and its `mac` section shows how many readings each source returned (`sourceRows`) and any source error (`sourceErrors`). Until a source has been accepted the `mac` section says `catalog: "not sampled"`, and a read that failed without answering leaves no `sourceErrors` entry; the plugin log then has a `read failed; retrying.` line.
@@ -122,8 +122,8 @@ A reading is selected, but this Mac does not report it right now. The saved iden
 Causes, most lasting first:
 
 1. **This Mac does not have that reading.** An SMC reading's identity includes the Mac model, so a selection saved on another model, or copied in a configuration document from another Mac, is missing here. An SMC key that this model does not have is never reported. See [Data sources](data-sources.html#reading-identity).
-2. **Its last read failed or was withheld.** When the SMC read fails, the SMC readings drop out while the system counters keep working. When a system counter read fails after an earlier one succeeded, the system readings drop out and the SMC readings keep working. If no system counter read has succeeded since keys appeared, keys show **Source error**, or **Source busy** while a read is still out after 15 seconds, because the font has not been checked yet. A value outside its accepted range is withheld.
-3. **It is a worked-out reading waiting for its pair.** CPU usage and the transfer rates show this for about a quarter second after keys appear, for one read after a sleep, and network rates for one read when an interface counter starts over at 4 GiB. See [Counter rebaseline](data-sources.html#counter-rebaseline).
+2. **Its last read failed or was withheld.** When the SMC read fails, the SMC readings drop out while the system counters keep working. When a system counter read fails after an earlier one succeeded, the system readings drop out and the SMC readings keep working. If no system counter read has succeeded since reading started, keys show **Source error**, or **Source busy** while a read is still out after 15 seconds, because the font has not been checked yet. A value outside its accepted range is withheld.
+3. **It is a worked-out reading waiting for its pair.** CPU usage and the transfer rates show this for about a quarter second after reading starts, for one read after a sleep, and network rates for one read when an interface counter starts over at 4 GiB. See [Counter rebaseline](data-sources.html#counter-rebaseline).
 
 The settings panel tells this apart from a source problem. Its header says **Saved reading not found**, and the message under it says the key keeps the saved reading with its label and colors and shows it again when this Mac reports it, with **Reload sensor list** and **Pick another reading** buttons.
 
@@ -174,8 +174,8 @@ Every read takes new measurements, and a reading older than 15 seconds is remove
 
 1. **Read every is long.** At 5 seconds a key changes at most every 5 seconds. Change it under **Advanced**, **Connection**.
 2. **The value is steady.** Memory total and Startup volume total rarely change. How often the SMC itself refreshes a key is unknown, and a register that stopped changing internally cannot be told apart from a steady one.
-3. **The key is not visible.** Nothing is read while no Sensor Reading key, Sensor Dial or detail tile is visible anywhere. A page you return to after none was visible starts with **Reading sensors** and new sparklines.
-4. **The sparkline restarted.** It starts again when **Read every** changes, after a status screen, when its reading was missing, and when you return to a page after no Sensor Reading key, Sensor Dial or detail tile was visible anywhere. It holds up to 36 points spaced by reads.
+3. **The key is not visible.** Nothing is read while no Sensor Reading key, Sensor Dial or detail tile is visible anywhere, and after 2 seconds like that reading stops. A page you return to after that starts with **Reading sensors** and new sparklines; a page back within the 2 seconds continues where it was.
+4. **The sparkline restarted.** It starts again when **Read every** changes, after a status screen, when its reading was missing, and when you return to a page after no Sensor Reading key, Sensor Dial or detail tile was visible anywhere for 2 seconds. It holds up to 36 points spaced by reads.
 5. **The plugin is not answering.** See [The panel says the plugin is not responding](#the-panel-says-the-plugin-is-not-responding).
 
 ## A reading shows the wrong unit
@@ -194,7 +194,7 @@ Check these first:
 2. **The direction.** By default the alert fires at or above the number. For readings where low is bad, such as a fan or available space, tick **Alert when the value drops to or below these numbers (for fans and clocks)**.
 3. **A key with several readings.** Only reading 1 is checked, and it recolors the whole key.
 4. **A dial.** Warn, Critical and the bar ends apply only to readings in the unit that was on the dial when you last changed any of them, so a temperature limit never fires on a fan. Change a limit while the reading you want is on the dial.
-5. **What an alert changes.** A dial stays in its theme: only the range bar's fill, or an overview row's value, turns amber or red. A key checks the live value even while it shows **MIN**, **MAX** or **AVG** as N/A. See [Alerts on a dial](sensor-dial.html#alerts-on-a-dial).
+5. **What an alert changes.** A dial stays in its theme: only the range bar's fill, or an overview row's value, turns amber or red. A key checks the live value even while it shows **MIN**, **MAX** or **AVG**, so a maximum past a limit does not color the key. See [Alerts on a dial](sensor-dial.html#alerts-on-a-dial).
 
 A blank field turns that level off, and a decimal comma such as `70,5` is accepted. No alert shows while a status screen or **Sensor missing** shows. See [Thresholds and alerts](thresholds.html) and [Warn at and Critical at](sensor-reading.html#warn-at-and-critical-at).
 
@@ -239,7 +239,7 @@ To install the same version again, export a profile backup, remove Mac Sensors a
 
 ## High CPU, memory or a lingering process
 
-The plugin runs one reader however many keys and dials are visible, and stops reading when none is (the log says `Stopped (no visible actions)`).
+The plugin runs one reader however many keys and dials are visible, and stops reading 2 seconds after none is (the log says `Stopped (no visible actions)`).
 
 1. **High CPU at 250 ms.** At **Read every** 250 ms both sources are read four times a second and every changed face is drawn again. The final 1.0.1 release candidate, measured as a development copy in the Stream Deck app on the M5 Pro with the development process observer and 32 single-reading keys, used 2.478% of one core at 250 ms against 0.668% at 1 second (PERF.md). Choose 1 second or longer under **Advanced**, **Connection**.
 2. **Memory.** In a 24-hour observation with the development process observer of the final 1.0.1 release candidate, measured as a development copy in the Stream Deck app with 32 single-reading keys at 1 second on the M5 Pro, resident memory went from 76.94 MiB to 82.08 MiB, with a maximum of 89.25 MiB, 12 threads and 49 to 50 file descriptors (PERF.md). In the shorter back-to-back sessions at 250 ms, the maximum was 95.9 MiB. If you see steady growth, note how many keys and dials are visible and the **Read every** value, and attach the log.
@@ -265,7 +265,7 @@ In Finder, choose **Go**, **Go to Folder** and paste the path. The newest file i
 
 Useful lines:
 
-- `MacSensors: Started (… ms interval)` and `MacSensors: Stopped (no visible actions)`: the reader started for the first visible key or dial, and stopped when none was left.
+- `MacSensors: Started (… ms interval)` and `MacSensors: Stopped (no visible actions)`: the reader started for the first visible key or dial, and stopped 2 seconds after none was left. A page change inside those 2 seconds logs neither line.
 - `MacSensors: Read interval set to … ms`: each effective **Read every** change.
 - `MacSensors: smc readings unavailable; other sources continue.` (or `public`): a source answered with an error or with data that was already too old; its readings were removed and the other source kept serving.
 - `MacSensors: smc read failed; retrying.` or `smc could not start; retrying.` (or `public`): a read did not complete or could not be queued.

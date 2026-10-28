@@ -40,13 +40,13 @@ Arrow keys browse, Enter picks, and Tab or a click elsewhere closes the list wit
 
 ## 5. Confirm a value
 
-The key shows a number and unit, and the settings header shows **Live · Mac sensors**. Readings update once per **Read every** interval, set under **Advanced**, **Connection**: 1 second by default, from 250 ms to 5 seconds. CPU usage and transfer rates are computed from two reads, so they appear about a quarter second after the key appears.
+The key shows a number and unit, and the settings header shows **Live · Mac sensors**. Readings update once per **Read every** interval, set under **Advanced**, **Connection**: 1 second by default, from 250 ms to 5 seconds. CPU usage and transfer rates are computed from two reads, so they appear about a quarter second after the key appears when it starts reading: the first Mac Sensors key, dial or detail tile shown, or the first after none was shown for 2 seconds. After a page change inside those 2 seconds they continue without a pause.
 
 ![Sensor Reading settings panel: the header with the key face, CPU super 1, CPU super core 1 · CPU and Live · Mac sensors, the theme chips, Reading with Label on the key and Readings on this key, and Display with Text color, Value shown, Decimals, Temperature and Graph under the value set to Sparkline](assets/img/settings-key.png)
 
 *Settings-panel capture of the staged 1.0.1.0 panel in a simulated host with sample data, with **Accent colors** set to **Theme accent everywhere**, so the header face's sparkline uses the theme accent. It is not the Stream Deck app's own window.*
 
-A press cycles current, min, max and avg. Mac readings carry no stored minimum, maximum or average, so min, max and avg show **N/A** on a key. Dials keep their own local session statistics.
+A press cycles current, min, max and avg. Mac Sensors keeps min, max and avg for each reading from its reads since the plugin last started reading sensors, and they start over after a gap in that reading ([Value shown](sensor-reading.html#value-shown-stat-mode)). Dials keep their own local session statistics.
 
 If you see **Tahoma needed**, **Reading sensors**, **No sensor data**, **Sensor missing** or **Bridge failed**, find the exact message in [Status screens](status-screens.html) or [Troubleshooting](troubleshooting.html).
 

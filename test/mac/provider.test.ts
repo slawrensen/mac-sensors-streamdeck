@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { mock, test } from 'node:test';
-import { MacProvider, counterRows, encodeModel, measurementKey } from '../../src/mac/provider';
+import { MacProvider, TTL_MS, counterRows, encodeModel, measurementKey } from '../../src/mac/provider';
+import { readingStatBadge, statValue } from '../../src/ui/format';
+import type { SensorSnapshot } from '../../src/hwinfo/types';
 import type { NativeBridge, NativePacket, NativeRow, NativeSource } from '../../src/mac/native-api';
 function packet(source:NativeSource,at=100):NativePacket {
 	const row:NativeRow={key:source==='smc'?'TB1T':'memory-total',label:source==='smc'?'Battery':'Memory total',group:source==='smc'?'Battery':'Memory',kind:source==='smc'?'temperature':'other',unit:source==='smc'?'°C':'B',value:source==='smc'?30:1024,valid:true,continuousMs:at,wallSeconds:1700000000+at/1000,error:0,systemCode:0};
@@ -16,7 +18,7 @@ async function publish(r:ReturnType<typeof rig>,source:NativeSource,value=packet
 test('opening and pending work provide no measurement; each accepted row owns its evidence',async()=>{
 	const r=rig();assert.equal(r.provider.current(),null);assert.equal(r.provider.read(),null);assert.equal(r.pending.size,2);
 	await publish(r,'public');const first=r.provider.current();assert.ok(first);assert.equal(first.readings.length,1);
-	await publish(r,'smc');const both=r.provider.current();assert.equal(both?.readings.length,2);assert.ok(both!.catalogRevision!>first.catalogRevision!);assert.equal(both?.readings[0]?.statistics,'unavailable');assert.ok(Number.isNaN(both!.readings[0]!.valueMin));
+	await publish(r,'smc');const both=r.provider.current();assert.equal(both?.readings.length,2);assert.ok(both!.catalogRevision!>first.catalogRevision!);assert.equal(both?.readings[0]?.statistics,'producer');assert.equal(both!.readings[0]!.valueMin,both!.readings[0]!.value);
 	const key='mac:v1:smc:Mac17%2C9:54423154:temp.v1',temperature=both!.byKey.get(key)!;
 	r.clock.now=200;r.provider.read();await publish(r,'public');const updated=r.provider.current()!;
 	assert.equal(updated.catalogRevision,both!.catalogRevision);assert.equal(updated.byKey.get(key)?.observationRevision,temperature.observationRevision);assert.equal(updated.byKey.get(key)?.observationTime,100);
@@ -112,4 +114,50 @@ test('a missing model on the first SMC row withholds it instead of throwing',asy
 	assert.equal(measurementKey('smc',row,undefined as unknown as string),null);
 	assert.equal(measurementKey('smc',row,''),null);
 	assert.ok(measurementKey('smc',row,'Mac17,9')?.startsWith('mac:v1:smc:Mac17%2C9:'));
+});
+function smcAt(r:ReturnType<typeof rig>,value:number,unit='°C'):NativePacket {const next=packet('smc',r.clock.now);next.rows[0]!.value=value;next.rows[0]!.unit=unit;return next;}
+const smcKey='mac:v1:smc:Mac17%2C9:54423154:temp.v1';
+async function readSmc(r:ReturnType<typeof rig>,at:number,value:number,unit='°C'):Promise<SensorSnapshot>{r.clock.now=at;r.provider.read();await publish(r,'public',packet('public',at));await publish(r,'smc',smcAt(r,value,unit));return r.provider.current()!;}
+test('keys get real session minimum, maximum and average from accepted Mac readings',async()=>{
+	const r=rig();
+	let snapshot=await readSmc(r,100,30);let reading=snapshot.byKey.get(smcKey)!;
+	assert.equal(reading.statistics,'producer');assert.deepEqual([reading.valueMin,reading.valueMax,reading.valueAvg],[30,30,30]);
+	snapshot=await readSmc(r,1100,40);reading=snapshot.byKey.get(smcKey)!;assert.deepEqual([reading.valueMin,reading.valueMax,reading.valueAvg],[30,40,35]);
+	snapshot=await readSmc(r,2100,20);reading=snapshot.byKey.get(smcKey)!;assert.deepEqual([reading.valueMin,reading.valueMax,reading.valueAvg],[20,40,30]);
+	assert.deepEqual((['current','min','max','avg'] as const).map(mode=>statValue(reading,mode)),[20,20,40,30]);
+	assert.deepEqual((['min','max','avg'] as const).map(mode=>readingStatBadge(reading,mode)),['MIN','MAX','AVG']);
+	r.provider.close();
+});
+test('a gap, a unit change, expiry or a new generation starts the session over',async()=>{
+	const r=rig();await readSmc(r,100,30);await readSmc(r,1100,40);
+	const failed=smcAt(r,99);failed.rows[0]!.valid=false;r.clock.now=2100;r.provider.read();await publish(r,'public',packet('public',2100));await publish(r,'smc',failed);
+	assert.equal(r.provider.current()!.byKey.get(smcKey),undefined);
+	let reading=(await readSmc(r,3100,50)).byKey.get(smcKey)!;assert.deepEqual([reading.valueMin,reading.valueMax,reading.valueAvg],[50,50,50],'a missing read is a gap');
+	reading=(await readSmc(r,4100,10,'°F')).byKey.get(smcKey)!;assert.deepEqual([reading.valueMin,reading.valueMax,reading.valueAvg],[10,10,10],'a unit change is a new session');
+	await readSmc(r,5100,12,'°F');r.clock.now=5100+TTL_MS;assert.throws(()=>r.provider.read(),{reason:'no-readable-sensors'},'every row expired');await publish(r,'public',packet('public',r.clock.now));
+	assert.equal(r.provider.current()!.byKey.get(smcKey),undefined,'the expired row and its session are gone');
+	await publish(r,'smc',smcAt(r,70,'°F'));reading=r.provider.current()!.byKey.get(smcKey)!;assert.deepEqual([reading.valueMin,reading.valueMax,reading.valueAvg],[70,70,70],'expiry is a gap');
+	r.provider.close();
+	const next=rig();reading=(await readSmc(next,100,25)).byKey.get(smcKey)!;assert.deepEqual([reading.valueMin,reading.valueMax,reading.valueAvg],[25,25,25],'a new generation keeps nothing');next.provider.close();
+});
+test('a repeated value that moves only the mean still publishes, and a steady value does not',async()=>{
+	const r=rig();await readSmc(r,100,30);const moved=await readSmc(r,1100,40);
+	const repeated=await readSmc(r,2100,40);assert.ok(repeated.valueRevision!>moved.valueRevision!,'AVG moved from 35 to 36.67, so faces must redraw');
+	assert.ok(Math.abs(repeated.byKey.get(smcKey)!.valueAvg-110/3)<1e-9);
+	const r2=rig();const first=await readSmc(r2,100,30);const steady=await readSmc(r2,1100,30);assert.equal(steady.valueRevision,first.valueRevision,'a steady reading keeps its revision');
+	r.provider.close();r2.provider.close();
+});
+test('a read that settles after a sleep longer than the TTL starts a new session even before expiry runs',async()=>{
+	const r=rig();await readSmc(r,100,30);await readSmc(r,1100,40);
+	r.clock.now=2100;r.provider.read();await publish(r,'public',packet('public',2100));
+	r.clock.now=2100+60*60*1000;await publish(r,'smc',smcAt(r,90));
+	const reading=r.provider.current()!.byKey.get(smcKey)!;assert.deepEqual([reading.valueMin,reading.valueMax,reading.valueAvg],[90,90,90],'the hour-old row is a gap, not part of the session');
+	r.provider.close();
+});
+test('a failed source read is a gap for every reading of that source',async()=>{
+	const r=rig();await readSmc(r,100,30);await readSmc(r,1100,40);
+	const failed=smcAt(r,0);failed.error=12;r.clock.now=2100;r.provider.read();await publish(r,'public',packet('public',2100));await publish(r,'smc',failed);
+	assert.equal(r.provider.current()!.byKey.get(smcKey),undefined);
+	const reading=(await readSmc(r,3100,55)).byKey.get(smcKey)!;assert.deepEqual([reading.valueMin,reading.valueMax,reading.valueAvg],[55,55,55]);
+	r.provider.close();
 });

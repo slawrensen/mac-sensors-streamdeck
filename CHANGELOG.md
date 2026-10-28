@@ -2,10 +2,12 @@
 
 ## 1.0.1.0 - 2026-10-27
 
+- Pressing a Sensor Reading key now cycles MIN, MAX and AVG values that Mac Sensors keeps from the reads since reading started, instead of N/A. They start over after a gap in that reading, and **Value shown** and detail tiles show the same values.
+- Changing pages, opening sensor details or pressing Back keeps the reading session, so statistics, sparklines and rates carry on; reading stops 2 seconds after the last Mac Sensors key, dial or detail tile leaves the deck.
 - Keys and dials that show both system and SMC readings change once per read instead of twice in quick succession when both sources answer within 100 ms of each other.
 - **Read every** has its own help: one shared read updates every reading key and dial, changing it clears sparkline history, and shorter intervals use more processor time.
 - A blank **Read every** value means the 1 second default. A stored value above 5 seconds is read as 5 seconds, so readings no longer expire between reads.
-- CPU usage and transfer rates appear about a quarter second after a key appears or a page returns, instead of one full read interval later.
+- CPU usage and transfer rates appear about a quarter second after the first key appears, or after a page returns once reading has stopped, instead of one full read interval later.
 - Keys and dials show Reading sensors, instead of keeping old values as live, when every reading lapses or fails before the first SMC read completes.
 - A key whose saved reading is missing says Sensor missing, pick again, naming the remedy in its settings, instead of check again.
 - Support reports from Intel-based Mac computers say the plugin runs natively instead of unknown.

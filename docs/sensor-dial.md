@@ -142,13 +142,24 @@ Rotation also protects your selection when the saved reading is missing (a senso
 
 ## Session stats are the dial's own, per reading
 
-Mac readings carry no stored minimum, maximum or average, so a Sensor Reading key's MIN, MAX and AVG show **N/A** ([why](faq.html#why-do-min-max-and-avg-show-na-on-a-key)). A dial calculates its own local min, max and average for each reading from the observations it receives. The average is the sum of accepted observations divided by their count; it is not time-weighted. A repeated display of the same observation does not count again; a new acquisition with the same value does.
+A dial calculates its own local min, max and average for each reading from the observations it receives, separate from the MIN, MAX and AVG that Sensor Reading keys and detail tiles show ([how those are calculated](faq.html#how-are-min-max-and-avg-calculated-on-a-key)). The average is the sum of accepted observations divided by their count; it is not time-weighted. A repeated display of the same observation does not count again; a new acquisition with the same value does.
 
 - The reading on the dial, every rotation-set member and the readings in an overview's list collect while sensors are being read. Ordinary rotation keeps each reading's session, so turning away and back finds it again.
 - A dial that goes off screen (another page or profile) keeps its pause and pin for up to 30 minutes; the plugin keeps the state of the 64 most recently hidden dials. Its sessions are kept too, and keep collecting, while a Sensor Reading key (the Back tile included), another Sensor Dial or a detail tile is visible. A visible Sensor Control key does not keep sensors being read.
 - A missing or non-finite reading, or a change of a reading's unit or type, ends that reading's session. A status screen ends every session on every dial; the first live frame afterwards shows `stats reset: data gap` once. The next accepted observation starts a new session.
-- With no Sensor Reading key, Sensor Dial or detail tile visible (Sensor Control keys do not count), the plugin stops reading sensors. A dial that comes back after that starts its sessions again and shows `stats reset: data gap` once; its pause and pin stay within the limits above.
+- With no Sensor Reading key, Sensor Dial or detail tile visible for 2 seconds (Sensor Control keys do not count), the plugin stops reading sensors. A dial that comes back after that starts its sessions again and shows `stats reset: data gap` once; its pause and pin stay within the limits above. A dial that comes back within those 2 seconds, as on a page change, keeps its sessions ([When reading starts and stops](data-sources.html#when-reading-starts-and-stops)).
 - **Push** resets the current reading under the Legacy preset. **A stats reset clears** can widen a reset to the rotation set or to every dial. Other presets can put the reset on another gesture.
+
+### How a dial's statistics can differ from a key's
+
+A dial and a Sensor Reading key showing the same reading both count one sample per acquisition and average without time weighting, and both start over when the reading goes missing, when its unit or type changes, and when the plugin stops reading sensors, 2 seconds after the last Sensor Reading key, Sensor Dial or detail tile disappears. Their numbers can still differ:
+
+| Difference | Sensor Reading key and detail tile | Sensor Dial |
+| --- | --- | --- |
+| Reads counted | Every accepted read since the plugin last started reading sensors, including reads before the key appeared or picked the reading | Only reads made while this dial follows the reading (on the dial, in its rotation set or in an overview's list), from when it first followed it |
+| Reset | None | A gesture or a Sensor Control key, as far as **A stats reset clears** reaches |
+| Status screens | The screen itself resets nothing; a reading removed or expired behind it starts over | Any status screen ends every session on every dial |
+| Shared or separate | One set per reading, the same on every key and detail tile | Each dial keeps its own |
 
 ## Settings
 

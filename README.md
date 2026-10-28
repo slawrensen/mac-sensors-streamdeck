@@ -159,7 +159,7 @@ macOS 13.5 or later, Stream Deck 7.1 or later, and Tahoma Bold. The package incl
 
 Measured on Apple silicon: an M5 Pro with macOS 27.0.1 and Stream Deck 7.5.0 on the Virtual Stream Deck. The x86_64 reader in 1.0.1 is byte-identical to the one in 1.0.0. Hosted Intel CI runners (a virtual machine with an emulated SMC) loaded that exact file and read live system and SMC values for both 1.0.0 and the 1.0.1 release candidate. Physical Intel validation is in progress.
 
-Sensor availability varies by Mac. The measured M5 Pro catalog includes temperatures, fans, system power, DC input voltage and current, CPU activity, named memory counters, storage space and aggregate transfer rates. CPU/GPU clocks and unqualified private GPU usage are not offered. Key provider statistics are unavailable; dial session statistics are local.
+Sensor availability varies by Mac. The measured M5 Pro catalog includes temperatures, fans, system power, DC input voltage and current, CPU activity, named memory counters, storage space and aggregate transfer rates. CPU/GPU clocks and unqualified private GPU usage are not offered. Keys show minimum, maximum and average that Mac Sensors keeps from its own reads since the plugin started reading sensors; each dial keeps separate session statistics.
 
 [Hardware compatibility](https://docs.slawrensen.com/mac-streamdeck/hardware.html) distinguishes actual app, hosted CI, Rosetta and physical-device evidence. [PERF.md](PERF.md) records timing windows and their limits. Images above use sample data and do not represent a hardware photograph.
 

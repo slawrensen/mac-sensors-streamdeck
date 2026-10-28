@@ -18,8 +18,8 @@ A status screen never changes saved settings. The selected reading, its label, c
 
 | Key shows | Looks like | What it means | What to do |
 | --- | --- | --- | --- |
-| **Reading sensors** / please wait | Blue clock | No reading has arrived since keys appeared: the first read is still out. It also returns if every reading lapses or fails before the first SMC read of that session has answered. | Wait for the first read. If it has still not finished after 15 seconds, the key changes to **Source busy**. |
-| **Source busy** / retrying | Amber clock | 15 seconds after keys appeared, the first read has still not finished: no system counter read has succeeded and at least one source has not answered. | Choose **Check again**. If it stays, choose **Copy support report** under **Advanced**, **Support** first, then quit and reopen the Stream Deck app, which restarts the plugin. |
+| **Reading sensors** / please wait | Blue clock | No reading has arrived since reading started: the first read is still out. It also returns if every reading lapses or fails before the first SMC read of that session has answered. | Wait for the first read. If it has still not finished after 15 seconds, the key changes to **Source busy**. |
+| **Source busy** / retrying | Amber clock | 15 seconds after reading started, the first read has still not finished: no system counter read has succeeded and at least one source has not answered. | Choose **Check again**. If it stays, choose **Copy support report** under **Advanced**, **Support** first, then quit and reopen the Stream Deck app, which restarts the plugin. |
 | **No sensor data** / copy report | Amber warning triangle | Both sources answered, but no reading is current: every reading failed, was withheld or expired. It can appear briefly after the Mac wakes from a sleep longer than 15 seconds. | Choose **Check again**. If it stays, choose **Copy support report** under **Advanced**, **Support** and file an issue. |
 | **Tahoma needed** / Open Font Book | Fixed image: blue square outline above the two lines | macOS did not return Tahoma Bold. Readings are hidden until it is available. The screen is stored as pixels, so it draws without the font. | Install Tahoma Bold in Font Book, or turn it on. The screen clears on the next read; **Check again** only makes that read happen at once. See [Keys show Tahoma needed](troubleshooting.html#keys-show-tahoma-needed). |
 | **Bridge failed** / reinstall | Red warning triangle | The native reader for this processor could not be used. The result is kept until the plugin restarts. | Quit and reopen Stream Deck. If it persists, remove Mac Sensors and install it again; opening the same version over itself changes nothing. See [Removing](installation.html#removing) and [Keys show Bridge failed](troubleshooting.html#keys-show-bridge-failed). |
@@ -32,7 +32,7 @@ The three colors are blue `#4cc2ff` (waiting or setup), amber `#f5a623` (attenti
 
 **Reading sensors**, **Source busy**, **No sensor data** and **Source error** come from the two data sources (see [Data sources](data-sources.html)). **Pick a sensor** and **Sensor missing** are about this key's selection; other readings keep working. **Bridge failed** and **Needs macOS** are about the installation and the runtime. **Tahoma needed** is about the font prerequisite.
 
-**Sensor missing** can be temporary. A reading that failed its last read, or CPU usage and the transfer rates for about a quarter second after keys appear, also show it. On a key with two to four readings, the screen appears only when every configured reading is missing; a single missing row shows its label, or **Sensor missing**, with a placeholder dash.
+**Sensor missing** can be temporary. A reading that failed its last read, or CPU usage and the transfer rates for about a quarter second after reading starts, also show it. On a key with two to four readings, the screen appears only when every configured reading is missing; a single missing row shows its label, or **Sensor missing**, with a placeholder dash.
 
 Detail tiles show the same screens. The Back tile keeps its return arrow on every status screen, including the fixed **Tahoma needed** image.
 
@@ -115,11 +115,11 @@ The reload button beside the **Reading** search box, labelled "Reload the sensor
 
 A status screen does not require removing the key. While a Sensor Reading key (including the Back tile), Sensor Dial or detail tile is visible, the plugin keeps reading at the **Read every** interval:
 
-- Every read asks both sources again. A source that failed is asked again on the next read, and the other source keeps serving meanwhile, with one exception: until a system counter read has succeeded since keys appeared, keys show **Source error**, or **Source busy** after 15 seconds while a read is still out, instead of SMC readings.
+- Every read asks both sources again. A source that failed is asked again on the next read, and the other source keeps serving meanwhile, with one exception: until a system counter read has succeeded since reading started, keys show **Source error**, or **Source busy** after 15 seconds while a read is still out, instead of SMC readings.
 - If the SMC connection breaks, the next read opens it again.
 - The font check runs on every system counter read, so **Tahoma needed** clears on the first read after Tahoma Bold is available. **Check again** is not required; it only makes that read happen at once.
 - A read that starts while a status screen shows never waits more than 100 ms for a slow source, so readings return at most 100 ms after their own source answers.
-- A page you return to after no Sensor Reading key, Sensor Dial or detail tile was visible anywhere shows **Reading sensors** until its first read completes.
+- A page you return to after no Sensor Reading key, Sensor Dial or detail tile was visible anywhere for 2 seconds starts reading again and shows **Reading sensors** until its first read completes. A page change, opening sensor details or pressing Back inside those 2 seconds shows readings at once ([When reading starts and stops](data-sources.html#when-reading-starts-and-stops)).
 
 **Bridge failed** and **Needs macOS** do not recover by themselves; the result is kept for the life of the plugin process. For **Bridge failed**, quit and reopen Stream Deck. **Needs macOS** means the Node runtime is not a supported macOS one, which a restart does not change; see [Installation and requirements](installation.html#system-requirements). A load failure alone does not establish whether a file is damaged, missing or blocked.
 

@@ -23,6 +23,7 @@ The detail view is a **plugin-managed profile**, not a Stream Deck folder. A plu
 - If you want a page you lay out yourself, with your own multi-reading keys on it, use a Stream Deck folder instead. That is the app's own feature, and unlike the detail page it belongs to one key. The trade: a folder's opener key shows a static icon, while a detail opener shows a live reading.
 - The Stream Deck app never updates a profile that is already installed. When a plugin update changes the page itself, the change ships as a new profile revision with a new internal identity, the next detail entry asks once to install it, and the copy you already have stays in your profile list untouched.
 - Back asks the app for its previous profile; the plugin stores no profile history of its own, so where Back lands after a Stream Deck app restart is unknown.
+- Opening details and pressing Back do not restart reading. The app removes the old page's actions before it shows the new page's, and the plugin keeps the reading for 2 seconds after the last Sensor Reading key, Sensor Dial or detail tile disappears. When the other page's tiles or keys appear within that time, MIN, MAX and AVG, sparklines and CPU usage and the rates carry on, and keys show readings at once instead of **Reading sensors** ([When reading starts and stops](data-sources.html#when-reading-starts-and-stops)).
 
 ## Turning it on
 
@@ -42,7 +43,7 @@ Open **Press** in the Sensor Reading settings ([Pressing the key](sensor-reading
 
 A custom list can mix tile sizes, labels and colors; see [Editing custom tiles](#editing-custom-tiles). Sensor and filter lists follow what this Mac reports and cannot hold fixed tile groups.
 
-Keys without a saved **A press** choice keep cycling statistics. Mac readings carry no stored minimum, maximum or average, so a key's MIN, MAX and AVG show **N/A** ([why](faq.html#why-do-min-max-and-avg-show-na-on-a-key)).
+Keys without a saved **A press** choice keep cycling current, MIN, MAX and AVG, from the statistics Mac Sensors keeps for each reading ([how they are calculated](faq.html#how-are-min-max-and-avg-calculated-on-a-key)).
 
 ### Choosing the list
 
@@ -78,7 +79,7 @@ Every detail page has these controls:
 - **A second Back under your finger**, on by default. When the opener key's cell falls on a reading cell of the page, that cell becomes a second Back tile showing the same opener face with the return arrow: press in, press out, without moving your hand. The readings flow around it; none are hidden, and it costs one tile per page. Untick **Also go back from this key's own position** on the opener to keep only the top-left Back.
 - **Title** (every deck except the Mini): the sensor group name, the filter pattern, **Custom set** or your **Title tile text**, over the visible range, such as `CPU` over `1-11 / 18` (a CPU opener on the measured M5 Pro, on a 15-key deck with the second Back off). The range counts readings, not tiles. Pressing the title does nothing.
 - **Previous** and **Next**: page through long lists. A chevron dims at either end; paging does not wrap. Paging happens inside the one profile page; nothing stacks.
-- **Reading tiles**: live readings in the opener's theme. At one reading per tile, each tile carries its own reading's type accent; a denser tile carries its first reading's accent. Pressing a tile cycles current, MIN, MAX and AVG for everything on it, for this visit; leaving the view resets that. A tile set to MIN, MAX or AVG shows **N/A**. Reading tiles do not take the opener's thresholds, because a temperature limit means nothing on a power or fan tile. The Back tile keeps its own.
+- **Reading tiles**: live readings in the opener's theme. At one reading per tile, each tile carries its own reading's type accent; a denser tile carries its first reading's accent. Pressing a tile cycles current, MIN, MAX and AVG for everything on it, for this visit; leaving the view resets that. On MIN, MAX or AVG a tile shows each reading's statistics since the plugin last started reading sensors, the same numbers a Sensor Reading key shows for that reading. Reading tiles do not take the opener's thresholds, because a temperature limit means nothing on a power or fan tile. The Back tile keeps its own.
 - **No trend lines on reading tiles.** A trend line needs history that fills over many reads, and a detail page shows many readings (up to 128 on a + XL at four per tile) that change with every page turn and filter. The opener key keeps its own graph on your page.
 
 If sensor data becomes unavailable while the page is open, the tiles show the same status screens as ordinary keys ([Status screens](status-screens.html)) and recover on their own; Back keeps working throughout. If a listed reading disappears from a custom list, its tile shows **Sensor missing** in place, and the other tiles do not shift.

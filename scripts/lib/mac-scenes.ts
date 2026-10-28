@@ -18,20 +18,27 @@ type ProviderGroup=typeof PROVIDER_GROUPS[number];
 // Each row's group is the one the native side reports: SMC rows from native/hwmac/catalog.json, public rows from
 // native/hwmac/collectors.c, and the counter rows (cpu-total, network-receive) from counterRows in src/mac/provider.ts.
 export const sampleGroups:Record<string,ProviderGroup>={};
-const sampleRows:{key:string;label:string;unit:string;value:number;type:SensorType;group:ProviderGroup}[]=[
-	{key:smc('Tp00','temp'),label:'CPU super core 1',unit:'°C',value:62.4,type:SensorType.Temperature,group:'CPU'},
-	{key:smc('Tg0U','temp'),label:'GPU 1',unit:'°C',value:54.8,type:SensorType.Temperature,group:'GPU'},
-	{key:smc('F0Ac','rpm'),label:'Fan 1',unit:'RPM',value:1820,type:SensorType.Fan,group:'Fans'},
-	{key:smc('PSTR','power'),label:'System Total',unit:'W',value:38.6,type:SensorType.Power,group:'System'},
-	{key:'mac:v1:system:cpu-total',label:'CPU usage',unit:'%',value:37.5,type:SensorType.Usage,group:'CPU'},
-	{key:'mac:v1:system:memory-active',label:'Memory active',unit:'B',value:18_600_000_000,type:SensorType.Other,group:'Memory'},
-	{key:'mac:v1:system:network-receive',label:'Network receive',unit:'B/s',value:12_400_000,type:SensorType.Other,group:'Network'},
-	{key:'mac:v1:system:disk-root-available',label:'Startup volume available',unit:'B',value:856_000_000_000,type:SensorType.Other,group:'Storage'}
+/** The fixed sample history behind sparklines, bar ranges and the dials' session line, by authoring index. */
+const sampleHistory=(value:number,index:number)=>Array.from({length:36},(_,i)=>value*(.64+.36*i/35)+Math.sin(i*.6+index)*value*.025);
+// Session statistics as MacProvider keeps them from its own accepted reads (statistics 'producer'): each current value lies
+// inside its range. CPU super core 1, the one reading drawn with a bar and a dial session line, takes its statistics from that
+// same history, so its MIN, MAX and AVG agree with them (39.9, 63.7, 51.3). The others are hand-picked ranges that suit each
+// kind, such as a free-space minimum close to its current value.
+const cpuHistory=sampleHistory(62.4,0);
+const sampleRows:{key:string;label:string;unit:string;value:number;min:number;max:number;avg:number;type:SensorType;group:ProviderGroup}[]=[
+	{key:smc('Tp00','temp'),label:'CPU super core 1',unit:'°C',value:62.4,min:Math.min(...cpuHistory),max:Math.max(...cpuHistory),avg:cpuHistory.reduce((sum,value)=>sum+value,0)/cpuHistory.length,type:SensorType.Temperature,group:'CPU'},
+	{key:smc('Tg0U','temp'),label:'GPU 1',unit:'°C',value:54.8,min:36.2,max:57.3,avg:46.1,type:SensorType.Temperature,group:'GPU'},
+	{key:smc('F0Ac','rpm'),label:'Fan 1',unit:'RPM',value:1820,min:1190,max:2160,avg:1610,type:SensorType.Fan,group:'Fans'},
+	{key:smc('PSTR','power'),label:'System Total',unit:'W',value:38.6,min:9.8,max:64.2,avg:27.4,type:SensorType.Power,group:'System'},
+	{key:'mac:v1:system:cpu-total',label:'CPU usage',unit:'%',value:37.5,min:2.6,max:91.4,avg:23.8,type:SensorType.Usage,group:'CPU'},
+	{key:'mac:v1:system:memory-active',label:'Memory active',unit:'B',value:18_600_000_000,min:15_200_000_000,max:19_300_000_000,avg:17_400_000_000,type:SensorType.Other,group:'Memory'},
+	{key:'mac:v1:system:network-receive',label:'Network receive',unit:'B/s',value:12_400_000,min:1_200,max:46_800_000,avg:3_900_000,type:SensorType.Other,group:'Network'},
+	{key:'mac:v1:system:disk-root-available',label:'Startup volume available',unit:'B',value:856_000_000_000,min:853_400_000_000,max:856_200_000_000,avg:855_100_000_000,type:SensorType.Other,group:'Storage'}
 ];
 // As the provider's rebuild(): only groups holding a reading become sensors, in GROUPS order.
 const sampleSensorNames=PROVIDER_GROUPS.filter(group=>sampleRows.some(row=>row.group===group));
 /** The scenes' authoring order; sampleSnapshot() publishes them in the provider's order. Reading ids are 0, as the provider sets them. */
-export const sampleReadings:Reading[]=sampleRows.map(({group,...row},index)=>{sampleGroups[row.key]=group;return {...row,id:0,sensorIndex:sampleSensorNames.indexOf(group),valueMin:NaN,valueMax:NaN,valueAvg:NaN,statistics:'unavailable' as const,observationTime:1000,observationRevision:index+1};});
+export const sampleReadings:Reading[]=sampleRows.map(({group,min,max,avg,...row},index)=>{sampleGroups[row.key]=group;return {...row,id:0,sensorIndex:sampleSensorNames.indexOf(group),valueMin:min,valueMax:max,valueAvg:avg,statistics:'producer' as const,observationTime:1000,observationRevision:index+1};});
 /** A snapshot shaped as MacProvider.rebuild() shapes one: sensors per present group, readings sorted by sensor then key. */
 export function sampleSnapshot():SensorSnapshot {
 	const sensors=sampleSensorNames.map((name,index)=>({index,id:PROVIDER_GROUPS.indexOf(name)+1,instance:0,name}));
@@ -40,6 +47,7 @@ export function sampleSnapshot():SensorSnapshot {
 }
 // Shared settings for every scene. Accents are off so faces compare across boards; the accents board alone turns on the shipped default.
 const docsGlobals={theme:'void',textMode:'theme',typeAccents:'off',dataUnits:'decimal',textFont:'tahoma'} as const;
+const STAT_CYCLE=['current','min','max','avg'] as const;
 const readingFaceLabels=['CPU super 1','GPU 1','Fan 1','System Total','CPU activity','Memory active','Network RX','Free space'];
 // The bundled 15-key detail profile, read from the one registry the runtime and profile generator use.
 const standardDetail=DETAIL_PROFILES.find(profile=>profile.key==='standard')!;
@@ -58,7 +66,7 @@ export function composeScenes():Scene[] {
 	const snapshot=sampleSnapshot(),status={state:'ok',snapshot,source:'mac'} as const,stats=new SessionStatsStore(),histories=new Map<string,number[]>();
 	// Authoring order, not snapshot order, so every reading keeps its scene id and history phase.
 	for(const [index,row] of sampleReadings.entries()){
-		const history=Array.from({length:36},(_,i)=>row.value*(.64+.36*i/35)+Math.sin(i*.6+index)*row.value*.025);histories.set(row.key,history);for(const value of history)stats.sample(row.key,value);
+		const history=sampleHistory(row.value,index);histories.set(row.key,history);for(const value of history)stats.sample(row.key,value);
 		// Fixture-only history in this rendering process; no provider is opened.
 		poller.subscribeSeries(row.key);const series=poller.getSeries(row.key) as number[];series.length=0;series.push(...history);
 	}
@@ -102,6 +110,11 @@ export function composeScenes():Scene[] {
 	applyGlobalThemeSettings({...docsGlobals,typeAccents:'on'});
 	for(const [index,row] of sampleReadings.entries())key('accent-reading-'+index,{readingKey:row.key,label:readingFaceLabels[index],displayMode:'sparkline'},row.label+', accents by sensor type');
 	applyGlobalThemeSettings(docsGlobals);
+	// A press cycles the stat mode (settings.statMode); each face here is one step of that cycle.
+	for(const statMode of STAT_CYCLE){
+		key('stat-single-'+statMode,{readingKey:sampleReadings[0]!.key,label:'CPU super 1',displayMode:'sparkline',statMode},'CPU super 1, '+statMode);
+		key('stat-dual-'+statMode,{...primary,keyLayout:'dual',quadLabels:true,statMode},'Dual layout, '+statMode);
+	}
 	return scenes;
 }
 export const boardDefinitions=[
@@ -114,5 +127,6 @@ export const boardDefinitions=[
 	{id:'alerts',title:'See when a reading crosses your threshold',subtitle:'Normal, warning and critical states. Hardware remains read-only.',scenes:['reading-0','warn','crit','bar'],columns:4},
 	{id:'reading-colors',title:'Give readings their own number colors',subtitle:'The same readings and geometry. Only numeric fills change.',scenes:['dial-overview','dial-overview-colored'],columns:2},
 	{id:'status',title:'Status screens on a key',subtitle:'Shown in place of the reading when there is no live value to draw.',scenes:['status-pending','status-busy','status-missing','status-no-readable-sensors','status-bridge-failed','status-font-missing','status-source-error'],columns:4},
-	{id:'accents',title:'Accent colors by sensor type',subtitle:'The default setting. Trend lines take the reading type\'s color; Free space keeps the theme accent.',scenes:['accent-reading-0','accent-reading-1','accent-reading-2','accent-reading-3','accent-reading-4','accent-reading-5','accent-reading-6','accent-reading-7'],columns:4}
+	{id:'accents',title:'Accent colors by sensor type',subtitle:'The default setting. Trend lines take the reading type\'s color; Free space keeps the theme accent.',scenes:['accent-reading-0','accent-reading-1','accent-reading-2','accent-reading-3','accent-reading-4','accent-reading-5','accent-reading-6','accent-reading-7'],columns:4},
+	{id:'stat-modes',title:'Pressing a key cycles current, MIN, MAX and AVG',subtitle:'MIN, MAX and AVG come from this session\'s reads. Below, two readings share one badge.',scenes:[...STAT_CYCLE.map(mode=>'stat-single-'+mode),...STAT_CYCLE.map(mode=>'stat-dual-'+mode)],columns:4}
 ];
