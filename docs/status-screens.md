@@ -6,7 +6,7 @@ nav_order: 11
 
 # Status screens
 
-When a key or dial cannot show a current reading, it shows a two-line status screen instead. The first line names the condition the plugin established; the second gives the next step. [In the settings panel](#in-the-settings-panel) explains what the panel shows at the same time. Use the tables below to identify a screen, then follow [Troubleshooting](troubleshooting.html) for the full repair path.
+When a key or dial cannot show a current reading, it shows a two-line status screen instead. The first line names the condition; the second names the next step. [In the settings panel](#in-the-settings-panel) explains what the panel shows at the same time, and [Troubleshooting](troubleshooting.html) has the full repair path.
 
 A status screen never changes saved settings. The selected reading, its label, colors and every other setting stay as they were. **Pick a sensor** clears when you pick a reading, and **Sensor missing** when this Mac reports the saved reading again or you pick another. **Bridge failed** and **Needs macOS** last until the plugin restarts. Every other screen clears by itself on the first read that produces a current reading.
 
@@ -22,7 +22,7 @@ A status screen never changes saved settings. The selected reading, its label, c
 | **Source busy** / retrying | Amber clock | 15 seconds after reading started, the first read has still not finished: no system counter read has succeeded and at least one source has not answered. | Choose **Check again**. If it stays, choose **Copy support report** under **Advanced**, **Support** first, then quit and reopen the Stream Deck app, which restarts the plugin. |
 | **No sensor data** / copy report | Amber warning triangle | Both sources answered, but no reading is current: every reading failed, was withheld or expired. It can appear briefly after the Mac wakes from a sleep longer than 15 seconds. | Choose **Check again**. If it stays, choose **Copy support report** under **Advanced**, **Support** and file an issue. |
 | **Tahoma needed** / Open Font Book | Fixed image: blue square outline above the two lines | macOS did not return Tahoma Bold. Readings are hidden until it is available. The screen is stored as pixels, so it draws without the font. | Install Tahoma Bold in Font Book, or turn it on. The screen clears on the next read; **Check again** only makes that read happen at once. See [Keys show Tahoma needed](troubleshooting.html#keys-show-tahoma-needed). |
-| **Bridge failed** / reinstall | Red warning triangle | The native reader for this processor could not be used. The result is kept until the plugin restarts. | Quit and reopen Stream Deck. If it persists, remove Mac Sensors and install it again; opening the same version over itself changes nothing. See [Removing](installation.html#removing) and [Keys show Bridge failed](troubleshooting.html#keys-show-bridge-failed). |
+| **Bridge failed** / reinstall | Red warning triangle | The native reader for this processor could not be used. The result is kept until the plugin restarts. | Quit and reopen Stream Deck. If it persists, remove Mac Sensors and install it again. See [Removing](installation.html#removing) and [Keys show Bridge failed](troubleshooting.html#keys-show-bridge-failed). |
 | **Source error** / copy report | Red warning triangle | A read failed in a way no other screen covers. Known causes: the native reader's clock returned no usable time, or both sources answered but the system counter read failed, so the font check that runs with it could not run. | Choose **Check again**. If it stays, copy a support report first, then quit and reopen the Stream Deck app, and file an issue. |
 | **Needs macOS** / check requirements | Red warning triangle | The Node runtime that started the plugin is not macOS on arm64 or x86_64. With the runtime the Stream Deck app supplies, this screen is not expected. | Check [Installation and requirements](installation.html), then copy a support report. |
 | **Pick a sensor** / in settings | Blue target | The key works, but no reading is selected yet. | Open the key's settings, type in the **Reading** box and choose a reading. |
@@ -109,13 +109,13 @@ What the buttons do:
 - **Sensor setup** opens the **Sensor setup** steps under **Advanced**, **Connection**: pick a reading under **Reading**; if no readings appear, choose **Check again** or **Copy support report** under **Advanced**, **Support**; if Tahoma is missing, install Tahoma Bold in Font Book and choose **Check again**.
 - **Pick another reading** moves to the **Reading** search box. Nothing is saved until you choose a reading.
 
-The reload button beside the **Reading** search box, labelled "Reload the sensor list", reloads the list from the latest read without starting a new one.
+The reload button beside the **Reading** search box, labeled "Reload the sensor list", reloads the list from the latest read without starting a new one.
 
 ## Recovery
 
 A status screen does not require removing the key. While a Sensor Reading key (including the Back tile), Sensor Dial or detail tile is visible, the plugin keeps reading at the **Read every** interval:
 
-- Every read asks both sources again. A source that failed is asked again on the next read, and the other source keeps serving meanwhile, with one exception: until a system counter read has succeeded since reading started, keys show **Source error**, or **Source busy** after 15 seconds while a read is still out, instead of SMC readings.
+- Every read asks both sources again. A source that failed is asked again on the next read, and the other source keeps serving meanwhile. One exception: SMC readings wait for the first successful system counter read, which carries the font check. Until then keys show **Source error**, or **Source busy** if a read is still out after 15 seconds.
 - If the SMC connection breaks, the next read opens it again.
 - The font check runs on every system counter read, so **Tahoma needed** clears on the first read after Tahoma Bold is available. **Check again** is not required; it only makes that read happen at once.
 - A read that starts while a status screen shows never waits more than 100 ms for a slow source, so readings return at most 100 ms after their own source answers.

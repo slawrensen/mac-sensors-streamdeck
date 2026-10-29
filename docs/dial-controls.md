@@ -8,7 +8,7 @@ nav_order: 7
 
 Choose what turning, pressing and touching a Sensor Dial does. Open its **Controls** section for **Gestures**, **Touch zones**, **Ignore turns**, **Auto cycle**, **A stats reset clears** and **Link ID**. Rotation groups are under **Reading**. Thresholds and **Auto cycle jumps to a critical reading** are under **Alerts**.
 
-Dial gestures have not yet been run on a physical Stream Deck +. Everything on this page is what the code implements and its tests check, including recorded gesture traces replayed in software. See [Hardware compatibility](hardware.html).
+Dial gestures have not yet been run on a physical Stream Deck +. Everything on this page is what the code implements and its tests check, including synthetic gesture traces replayed through the production gesture code. See [Hardware compatibility](hardware.html).
 
 ## Control presets
 
@@ -79,7 +79,6 @@ How groups behave:
 - A plain turn stays inside a group only when the dial has a gesture that can switch groups. Legacy has none, so on Legacy a plain turn, the auto cycle and the overviews treat all groups as one list, in group order. A Sensor Control group jump still lands in the next group, but turns then keep stepping through that one list, past the group's last reading into the following group. On Custom, assign **Switch sensor or group** to a turn and the boundaries engage; assign it nowhere and the dial keeps one flat list, so no group can become unreachable.
 - The [Sensor Control key](#the-sensor-control-key-action)'s **Next sensor or group** and **Previous sensor or group** honor your groups on every preset.
 - A single group behaves like a plain rotation set. **A stats reset clears** set to **The whole rotation set** means every group.
-- The flat rotation set is stored alongside the groups and kept equal to all grouped readings.
 
 ## Touch zones
 
@@ -103,13 +102,13 @@ Pause and pin survive page switches and profile changes for up to 30 minutes off
 
 ## Session stats are per reading
 
-Each reading keeps its own local session min, max and average, and ordinary rotation keeps that session. The reading on the dial, rotation-set members and the readings in an overview's list collect while sensors are read; hidden dials keep collecting within the limits above while a Sensor Reading key, another Sensor Dial or a detail tile is visible; a Sensor Control key does not keep sensors being read. Repeated displays of one observation do not count again, and averages are sample-weighted. Missing or non-finite readings, unit or type changes and any period without sensor data end the affected sessions, and the first live frame after a gap says so once. These sessions are separate from the MIN, MAX and AVG on Sensor Reading keys, which no dial gesture or Sensor Control key resets. See [session statistics](sensor-dial.html#session-stats-are-the-dials-own-per-reading) for the full rules and [how a dial's statistics can differ from a key's](sensor-dial.html#how-a-dials-statistics-can-differ-from-a-keys).
+Each reading keeps its own local session min, max and average, and ordinary rotation keeps that session. These sessions are separate from the MIN, MAX and AVG on Sensor Reading keys, which no dial gesture or Sensor Control key resets. See [session statistics](sensor-dial.html#session-stats-are-the-dials-own-per-reading) for the full rules and [how a dial's statistics can differ from a key's](sensor-dial.html#how-a-dials-statistics-can-differ-from-a-keys).
 
 ## Thresholds and mixed units
 
 A reading is **warning** once it crosses **Warn at** and **critical** once it crosses **Critical at**, in the alert direction: at or above the value by default, at or below it with **Alert when the value drops to or below these numbers**. A key turns its whole face amber or red. A dial keeps its theme: in the one-reading view only the range bar's fill takes the alert color, and in the overviews, which have no bar, the alerting row's own value takes it.
 
-**Warn at**, **Critical at** and the manual bar range apply only to readings measured in the unit they were configured against. Type a warn value of 80 while a °C reading is on the dial, and it will never fire on a fan at 3000 RPM you rotate to; the alert and the manual bar do not apply to readings in other units. Edit a threshold or a bar end and the plugin anchors them to the unit of the reading on the dial at that moment. A threshold saved without a unit anchor applies to every reading until the next edit anchors it.
+**Warn at**, **Critical at** and the manual bar range apply only to readings measured in the unit they were configured against. Type a warn value of 80 while a °C reading is on the dial, and it never fires on a fan at 3000 RPM you rotate to. Edit a threshold or a bar end and the plugin anchors them to the unit of the reading on the dial at that moment. A threshold saved without a unit anchor applies to every reading until the next edit anchors it.
 
 Alert-aware cycling is opt-in, with **Auto cycle jumps to a critical reading in the rotation and holds there while it stays critical** under **Alerts**. Ticked, the auto cycle never rotates away from a reading that is currently critical, and its next step goes to a critical member of your set instead of the next one in order. A manual turn still moves away. Unticked (the default), alerts do not steer the cycle; it keeps stepping in order, straight through critical readings. See [Thresholds and alerts](thresholds.html).
 
@@ -147,7 +146,7 @@ The panel's **Advanced** section holds **Copy support report**. A Sensor Control
 
 ## Page swipe
 
-Swiping sideways on the touch strip switches Stream Deck pages. The Stream Deck app handles that gesture; the plugin only keeps state across it. The reading on the dial and its labels are saved settings. Pause and pin are kept off screen within the hidden-dial limits above. Session statistics also keep collecting while a Sensor Reading key, another Sensor Dial or a detail tile stays visible; with none of those visible for 2 seconds (Sensor Control keys do not count), sensor reading stops and session statistics start again when the dial returns. A swipe that shows one of them again within those 2 seconds keeps every session. Page swipe has not been checked on a physical Stream Deck + yet; see [Page swipe and page changes](hardware.html#page-swipe-and-page-changes).
+Swiping sideways on the touch strip switches Stream Deck pages. The Stream Deck app handles that gesture; the plugin only keeps state across it. The reading on the dial and its labels are saved settings. Pause and pin are kept off screen within the hidden-dial limits above. A swipe that shows a Sensor Reading key, Sensor Dial or detail tile again within 2 seconds keeps every session ([When reading starts and stops](data-sources.html#when-reading-starts-and-stops)). Page swipe has not been checked on a physical Stream Deck + yet; see [Page swipe and page changes](hardware.html#page-swipe-and-page-changes).
 
 If a gesture does nothing, see [Dial gestures do nothing](troubleshooting.html#dial-gestures-do-nothing); the dial's own screens are on [Status screens](status-screens.html).
 

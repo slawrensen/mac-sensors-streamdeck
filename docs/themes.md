@@ -12,7 +12,7 @@ Pick a theme in the strip under a key's or dial's settings header. Choose **Defa
 
 ![The same CPU super 1 key at 62.4 °C with a sparkline in each of the seven themes: Void, Graphite, Ultraviolet, Midnight, Forest, Ember and Paper](assets/img/themes.png)
 
-*Production-rendered sample data: the CPU super core 1 reading with the custom label CPU super 1 and an illustrative value. Rendered with **Accent colors** set to Theme accent everywhere, so each sparkline shows its theme's own accent instead of the default temperature accent.*
+*Production-rendered sample data: the CPU super core 1 reading with the custom label CPU super 1 and an illustrative value. Rendered with **Accent colors** set to **Theme accent everywhere**, so each sparkline shows its theme's own accent instead of the default temperature accent.*
 
 | Theme | Background | Value text | Accent | Notes |
 | --- | --- | --- | --- | --- |
@@ -121,7 +121,7 @@ The Sensor Dial's overview views, two rows and three rows, can give each reading
 
 ![Two Sensor Dial overview faces with rows CPU SUPER 1, GPU 1 and FAN 1: uniform white numbers on the left, blue, rose and green numbers on the right, with the same labels, units and layout](assets/img/reading-colors.png)
 
-*Production-rendered sample data: Mac catalog readings, the first with the custom label CPU super 1, and illustrative values. Only the number colors differ. Rendered with **Accent colors** set to Theme accent everywhere.*
+*Production-rendered sample data: Mac catalog readings, the first with the custom label CPU super 1, and illustrative values. Only the number colors differ. Rendered with **Accent colors** set to **Theme accent everywhere**.*
 
 ## Alert colors take priority
 
