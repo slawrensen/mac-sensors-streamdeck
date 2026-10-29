@@ -35,6 +35,38 @@ The repository mock host (`scripts/lib/mock-host.mjs`) ran the 1.0.1 candidate b
 
 This supports the panel help line that shorter intervals use more processor time. It is mock-host evidence with the real read-only native reader, not the Stream Deck app: the app's rasterization and device transfer cost is not included. Background development activity was present.
 
+### 2026-10-28 to 2026-10-29: Published 1.0.1.0, 24-hour observation
+
+Command: `npm run soak -- --plugin <frozen dev directory> --out <evidence directory> --hours 24 --interval-ms 60000`. Package SHA-256: 5642f80fa6e4e1833bd7c50382c45b68c9390dce3ba279c9026e3ceedc82814b (316655 bytes). Development bundle SHA-256: eb13eb0f76976c487450d1d73fd87e8114f7adc72ad5a77e05215ed5921a5819.
+
+| Measure | Result |
+| --- | --- |
+| Window | 2026-10-28T00:48:11.017Z to 2026-10-29T00:49:11.312Z; 24.017 hours, 1442 samples |
+| Maximum measured RSS slope | -0.944 MiB per 30 minutes |
+| RSS start / close | 85.11 MiB / 50.41 MiB |
+| Maximum RSS | 92.55 MiB |
+| Maximum footprint | 35.32 MiB |
+| File descriptors start / close / maximum | 49 / 49 / 50 |
+| Maximum threads | 12 |
+| CPU time across measured process segments | 609.00 seconds |
+| Observed process identity changes | 0 |
+| WARN / ERROR lines | 0 / 0 |
+| Sampling gaps / freshness flags | 0 / 0 |
+| Unexplained flags | 0 |
+| Resource/freshness gate | NOT PASSED |
+
+Each observed process segment is kept, including warm-up. A segment shorter than 30 minutes has no fitted slope.
+
+| Segment | Samples | Hours | RSS start / close | MiB per 30 minutes |
+| --- | --- | --- | --- | --- |
+| 1 | 1442 | 24.017 | 85.11 MiB / 50.41 MiB | -0.944 |
+
+Scope: actual app development identity. Physical gestures, Intel hardware and owner-only events require separate evidence. Event records: 0; their presence alone does not verify recovery. New diagnostic reports: 2; scan errors: 0; review: REVIEW REQUIRED. The observer completed its requested window.
+
+The gate line reads NOT PASSED for one reason: the observer scans every process for new crash reports, and it found two, both non-fatal faults of the macOS text service nsattributedstringagent raised for the Software Update notifier at 22:11 UTC. None came from Stream Deck, Node or Mac Sensors, and every plugin measure above stayed within its limit, so 1.0.1.0 was released on that review. RSS fell from 92.55 to 50.41 MiB while the Mac was under memory pressure; the maximum footprint, 35.32 MiB, is lower than the 42.82 MiB of the 088ad51 observation below.
+
+Host: Mac17,9, M5 Pro, macOS 27.0.1, Stream Deck 7.6.0.23012, app Node 24.22.1, 32 single-reading keys on the 8 by 4 Virtual Stream Deck at the default 1 second interval. The development bundle is the a6e7283 release bundle with the development identity and trace switch; the published package's 37 members equal that freeze.
+
 ### 2026-10-18 to 2026-10-19: Final 1.0.1 candidate, 24-hour observation
 
 Command: `npm run soak -- --plugin <frozen dev directory> --out <evidence directory> --hours 24 --interval-ms 60000`. Package SHA-256: 7129b0adc980a89a9f2ab863fbd3b7e3f663cdbe0679913f8bfbf5e0e8d3e414 (316324 bytes). Development bundle SHA-256: 7c24b65d78d8dc53e053190d924338614e30cc7fe4a0a3ce10e3a4151f0fd6b1.
