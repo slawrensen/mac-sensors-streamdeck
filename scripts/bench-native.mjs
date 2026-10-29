@@ -14,9 +14,10 @@ const session=native.open(),results=[];
 const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 const percentile=(array,p)=>{const sorted=[...array].sort((a,b)=>a-b);return sorted[Math.min(sorted.length-1,Math.ceil(p*sorted.length)-1)];};
 try {
-	const cold=await Promise.all([session.read('public'),session.read('smc')]);
-	if(cold.some(packet=>!packet.rows.some(row=>row.valid)))throw new Error('Both sources need a qualified live observation for this benchmark');fs.writeFileSync(path.join(folder,'cold.json'),JSON.stringify(cold,null,2)+'\n');
-	for(let i=0;i<20;i++)await Promise.all([session.read('public'),session.read('smc')]);
+	// Every sample reads all three sources at once, the worst case: the provider asks health at most every 1.5 s.
+	const cold=await Promise.all([session.read('public'),session.read('smc'),session.read('health')]);
+	if(cold.slice(0,2).some(packet=>!packet.rows.some(row=>row.valid)))throw new Error('Public and SMC need a qualified live observation for this benchmark');fs.writeFileSync(path.join(folder,'cold.json'),JSON.stringify(cold,null,2)+'\n');
+	for(let i=0;i<20;i++)await Promise.all([session.read('public'),session.read('smc'),session.read('health')]);
 	for(const interval of [1000,250]) {
 		const beginning=performance.now(),rows=[];const output=fs.openSync(path.join(folder,`${interval}ms.jsonl`),'w');
 		try {
@@ -24,13 +25,13 @@ try {
 				await wait(Math.max(0,beginning+sample*interval-performance.now()));
 				const before=performance.now();let heartbeat;
 				const responsive=new Promise(resolve=>{heartbeat=setTimeout(()=>resolve(performance.now()-before),1);});
-				const [system,smc]=await Promise.all([session.read('public'),session.read('smc')]);const elapsed=performance.now()-before;
+				const [system,smc,health]=await Promise.all([session.read('public'),session.read('smc'),session.read('health')]);const elapsed=performance.now()-before;
 				const eventLoopMs=await responsive;clearTimeout(heartbeat);
-				const row={sample,interval,at:new Date().toISOString(),elapsedMs:elapsed,publicMs:system.durationMs,smcMs:smc.durationMs,eventLoopMs,publicRows:system.rows.filter(r=>r.valid).length,smcRows:smc.rows.filter(r=>r.valid).length,errors:[system.error,smc.error],rss:process.memoryUsage().rss};
+				const row={sample,interval,at:new Date().toISOString(),elapsedMs:elapsed,publicMs:system.durationMs,smcMs:smc.durationMs,healthMs:health.durationMs,eventLoopMs,publicRows:system.rows.filter(r=>r.valid).length,smcRows:smc.rows.filter(r=>r.valid).length,healthRows:health.rows.filter(r=>r.valid).length,errors:[system.error,smc.error,health.error],rss:process.memoryUsage().rss};
 				rows.push(row);fs.writeSync(output,JSON.stringify(row)+'\n');
 			}
 		}finally{fs.closeSync(output);}
-		const result={interval,samples:rows.length,elapsedSeconds:(performance.now()-beginning)/1000,p99Ms:{total:percentile(rows.map(r=>r.elapsedMs),.99),public:percentile(rows.map(r=>r.publicMs),.99),smc:percentile(rows.map(r=>r.smcMs),.99),eventLoop:percentile(rows.map(r=>r.eventLoopMs),.99)},maxRss:Math.max(...rows.map(r=>r.rss)),minimumValidRows:{public:Math.min(...rows.map(r=>r.publicRows)),smc:Math.min(...rows.map(r=>r.smcRows))},errors:rows.filter(r=>r.errors.some(Boolean)||r.publicRows===0||r.smcRows===0).length};
+		const result={interval,samples:rows.length,elapsedSeconds:(performance.now()-beginning)/1000,p50Ms:{total:percentile(rows.map(r=>r.elapsedMs),.5),public:percentile(rows.map(r=>r.publicMs),.5),smc:percentile(rows.map(r=>r.smcMs),.5),health:percentile(rows.map(r=>r.healthMs),.5)},p99Ms:{total:percentile(rows.map(r=>r.elapsedMs),.99),public:percentile(rows.map(r=>r.publicMs),.99),smc:percentile(rows.map(r=>r.smcMs),.99),health:percentile(rows.map(r=>r.healthMs),.99),eventLoop:percentile(rows.map(r=>r.eventLoopMs),.99)},maxRss:Math.max(...rows.map(r=>r.rss)),minimumValidRows:{public:Math.min(...rows.map(r=>r.publicRows)),smc:Math.min(...rows.map(r=>r.smcRows)),health:Math.min(...rows.map(r=>r.healthRows))},errors:rows.filter(r=>r.errors.some(Boolean)||r.publicRows===0||r.smcRows===0).length};
 		results.push(result);console.log(JSON.stringify(result));
 	}
 }finally{session.close();fs.writeFileSync(path.join(folder,'summary.json'),JSON.stringify({...startInfo,finishedAt:new Date().toISOString(),results},null,2)+'\n');}
