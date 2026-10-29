@@ -299,7 +299,8 @@ static bool internal_drive(io_service_t service) {
 }
 /* The internal NVMe drive's SMART composite temperature through the public NVMeSMARTLib plug-in. The user client is opened and closed per read. */
 static void drive(source_packet *packet) {
-	CFMutableDictionaryRef match = CFDictionaryCreateMutable(kCFAllocatorDefault, 1, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+	/* Matching the property alone walks the whole registry (2 to 9 ms on Mac17,9); the NVMe namespace is a block storage device. */
+	CFMutableDictionaryRef match = IOServiceMatching("IOBlockStorageDevice");
 	CFMutableDictionaryRef property = CFDictionaryCreateMutable(kCFAllocatorDefault, 1, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
 	if (match == NULL || property == NULL) { if (match != NULL) CFRelease(match); if (property != NULL) CFRelease(property); return; }
 	CFDictionarySetValue(property, CFSTR(kIOPropertyNVMeSMARTCapableKey), kCFBooleanTrue); CFDictionarySetValue(match, CFSTR(kIOPropertyMatchKey), property); CFRelease(property);

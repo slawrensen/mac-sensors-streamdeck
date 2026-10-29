@@ -70,6 +70,14 @@ test('the production health source names only public battery and drive rows and 
 	assert.equal(new Set(packet.rows.map(row=>row.key)).size,packet.rows.length);
 	for(const row of packet.rows){assert.deepEqual([row.label,row.group,row.kind,row.unit],allowed[row.key],row.key);if(row.valid)assert.ok(Number.isFinite(row.value)&&row.continuousMs<=packet.continuousMs,row.key);else assert.notEqual(row.error,0,row.key);}
 });
+test('on the qualified Mac17,9 a health read stays a small part of the 25 ms acquisition budget',async()=>{
+	// The drive is found among block storage devices; matching the SMART property over the whole registry took 2 to 9 ms there.
+	// Reads are spaced as the provider spaces them (at least 1.5 s apart, shortened here): back-to-back reads are faster than real ones.
+	const HEALTH_P50_LIMIT_MS=3,READS=11,SPACING_MS=200;const session=production.open(),durations=[];let model='';
+	try{for(let i=0;i<READS;i++){const packet=await session.read('health');model=packet.model;durations.push(packet.durationMs);await new Promise(resolve=>setTimeout(resolve,SPACING_MS));}}finally{session.close();}
+	if(model!=='Mac17,9')return;
+	const median=[...durations].sort((a,b)=>a-b)[Math.floor(READS/2)];assert.ok(median<=HEALTH_P50_LIMIT_MS,`median ${median} ms`);
+});
 test('a delayed successful response retains its acquisition age',async()=>{
 	reset();native.configure({smc:{delayMs:150}});const session=native.open();const before=native.now(),packet=await session.read('smc');session.close();
 	assert.ok(packet.rows[0].continuousMs>=before);assert.ok(native.now()-packet.rows[0].continuousMs>=140);assert.equal(packet.code,'HWMAC_OK');reset();
