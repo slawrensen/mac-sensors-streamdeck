@@ -4,7 +4,7 @@ Report suspected vulnerabilities through [private vulnerability reporting](https
 
 Security fixes target the latest published 1.x release. The plugin has no update channel of its own; updates arrive through the Elgato Marketplace or GitHub releases. Install a newer published version when a fix is announced.
 
-Mac Sensors reads local macOS system interfaces and a bounded set of typed SMC keys. It exposes no sensor-register setter or fan control. It installs no privileged helper, daemon or kernel extension and requires no administrator access for normal reads. Settings are stored through the Stream Deck app. Logs stay local. The plugin makes no internet requests and sends no telemetry; its SDK connection is to the local app.
+Mac Sensors reads local macOS system interfaces, a bounded set of typed SMC keys, and battery and internal drive health through public IOKit interfaces (IOPowerSources, AppleSmartBattery registry properties and the NVMe SMART read). It exposes no sensor-register setter or fan control. It installs no privileged helper, daemon or kernel extension and requires no administrator access for normal reads. Settings are stored through the Stream Deck app. Logs stay local. The plugin makes no internet requests and sends no telemetry; its SDK connection is to the local app.
 
 The native files are ad-hoc signed. That checks file integrity but is not a Developer ID publisher certificate or notarization claim. Verify a downloaded package against the release's SHA256SUMS.txt with `shasum -a 256`. For extracted native files, use `codesign --verify --strict <file>` and `codesign -dv --verbose=4 <file>`. The native manifest records architecture, deployment floor, source identity and file hashes.
 

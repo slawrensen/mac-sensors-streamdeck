@@ -287,7 +287,7 @@ A two-line status replaces the value when the key cannot show a reading. The sav
 | **Reading sensors** / please wait | No reading has arrived since reading started: the first read is still out. | Wait for the first read. |
 | **Sensor missing** / pick again | A reading is selected, but this Mac does not report it right now. | Choose **Reload sensor list** or **Pick another reading**; see [Reading](#reading). |
 | **Source busy** / retrying | 15 seconds after reading started, the first read has still not finished. | Choose **Check again**. |
-| **No sensor data** / copy report | Both sources answered, but no reading is current. | Choose **Check again**. If it stays, choose **Copy support report** under **Advanced → Support**. |
+| **No sensor data** / copy report | Every source answered, but no reading is current. | Choose **Check again**. If it stays, choose **Copy support report** under **Advanced → Support**. |
 | **Tahoma needed** / Open Font Book | The plugin could not find the font Tahoma Bold. | Install Tahoma Bold in Font Book, then choose **Check again**. |
 | **Bridge failed** / reinstall | The native reader for the Node runtime's architecture could not be used. | Quit and reopen Stream Deck. If it persists, remove Mac Sensors and install it again; opening the same version over itself changes nothing. See [Removing](installation.html#removing). |
 | **Source error** / copy report | A read failed in a way that has no more specific screen. | Choose **Check again**. If it stays, choose **Copy support report** under **Advanced → Support**. |

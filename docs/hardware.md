@@ -21,7 +21,7 @@ Check your Mac and deck and the evidence behind each row. A result from one Mac 
 | Mac | Evidence | What ran |
 | --- | --- | --- |
 | Apple silicon: Mac17,9 with M5 Pro, macOS 27.0.1 | **Measured** | Stream Deck app 7.5.0 with its Node 24.13.1 on the 8 by 4 Virtual Stream Deck: the 1.0.0.0 package installed from Finder, 14 system and 38 SMC readings, and a 24-hour observation of the final 1.0.1 release candidate, run as a development copy in the Stream Deck app with the development process observer, with 32 keys at the 1 second default (24.017 hours, 1,442 samples, no warnings or errors, resource and freshness check passed). The native reader was also checked under Node 24.22.1, another runtime the app carries. |
-| Other Apple silicon models | **Pending** | Not run. The table of generation-specific SMC readings is qualified only for Mac17,9 with the M5 Pro chip. On another Apple silicon model the plugin offers the 31 common and 4 Apple silicon SMC keys its SMC answers, and the system counters the Mac reports. |
+| Other Apple silicon models | **Pending** | Not run. The table of generation-specific SMC readings is qualified only for Mac17,9 with the M5 Pro chip. On another Apple silicon model the plugin offers the 31 common and 4 Apple silicon SMC keys its SMC answers, the system counters the Mac reports, and the battery and drive health readings its hardware has, but no computed readings. |
 | Intel | **Hosted VM** | The x86_64 native reader in 1.0.1 is byte-identical to the one in 1.0.0. Hosted Intel CI runners (a virtual machine with an emulated SMC) loaded that exact file and read live system and SMC values for both 1.0.0 and the 1.0.1 release candidate. Physical Intel validation is in progress. |
 | Rosetta on the M5 Pro | **Pending** in the app | Outside the Stream Deck app, x86_64 Node 20, 22 and 24 running under Rosetta loaded the x86_64 reader and read live values on this Mac. Running the whole Stream Deck app under Rosetta has not been checked. The Node runtimes the Stream Deck app supplies on this Mac are arm64 files. |
 | macOS 26.6 | **Hosted VM** | Hosted Apple silicon runners on macOS 26.6.2 and Intel runners on macOS 26.6.1 ran the full test suite and loaded and read the exact shipped native readers. No physical Mac has run Mac Sensors on macOS 26. |
@@ -46,17 +46,17 @@ The package requires Stream Deck 7.1 or later, which plugins that use the Node 2
 
 ## Readings measured on the M5 Pro
 
-On Mac17,9 with the M5 Pro and macOS 27.0.1, the picker lists 65 readings: 14 from macOS system counters and 51 from the SMC. Another Mac can report a different set.
+On Mac17,9 with the M5 Pro and macOS 27.0.1, the picker lists 71 readings: 14 from macOS system counters, 51 from the SMC, 3 computed from SMC readings, and 3 battery and drive health readings. Another Mac can report a different set.
 
 | Group | Readings on the measured Mac | Source |
 | --- | --- | --- |
-| CPU | CPU usage; 6 super core and 12 performance core temperatures | System counters; SMC |
+| CPU | CPU usage; 6 super core and 12 performance core temperatures; CPU average and CPU hottest core | System counters; SMC; computed |
 | GPU | 7 GPU temperatures | SMC |
 | Memory | Memory total, free, active, inactive, wired and compressed; swap used | System counters |
-| Storage | Startup volume total and available; storage read and write rates | System counters |
+| Storage | Startup volume total and available; storage read and write rates; Internal SSD temperature | System counters; health |
 | Network | Network receive and send rates | System counters |
-| Battery | Battery and Battery 2 temperatures; Battery power | SMC |
-| Fans | Fan 1 and Fan 2 speeds; their target, minimum and maximum speeds | SMC |
+| Battery | Battery and Battery 2 temperatures; Battery power; Battery cycles and Battery health | SMC; health |
+| Fans | Fan 1 and Fan 2 speeds; their target, minimum and maximum speeds; Fan average | SMC; computed |
 | System | NAND, Airport, Airflow left, Airflow right and Airflow top temperatures; Charger proximity, Power supply proximity, Thunderbolt left, Thunderbolt right, Trackpad and Trackpad actuator temperatures; DC In and System Total power; DC In current; DC In voltage | SMC |
 
 CPU and GPU clock speeds, private GPU usage and the HID temperature channels are not offered. [Data sources](data-sources.html) explains what each reading family means.

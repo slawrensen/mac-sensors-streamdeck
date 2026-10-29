@@ -38,7 +38,7 @@ No. The plugin reads macOS system counters and SMC readings itself, through the 
 
 Available readings depend on the Mac model and macOS version. A reading appears only when this Mac answers for it with a valid value.
 
-On the measured Mac17,9 with an M5 Pro, the catalog has 38 SMC readings (temperatures, fans, power and related values) and 14 system readings: CPU usage, memory counters, swap, startup volume space, and network and storage transfer rates. Other models get a common table of typed SMC readings; the M5-specific table applies only to the measured model, and the plugin log notes that the model's own catalog is not qualified. CPU and GPU clock speeds and GPU usage are not offered.
+On the measured Mac17,9 with an M5 Pro, the catalog has 51 SMC readings (temperatures, fans, power and related values), 3 readings computed from them (CPU average, CPU hottest core and Fan average), 14 system readings (CPU usage, memory counters, swap, startup volume space, and network and storage transfer rates) and 3 battery and drive health readings (battery cycles, battery health and the internal SSD temperature). Other models get a common table of typed SMC readings and no computed readings; the M5-specific table applies only to the measured model, and the plugin log notes that the model's own catalog is not qualified. CPU and GPU clock speeds and GPU usage are not offered.
 
 [Hardware compatibility](hardware.html) lists what was measured. [Data sources](data-sources.html) explains what each reading means.
 

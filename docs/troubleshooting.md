@@ -12,7 +12,7 @@ Start with the exact text on your key, dial or settings panel header. Mac Sensor
 | --- | --- |
 | Reading sensors | [Wait for the first read](#keys-show-reading-sensors) |
 | Source busy | [Check the first read](#keys-show-source-busy) |
-| No sensor data | [Check both sources](#keys-show-no-sensor-data) |
+| No sensor data | [Check every source](#keys-show-no-sensor-data) |
 | Tahoma needed | [Install Tahoma Bold](#keys-show-tahoma-needed) |
 | Bridge failed | [Reinstall the native reader](#keys-show-bridge-failed) |
 | Source error | [Collect the evidence](#keys-show-source-error) |
@@ -37,7 +37,7 @@ When a key cannot show a current reading, it shows a two-line status screen. Dia
 | --- | --- | --- |
 | **Reading sensors** / please wait | Reading sensors / please wait | The first read since reading started has not returned yet. |
 | **Source busy** / retrying | Source busy / retrying | The first read has not finished after 15 seconds. |
-| **No sensor data** / copy report | No sensor data / copy report | Both sources answered, but no reading is current. |
+| **No sensor data** / copy report | No sensor data / copy report | Every source answered, but no reading is current. |
 | **Tahoma needed** / Open Font Book | Tahoma needed / Open Font Book | Tahoma Bold was not found. Fixed image. |
 | **Bridge failed** / reinstall | Bridge failed / reinstall | The native reader could not be used. |
 | **Source error** / copy report | Source error / copy report | A read failed with no more specific cause. |
@@ -64,15 +64,15 @@ It can also return during use if every reading lapses or fails before the sessio
 15 seconds after reading started, the first read has still not finished: no system counter read has succeeded and at least one source has not answered. The plugin cannot even check the font yet.
 
 1. Choose **Check again**. Each read asks the sources again; a source whose earlier call is still running is asked again once that call returns.
-2. If it stays, copy a support report before anything else: it describes the running plugin, and a restart replaces it. Its `dataSource` section shows the reason, and its `mac` section shows how many readings each source returned (`sourceRows`) and any source error (`sourceErrors`). Until a source has been accepted the `mac` section says `catalog: "not sampled"`, and a read that failed without answering leaves no `sourceErrors` entry; the plugin log then has a `read failed; retrying.` line.
+2. If it stays, copy a support report before anything else: it describes the running plugin, and a restart replaces it. Its `dataSource` section shows the reason, and its `mac` section shows how many readings each source returned (`sourceRows`: `public`, `smc` and `health`), how many were computed from them (`computedRows`) and any source error (`sourceErrors`). Until a source has been accepted the `mac` section says `catalog: "not sampled"`, and a read that failed without answering leaves no `sourceErrors` entry; the plugin log then has a `read failed; retrying.` line.
 3. Then quit and reopen the Stream Deck app. A hardware call that is already running cannot be cancelled. Quitting and reopening the app starts a new plugin process; whether that clears a stuck call has not been tested.
 
 ## Keys show No sensor data
 
-Both sources have answered, but no reading is current: every reading failed, was withheld as invalid, or expired.
+Every source has answered, but no reading is current: every reading failed, was withheld as invalid, or expired.
 
 1. **The Mac just woke from sleep.** After a sleep longer than 15 seconds every reading has expired, and this screen can show until the first read after waking returns. Wait for the next read. Real sleep and wake on hardware has not been checked yet; see [Sleep and wake](data-sources.html#sleep-and-wake).
-2. **Both sources are failing.** Choose **Check again**. Look in the plugin log for `smc readings unavailable; other sources continue.`, `public readings unavailable; other sources continue.` or `read failed; retrying.` lines.
+2. **Every source is failing.** Choose **Check again**. Look in the plugin log for `smc readings unavailable; other sources continue.`, `public readings unavailable; other sources continue.`, `health readings unavailable; other sources continue.` or `read failed; retrying.` lines.
 3. Copy a support report and file an issue with the log lines.
 
 ## Keys show Tahoma needed
@@ -105,7 +105,7 @@ The native files are ad-hoc signed. `codesign --verify --strict` checks a file's
 
 ## Keys show Source error
 
-A read failed in a way no other screen covers. Known causes: the native reader's clock returned no usable time, or both sources answered but the system counter read failed, so the font check that runs with it could not run. Every cause shows the same panel sentence.
+A read failed in a way no other screen covers. Known causes: the native reader's clock returned no usable time, or the other sources answered but the system counter read failed, so the font check that runs with it could not run. Every cause shows the same panel sentence.
 
 1. Choose **Check again**.
 2. If it stays, copy a support report first and keep the plugin log. The report gives the reason; the log can carry the source warnings listed under [Reading the plugin log](#reading-the-plugin-log).
@@ -241,7 +241,7 @@ To install the same version again, export a profile backup, remove Mac Sensors a
 
 The plugin runs one reader however many keys and dials are visible, and stops reading 2 seconds after none is (the log says `Stopped (no visible actions)`).
 
-1. **High CPU at 250 ms.** At **Read every** 250 ms both sources are read four times a second and every changed face is drawn again. The final 1.0.1 release candidate, measured as a development copy in the Stream Deck app on the M5 Pro with the development process observer and 32 single-reading keys, used 2.478% of one core at 250 ms against 0.668% at 1 second (PERF.md). Choose 1 second or longer under **Advanced**, **Connection**.
+1. **High CPU at 250 ms.** At **Read every** 250 ms the system counters and the SMC are read four times a second and every changed face is drawn again. The final 1.0.1 release candidate, measured as a development copy in the Stream Deck app on the M5 Pro with the development process observer and 32 single-reading keys, used 2.478% of one core at 250 ms against 0.668% at 1 second (PERF.md). Choose 1 second or longer under **Advanced**, **Connection**.
 2. **Memory.** In a 24-hour observation with the development process observer of the final 1.0.1 release candidate, measured as a development copy in the Stream Deck app with 32 single-reading keys at 1 second on the M5 Pro, resident memory went from 76.94 MiB to 82.08 MiB, with a maximum of 89.25 MiB, 12 threads and 49 to 50 file descriptors (PERF.md). In the shorter back-to-back sessions at 250 ms, the maximum was 95.9 MiB. If you see steady growth, note how many keys and dials are visible and the **Read every** value, and attach the log.
 3. **A plugin process stays after the Stream Deck app quits.** The plugin checks for the app every 30 seconds. After two checks in a row find the app's process gone, it asks the app directly and exits if no answer comes within 15 seconds. The Stream Deck app starts its plugins when it launches; a real app restart with Mac Sensors has not been observed yet. If a Mac Sensors process keeps running well after that, keep the log and file an issue.
 
@@ -267,7 +267,7 @@ Useful lines:
 
 - `MacSensors: Started (… ms interval)` and `MacSensors: Stopped (no visible actions)`: the reader started for the first visible key or dial, and stopped 2 seconds after none was left. A page change inside those 2 seconds logs neither line.
 - `MacSensors: Read interval set to … ms`: each effective **Read every** change.
-- `MacSensors: smc readings unavailable; other sources continue.` (or `public`): a source answered with an error or with data that was already too old; its readings were removed and the other source kept serving.
+- `MacSensors: smc readings unavailable; other sources continue.` (or `public` or `health`): a source answered with an error or with data that was already too old; its readings, and any computed from them, were removed and the other sources kept serving.
 - `MacSensors: smc read failed; retrying.` or `smc could not start; retrying.` (or `public`): a read did not complete or could not be queued.
 - `MacSensors: Node is running under translation; sensor interfaces follow the detected hardware.`: macOS reports the Node process as translated.
 - `MacSensors: This model uses common typed sensors; its generation-specific catalog is not qualified.`: this model gets the common SMC table.
@@ -293,7 +293,7 @@ The report is JSON with these parts:
 | `plugin`, `streamDeckApp`, `macOS` | Installed plugin version, Stream Deck app version and macOS version |
 | `devices` | Each deck by model, type, key grid, encoders and touch strip, with a hashed identifier |
 | `recentEvents` | The last 24 recorded dial and Sensor Control events, with hashed device and reading identities |
-| `mac` | Node version, process architecture, platform, kernel release, the Node path with your home folder shown as `~`, Mac model, chip, Apple silicon, translation, and how many readings each source returned (`sourceRows`) with any source error (`sourceErrors`); `catalog: "not sampled"` before the first read |
+| `mac` | Node version, process architecture, platform, kernel release, the Node path with your home folder shown as `~`, Mac model, chip, Apple silicon, translation, and how many readings each source returned (`sourceRows`) and how many were computed (`computedRows`), with any source error (`sourceErrors`); `catalog: "not sampled"` before the first read |
 | `dataSource` | Current state and reason, reading count, effective **Read every**, whether reading is running, how many actions keep it running, and the age of the oldest current reading |
 | `sensorDial`, `control`, `detailNav` | Dial presets, views and set sizes, visible Sensor Control keys, and detail view state, by hashed identifiers |
 
@@ -340,5 +340,5 @@ Report security issues through the [private security-report form](https://github
 ## Where to go next
 
 - [Status screens](status-screens.html) lists every screen with its panel sentence and buttons.
-- [Data sources](data-sources.html) explains the two sources, freshness and sleep.
+- [Data sources](data-sources.html) explains the three sources, freshness and sleep.
 - [FAQ and privacy](faq.html) answers common questions, including what a support report contains.
