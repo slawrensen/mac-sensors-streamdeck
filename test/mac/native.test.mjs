@@ -8,7 +8,7 @@ import { test } from 'node:test';
 const require=createRequire(import.meta.url),arch=process.arch==='x64'?'x86_64':'arm64';
 const nativePath=path.resolve(`build/native/test/hwmac-${arch}.node`);
 const native=require(nativePath),production=require(path.resolve(`build/native/production/hwmac-${arch}.node`));
-const reset=()=>native.configure({public:{delayMs:0,fault:0,value:68719476736},smc:{delayMs:0,fault:0,value:30}});
+const reset=()=>native.configure({public:{delayMs:0,fault:0,value:68719476736},smc:{delayMs:0,fault:0,value:30},health:{delayMs:0,fault:0,value:82}});
 test('production surface has only read capabilities; fake and wrong-protocol artifacts identify themselves',()=>{
 	assert.deepEqual(Object.getOwnPropertyNames(production).sort(),['getBuildInfo','now','open']);assert.equal(production.getBuildInfo().testHooks,false);assert.equal(native.getBuildInfo().testHooks,true);
 	assert.equal(require(path.resolve(`build/native/wrong-protocol/hwmac-${arch}.node`)).getBuildInfo().protocol,999);
@@ -53,6 +53,23 @@ test('slow optional reads do not prevent public counters; replacement sessions c
 	first.close();assert.throws(()=>second.read('smc'),{code:'HWMAC_BUSY'});await closed;
 	native.configure({smc:{delayMs:0}});assert.ok((await second.read('smc')).rows[0].valid);second.close();reset();
 });
+test('the health source is a third independent read slot with its own fixture row',async()=>{
+	reset();const session=native.open();
+	const packet=await session.read('health');assert.equal(packet.source,'health');assert.equal(packet.operation,'health.read');
+	assert.deepEqual(packet.rows.map(r=>[r.key,r.label,r.group,r.kind,r.unit,r.value,r.valid,r.operation]),[['battery-cycles','Battery cycles','Battery','count','cycles',82,true,'health.read']]);
+	native.configure({health:{delayMs:200}});const slow=session.read('health');assert.throws(()=>session.read('health'),{code:'HWMAC_BUSY'});
+	const quick=await Promise.all([session.read('public'),session.read('smc')]);assert.ok(quick.every(item=>item.rows[0].valid),'a slow health read never holds the other sources');assert.equal((await slow).rows[0].valid,true);
+	for(const name of ['Health','healthy','health\0','heal',''])assert.throws(()=>session.read(name),{code:'HWMAC_ARGUMENT'},JSON.stringify(name));
+	session.close();reset();
+});
+test('the production health source names only public battery and drive rows and needs no privilege',async()=>{
+	assert.notEqual(process.getuid(),0,'run as the logged-in user, never root');
+	const session=production.open();let packet;try{packet=await session.read('health');}finally{session.close();}
+	assert.equal(packet.source,'health');assert.equal(packet.error,0);assert.equal(packet.operation,'health.read');
+	const allowed={'battery-cycles':['Battery cycles','Battery','count','cycles'],'battery-health':['Battery health','Battery','percent','%'],'ssd-temperature':['Internal SSD','Storage','temperature','°C']};
+	assert.equal(new Set(packet.rows.map(row=>row.key)).size,packet.rows.length);
+	for(const row of packet.rows){assert.deepEqual([row.label,row.group,row.kind,row.unit],allowed[row.key],row.key);if(row.valid)assert.ok(Number.isFinite(row.value)&&row.continuousMs<=packet.continuousMs,row.key);else assert.notEqual(row.error,0,row.key);}
+});
 test('a delayed successful response retains its acquisition age',async()=>{
 	reset();native.configure({smc:{delayMs:150}});const session=native.open();const before=native.now(),packet=await session.read('smc');session.close();
 	assert.ok(packet.rows[0].continuousMs>=before);assert.ok(native.now()-packet.rows[0].continuousMs>=140);assert.equal(packet.code,'HWMAC_OK');reset();
@@ -73,7 +90,7 @@ test('10000 reads and 2000 open/close cycles remain inside explicit RSS and desc
 	reset();const fdCount=()=>execFileSync('/usr/sbin/lsof',['-nP','-p',String(process.pid),'-F','f'],{encoding:'utf8'}).split('\n').filter(line=>/^f[0-9]+/.test(line)).length;
 	const session=native.open();for(let i=0;i<100;i++)await session.read('public');global.gc?.();
 	const baseline={rss:process.memoryUsage().rss,fds:fdCount()};let peak=baseline.rss;
-	for(let i=0;i<10000;i++){await session.read(i%2?'public':'smc');if(i%100===0)peak=Math.max(peak,process.memoryUsage().rss);}
+	for(let i=0;i<10000;i++){await session.read(['public','smc','health'][i%3]);if(i%100===0)peak=Math.max(peak,process.memoryUsage().rss);}
 	session.close();for(let i=0;i<2000;i++){const s=native.open();s.close();}peak=Math.max(peak,process.memoryUsage().rss);global.gc?.();await new Promise(resolve=>setImmediate(resolve));global.gc?.();
 	const final={rss:process.memoryUsage().rss,fds:fdCount()},record={architecture:process.arch,reads:10000,cycles:2000,baseline,sampledPeakRss:Math.max(peak,final.rss),lifetimePeakRss:process.resourceUsage().maxRSS*1024,final,bounds:{rssGrowth:64*1024*1024,descriptorGrowth:2}};
 	fs.mkdirSync('build/native-test-results',{recursive:true});fs.writeFileSync(`build/native-test-results/hygiene-${arch}.json`,JSON.stringify(record,null,2)+'\n');

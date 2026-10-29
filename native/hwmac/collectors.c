@@ -2,6 +2,12 @@
 #include "smc.h"
 #include <CoreFoundation/CoreFoundation.h>
 #include <CoreText/CoreText.h>
+#include <IOKit/IOCFPlugIn.h>
+#include <IOKit/ps/IOPowerSources.h>
+#include <IOKit/ps/IOPSKeys.h>
+#include <IOKit/pwr_mgt/IOPM.h>
+#include <IOKit/storage/IOStorageProtocolCharacteristics.h>
+#include <IOKit/storage/nvme/NVMeSMARTLibExternal.h>
 #include <mach/mach.h>
 #include <mach/mach_time.h>
 #include <sys/sysctl.h>
@@ -231,4 +237,109 @@ void hwmac_collect_public(source_packet *packet) {
 	packet->duration_ms = hwmac_continuous_ms() - start;
 	packet->continuous_ms = start; packet->awake_ms = awake_start; packet->wall_seconds = wall_start;
 	for (unsigned i = 0; i < packet->count; i++) { packet->rows[i].continuous_ms = start; packet->rows[i].wall_seconds = wall_start; }
+}
+/* NVMe reports the composite temperature in whole kelvin; this is the SI offset, which the Linux NVMe hwmon driver also uses. */
+#define HWMAC_KELVIN_OFFSET 273.15
+/* A row read by one API call is as old as the start of that call. */
+static void observed_at(sensor_row *row, double value, double acquired, double acquired_wall) {
+	observed(row, value);
+	if (row->valid) { row->continuous_ms = acquired; row->wall_seconds = acquired_wall; row->valid = isfinite(acquired) && isfinite(acquired_wall); }
+	if (!row->valid) row->value = NAN;
+}
+/* 1 when IOPowerSources lists a present internal battery, 0 when it lists none (a desktop), -1 when it cannot answer. */
+static int internal_battery(void) {
+	CFTypeRef info = IOPSCopyPowerSourcesInfo(); if (info == NULL) return -1;
+	CFArrayRef list = IOPSCopyPowerSourcesList(info); int present = list == NULL ? -1 : 0;
+	for (CFIndex i = 0; list != NULL && i < CFArrayGetCount(list) && present == 0; i++) {
+		CFDictionaryRef description = IOPSGetPowerSourceDescription(info, CFArrayGetValueAtIndex(list, i));
+		if (description == NULL) continue;
+		CFTypeRef type = CFDictionaryGetValue(description, CFSTR(kIOPSTypeKey)), installed = CFDictionaryGetValue(description, CFSTR(kIOPSIsPresentKey));
+		if (type != NULL && CFGetTypeID(type) == CFStringGetTypeID() && CFEqual(type, CFSTR(kIOPSInternalBatteryType)) && installed != NULL && CFGetTypeID(installed) == CFBooleanGetTypeID() && CFBooleanGetValue(installed)) present = 1;
+	}
+	if (list != NULL) CFRelease(list);
+	CFRelease(info); return present;
+}
+/* A non-negative number from a registry property, or from the BatteryData dictionary where macOS 27 moved the capacities. */
+static bool battery_number(io_service_t battery, CFDictionaryRef data, CFStringRef key, uint64_t *value) {
+	if (data != NULL && dictionary_counter(data, key, value)) return true;
+	CFTypeRef property = IORegistryEntryCreateCFProperty(battery, key, kCFAllocatorDefault, 0); int64_t number = -1;
+	bool found = property != NULL && CFGetTypeID(property) == CFNumberGetTypeID() && CFNumberGetValue((CFNumberRef)property, kCFNumberSInt64Type, &number) && number >= 0;
+	if (property != NULL) CFRelease(property);
+	if (found) *value = (uint64_t)number;
+	return found;
+}
+static void battery(source_packet *packet) {
+	int present = internal_battery(); if (present == 0) return;
+	sensor_row *cycles = new_row(packet, "battery-cycles", "Battery cycles", "Battery", "count", "cycles");
+	sensor_row *health = new_row(packet, "battery-health", "Battery health", "Battery", "percent", "%");
+	if (cycles == NULL || health == NULL) { packet->error = 12; return; }
+	io_service_t service = present < 0 ? 0 : IOServiceGetMatchingService(kIOMainPortDefault, IOServiceMatching("AppleSmartBattery"));
+	if (service == 0) { cycles->error = health->error = 10; return; }
+	/* CycleCount is kIOPMPSCycleCountKey. The capacities are read before BatteryData is released. */
+	double acquired = hwmac_continuous_ms(), acquired_wall = wall_now(); uint64_t count = 0, nominal = 0, design = 0;
+	if (battery_number(service, NULL, CFSTR(kIOPMPSCycleCountKey), &count)) observed_at(cycles, (double)count, acquired, acquired_wall); else cycles->error = 13;
+	acquired = hwmac_continuous_ms(); acquired_wall = wall_now();
+	CFTypeRef data = IORegistryEntryCreateCFProperty(service, CFSTR("BatteryData"), kCFAllocatorDefault, 0);
+	CFDictionaryRef capacities = data != NULL && CFGetTypeID(data) == CFDictionaryGetTypeID() ? (CFDictionaryRef)data : NULL;
+	/* Health is the nominal full charge capacity as a percent of design capacity. System Settings' Maximum Capacity uses a method Apple does not publish. */
+	if (battery_number(service, capacities, CFSTR("NominalChargeCapacity"), &nominal) && battery_number(service, capacities, CFSTR(kIOPMPSDesignCapacityKey), &design) && nominal > 0 && design > 0) observed_at(health, 100.0 * (double)nominal / (double)design, acquired, acquired_wall);
+	else health->error = 13;
+	if (data != NULL) CFRelease(data);
+	IOObjectRelease(service);
+}
+static bool internal_drive(io_service_t service) {
+	CFTypeRef protocol = IORegistryEntrySearchCFProperty(service, kIOServicePlane, CFSTR(kIOPropertyProtocolCharacteristicsKey), kCFAllocatorDefault, kIORegistryIterateRecursively | kIORegistryIterateParents);
+	bool internal = false;
+	if (protocol != NULL && CFGetTypeID(protocol) == CFDictionaryGetTypeID()) {
+		CFTypeRef location = CFDictionaryGetValue((CFDictionaryRef)protocol, CFSTR(kIOPropertyPhysicalInterconnectLocationKey));
+		internal = location != NULL && CFGetTypeID(location) == CFStringGetTypeID() && CFEqual(location, CFSTR(kIOPropertyInternalKey));
+	}
+	if (protocol != NULL) CFRelease(protocol);
+	return internal;
+}
+/* The internal NVMe drive's SMART composite temperature through the public NVMeSMARTLib plug-in. The user client is opened and closed per read. */
+static void drive(source_packet *packet) {
+	CFMutableDictionaryRef match = CFDictionaryCreateMutable(kCFAllocatorDefault, 1, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+	CFMutableDictionaryRef property = CFDictionaryCreateMutable(kCFAllocatorDefault, 1, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+	if (match == NULL || property == NULL) { if (match != NULL) CFRelease(match); if (property != NULL) CFRelease(property); return; }
+	CFDictionarySetValue(property, CFSTR(kIOPropertyNVMeSMARTCapableKey), kCFBooleanTrue); CFDictionarySetValue(match, CFSTR(kIOPropertyMatchKey), property); CFRelease(property);
+	io_iterator_t iterator = 0; io_service_t service, internal = 0; unsigned drives = 0;
+	/* IOServiceGetMatchingServices consumes the matching dictionary. */
+	if (IOServiceGetMatchingServices(kIOMainPortDefault, match, &iterator) != KERN_SUCCESS) return;
+	while ((service = IOIteratorNext(iterator)) != 0) {
+		if (internal_drive(service) && drives++ == 0) { internal = service; continue; }
+		IOObjectRelease(service);
+	}
+	IOObjectRelease(iterator);
+	if (drives == 0) return;
+	sensor_row *row = new_row(packet, "ssd-temperature", "Internal SSD", "Storage", "temperature", "°C");
+	if (row == NULL) packet->error = 12;
+	/* One key cannot name two internal drives, so a Mac with more than one gets no value instead of an arbitrary one. */
+	else if (drives > 1) row->error = 13;
+	else {
+		IOCFPlugInInterface **plugin = NULL; IONVMeSMARTInterface **smart = NULL; SInt32 score = 0;
+		kern_return_t status = IOCreatePlugInInterfaceForService(internal, kIONVMeSMARTUserClientTypeID, kIOCFPlugInInterfaceID, &plugin, &score);
+		if (status != KERN_SUCCESS || plugin == NULL) { row->error = 11; row->system_error = status; }
+		else {
+			HRESULT result = (*plugin)->QueryInterface(plugin, CFUUIDGetUUIDBytes(kIONVMeSMARTInterfaceID), (LPVOID *)&smart);
+			if (result != S_OK || smart == NULL) { row->error = 11; row->system_error = result; }
+			else {
+				NVMeSMARTData data; memset(&data, 0, sizeof(data));
+				double acquired = hwmac_continuous_ms(), acquired_wall = wall_now();
+				IOReturn read = (*smart)->SMARTReadData(smart, &data); uint16_t kelvin = data.TEMPERATURE;
+				/* Zero kelvin means the drive reports no temperature. */
+				if (read != kIOReturnSuccess) { row->error = 3; row->system_error = read; }
+				else if (kelvin == 0) row->error = 13;
+				else observed_at(row, (double)kelvin - HWMAC_KELVIN_OFFSET, acquired, acquired_wall);
+				(*smart)->Release(smart);
+			}
+			IODestroyPlugInInterface(plugin);
+		}
+	}
+	IOObjectRelease(internal);
+}
+void hwmac_collect_health(source_packet *packet) {
+	double start = hwmac_continuous_ms(); hwmac_facts(packet);
+	battery(packet); drive(packet);
+	packet->continuous_ms = hwmac_continuous_ms(); packet->awake_ms = hwmac_awake_ms(); packet->wall_seconds = wall_now(); packet->duration_ms = packet->continuous_ms - start;
 }

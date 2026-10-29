@@ -37,13 +37,16 @@ typedef struct module_state module_state;
 typedef struct session session;
 typedef struct read_job read_job;
 typedef struct { unsigned delay_ms; int fault; double value; } fake_source;
+/* Read slots by index. A new name here is additive: the loader pairs JS and native by sourceId, so a peer never sees an unknown name. */
+#define HWMAC_SOURCES 3
+static const char *const SOURCE_NAMES[HWMAC_SOURCES] = { "public", "smc", "health" };
 struct module_state {
 	napi_env env;
 	napi_async_cleanup_hook_handle hook;
 	unsigned references;
 	bool closing;
-	read_job *pending[2];
-	fake_source fake[2];
+	read_job *pending[HWMAC_SOURCES];
+	fake_source fake[HWMAC_SOURCES];
 	unsigned fake_revision;
 };
 struct session {
@@ -88,14 +91,15 @@ static void session_release(session *owner) {
 	if (--owner->references == 0) { hwmac_close_smc(&owner->smc); state_release(owner->state); free(owner); }
 }
 static void maybe_finish_cleanup(module_state *state) {
-	if (state->closing && state->pending[0] == NULL && state->pending[1] == NULL && state->hook != NULL) {
+	bool idle = true; for (unsigned i = 0; i < HWMAC_SOURCES; i++) if (state->pending[i] != NULL) idle = false;
+	if (state->closing && idle && state->hook != NULL) {
 		napi_async_cleanup_hook_handle hook = state->hook; state->hook = NULL;
 		napi_remove_async_cleanup_hook(hook); state_release(state);
 	}
 }
 static void cleanup(napi_async_cleanup_hook_handle hook, void *data) {
 	module_state *state = data; state->closing = true; state->hook = hook;
-	for (unsigned i = 0; i < 2; i++) if (state->pending[i] != NULL) {
+	for (unsigned i = 0; i < HWMAC_SOURCES; i++) if (state->pending[i] != NULL) {
 		atomic_store(&state->pending[i]->owner->closed, true);
 		/* Only queued work can be cancelled. Running calls retain their owner. */
 		napi_cancel_async_work(state->env, state->pending[i]->work);
@@ -130,12 +134,12 @@ static const char *source_error_code(int code) {
 static napi_value packet_value(napi_env env, const read_job *job) {
 	const source_packet *packet = &job->packet; napi_value result, rows, cpu;
 	napi_create_object(env, &result); napi_create_array_with_length(env, packet->count, &rows);
-	set_string(env, result, "source", job->source == 0 ? "public" : "smc");
+	set_string(env, result, "source", SOURCE_NAMES[job->source]);
 	set_number(env, result, "continuousMs", packet->continuous_ms); set_number(env, result, "awakeMs", packet->awake_ms);
 	set_number(env, result, "wallSeconds", packet->wall_seconds); set_number(env, result, "durationMs", packet->duration_ms);
 	set_string(env, result, "code", source_error_code(packet->error));
 	set_number(env, result, "error", packet->error); set_number(env, result, "systemCode", (double)packet->system_error);
-	set_string(env, result, "operation", job->source == 0 ? "public.read" : packet->error == 10 ? "smc.matchService" : packet->error == 11 ? "smc.open" : "smc.read");
+	set_string(env, result, "operation", job->source == 0 ? "public.read" : job->source == 2 ? "health.read" : packet->error == 10 ? "smc.matchService" : packet->error == 11 ? "smc.open" : "smc.read");
 	set_string(env, result, "model", packet->model); set_string(env, result, "chip", packet->chip);
 	set_number(env, result, "appleSilicon", packet->apple_silicon); set_number(env, result, "translated", packet->translated); set_number(env, result, "translationError", packet->translation_error);
 	set_bool(env, result, "fontAvailable", packet->font_available);
@@ -147,7 +151,7 @@ static napi_value packet_value(napi_env env, const read_job *job) {
 		set_number(env, object, "continuousMs", row->continuous_ms); set_number(env, object, "wallSeconds", row->wall_seconds);
 		set_string(env, object, "code", source_error_code(row->error != 0 ? row->error : row->valid ? 0 : 13));
 		set_number(env, object, "error", row->error); set_number(env, object, "systemCode", (double)row->system_error);
-		set_number(env, object, "firmwareCode", row->firmware_error); set_string(env, object, "operation", row->operation == 9 ? "smc.keyInfo" : row->operation == 5 ? "smc.read" : "public.read");
+		set_number(env, object, "firmwareCode", row->firmware_error); set_string(env, object, "operation", job->source == 2 ? "health.read" : row->operation == 9 ? "smc.keyInfo" : row->operation == 5 ? "smc.read" : "public.read");
 		napi_set_element(env, rows, i, object);
 	}
 	napi_set_named_property(env, result, "rows", rows);
@@ -171,12 +175,16 @@ static void execute_read(napi_env env, void *data) {
 	packet->apple_silicon = 1; packet->font_available = job->fake.fault != 4;
 	/* Fixture data was acquired when the job copied its configured values. */
 	if (job->fake.fault == 1) { packet->error = 10; return; }
+	static const char *const FAKE_ROWS[HWMAC_SOURCES][5] = {
+		{ "memory-total", "Memory total", "Memory", "other", "B" },
+		{ "TB1T", "Battery", "Battery", "temperature", "°C" },
+		{ "battery-cycles", "Battery cycles", "Battery", "count", "cycles" }
+	};
+	const char *const *fixture = FAKE_ROWS[job->source];
 	packet->count = 1; sensor_row *row = &packet->rows[0];
-	snprintf(row->key, sizeof(row->key), "%s", job->source == 0 ? "memory-total" : "TB1T");
-	snprintf(row->label, sizeof(row->label), "%s", job->source == 0 ? "Memory total" : "Battery");
-	snprintf(row->group, sizeof(row->group), "%s", job->source == 0 ? "Memory" : "Battery");
-	snprintf(row->kind, sizeof(row->kind), "%s", job->source == 0 ? "other" : "temperature");
-	snprintf(row->unit, sizeof(row->unit), "%s", job->source == 0 ? "B" : "°C");
+	snprintf(row->key, sizeof(row->key), "%s", fixture[0]); snprintf(row->label, sizeof(row->label), "%s", fixture[1]);
+	snprintf(row->group, sizeof(row->group), "%s", fixture[2]); snprintf(row->kind, sizeof(row->kind), "%s", fixture[3]);
+	snprintf(row->unit, sizeof(row->unit), "%s", fixture[4]);
 	row->value = job->fake.fault == 2 ? NAN : job->fake.fault == 3 ? 1e30 : job->fake.value;
 	row->valid = job->fake.fault != 5; row->continuous_ms = packet->continuous_ms; row->wall_seconds = packet->wall_seconds;
 	packet->cpu_valid = true; packet->cpu_count = 1;
@@ -188,6 +196,7 @@ static void execute_read(napi_env env, void *data) {
 	packet->duration_ms = hwmac_continuous_ms() - packet->continuous_ms;
 #else
 	if (job->source == 0) hwmac_collect_public(&job->packet);
+	else if (job->source == 2) hwmac_collect_health(&job->packet);
 	else hwmac_collect_smc(&job->owner->smc, &job->packet);
 #endif
 }
@@ -210,8 +219,10 @@ static napi_value read_source(napi_env env, napi_callback_info info) {
 	session *owner = receiver(env, self); if (owner == NULL) return NULL;
 	if (argc != 1) return fail(env, "HWMAC_ARGUMENT", "read", "Read expects one source name.");
 	char source[16]; size_t length = 0; CHECK(napi_get_value_string_utf8(env, argv[0], source, sizeof(source), &length));
-	if (!((length == 6 && memcmp(source, "public", 6) == 0) || (length == 3 && memcmp(source, "smc", 3) == 0))) return fail(env, "HWMAC_ARGUMENT", "read", "Unknown sensor source.");
-	module_state *state = owner->state; unsigned index = strcmp(source, "public") == 0 ? 0 : 1;
+	unsigned index = HWMAC_SOURCES;
+	for (unsigned i = 0; i < HWMAC_SOURCES; i++) if (length == strlen(SOURCE_NAMES[i]) && memcmp(source, SOURCE_NAMES[i], length) == 0) index = i;
+	if (index == HWMAC_SOURCES) return fail(env, "HWMAC_ARGUMENT", "read", "Unknown sensor source.");
+	module_state *state = owner->state;
 	if (atomic_load(&owner->closed) || state->closing) return fail(env, "HWMAC_CLOSED", "read", "The sensor session has closed.");
 	if (state->pending[index] != NULL) return fail(env, "HWMAC_BUSY", "read", "This source already has a pending read.");
 	read_job *job = calloc(1, sizeof(*job)); if (job == NULL) return fail(env, "HWMAC_MEMORY", "read", "Native allocation failed.");
@@ -237,7 +248,7 @@ static napi_value close_session(napi_env env, napi_callback_info info) {
 	if (argc != 0) return fail(env, "HWMAC_ARGUMENT", "close", "Close accepts no arguments.");
 	session *owner = receiver(env, self); if (owner == NULL) return NULL;
 	atomic_store(&owner->closed, true);
-	for (unsigned i = 0; i < 2; i++) if (owner->state->pending[i] != NULL && owner->state->pending[i]->owner == owner) napi_cancel_async_work(env, owner->state->pending[i]->work);
+	for (unsigned i = 0; i < HWMAC_SOURCES; i++) if (owner->state->pending[i] != NULL && owner->state->pending[i]->owner == owner) napi_cancel_async_work(env, owner->state->pending[i]->work);
 	if (owner->jobs == 0) hwmac_close_smc(&owner->smc);
 	return undefined_value(env);
 }
@@ -272,8 +283,8 @@ static napi_value configure(napi_env env, napi_callback_info info) {
 	size_t argc = 1; napi_value args[1]; CHECK(napi_get_cb_info(env, info, &argc, args, NULL, NULL));
 	if (argc != 1) return fail(env, "HWMAC_ARGUMENT", "configure", "Fixture object required.");
 	module_state *state; CHECK(napi_get_instance_data(env, (void **)&state));
-	for (unsigned i = 0; i < 2; i++) {
-		napi_value source; bool present; const char *key = i == 0 ? "public" : "smc";
+	for (unsigned i = 0; i < HWMAC_SOURCES; i++) {
+		napi_value source; bool present; const char *key = SOURCE_NAMES[i];
 		CHECK(napi_has_named_property(env, args[0], key, &present)); if (!present) continue; CHECK(napi_get_named_property(env, args[0], key, &source));
 		const char *names[] = { "delayMs", "fault", "value" };
 		for (unsigned j = 0; j < 3; j++) {
@@ -329,7 +340,7 @@ static napi_value test_decode(napi_env env, napi_callback_info info) {
 #endif
 NAPI_MODULE_INIT() {
 	module_state *state = calloc(1, sizeof(*state)); if (state == NULL) return fail(env, "HWMAC_MEMORY", "initialize", "Native allocation failed.");
-	state->env = env; state->references = 2; state->fake[0].value = 68719476736.0; state->fake[1].value = 30.0;
+	state->env = env; state->references = 2; state->fake[0].value = 68719476736.0; state->fake[1].value = 30.0; state->fake[2].value = 82.0;
 	napi_status status = napi_set_instance_data(env, state, finalize_state, NULL);
 	if (status != napi_ok) { free(state); return fail(env, "HWMAC_API", "initialize", "Could not register native state."); }
 	status = napi_add_async_cleanup_hook(env, cleanup, state, &state->hook);

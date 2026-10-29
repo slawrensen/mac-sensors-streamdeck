@@ -46,4 +46,6 @@ void hwmac_facts(source_packet *packet);
 void hwmac_collect_smc(smc_context *context, source_packet *packet);
 void hwmac_close_smc(smc_context *context);
 void hwmac_collect_public(source_packet *packet);
+/* Battery cycles and health from IOPowerSources and AppleSmartBattery, and the internal NVMe SMART temperature. No handle is held. */
+void hwmac_collect_health(source_packet *packet);
 #endif

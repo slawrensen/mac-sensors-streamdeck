@@ -1,6 +1,6 @@
 import { SensorType, type Reading, type SensorSnapshot, type SensorSource } from '../hwinfo/types';
 import type { SnapshotProvider } from '../hwinfo/provider';
-import type { NativeBridge, NativePacket, NativeRow, NativeSession, NativeSource } from './native-api';
+import { NATIVE_SOURCES, type NativeBridge, type NativePacket, type NativeRow, type NativeSession, type NativeSource } from './native-api';
 import { constants } from 'node:os';
 import { MacSensorError } from './bridge';
 /** How long a reading stays live after its own acquisition; past it the reading is removed, never shown as current. */
@@ -13,6 +13,12 @@ const COUNTER_REBASELINE_MS=250;
 const MIN_COUNTER_WINDOW_MS=200;
 /** sysctl.proc_translated is absent (ENOENT) on Intel Macs; Apple's Rosetta documentation treats that as a native process. */
 const TRANSLATION_ABSENT_ERRNO=constants.errno.ENOENT;
+/**
+ * Shortest time between two health read requests. Battery cycles and health change over days and the SSD temperature over
+ * seconds, and every read sends the drive one SMART command, so health is read about as often as TG Pro's 2 s default:
+ * every second read at the 1 s default, with half a read of room for timer jitter. Far inside the TTL, so its readings stay live.
+ */
+export const HEALTH_MIN_SPACING_MS=1500;
 /** Native when the sysctl says 0 or does not exist; translated only on 1; anything else, including other errors, stays unknown. */
 function translationOf(translated:number,translationError:number):ProviderFacts['translation'] {return translated===0||(translated<0&&translationError===TRANSLATION_ABSENT_ERRNO)?'native':translated===1?'translated':'unknown';}
 const GROUPS:Record<string,number>={CPU:1,GPU:2,Memory:3,Storage:4,Network:5,Battery:6,Fans:7,System:8};
@@ -23,8 +29,13 @@ const KIND:Record<string,{type:SensorType;meaning:string;minimum:number;maximum:
 	current:{type:SensorType.Current,meaning:'current.v1',minimum:-500,maximum:500},
 	power:{type:SensorType.Power,meaning:'power.v1',minimum:-1000,maximum:2000},
 	usage:{type:SensorType.Usage,meaning:'usage.v1',minimum:0,maximum:100},
+	count:{type:SensorType.Other,meaning:'count.v1',minimum:0,maximum:Number.MAX_SAFE_INTEGER},
+	// A new battery's nominal capacity can read a little above its design capacity; twice the design capacity is not a battery.
+	percent:{type:SensorType.Other,meaning:'percent.v1',minimum:0,maximum:200},
 	other:{type:SensorType.Other,meaning:'other.v1',minimum:0,maximum:Number.MAX_SAFE_INTEGER}
 };
+/** Health rows: one internal battery and one internal drive per Mac, so the name alone identifies them, as system counters do. */
+const HEALTH_KEYS=new Set(['battery-cycles','battery-health','ssd-temperature']);
 const SYSTEM_KEYS=new Set(['cpu-total','memory-total','memory-free','memory-active','memory-inactive','memory-wired','memory-compressed','swap-used','disk-root-total','disk-root-available','network-receive','network-send','storage-read','storage-write']);
 /** A reading this provider computes from other readings of one SMC packet. */
 interface ComputedSpec { name:string; label:string; group:string; kind:'temperature'|'fan'; unit:string; reduce:'mean'|'max'; inputs:readonly string[]; }
@@ -71,6 +82,7 @@ export function encodeModel(model:string): string | null {
 let lastModel:{model:string;encoded:string|null}|null=null;
 export function measurementKey(source:NativeSource,row:NativeRow,model:string):string|null {
 	if(source==='public')return SYSTEM_KEYS.has(row.key)?`mac:v1:system:${row.key}`:null;
+	if(source==='health'){const kind=KIND[row.kind];return HEALTH_KEYS.has(row.key)&&kind?`mac:v1:health:${row.key}:${kind.meaning}`:null;}
 	if(lastModel===null||lastModel.model!==model)lastModel={model,encoded:encodeModel(model)};
 	const encoded=lastModel.encoded,kind=KIND[row.kind];
 	if(encoded===null||!/^[\x20-\x7e]{4}$/.test(row.key)||!kind)return null;
@@ -130,6 +142,8 @@ export class MacProvider implements SnapshotProvider {
 	private rebaselineStartedAt:number|null=null;
 	/** When the in-flight public read was requested, so the rebaseline window counts from the first read's start, not its completion. */
 	private publicRequestedAt:number|null=null;
+	/** When the last health read was requested; the next read asks health again only HEALTH_MIN_SPACING_MS later. */
+	private healthRequestedAt:number|null=null;
 	private fontKnown=false;
 	private fontAvailable=false;
 	private readonly completed=new Set<NativeSource>();
@@ -140,7 +154,7 @@ export class MacProvider implements SnapshotProvider {
 	private dirty=true;
 	private catalogDirty=true;
 	private catalogRevision=0;
-	private factsValue:ProviderFacts={model:'unknown',chip:'unknown',appleSilicon:null,translation:'unknown',translationError:0,sourceRows:{public:0,smc:0},computedRows:0,sourceErrors:{}};
+	private factsValue:ProviderFacts={model:'unknown',chip:'unknown',appleSilicon:null,translation:'unknown',translationError:0,sourceRows:{public:0,smc:0,health:0},computedRows:0,sourceErrors:{}};
 	constructor(private readonly native:NativeBridge,private readonly ready:()=>void,private readonly report:(facts:ProviderFacts)=>void=()=>{}) {this.startedAt=native.now();this.session=native.open();}
 	facts():ProviderFacts{return structuredClone(this.factsValue);}
 	/** Reads requested and not yet settled; the poller publishes a read once none remain. */
@@ -213,7 +227,7 @@ export class MacProvider implements SnapshotProvider {
 	private request(source:NativeSource):void {
 		if(this.closed||this.pending.has(source)||this.retries.has(source))return;
 		try {
-			const promise=this.session.read(source);this.pending.add(source);if(source==='public')this.publicRequestedAt=this.native.now();
+			const promise=this.session.read(source);this.pending.add(source);if(source==='public')this.publicRequestedAt=this.native.now();if(source==='health')this.healthRequestedAt=this.native.now();
 			void promise.then(packet=>{if(!this.closed)this.accept(source,packet);}).catch(()=>{if(!this.closed){this.completed.add(source);this.removeSource(source);if(source==='public')this.previousPublic=null;this.notice(`${source} read failed; retrying.`);}}).finally(()=>{this.pending.delete(source);if(!this.closed)this.ready();}).catch(()=>{if(!this.closed)this.notice('A sensor update could not be delivered.');});
 		} catch(error) {
 			if((error as {code?:string}).code==='HWMAC_BUSY') {
@@ -228,11 +242,14 @@ export class MacProvider implements SnapshotProvider {
 		if(this.rebaseline){clearTimeout(this.rebaseline);this.rebaseline=null;}
 		const sinceRebaseline=this.rebaselineStartedAt===null?Infinity:this.native.now()-this.rebaselineStartedAt;this.rebaselineStartedAt=null;
 		if(!(sinceRebaseline<MIN_COUNTER_WINDOW_MS&&this.previousPublic!==null))this.request('public');
-		this.request('smc');return this.current();
+		this.request('smc');
+		// A missing or non-finite clock asks health every read rather than never.
+		if(!(this.native.now()-(this.healthRequestedAt??-Infinity)<HEALTH_MIN_SPACING_MS))this.request('health');
+		return this.current();
 	}
 	private rebuild():void {
 		if(this.catalogDirty){this.catalogRevision++;this.catalogDirty=false;}
-		this.factsValue.sourceRows={public:0,smc:0};this.factsValue.computedRows=0;for(const item of this.rows.values())if(item.computed)this.factsValue.computedRows++;else this.factsValue.sourceRows[item.source]++;
+		this.factsValue.sourceRows={public:0,smc:0,health:0};this.factsValue.computedRows=0;for(const item of this.rows.values())if(item.computed)this.factsValue.computedRows++;else this.factsValue.sourceRows[item.source]++;
 		this.report(this.facts());
 		if(this.dirty){this.valueRevision++;this.dirty=false;}
 		const groups=[...new Set([...this.rows.values()].map(item=>Object.hasOwn(GROUPS,item.row.group)?item.row.group:'System'))].sort((a,b)=>GROUPS[a]!-GROUPS[b]!);
@@ -248,13 +265,13 @@ export class MacProvider implements SnapshotProvider {
 		for(const [key,item] of this.rows)if(now-item.row.continuousMs>=TTL_MS||now<item.row.continuousMs){this.rows.delete(key);this.dirty=true;this.catalogDirty=true;}
 		if(this.dirty)this.rebuild();
 		if(this.fontKnown&&!this.fontAvailable)throw new MacSensorError('font-missing','Install Tahoma Bold in Font Book, then choose Check again.');
-		if(!this.fontKnown&&this.completed.size<2){if(now-this.startedAt>=TTL_MS)throw new MacSensorError('busy','The sensor source is still busy. Choose Check again.');return null;}
+		if(!this.fontKnown&&this.completed.size<NATIVE_SOURCES.length){if(now-this.startedAt>=TTL_MS)throw new MacSensorError('busy','The sensor source is still busy. Choose Check again.');return null;}
 		if(!this.fontKnown)throw new MacSensorError('source-error','The font prerequisite could not be checked. Choose Check again.');
-		if(this.rows.size===0&&this.completed.size===2)throw new MacSensorError('no-readable-sensors','No recent readable sensors were found. Choose Copy support report.');
+		if(this.rows.size===0&&this.completed.size===NATIVE_SOURCES.length)throw new MacSensorError('no-readable-sensors','No recent readable sensors were found. Choose Copy support report.');
 		return this.rows.size?this.snapshot:null;
 	}
 	/** Ms until the next row expires. No deadline while the clock is not finite: current() has already cleared the rows, and the interval tick rechecks, so a NaN clock cannot drive a 1 ms expiry loop. */
-	untilExpiry():number|null {if(this.closed)return null;const now=this.native.now();if(!Number.isFinite(now))return null;if(!this.rows.size)return !this.fontKnown&&this.completed.size<2&&now-this.startedAt<TTL_MS?this.startedAt+TTL_MS-now:null;return Math.max(0,Math.min(...[...this.rows.values()].map(item=>item.row.continuousMs+TTL_MS-now)));}
+	untilExpiry():number|null {if(this.closed)return null;const now=this.native.now();if(!Number.isFinite(now))return null;if(!this.rows.size)return !this.fontKnown&&this.completed.size<NATIVE_SOURCES.length&&now-this.startedAt<TTL_MS?this.startedAt+TTL_MS-now:null;return Math.max(0,Math.min(...[...this.rows.values()].map(item=>item.row.continuousMs+TTL_MS-now)));}
 	age():number|null {if(this.closed||!this.rows.size)return null;const now=this.native.now();return Number.isFinite(now)?Math.max(...[...this.rows.values()].map(item=>now-item.row.continuousMs)):null;}
-	close():void {if(this.closed)return;this.closed=true;for(const retry of this.retries.values())clearTimeout(retry);this.retries.clear();if(this.rebaseline)clearTimeout(this.rebaseline);this.rebaseline=null;this.rows.clear();this.snapshot=null;this.previousPublic=null;this.factsValue.sourceRows={public:0,smc:0};this.factsValue.computedRows=0;this.report(this.facts());this.session.close();}
+	close():void {if(this.closed)return;this.closed=true;for(const retry of this.retries.values())clearTimeout(retry);this.retries.clear();if(this.rebaseline)clearTimeout(this.rebaseline);this.rebaseline=null;this.rows.clear();this.snapshot=null;this.previousPublic=null;this.factsValue.sourceRows={public:0,smc:0,health:0};this.factsValue.computedRows=0;this.report(this.facts());this.session.close();}
 }

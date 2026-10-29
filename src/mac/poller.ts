@@ -56,7 +56,7 @@ const TRUSTED_READS = 8;
  */
 export const RELEASE_GRACE_MS = 2000;
 /** Key families in the source observation trace: the native sources' key prefixes and the provider's computed readings. */
-const TRACE_SOURCES = ['system', 'smc', 'computed'] as const;
+const TRACE_SOURCES = ['system', 'smc', 'health', 'computed'] as const;
 /** Per key family: row count, newest observation revision and oldest acquisition, as the soak freshness check reads them. */
 export function sourceObservations(snapshot: SensorSnapshot): Array<{ source: string; rows: number; observation: number; acquired: number | null }> {
 	return TRACE_SOURCES.map(source => {

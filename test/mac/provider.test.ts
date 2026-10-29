@@ -17,7 +17,7 @@ function rig():{provider:MacProvider;pending:Map<NativeSource,(packet:NativePack
 const settle=():Promise<void>=>new Promise(resolve=>setImmediate(resolve));
 async function publish(r:ReturnType<typeof rig>,source:NativeSource,value=packet(source,r.clock.now)):Promise<void>{const resolve=r.pending.get(source);assert.ok(resolve);r.pending.delete(source);resolve(value);await settle();}
 test('opening and pending work provide no measurement; each accepted row owns its evidence',async()=>{
-	const r=rig();assert.equal(r.provider.current(),null);assert.equal(r.provider.read(),null);assert.equal(r.pending.size,2);
+	const r=rig();assert.equal(r.provider.current(),null);assert.equal(r.provider.read(),null);assert.equal(r.pending.size,3,'public, SMC and health are each asked once');
 	await publish(r,'public');const first=r.provider.current();assert.ok(first);assert.equal(first.readings.length,1);
 	await publish(r,'smc');const both=r.provider.current();assert.equal(both?.readings.length,2);assert.ok(both!.catalogRevision!>first.catalogRevision!);assert.equal(both?.readings[0]?.statistics,'producer');assert.equal(both!.readings[0]!.valueMin,both!.readings[0]!.value);
 	const key='mac:v1:smc:Mac17%2C9:54423154:temp.v1',temperature=both!.byKey.get(key)!;
@@ -26,10 +26,10 @@ test('opening and pending work provide no measurement; each accepted row owns it
 	r.provider.close();await publish(r,'smc');
 });
 test('failure and independent expiry remove only affected rows without minting freshness',async()=>{
-	const r=rig();r.provider.read();await publish(r,'public');await publish(r,'smc');const before=r.provider.current()!;
+	const r=rig();r.provider.read();await publish(r,'public');await publish(r,'smc');await publish(r,'health');const before=r.provider.current()!;
 	r.clock.now=14900;r.provider.read();await publish(r,'public');const recent=r.provider.current()!;
 	r.clock.now=15100;const expired=r.provider.current()!;
-	assert.equal(expired.readings.length,1);assert.ok(expired.catalogRevision!>recent.catalogRevision!);assert.deepEqual(r.provider.facts().sourceRows,{public:1,smc:0});assert.equal(expired.pollTime,recent.pollTime);assert.equal(expired.freshnessRevision,before.freshnessRevision);assert.ok(expired.valueRevision!>recent.valueRevision!);
+	assert.equal(expired.readings.length,1);assert.ok(expired.catalogRevision!>recent.catalogRevision!);assert.deepEqual(r.provider.facts().sourceRows,{public:1,smc:0,health:0});assert.equal(expired.pollTime,recent.pollTime);assert.equal(expired.freshnessRevision,before.freshnessRevision);assert.ok(expired.valueRevision!>recent.valueRevision!);
 	const failed=packet('smc',15100);failed.rows[0]!.valid=false;await publish(r,'smc',failed);assert.equal(r.provider.current()!.readings.length,1);
 	r.clock.now=30000;assert.throws(()=>r.provider.current(),{reason:'no-readable-sensors'});r.provider.close();
 });
@@ -46,12 +46,12 @@ test('invalid/duplicate measurements are withheld; valid zero survives; bad mode
 	}
 });
 test('continuous time expires values despite wall rollback and font recovery preserves sensor keys',async()=>{
-	const r=rig();r.provider.read();const missing=packet('public');missing.fontAvailable=false;await publish(r,'public',missing);await publish(r,'smc');assert.throws(()=>r.provider.current(),{reason:'font-missing'});
+	const r=rig();r.provider.read();const missing=packet('public');missing.fontAvailable=false;await publish(r,'public',missing);await publish(r,'smc');await publish(r,'health');assert.throws(()=>r.provider.current(),{reason:'font-missing'});
 	r.clock.now=200;assert.throws(()=>r.provider.read(),{reason:'font-missing'});const fixed=packet('public',200);fixed.wallSeconds=100;fixed.rows[0]!.wallSeconds=100;await publish(r,'public',fixed);await publish(r,'smc',packet('smc',200));assert.equal(r.provider.current()!.readings.length,2);
 	r.clock.now=15200;assert.throws(()=>r.provider.current(),{reason:'no-readable-sensors'});r.provider.close();
 });
 test('all-source first-read failure is explicit, and an invalid clock never becomes age zero',async()=>{
-	const r=rig();r.provider.read();for(const source of ['public','smc'] as const){const p=packet(source);p.rows=[];await publish(r,source,p);}assert.throws(()=>r.provider.current(),{reason:'no-readable-sensors'});
+	const r=rig();r.provider.read();for(const source of ['public','smc'] as const){const p=packet(source);p.rows=[];await publish(r,source,p);}assert.equal(r.provider.current(),null,'the health source has not answered yet');const empty=packet('health');empty.rows=[];await publish(r,'health',empty);assert.throws(()=>r.provider.current(),{reason:'no-readable-sensors'});
 	r.clock.now=NaN;assert.equal(r.provider.age(),null);assert.throws(()=>r.provider.current(),{reason:'source-error'});r.provider.close();
 });
 test('measurement identity is canonical, case preserving and independent of build or catalog order',()=>{
@@ -118,7 +118,7 @@ test('a missing model on the first SMC row withholds it instead of throwing',asy
 });
 function smcAt(r:ReturnType<typeof rig>,value:number,unit='°C'):NativePacket {const next=packet('smc',r.clock.now);next.rows[0]!.value=value;next.rows[0]!.unit=unit;return next;}
 const smcKey='mac:v1:smc:Mac17%2C9:54423154:temp.v1';
-async function readSmc(r:ReturnType<typeof rig>,at:number,value:number,unit='°C'):Promise<SensorSnapshot>{r.clock.now=at;r.provider.read();await publish(r,'public',packet('public',at));await publish(r,'smc',smcAt(r,value,unit));return r.provider.current()!;}
+async function readSmc(r:ReturnType<typeof rig>,at:number,value:number,unit='°C'):Promise<SensorSnapshot>{r.clock.now=at;r.provider.read();await publish(r,'public',packet('public',at));await publish(r,'smc',smcAt(r,value,unit));if(r.pending.has('health'))await publish(r,'health');return r.provider.current()!;}
 test('keys get real session minimum, maximum and average from accepted Mac readings',async()=>{
 	const r=rig();
 	let snapshot=await readSmc(r,100,30);let reading=snapshot.byKey.get(smcKey)!;
@@ -183,7 +183,7 @@ test('Mac17,9 gets a CPU average, hottest CPU core and fan average from the actu
 	const r=rig();const snapshot=await readM5(r,100);
 	assert.equal(snapshot.byKey.get(CPU_AVERAGE)?.value,48.5);assert.equal(snapshot.byKey.get(CPU_HOTTEST)?.value,57);assert.equal(snapshot.byKey.get(FAN_AVERAGE)?.value,2500,'target, minimum and maximum rows stay out of the fan average');
 	assert.deepEqual(COMPUTED.map(key=>[snapshot.byKey.get(key)?.label,groupOf(snapshot,key),snapshot.byKey.get(key)?.type,snapshot.byKey.get(key)?.unit]),[['CPU average','CPU',1,'°C'],['CPU hottest core','CPU',1,'°C'],['Fan average','Fans',3,'RPM']]);
-	assert.deepEqual(r.provider.facts().sourceRows,{public:1,smc:CORE_KEYS.length+8});assert.equal(r.provider.facts().computedRows,3,'computed readings are counted apart from the SMC rows they come from');
+	assert.deepEqual(r.provider.facts().sourceRows,{public:1,smc:CORE_KEYS.length+8,health:0});assert.equal(r.provider.facts().computedRows,3,'computed readings are counted apart from the SMC rows they come from');
 	r.provider.close();
 });
 test('a computed reading is as old as its oldest input and keeps its own session',async()=>{
@@ -225,5 +225,44 @@ test('computed readings expire with their oldest input when SMC stops answering'
 	const r=rig();await readM5(r,100,next=>{next.rows[0]!.continuousMs=90;});
 	r.clock.now=90+TTL_MS-1;r.provider.read();await publish(r,'public',packet('public',r.clock.now));assert.ok(r.provider.current()!.byKey.has(CPU_AVERAGE));
 	r.clock.now=90+TTL_MS;assert.equal(r.provider.current()!.byKey.get(CPU_AVERAGE),undefined,'the oldest core expired, so the average did too');
+	r.provider.close();
+});
+// Battery and drive health (TG Pro parity tier C): a third native source over public IOKit interfaces.
+/** Mirrors HEALTH_MIN_SPACING_MS in src/mac/provider.ts: the shortest time between two health read requests. */
+const HEALTH_MIN_SPACING_MS=1500;
+const CYCLES='mac:v1:health:battery-cycles:count.v1',BATTERY_HEALTH='mac:v1:health:battery-health:percent.v1',SSD='mac:v1:health:ssd-temperature:temp.v1';
+type HealthRow=[key:string,label:string,group:string,kind:string,unit:string,value:number];
+const HEALTH_ROWS:HealthRow[]=[['battery-cycles','Battery cycles','Battery','count','cycles',82],['battery-health','Battery health','Battery','percent','%',92.1],['ssd-temperature','Internal SSD','Storage','temperature','°C',35.85]];
+function healthPacket(at:number,rows:HealthRow[]=HEALTH_ROWS):NativePacket {const next=packet('health',at);next.rows=rows.map(([key,label,group,kind,unit,value])=>({...smcRow(key,group,kind,unit,value,at),label}));return next;}
+async function readAll(r:ReturnType<typeof rig>,at:number,health:NativePacket|null=healthPacket(at)):Promise<SensorSnapshot>{r.clock.now=at;r.provider.read();await publish(r,'public',packet('public',at));await publish(r,'smc',packet('smc',at));if(health)await publish(r,'health',health);return r.provider.current()!;}
+test('health rows are keyed by a fixed name and meaning, the same on every Mac',()=>{
+	const row=(key:string,kind:string):NativeRow=>({...packet('health').rows[0]!,key,kind});
+	assert.equal(measurementKey('health',row('battery-cycles','count'),'Mac17,9'),CYCLES);assert.equal(measurementKey('health',row('battery-health','percent'),'Mac16,1'),BATTERY_HEALTH);assert.equal(measurementKey('health',row('ssd-temperature','temperature'),''),SSD,'no model segment');
+	for(const [source,key,kind] of [['health','memory-total','other'],['health','ssd-serial','other'],['health','battery-cycles','unknown'],['public','battery-cycles','count'],['smc','battery-cycles','count']] as const)assert.equal(measurementKey(source,row(key,kind),'Mac17,9'),null,`${source} ${key} ${kind}`);
+});
+test('battery cycles, battery health and the internal SSD temperature are accepted as their own source',async()=>{
+	const r=rig();const snapshot=await readAll(r,100);
+	assert.deepEqual([CYCLES,BATTERY_HEALTH,SSD].map(key=>{const reading=snapshot.byKey.get(key);return [reading?.label,groupOf(snapshot,key),reading?.type,reading?.unit,reading?.value];}),[['Battery cycles','Battery',8,'cycles',82],['Battery health','Battery',8,'%',92.1],['Internal SSD','Storage',1,'°C',35.85]]);
+	assert.deepEqual(r.provider.facts().sourceRows,{public:1,smc:1,health:3});
+	r.provider.close();
+	for(const [value,kept] of [[101,true],[200,true],[200.5,false],[-1,false]] as const){const next=rig();const health=await readAll(next,100,healthPacket(100,[['battery-health','Battery health','Battery','percent','%',value]]));assert.equal(health.byKey.has(BATTERY_HEALTH),kept,`battery health ${value}`);next.provider.close();}
+	const cycles=rig();assert.equal((await readAll(cycles,100,healthPacket(100,[['battery-cycles','Battery cycles','Battery','count','cycles',-1]]))).byKey.has(CYCLES),false,'a negative count is withheld');cycles.provider.close();
+});
+test('the health source is read at most every 1.5 s and its readings keep their own acquisition time in between',async()=>{
+	const r=rig();await readAll(r,100);
+	r.clock.now=100+HEALTH_MIN_SPACING_MS-1;r.provider.read();assert.deepEqual([...r.pending.keys()].sort(),['public','smc'],'too soon for another health read');
+	await publish(r,'public');await publish(r,'smc');const between=r.provider.current()!;
+	assert.equal(between.byKey.get(CYCLES)?.observationTime,100,'the skipped read never freshens a health reading');assert.equal(between.byKey.get(SSD)?.value,35.85);
+	r.clock.now=100+HEALTH_MIN_SPACING_MS;r.provider.read();assert.deepEqual([...r.pending.keys()].sort(),['health','public','smc']);
+	await publish(r,'public');await publish(r,'smc');await publish(r,'health',healthPacket(r.clock.now,[HEALTH_ROWS[0]!,HEALTH_ROWS[1]!,[...HEALTH_ROWS[2]!.slice(0,5),36.85] as HealthRow]));
+	const ssd=r.provider.current()!.byKey.get(SSD)!;assert.deepEqual([ssd.value,ssd.valueMin,ssd.valueMax,ssd.observationTime],[36.85,35.85,36.85,100+HEALTH_MIN_SPACING_MS]);
+	r.provider.close();
+});
+test('a failed, missing or expired health read removes only health readings',async()=>{
+	const r=rig();await readAll(r,100);
+	const failed=healthPacket(1700);failed.error=12;let snapshot=await readAll(r,1700,failed);
+	assert.deepEqual([CYCLES,BATTERY_HEALTH,SSD].filter(key=>snapshot.byKey.has(key)),[]);assert.equal(snapshot.readings.length,2,'system and SMC readings stay');assert.equal(r.provider.facts().sourceErrors.health?.operation,'health.read');
+	snapshot=await readAll(r,3300,healthPacket(3300,HEALTH_ROWS.slice(0,2)));assert.deepEqual([CYCLES,BATTERY_HEALTH,SSD].filter(key=>snapshot.byKey.has(key)),[CYCLES,BATTERY_HEALTH],'a drive row missing from the packet is a gap');
+	r.clock.now=3300+TTL_MS;assert.throws(()=>r.provider.current(),{reason:'no-readable-sensors'},'health rows expire on the same TTL as every other reading');
 	r.provider.close();
 });

@@ -1,5 +1,7 @@
 /** Internal read-only addon contract. No native resource identifier crosses it. */
-export type NativeSource = 'public' | 'smc';
+export type NativeSource = 'public' | 'smc' | 'health';
+/** Every source a read asks, in request order. */
+export const NATIVE_SOURCES: readonly NativeSource[] = ['public', 'smc', 'health'];
 export interface NativeRow {
 	key: string; label: string; group: string; kind: string; unit: string;
 	value: number; valid: boolean; continuousMs: number; wallSeconds: number;

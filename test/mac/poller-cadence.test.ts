@@ -38,23 +38,28 @@ type Emit = { at: number; signature: string; smc: boolean; mem: boolean; cpu: bo
 interface Rig { poller: MacPoller; emits: Emit[]; reads: Record<NativeSource, number[]> }
 /** Read duration in ms: fixed, or by the 1-based count of that source's reads (the first read of a session is the slow cold one). */
 type Delay = number | ((n: number) => number);
-/** Real MacPoller and MacProvider over a fake bridge whose reads settle after a delay per source. */
-function rig(delay: Record<NativeSource, Delay>, options: { smcError?: boolean; publicError?: (n: number) => boolean; cpu?: boolean; intervalMs?: number; clock?: false; asleepMs?: () => number; clockFails?: () => boolean } = {}): Rig {
-	const reads: Record<NativeSource, number[]> = { public: [], smc: [] };
+/** Mirrors HEALTH_MIN_SPACING_MS in src/mac/provider.ts: at the 1 s default the health source is asked every second read. */
+const HEALTH_MIN_SPACING_MS = 1500;
+/**
+ * Real MacPoller and MacProvider over a fake bridge whose reads settle after a delay per source. The health source answers
+ * with no rows after public's delay unless a test sets its own, so it never changes when a read's last source settles.
+ */
+function rig(delay: { public: Delay; smc: Delay; health?: Delay }, options: { smcError?: boolean; publicError?: (n: number) => boolean; cpu?: boolean; intervalMs?: number; clock?: false; asleepMs?: () => number; clockFails?: () => boolean } = {}): Rig {
+	const reads: Record<NativeSource, number[]> = { public: [], smc: [], health: [] };
 	// asleepMs: time the Mac spent asleep so far. The native continuous clock counts it; the awake clock and Node timers do not.
 	// clockFails: the native clock reads NaN, as when mach_timebase_info fails.
 	const continuous = (): number => (options.clockFails?.() ? NaN : Date.now() + (options.asleepMs?.() ?? 0));
 	const row = (key: string, kind: string, unit: string, value: number, at: number): NativeRow => ({ key, label: key, group: kind === 'temperature' ? 'Battery' : 'Memory', kind, unit, value, valid: true, continuousMs: at, wallSeconds: 1.7e9 + at / 1000, error: 0, systemCode: 0 });
 	const packet = (source: NativeSource, n: number, at: number): NativePacket => ({
 		source, continuousMs: at, awakeMs: at - (options.asleepMs?.() ?? 0), wallSeconds: 1.7e9 + at / 1000, durationMs: 1, error: (source === 'smc' && options.smcError) || (source === 'public' && options.publicError?.(n)) ? 12 : 0, systemCode: 0, operation: 'fixture',
-		rows: source === 'public' ? [row('memory-free', 'other', 'B', 1e9 + n * 4096, at)] : options.smcError ? [] : [row('TB1T', 'temperature', '°C', 40 + (n % 9), at)],
+		rows: source === 'public' ? [row('memory-free', 'other', 'B', 1e9 + n * 4096, at)] : source === 'health' || options.smcError ? [] : [row('TB1T', 'temperature', '°C', 40 + (n % 9), at)],
 		model: 'Mac17,9', chip: 't6050', appleSilicon: 1, translated: 0, translationError: 0, fontAvailable: true, cpuValid: options.cpu === true, cpuTicks: [[Math.floor(at / CPU_TICK_MS) * 3, 0, Math.floor(at / CPU_TICK_MS) * 7, 0]],
 		networkValid: false, networkIn: '0', networkOut: '0', networkMembers: '1', storageValid: false, storageRead: '0', storageWrite: '0', storageMembers: '1'
 	});
 	const bridge: NativeBridge = {
 		getBuildInfo: () => ({ protocol: 1, napi: 8, version: 'test', sourceId: 'test', arch: process.arch, platform: 'darwin', testHooks: true }),
 		now: continuous,
-		open: () => ({ read: (source) => { const at = continuous(); const n = reads[source].push(Date.now() - START_MS); return new Promise((resolve) => { const ms = delay[source]; setTimeout(() => resolve(packet(source, n, at)), typeof ms === 'number' ? ms : ms(n)); }); }, close: () => {} })
+		open: () => ({ read: (source) => { const at = continuous(); const n = reads[source].push(Date.now() - START_MS); return new Promise((resolve) => { const ms = delay[source] ?? delay.public; setTimeout(() => resolve(packet(source, n, at)), typeof ms === 'number' ? ms : ms(n)); }); }, close: () => {} })
 	};
 	const poller = poller0((ready) => {
 		const provider = new MacProvider(bridge, ready);
@@ -217,7 +222,9 @@ test('coalescing changes no measurement: own acquisition times, one sample and o
 	const starts = Array.from({ length: READS + 1 }, (_, k) => k * INTERVAL_MS);
 	// The provider's one counter rebaseline read (250 ms after the first public request) is a genuine extra public observation.
 	const publicStarts = [0, 250, ...starts.slice(1)];
-	assert.deepEqual(reads, { public: publicStarts, smc: starts });
+	// One interval after a health request is inside HEALTH_MIN_SPACING_MS and two are not, so health is read every second tick.
+	assert.ok(INTERVAL_MS < HEALTH_MIN_SPACING_MS && 2 * INTERVAL_MS >= HEALTH_MIN_SPACING_MS);
+	assert.deepEqual(reads, { public: publicStarts, smc: starts, health: starts.filter((_, k) => k % 2 === 0) });
 	assert.equal(poller.getSeries(MEM)?.length, publicStarts.length);
 	assert.equal(poller.getSeries(SMC)?.length, starts.length);
 	const stats = new SessionStatsStore();
@@ -248,7 +255,7 @@ test('the last release cancels a pending settle window and stops acquisition', a
 	const count = emits.length;
 	await advance(3 * INTERVAL_MS);
 	assert.equal(emits.length, count);
-	assert.deepEqual(reads, { public: [0], smc: [0] });
+	assert.deepEqual(reads, { public: [0], smc: [0], health: [0] });
 });
 
 test('counter readings appear about 250 ms after a key appears or returns, with no extra reads afterwards', async () => {
