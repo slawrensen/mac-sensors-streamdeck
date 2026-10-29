@@ -46,7 +46,7 @@ The package requires Stream Deck 7.1 or later, which plugins that use the Node 2
 
 ## Readings measured on the M5 Pro
 
-On Mac17,9 with the M5 Pro and macOS 27.0.1, the picker lists 52 readings: 14 from macOS system counters and 38 from the SMC. Another Mac can report a different set.
+On Mac17,9 with the M5 Pro and macOS 27.0.1, the picker lists 65 readings: 14 from macOS system counters and 51 from the SMC. Another Mac can report a different set.
 
 | Group | Readings on the measured Mac | Source |
 | --- | --- | --- |
@@ -56,8 +56,8 @@ On Mac17,9 with the M5 Pro and macOS 27.0.1, the picker lists 52 readings: 14 fr
 | Storage | Startup volume total and available; storage read and write rates | System counters |
 | Network | Network receive and send rates | System counters |
 | Battery | Battery and Battery 2 temperatures; Battery power | SMC |
-| Fans | Fan 1 and Fan 2 speeds | SMC |
-| System | NAND, Airport, Airflow left and Airflow right temperatures; DC In and System Total power; DC In current; DC In voltage | SMC |
+| Fans | Fan 1 and Fan 2 speeds; their target, minimum and maximum speeds | SMC |
+| System | NAND, Airport, Airflow left, Airflow right and Airflow top temperatures; Charger proximity, Power supply proximity, Thunderbolt left, Thunderbolt right, Trackpad and Trackpad actuator temperatures; DC In and System Total power; DC In current; DC In voltage | SMC |
 
 CPU and GPU clock speeds, private GPU usage and the HID temperature channels are not offered. [Data sources](data-sources.html) explains what each reading family means.
 

@@ -25,7 +25,7 @@ Version 1.0.1.0 is published as a GitHub release, and its downloads require repo
 | [Sensor details](sensor-details.html) | A **Press** choice on Sensor Reading: a page of tiles for the reading's group or your own list, with a Back tile | Decks with a bundled detail view ([Sensor details support](hardware.html#sensor-details-support)) |
 | [Sensor Control](dial-controls.html#the-sensor-control-key-action) | Steers Sensor Dials: next or previous reading, pause, pin, reset statistics | Any key, pedal or Multi Action step |
 
-Which readings appear depends on the Mac and its macOS version. The measured M5 Pro reports 52: 14 from system counters and 38 from the SMC ([Readings measured on the M5 Pro](hardware.html#readings-measured-on-the-m5-pro)). CPU and GPU clock speeds and GPU usage are not offered.
+Which readings appear depends on the Mac and its macOS version. The measured M5 Pro reports 65: 14 from system counters and 51 from the SMC ([Readings measured on the M5 Pro](hardware.html#readings-measured-on-the-m5-pro)). CPU and GPU clock speeds and GPU usage are not offered.
 
 ## What it does not do
 

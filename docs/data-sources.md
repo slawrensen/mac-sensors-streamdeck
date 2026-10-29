@@ -60,15 +60,15 @@ When a worked-out reading is left out, a key showing only that reading shows **S
 
 The native reader opens the `AppleSMC` service and, for each key in its table, asks for the key's type and size once per connection, then reads its value on every read. Its transport accepts three read-only SMC commands and rejects any other command before it reaches the SMC. It checks the reply's length and firmware status, decodes the types `flt`, `sp78`, `fpe2`, `ui8`, `ui16` and `ui32`, and withholds anything else.
 
-The table has 61 candidate SMC keys. Keys that the SMC on this Mac does not have are left out.
+The table has 74 candidate SMC keys. Keys that the SMC on this Mac does not have are left out.
 
 | Applies to | SMC keys | Readings |
 | --- | --- | --- |
 | Every Mac | 31 | CPU and GPU diode and proximity, battery and Airport temperatures; memory and DC In voltage; CPU and GPU high side, DC In and battery current; CPU package, GPU, battery, DC In, memory and system power; Fan 1 to Fan 8 |
 | Mac computers with Apple silicon | 4 more | Airflow left, Airflow right, NAND and Battery 2 temperatures |
-| Mac17,9 with the t6050 chip only | 26 more | CPU super core and performance core temperatures, GPU 1 to GPU 8 temperatures |
+| Mac17,9 with the t6050 chip only | 39 more | CPU super core and performance core temperatures, GPU 1 to GPU 8 temperatures; Airflow top, Charger proximity, Power supply proximity, Thunderbolt left and right, Trackpad and Trackpad actuator temperatures; Fan 1 and Fan 2 target, minimum and maximum speeds |
 
-On the measured Mac17,9 with an M5 Pro, 38 of the 61 SMC keys answer. Any other model with Apple silicon receives the first two rows, and an Intel Mac the first row only; on both, the plugin log records `This model uses common typed sensors; its generation-specific catalog is not qualified.` A Mac without fans need not report fan readings. For the state of Intel validation, see [Hardware compatibility](hardware.html).
+On the measured Mac17,9 with an M5 Pro, 51 of the 74 SMC keys answer. Any other model with Apple silicon receives the first two rows, and an Intel Mac the first row only; on both, the plugin log records `This model uses common typed sensors; its generation-specific catalog is not qualified.` A Mac without fans need not report fan readings. For the state of Intel validation, see [Hardware compatibility](hardware.html).
 
 Each kind of reading has a range. A value outside it is withheld, never shown:
 

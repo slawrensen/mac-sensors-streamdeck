@@ -16,7 +16,7 @@ Each source owns one asynchronous work slot across all sessions in the Node envi
 
 ## Catalog and exclusions
 
-The initial bounded table has 61 candidate SMC keys. The generation-specific table is qualified only for the observed Mac17,9/t6050 model/chip pair; unknown pairs retain common typed keys. Readings identify the exact model, four key bytes and a semantic revision. Display labels and build identifiers are not part of measurement identity. Selected names/key associations are documented in provenance.json and NOTICE.md.
+The bounded table has 74 candidate SMC keys. The generation-specific table is qualified only for the observed Mac17,9/t6050 model/chip pair; unknown pairs retain common typed keys. Readings identify the exact model, four key bytes and a semantic revision. Display labels and build identifiers are not part of measurement identity. Selected names/key associations are documented in provenance.json and NOTICE.md.
 
 On the development M5 Pro, the initial native provider observed 38 SMC readings and 14 public/derived readings. That is one host observation, not a promise that another Mac offers the same catalog. The public readings are CPU activity, named VM page counts, swap use, startup-volume space and aggregate network/storage rates. The first sample, counter resets, membership changes and a detected sleep gap withhold derived rates until a new baseline exists. Memory fields are the named Mach counters, not an imitation of Activity Monitor's Memory Used.
 
