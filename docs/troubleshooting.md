@@ -191,7 +191,7 @@ See [Temperature unit](sensor-reading.html#temperature-unit) and [Data units](se
 Check these first:
 
 1. **The threshold unit.** **Warn at** and **Critical at** compare the current value in the reading's own unit: °F when **°F** is on. Byte and rate readings compare the source number in bytes or bytes per second, before **Data units** rescales the display. 100 Mbps is `12500000`; 8 GB is `8000000000`.
-2. **The direction.** By default the alert fires at or above the number. For readings where low is bad, such as a fan or available space, tick **Alert when the value drops to or below these numbers (for fans and clocks)**.
+2. **The direction.** By default the alert fires at or above the number. For readings where low is bad, such as a fan or available space, tick **Alert when the value drops to or below these numbers (for fans and free space)**.
 3. **A key with several readings.** Only reading 1 is checked, and it recolors the whole key.
 4. **A dial.** Warn, Critical and the bar ends apply only to readings in the unit that was on the dial when you last changed any of them, so a temperature limit never fires on a fan. Change a limit while the reading you want is on the dial.
 5. **What an alert changes.** A dial stays in its theme: only the range bar's fill, or an overview row's value, turns amber or red. A key checks the live value even while it shows **MIN**, **MAX** or **AVG**, so a maximum past a limit does not color the key. See [Alerts on a dial](sensor-dial.html#alerts-on-a-dial).

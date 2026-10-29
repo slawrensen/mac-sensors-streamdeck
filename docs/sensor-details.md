@@ -114,8 +114,6 @@ Examples, by these rules:
 | `?PU*` | readings in groups whose name is one character plus PU: CPU and GPU (anchored start) |
 | `*` | every reading, paged |
 
-The **Filter** field's sample text, `*4090*`, and the help's example, `*gpu*fan*`, match no Mac reading. Start from a pattern in the table above.
-
 Which readings exist depends on the Mac model and macOS version, so a pattern's matches differ from one Mac to another; the panel's count shows what this Mac reports now. See [Data sources](data-sources.html).
 
 An empty pattern refuses entry with the Stream Deck alert triangle, and the panel says *Type a pattern; the view refuses to open while it is empty.* A pattern that matches nothing opens an empty view reading `0 / 0`, and the panel warns *Matches nothing right now; the view would open empty (0 / 0).* Leading and trailing spaces are trimmed, and everything past 128 characters is cut. The panel's live count reflects all of this before you press.

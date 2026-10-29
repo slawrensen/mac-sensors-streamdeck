@@ -4,11 +4,11 @@ import type { StatusKeyOptions } from '../ui/key-renderer';
 export { keyLabel, noSelectionScreen } from '../ui/state-screens';
 const COPY: Record<string, { lines: [string,string]; hint: string; accent: string; icon: StatusKeyOptions['icon'] }> = {
 	pending: { lines: ['Reading sensors','please wait'], hint: 'Readings appear after the first successful sample.', accent:'#4cc2ff', icon:'clock' },
-	busy: { lines: ['Source busy','retrying'], hint: 'The source is busy. Choose Check again to request another check.', accent:'#f5a623', icon:'clock' },
+	busy: { lines: ['Source busy','retrying'], hint: 'The first read has not finished after 15 seconds. Choose Check again.', accent:'#f5a623', icon:'clock' },
 	'no-readable-sensors': { lines: ['No sensor data','copy report'], hint: 'No readable sensors were found. Choose Copy support report under Advanced, Support.', accent:'#f5a623', icon:'warning' },
 	'access-denied': { lines: ['Access denied','copy report'], hint: 'macOS denied a read. Choose Copy support report under Advanced, Support.', accent:'#ff5d52', icon:'lock' },
-	'unsupported-platform': { lines: ['Needs macOS','check requirements'], hint: 'This build needs a supported Mac and app version. Open Installation and requirements in the docs.', accent:'#ff5d52', icon:'warning' },
-	'bridge-failed': { lines: ['Bridge failed','reinstall'], hint: 'The native reader could not load. Reinstall Mac Sensors, then choose Copy support report if it still fails.', accent:'#ff5d52', icon:'warning' },
+	'unsupported-platform': { lines: ['Needs macOS','check requirements'], hint: 'The Node runtime is not macOS on arm64 or x86_64. Open Installation and requirements in the docs.', accent:'#ff5d52', icon:'warning' },
+	'bridge-failed': { lines: ['Bridge failed','reinstall'], hint: 'The native reader could not load. Quit and reopen Stream Deck; if it still fails, reinstall Mac Sensors and choose Copy support report.', accent:'#ff5d52', icon:'warning' },
 	'font-missing': { lines: ['Tahoma needed','Open Font Book'], hint: 'Install Tahoma Bold in Font Book, then choose Check again.', accent:'#4cc2ff', icon:'warning' },
 	'source-error': { lines: ['Source error','copy report'], hint: 'The sensor source could not be read. Choose Copy support report under Advanced, Support.', accent:'#ff5d52', icon:'warning' },
 	stale: { lines: ['Not updating','check again'], hint: 'No recent measurement is available. Choose Check again.', accent:'#f5a623', icon:'clock' }

@@ -28,7 +28,7 @@
     "pi-common.js": [
       {
         "before": "Pressing the key cycles current → min → max → avg. With Shared Memory these are HWiNFO's own, since HWiNFO started; Gadget has none, so they show N/A.",
-        "after": "Pressing the key cycles current, min, max and avg. Min, max and avg come from this session's reads; they start over after a gap in the reading, or when no Mac Sensors key, dial or detail tile has been shown for 2 seconds.",
+        "after": "Pressing the key cycles current, min, max and avg. Min, max and avg come from this session's reads; they start over after a gap in the reading, or when no Sensor Reading key, Sensor Dial or detail tile has been shown for 2 seconds.",
         "count": 1
       },
       {
@@ -413,6 +413,11 @@
         "before": "<select id=\"shared-poll\" data-setting=\"pollIntervalMs\" data-global data-default=\"1000\">",
         "after": "<select id=\"shared-poll\" data-setting=\"pollIntervalMs\" data-global data-default=\"1000\" aria-describedby=\"poll-help\">",
         "count": 1
+      },
+      {
+        "before": "Alert when the value drops to or below these numbers (for fans and clocks)",
+        "after": "Alert when the value drops to or below these numbers (for fans and free space)",
+        "count": 1
       }
     ],
     "sensor-reading.html": [
@@ -443,7 +448,7 @@
       },
       {
         "before": "\t\t\t\t\t<p class=\"hw-help\" id=\"show-help\">Pressing the key cycles current → min → max → avg. Shared Memory gives HWiNFO's own minimum, maximum and average since it started; Gadget publishes none, so they show N/A.</p>",
-        "after": "\t\t\t\t\t<p class=\"hw-help\" id=\"show-help\">Pressing the key cycles current, min, max and avg. Min, max and avg come from this session's reads; they start over after a gap in the reading, or when no Mac Sensors key, dial or detail tile has been shown for 2 seconds.</p>",
+        "after": "\t\t\t\t\t<p class=\"hw-help\" id=\"show-help\">Pressing the key cycles current, min, max and avg. Min, max and avg come from this session's reads; they start over after a gap in the reading, or when no Sensor Reading key, Sensor Dial or detail tile has been shown for 2 seconds.</p>",
         "count": 1
       },
       {
@@ -464,6 +469,21 @@
       {
         "before": "<select id=\"shared-poll\" data-setting=\"pollIntervalMs\" data-global data-default=\"1000\">",
         "after": "<select id=\"shared-poll\" data-setting=\"pollIntervalMs\" data-global data-default=\"1000\" aria-describedby=\"poll-help\">",
+        "count": 1
+      },
+      {
+        "before": "Alert when the value drops to or below these numbers (for fans and clocks)",
+        "after": "Alert when the value drops to or below these numbers (for fans and free space)",
+        "count": 1
+      },
+      {
+        "before": "placeholder=\"*4090*\"",
+        "after": "placeholder=\"*fan*\"",
+        "count": 1
+      },
+      {
+        "before": "one character (*gpu*fan*).",
+        "after": "one character (*cpu*core*).",
         "count": 1
       }
     ]

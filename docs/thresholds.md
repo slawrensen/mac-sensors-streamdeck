@@ -24,7 +24,7 @@ Alerts change only what the plugin shows: colors, and with **Auto cycle jumps to
 | --- | --- | --- |
 | **Warn at** | The whole face turns amber with near-black text | The single view's bar fill turns amber; in an overview view, the alerting row's value |
 | **Critical at** | The whole face turns red with white text | The single view's bar fill turns red; in an overview view, the alerting row's value |
-| **Alert when the value drops to or below these numbers (for fans and clocks)** | Makes a low value the alarm | Same |
+| **Alert when the value drops to or below these numbers (for fans and free space)** | Makes a low value the alarm | Same |
 
 An empty field shows *Off*. On a dial the fields say what will change, such as *Off (bar turns amber)* in the single view and *Off (row value turns amber)* in an overview view.
 
@@ -70,7 +70,7 @@ The fields also accept exponent notation: `50e9` means 50000000000. That helps w
 
 ## Direction: alert when high or when low
 
-By default higher is worse: the right setting for temperatures, power, CPU usage and transfer rates. Tick **Alert when the value drops to or below these numbers (for fans and clocks)** for readings where low is the problem:
+By default higher is worse: the right setting for temperatures, power, CPU usage and transfer rates. Tick **Alert when the value drops to or below these numbers (for fans and free space)** for readings where low is the problem:
 
 - **Fan speed**, on a fan that should keep spinning.
 - **Startup volume available**, to know when free space drops under a floor.

@@ -55,7 +55,7 @@ The settings in panel order. Settings marked with a layout appear only for that 
 | Display | **Cell colors** | Signal (four hues) | Signal, Pairs, Uniform, or one color per cell; four readings |
 | Display | **Show a small label in each cell** | unticked | four readings |
 | Alerts | **Warn at**, **Critical at** | blank (Off) | any number |
-| Alerts | **Alert when the value drops to or below these numbers (for fans and clocks)** | unticked | ticked makes low values alert |
+| Alerts | **Alert when the value drops to or below these numbers (for fans and free space)** | unticked | ticked makes low values alert |
 | Press | **A press** | Cycles current, min, max, avg | Opens sensor details; Tap cycles; hold opens details |
 | Press | **Readings per tile**, **Title tile text**, **Also go back from this key's own position**, **Details list** | One; blank; ticked; Every reading from this reading's sensor | when a press opens details; see [Sensor details](sensor-details.html) |
 | Press | **Add readings**, **Filter** | none; blank | A custom list, or Readings matching a filter; see [Choosing the list](sensor-details.html#choosing-the-list) |
@@ -148,7 +148,7 @@ A reading's statistics start over:
 
 Changing **Read every** keeps them; it clears sparklines only. There is no reset for a key's statistics.
 
-With the default **A press**, the **How Display works** fold says: *Pressing the key cycles current, min, max and avg. Min, max and avg come from this session's reads; they start over after a gap in the reading, or when no Mac Sensors key, dial or detail tile has been shown for 2 seconds.* Sensor Control keys do not count as shown.
+With the default **A press**, the **How Display works** fold says: *Pressing the key cycles current, min, max and avg. Min, max and avg come from this session's reads; they start over after a gap in the reading, or when no Sensor Reading key, Sensor Dial or detail tile has been shown for 2 seconds.*
 
 A Sensor Dial keeps separate statistics of its own, which can differ from a key's for the same reading; see [Session stats are the dial's own, per reading](sensor-dial.html#session-stats-are-the-dials-own-per-reading).
 
@@ -249,7 +249,7 @@ See [Thresholds and alerts](thresholds.html) for the full behavior and worked ex
 
 ### Direction
 
-**Alert when the value drops to or below these numbers (for fans and clocks)** makes lower worse: the alert fires at or below each number. Use it for fan speed or free space on the startup volume. Unticked *(default)*, higher is worse, for temperatures, power and CPU usage.
+**Alert when the value drops to or below these numbers (for fans and free space)** makes lower worse: the alert fires at or below each number. Use it for fan speed or free space on the startup volume. Unticked *(default)*, higher is worse, for temperatures, power and CPU usage.
 
 ## Pressing the key
 

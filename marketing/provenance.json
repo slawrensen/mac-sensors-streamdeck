@@ -97,15 +97,15 @@
       "kind": "settings-panel capture, simulated host",
       "width": 1920,
       "height": 960,
-      "sha256": "cdb597d01d7aac9cb9de9ebf5ee758333fe69172c3beda81ab6f9e79ffcd97eb",
+      "sha256": "d765e8558930a7b039481b9eebde91dd5f45224f482dc0e5a781deb91ef112ff",
       "inputs": [
         {
           "file": "docs/assets/img/settings-key.png",
-          "sha256": "62aa7f1c18218b4e13aaddd36bc440deeda0fa3b899f9289fb20110282113eb3"
+          "sha256": "eda4462e2b07e37fb85107939f8e9ed4df9d6e96243dccc75db725c4516828ff"
         },
         {
           "file": "docs/assets/img/settings-dial.png",
-          "sha256": "6014f4d5e090bc20736776c31a830ac6d39697b0666599ae9a2cf744ba603dbc"
+          "sha256": "c30d32186573e0bdb188f0f9044e07bd86ced97f7f38d70d5bb55343094e6fb5"
         }
       ]
     },

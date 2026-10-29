@@ -96,12 +96,12 @@ Panel sentences for each status screen:
 | Screen | Panel sentence |
 | --- | --- |
 | Reading sensors | "Readings appear after the first successful sample." |
-| Source busy | "The source is busy. Choose Check again to request another check." |
+| Source busy | "The first read has not finished after 15 seconds. Choose Check again." |
 | No sensor data | "No readable sensors were found. Choose Copy support report under Advanced, Support." |
 | Tahoma needed | "Install Tahoma Bold in Font Book, then choose Check again." |
-| Bridge failed | "The native reader could not load. Reinstall Mac Sensors, then choose Copy support report if it still fails." |
+| Bridge failed | "The native reader could not load. Quit and reopen Stream Deck; if it still fails, reinstall Mac Sensors and choose Copy support report." |
 | Source error | "The sensor source could not be read. Choose Copy support report under Advanced, Support." |
-| Needs macOS | "This build needs a supported Mac and app version. Open Installation and requirements in the docs." |
+| Needs macOS | "The Node runtime is not macOS on arm64 or x86_64. Open Installation and requirements in the docs." |
 
 What the buttons do:
 
