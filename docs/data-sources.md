@@ -142,7 +142,7 @@ Each read asks the system counters and the SMC, and asks the health source when 
 
 Every reading carries its own acquisition time, taken when its read started, not when the answer arrived. A late answer therefore cannot make an older value look newer.
 
-### One publication per read
+### One redraw per read
 
 When a key or dial shows readings from more than one source, the sources that answer first wait for the rest of the read, so the face changes once for that read instead of several times:
 
@@ -154,7 +154,7 @@ When a key or dial shows readings from more than one source, the sources that an
 
 Waiting changes only when the face is drawn. It never changes a reading's acquisition time, and each read still adds one sparkline point and one dial observation.
 
-In a traced run of the final 1.0.1 release candidate, measured as a development copy in the Stream Deck app on the M5 Pro at 1 second, the two sources of a read answered a median 11.5 ms apart and at most 40.2 ms apart (PERF.md). In a separate terminal benchmark of the native reader, two windows of 1,000 reads at 1 second, the SMC part of a read had a median of 11.52 ms and 11.10 ms; the slowest read, 66.39 ms, was in the first window (PERF.md, `scripts/bench-native.mjs`). How long SMC reads take on an Intel Mac is unknown; a source that answers more than 100 ms after the first can change the face twice in one read.
+In a traced run of an earlier 1.0.1 candidate, measured as a development copy in the Stream Deck app on the M5 Pro at 1 second, the two sources of a read answered a median 11.5 ms apart and at most 40.2 ms apart (PERF.md). In a separate terminal benchmark of the native reader, two windows of 1,000 reads at 1 second, the SMC part of a read had a median of 11.52 ms and 11.10 ms; the slowest read, 66.39 ms, was in the first window (PERF.md, `scripts/bench-native.mjs`). How long SMC reads take on an Intel Mac is unknown; a source that answers more than 100 ms after the first can change the face twice in one read.
 
 ### Counter rebaseline
 
@@ -173,7 +173,7 @@ Until the extra read, a key that shows only CPU usage or a rate shows **Sensor m
 
 **Read every** sets how often the plugin reads the system counters and the SMC; the health source is read at most every 1.5 seconds. It is under **Advanced**, **Connection**, marked **All keys and dials**, in both the Sensor Reading and Sensor Dial panels. It is one setting for the whole plugin, not one per key.
 
-**Connection** also says that the plugin reads available sensors on this Mac and does not change hardware settings, that available readings depend on this Mac and macOS version, and that a saved reading stays selected when it is unavailable. It holds **Sensor setup**, three first steps (see [Status screens](status-screens.html#in-the-settings-panel)). Mac Sensors has no data source setting.
+**Connection** also says that the plugin reads available sensors on this Mac and does not change hardware settings, that available readings depend on this Mac and macOS version, and that a saved reading stays selected when it is unavailable. It holds **Sensor setup**, three first steps (see [Status screens](status-screens.html#in-the-settings-panel)).
 
 | Option | Notes |
 | --- | --- |
@@ -181,7 +181,7 @@ Until the extra read, a key that shows only CPU usage or a rate shows **Sensor m
 | 500 ms | |
 | 1 second | Default |
 | 2 seconds | |
-| 5 seconds | Longest. Still well inside the 15-second reading lifetime |
+| 5 seconds | Longest. Inside the 15-second reading lifetime |
 
 The Connection summary shows the effective value, for example "Mac sensors · read every 1 s".
 
@@ -190,14 +190,14 @@ The Connection summary shows the effective value, for example "Mac sensors · re
 - A blank or non-numeric stored value means 1 second. A stored number outside the range is read as the nearest end, so a value above 5 seconds, for example from a configuration document, runs at 5 seconds, and one below 250 ms runs at 250 ms. A number inside the range that the menu does not offer, such as 1500, is used as stored. The stored setting itself is never rewritten.
 - Each read asks the system counters and the SMC for new measurements. How often the SMC itself refreshes a key is unknown, so an SMC value can repeat between reads.
 
-Shorter intervals use more processor time. The final 1.0.1 release candidate, measured as a development copy in the Stream Deck app on the M5 Pro with the development process observer and 32 single-reading keys on a Virtual Stream Deck, used 0.668% of one core at 1 second and 2.478% at 250 ms (PERF.md). An earlier 1.0.1 release candidate in the repository mock host (`scripts/lib/mock-host.mjs`) with six actions used 18 to 19 ms of plugin CPU time per second at 250 ms, about 5 ms at 1 second and about 1 ms at 5 seconds; the app's own drawing cost is not included (PERF.md).
+Shorter intervals use more processor time. As a development copy in the Stream Deck app on the M5 Pro with 32 single-reading keys, the published 1.0.1.0 used 0.704% of one core at 1 second over 24 hours, and an earlier 1.0.1 candidate used 0.668% at 1 second and 2.478% at 250 ms (PERF.md). An earlier 1.0.1 release candidate in the repository mock host (`scripts/lib/mock-host.mjs`) with six actions used 18 to 19 ms of plugin CPU time per second at 250 ms, about 5 ms at 1 second and about 1 ms at 5 seconds; the app's own drawing cost is not included (PERF.md).
 
 ## When reading starts and stops
 
 The plugin reads sensors while at least one Sensor Reading key (the Back tile of a detail page included), Sensor Dial or detail tile is visible on any deck. Sensor Control keys do not count.
 
 - **Reading starts** when one of them appears while reading is stopped: the first time after the plugin starts, or after none has been visible for 2 seconds. Keys show **Reading sensors** until the first read returns, CPU usage and the transfer rates follow about a quarter second later ([Counter rebaseline](#counter-rebaseline)), and the plugin log says `Started (… ms interval)`.
-- **When the last one disappears**, the plugin makes no new regular reads but keeps the reading for 2 seconds. The Stream Deck app removes the old page's actions before it shows the new page's, so changing pages, opening sensor details and pressing Back leave a moment with nothing visible. If one appears again within the 2 seconds, the same reading continues: key MIN, MAX and AVG, sparklines, the counter baseline, the count of fast reads and dial sessions are kept, keys show readings at once instead of **Reading sensors**, CPU usage and the rates do not wait for a new pair, the log shows no new `Started` line, and the next read comes on the next **Read every** tick.
+- **When the last one disappears**, the plugin makes no new regular reads but keeps the reading for 2 seconds. The Stream Deck app removes the old page's actions before it shows the new page's, so changing pages, opening sensor details and pressing Back leave a moment with nothing visible. If one appears again within the 2 seconds, the same reading continues. Key MIN, MAX and AVG, sparklines, the counter baseline, the count of fast reads and dial sessions are kept. Keys show readings at once instead of **Reading sensors**, CPU usage and the rates do not wait for a new pair, and the log shows no new `Started` line. The next read comes on the next **Read every** tick.
 - **Reading stops** 2 seconds after the last one disappeared, if none has appeared since. The plugin closes its reader, clears every sparkline, ends every reading's MIN, MAX and AVG, and logs `Stopped (no visible actions)`. The next appearance starts reading as above, and a dial that returns then shows `stats reset: data gap` once.
 
 The 2 seconds is fixed. This comes from the code and its software tests; how long a page change takes on a physical deck has not been measured.
@@ -206,9 +206,9 @@ The 2 seconds is fixed. This comes from the code and its software tests; how lon
 
 Each reading expires 15 seconds after its own acquisition time and is then removed, at that moment rather than at the next read. Ages are measured on a clock that keeps counting while the Mac sleeps, so changing the system clock cannot extend a reading's life. With **Read every** at most 5 seconds, a source that keeps answering replaces its readings long before they expire.
 
-- A read that fails removes that source's readings at once, and the readings computed from it. The other sources keep serving, with one exception: until a system counter read has succeeded since reading started, the font is unchecked, and keys show **Source error**, or **Source busy** after 15 seconds while a read is still out, instead of SMC readings.
+- A read that fails removes that source's readings at once, and the readings computed from it. The other sources keep serving. One exception: SMC readings wait for the first successful system counter read, which carries the font check. Until then keys show **Source error**, or **Source busy** if a read is still out after 15 seconds.
 - A row that is invalid, out of range, not a finite number or duplicated is withheld.
-- An expired or failed reading is never shown as live. The plugin has no held-value state: a reading is current or it is absent, and an absent reading shows **Sensor missing** on its key or **Sensor missing** / **waiting** on its dial (see [Status screens](status-screens.html#key-screens)).
+- The plugin never draws an expired or failed reading as live. It has no held-value state: a reading is current or it is absent, and an absent reading shows **Sensor missing** on its key or **Sensor missing** / **waiting** on its dial (see [Status screens](status-screens.html#key-screens)).
 - An unchanged value can be a genuine new measurement. A hardware register that stopped changing internally cannot be told apart from a steady one by reading it.
 - Nothing is shown before the first successful read: keys and dials show **Reading sensors** until then.
 
@@ -216,7 +216,7 @@ Sparklines add one point for each new acquisition, not for each redraw, and keep
 
 Each reading's MIN, MAX and AVG take one sample from each accepted read of it. A reading that is withheld, removed by a failed read or expired, or whose unit or type changes, starts its statistics over at its next accepted read, and every reading starts over when reading stops, 2 seconds after the last Sensor Reading key, Sensor Dial or detail tile disappears. A **Read every** change keeps them, and so does a page change inside those 2 seconds. See [Value shown](sensor-reading.html#value-shown-stat-mode).
 
-Dial minimum, maximum and average are local session statistics from genuine observations; a redraw of the same observation does not count again. See [Sensor Dial](sensor-dial.html).
+Dial minimum, maximum and average are local session statistics from new observations; a redraw of the same observation does not count again. See [Sensor Dial](sensor-dial.html).
 
 ## Sleep and wake
 

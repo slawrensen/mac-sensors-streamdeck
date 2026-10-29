@@ -20,7 +20,7 @@ Version 1.0.1.0 is published as a GitHub release, and its downloads require repo
 
 | Action | What it shows | Where it goes |
 | --- | --- | --- |
-| [Sensor Reading](sensor-reading.html) | One to four readings on a key. A single reading can have a sparkline, bar or ring under it. A press cycles min, max and average. Themes, warning and critical colors. | A display key on a deck with keys ([Stream Deck models](hardware.html#stream-deck-models)); physical key checks are pending |
+| [Sensor Reading](sensor-reading.html) | One to four readings on a key. A single reading can have a sparkline, bar or ring under it. A press cycles current, min, max and average. Themes, warning and critical colors. | A display key on a deck with keys ([Stream Deck models](hardware.html#stream-deck-models)); physical key checks are pending |
 | [Sensor Dial](sensor-dial.html) | One reading, two rows or three rows on the touch strip. Turn through a reading set; local session min, max and average. | A dial on a Stream Deck + or + XL |
 | [Sensor details](sensor-details.html) | A **Press** choice on Sensor Reading: a page of tiles for the reading's group or your own list, with a Back tile | Decks with a bundled detail view ([Sensor details support](hardware.html#sensor-details-support)) |
 | [Sensor Control](dial-controls.html#the-sensor-control-key-action) | Steers Sensor Dials: next or previous reading, pause, pin, reset statistics | Any key, pedal or Multi Action step |
@@ -29,17 +29,17 @@ Which readings appear depends on the Mac and its macOS version. The measured M5 
 
 ## What it does not do
 
-Mac Sensors reads. It has no fan control and no way to write a sensor register, installs no privileged helper, daemon or kernel extension, and needs no administrator password. It makes no internet requests and sends no telemetry. You choose when to copy and share a support report. [Privacy](faq.html#privacy) has the details.
+Mac Sensors reads. It has no fan control and cannot write a sensor register. It installs no privileged helper, daemon or kernel extension and needs no administrator password. It makes no internet requests and sends no telemetry. You choose when to copy and share a support report. [Privacy](faq.html#privacy) has the details.
 
 ## Mac Sensors 1.0.1.0
 
-1.0.0.0 was the first release. 1.0.1.0 keeps its native readers byte for byte. It changes what a key shows for MIN, MAX and AVG, keeps reading through page changes, and changes how often keys redraw, how fast counter readings appear and what some status text says. The [changelog](changelog.html) lists every change.
+1.0.0.0 was the first release. 1.0.1.0 ships the same native readers, byte for byte. The [changelog](changelog.html) lists every change.
 
 ### What changed in 1.0.1
 
 | Change | What you see | What you need to do |
 | --- | --- | --- |
-| Key statistics | Pressing a Sensor Reading key, or **Value shown** on **Minimum**, **Maximum** or **Average**, shows the MIN, MAX and AVG that Mac Sensors keeps from the reads since the plugin last started reading sensors, instead of N/A. Detail tiles show the same numbers. They start over after a gap in that reading. Sensor Dials keep their own session statistics as before. | Nothing. A key already set to a statistic shows numbers from its next read. |
+| Key statistics | A Sensor Reading key shows MIN, MAX and AVG instead of N/A, on a press or with **Value shown** on **Minimum**, **Maximum** or **Average**. Mac Sensors keeps them from its reads since the plugin last started reading sensors. Detail tiles show the same numbers. They start over after a gap in that reading. Sensor Dials keep their own session statistics as before. | Nothing. A key already set to a statistic shows numbers from its next read. |
 | Page changes keep reading | Changing pages, opening sensor details or pressing Back keeps reading going: key MIN, MAX and AVG, sparklines, CPU usage and the rates carry on, and keys do not show **Reading sensors**. Reading stops 2 seconds after the last Sensor Reading key, Sensor Dial or detail tile leaves the deck. See [When reading starts and stops](data-sources.html#when-reading-starts-and-stops). | Nothing. |
 | One redraw per read | A key or dial that shows both system and SMC readings changes once per read instead of twice in quick succession, when both sources answer within 100 ms of each other. | Nothing. |
 | **Read every** help | The setting under **Advanced**, **Connection** explains that one shared read updates every reading key and dial, that changing it clears sparkline history, and that shorter intervals use more processor time. | Nothing. |
@@ -49,7 +49,7 @@ Mac Sensors reads. It has no fan control and no way to write a sensor register, 
 | Missing saved reading | A key whose saved reading this Mac does not report says **Sensor missing** and **pick again**. | Pick another reading under **Reading**, or wait until this Mac reports it again. |
 | Intel support reports | When macOS has no translation flag, as on an Intel Mac, the support report's `translation` field now says `native` instead of `unknown`. Physical Intel validation is in progress. | Nothing. |
 | Panel wording | Status text in the settings panel no longer names the plugin as the source of sensor data. The Text font line uses the same spacing as other fields. | Nothing. |
-| Processor time | PERF.md records the final 1.0.1 release candidate and a rebuild of 1.0.0, each run as a development copy in the Stream Deck app 7.5.0 on the M5 Pro with 32 single-reading keys on an 8 by 4 Virtual Stream Deck, sampled by the development process observer. 1.0.1 used 0.668% of one core at 1 second against 0.855% for 1.0.0, and 2.478% against 3.164% at 250 ms. [Performance and resource use](faq.html#performance-and-resource-use) has the limits. | Nothing. |
+| Processor time | PERF.md compares an earlier 1.0.1 candidate, built before key statistics and the 2 second hold, with a rebuild of 1.0.0, each run as a development copy in the Stream Deck app 7.5.0 on the M5 Pro with 32 single-reading keys. The candidate used 0.668% of one core at 1 second against 0.855% for 1.0.0, and 2.478% against 3.164% at 250 ms. The published 1.0.1.0 used 0.704% at 1 second over a 24-hour observation. [Performance and resource use](faq.html#performance-and-resource-use) has the limits. | Nothing. |
 
 ### What is still pending
 
@@ -62,7 +62,7 @@ Mac Sensors reads. It has no fan control and no way to write a sensor register, 
 | App restart, sleep and wake | Pending: not yet observed with a real app restart or a real sleep |
 | Hardware photograph | Pending. The images on these pages are production-rendered sample data or settings-panel captures. |
 
-Unit tests, a mock Stream Deck host and a 24-hour observation on the measured Mac establish software behavior. They do not establish physical readability, dial gestures or Intel hardware behavior. [Hardware compatibility](hardware.html) lists what ran on which Mac and deck.
+Unit tests, a mock Stream Deck host and a 24-hour observation on the measured Mac cover software behavior. They do not cover physical readability, dial gestures or Intel hardware behavior. [Hardware compatibility](hardware.html) lists what ran on which Mac and deck.
 
 ## License and trademarks
 

@@ -10,15 +10,15 @@ Install the plugin, then confirm that Tahoma Bold is present. No separate sensor
 
 ## System requirements
 
-The declared floor is what the package asks for. The last column is what has actually run; the floor is not a list of tested versions.
+The declared floor is what the package asks for; **Actually run** lists the versions that ran on the measured Mac.
 
 | Requirement | Declared floor | Actually run |
 | --- | --- | --- |
 | **macOS** | 13.5 or later | 27.0.1 on an Apple silicon M5 Pro. Hosted CI virtual machines ran the test suite and the native readers on macOS 26.6.2 (Apple silicon) and 26.6.1 (Intel). |
-| **Stream Deck app** | 7.1 or later | 7.5.0 |
-| **Node runtime** | Node 24, supplied by the Stream Deck app. You install nothing. | 24.13.1, the runtime the app chose. The native reader was also checked under 24.22.1. |
+| **Stream Deck app** | 7.1 or later | 7.5.0 and 7.6.0 |
+| **Node runtime** | Node 24, supplied by the Stream Deck app. You install nothing. | 24.13.1 with app 7.5.0 and 24.22.1 with app 7.6.0, the runtimes the app chose. |
 | **Tahoma Bold** | Installed. It ships with macOS. | Present on the measured Mac |
-| **Processor** | The package carries an arm64 reader for Apple silicon and an x86_64 reader for Intel | Apple silicon measured. The x86_64 native reader in 1.0.1 is byte-identical to the one in 1.0.0. Hosted Intel CI runners (a virtual machine with an emulated SMC) loaded that exact file and read live system and SMC values for both 1.0.0 and the 1.0.1 release candidate. Physical Intel validation is in progress. |
+| **Processor** | The package carries an arm64 reader for Apple silicon and an x86_64 reader for Intel | Apple silicon measured. Intel ran only on hosted virtual machines; physical Intel validation is in progress ([Mac](hardware.html#mac)). |
 | **A deck** | **Sensor Reading** goes on a display key. **Sensor Dial** goes on a dial of a Stream Deck + or + XL. **Sensor Control** can go on any key, including a Stream Deck Pedal or Corsair G-Keys (not checked on hardware), and steers dials on another deck ([Stream Deck models](hardware.html#stream-deck-models)). | The 8 by 4 Virtual Stream Deck. Physical Stream Deck key checks and Stream Deck + dial gestures are pending. |
 
 Mac Sensors needs no administrator password, privileged helper, daemon or kernel extension. Which readings appear depends on the Mac and its macOS version. The [compatibility matrix](hardware.html#compatibility-matrix) lists every Mac and deck row with its evidence.
@@ -35,11 +35,11 @@ Version 1.0.1.0 is published as a GitHub release, and its downloads require repo
 2. In Finder, double-click `com.lawrensen.mac.streamDeckPlugin`. The Stream Deck app asks whether to install it. Choose **Install**.
 3. Find the **Mac Sensors** category in the actions list. It holds **Sensor Reading**, **Sensor Dial** and **Sensor Control**.
 
-A file you download with a browser keeps the macOS download quarantine. On the measured Mac, Finder opened a quarantined package and passed it to the Stream Deck app without clearing the quarantine first.
+A browser download keeps the macOS quarantine flag. You do not need to clear it. On the measured Mac, Finder passed a quarantined package straight to the Stream Deck app.
 
 ### Check the download
 
-If your copy came with a `SHA256SUMS.txt` file, as each GitHub release of the package does (the releases require repository access), put the package, `native-manifest.json` and `SHA256SUMS.txt` from the same release in one folder and run this there:
+Each GitHub release includes `SHA256SUMS.txt`. Put the package, `native-manifest.json` and `SHA256SUMS.txt` from the same release in one folder and run:
 
 ```sh
 shasum -a 256 -c SHA256SUMS.txt
@@ -47,17 +47,17 @@ shasum -a 256 -c SHA256SUMS.txt
 
 Each line must end in `OK`. A matching checksum identifies the published bytes. It does not establish safety. The two native readers are ad-hoc signed: that checks file integrity, and it is not a Developer ID certificate or notarization. To inspect an extracted reader, run `codesign --verify --strict <file>` and `codesign -dv --verbose=4 <file>`.
 
-Before loading a reader, the plugin compares the file's SHA-256 with the record inside the package. A file that does not match is not loaded, and keys show **Bridge failed**. Quit and reopen Stream Deck. If it persists, remove Mac Sensors and install it again; opening the same version over itself changes nothing. [Removing](#removing) has the steps.
+Before loading a reader, the plugin compares the file's SHA-256 with the record inside the package. A file that does not match is not loaded, and keys show **Bridge failed**. Quit and reopen Stream Deck. If it persists, remove Mac Sensors and install it again ([Removing](#removing)).
 
 ### Elgato Marketplace
 
-Mac Sensors is not on the Elgato Marketplace yet. Elgato repackages Marketplace copies, so a Marketplace package checksum can differ from the GitHub package checksum. Do not compare the two. Opening a Marketplace copy of the same version as the one already installed changes nothing, as for any equal version ([Updating](#updating)); remove Mac Sensors first if you want the Marketplace copy in its place.
+Mac Sensors is not on the Elgato Marketplace yet. Elgato repackages Marketplace copies, so their checksums can differ from the GitHub package's. Do not compare the two.
 
 ### Updating
 
 - **Newer version:** open the newer package the same way. The Stream Deck app replaces the installed plugin. Your keys, dials and their settings are kept by the Stream Deck app, not in the plugin folder, so they stay. On the measured Mac, 1.0.0.0 installed this way over an earlier build.
 - **Same version:** opening the package of the version that is already installed changes nothing. The app writes `AlreadyInstalled` to its log in `~/Library/Logs/ElgatoStreamDeck`, the running plugin keeps going, and its files stay as they were. To install the same version again, remove it first.
-- **Detail view:** after an update that changes the bundled detail view, the first time details open on each kind of deck, Stream Deck asks again to install it.
+- **Detail view:** after an update that changes the bundled detail view, the first time details open on each kind of deck, Stream Deck asks again to install it. 1.0.1.0 ships the 1.0.0.0 detail view files unchanged.
 
 ### Removing
 

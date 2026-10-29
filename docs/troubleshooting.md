@@ -61,7 +61,7 @@ It can also return during use if every reading lapses or fails before the sessio
 
 ## Keys show Source busy
 
-15 seconds after reading started, the first read has still not finished: no system counter read has succeeded and at least one source has not answered. The plugin cannot even check the font yet.
+15 seconds after reading started, the first read has still not finished: no system counter read has succeeded and at least one source has not answered. The plugin has not checked the font yet.
 
 1. Choose **Check again**. Each read asks the sources again; a source whose earlier call is still running is asked again once that call returns.
 2. If it stays, copy a support report before anything else: it describes the running plugin, and a restart replaces it. Its `dataSource` section shows the reason, and its `mac` section shows how many readings each source returned (`sourceRows`: `public`, `smc` and `health`), how many were computed from them (`computedRows`) and any source error (`sourceErrors`). Until a source has been accepted the `mac` section says `catalog: "not sampled"`, and a read that failed without answering leaves no `sourceErrors` entry; the plugin log then has a `read failed; retrying.` line.
@@ -93,7 +93,7 @@ Your readings, labels, colors and other settings stay as they were, and the same
 
 Before loading its native reader, the plugin checks it. When the Stream Deck app's Node runtime runs as arm64 it uses `bin/hwmac-arm64.node`, and as x86_64 it uses `bin/hwmac-x86_64.node`. The file's SHA-256 must match `bin/native-artifacts.json`, and its build information (protocol, version, source identity, Node-API level, architecture, macOS, not a test build) must match this plugin. **Bridge failed** means a check failed or macOS would not load the file. A load failure alone does not establish whether the file is damaged, missing or blocked.
 
-The result is kept for the life of the plugin process. Quit and reopen Stream Deck. If it persists, remove Mac Sensors and install it again; opening the same version over itself changes nothing.
+The result is kept for the life of the plugin process.
 
 1. Quit and reopen Stream Deck. The new plugin process checks the reader again.
 2. If it persists, export a backup of your Stream Deck profiles, remove Mac Sensors as described in [Removing](installation.html#removing), then open the `.streamDeckPlugin` package again. Removing and reinstalling the same version has not been run on the measured Mac yet.
@@ -182,7 +182,7 @@ Every read takes new measurements, and a reading older than 15 seconds is remove
 
 Temperatures: each key and dial has its own **°F** checkbox under **Display**, **Temperature**. It changes only °C readings, and thresholds follow it. The sparkline is stored in °C and keeps its shape.
 
-Bytes and rates: **Data units**, under **Advanced**, **Shared defaults**, applies to every key and dial. **Decimal (KB, MB, GB; rates in Mbps)** shows rates in bits per second; **Binary (KiB, MiB, GiB; rates in MiB/s)** shows bytes. Memory, swap and startup volume readings follow the same choice.
+Bytes and rates: **Data units**, under **Advanced**, **Shared defaults**, applies to every key and dial. **Decimal (KB, MB, GB; rates in Mbps)** shows rates in bits per second; **Binary (KiB, MiB, GiB; rates in MiB/s)** shows bytes per second. Memory, swap and startup volume readings follow the same choice.
 
 See [Temperature unit](sensor-reading.html#temperature-unit) and [Data units](sensor-reading.html#data-units).
 
@@ -220,7 +220,7 @@ A development link does not install the bundled detail profiles. See [When a pre
 2. **No reading is picked yet.** A new dial shows **Mac Sensors** / **rotate to pick**. Turn it or pick a reading under **On the dial now** in the settings panel.
 3. **Turns specifically do nothing.** Check whether **Ignore turns (protects against accidental bumps)** is ticked, whether the dial shows **pinned**, whether its reading is missing (**Sensor missing** / **waiting** holds the saved pick), whether a status screen shows, and, with **Gestures** set to **Custom**, whether **Turn** is **Do nothing**. The list under **Gestures** says what each gesture does now.
 
-Software gesture traces are tested; checks of physical Stream Deck + dial gestures are pending. See [Dial controls and presets](dial-controls.html) and [Hardware compatibility](hardware.html).
+Synthetic gesture traces replay in software tests; checks of physical Stream Deck + dial gestures are pending. See [Dial controls and presets](dial-controls.html) and [Hardware compatibility](hardware.html).
 
 ## Mac Sensors is missing after install
 
@@ -241,8 +241,8 @@ To install the same version again, export a profile backup, remove Mac Sensors a
 
 The plugin runs one reader however many keys and dials are visible, and stops reading 2 seconds after none is (the log says `Stopped (no visible actions)`).
 
-1. **High CPU at 250 ms.** At **Read every** 250 ms the system counters and the SMC are read four times a second and every changed face is drawn again. The final 1.0.1 release candidate, measured as a development copy in the Stream Deck app on the M5 Pro with the development process observer and 32 single-reading keys, used 2.478% of one core at 250 ms against 0.668% at 1 second (PERF.md). Choose 1 second or longer under **Advanced**, **Connection**.
-2. **Memory.** In a 24-hour observation with the development process observer of the final 1.0.1 release candidate, measured as a development copy in the Stream Deck app with 32 single-reading keys at 1 second on the M5 Pro, resident memory went from 76.94 MiB to 82.08 MiB, with a maximum of 89.25 MiB, 12 threads and 49 to 50 file descriptors (PERF.md). In the shorter back-to-back sessions at 250 ms, the maximum was 95.9 MiB. If you see steady growth, note how many keys and dials are visible and the **Read every** value, and attach the log.
+1. **High CPU at 250 ms.** At **Read every** 250 ms the system counters and the SMC are read four times a second and every changed face is drawn again. An earlier 1.0.1 candidate, measured as a development copy in the Stream Deck app on the M5 Pro with 32 single-reading keys, used 2.478% of one core at 250 ms against 0.668% at 1 second (PERF.md). Choose 1 second or longer under **Advanced**, **Connection**.
+2. **Memory.** Over 24 hours with 32 single-reading keys at 1 second on the M5 Pro, the published 1.0.1.0, run as a development copy, peaked at 92.55 MiB of resident memory with 12 threads and 49 to 50 file descriptors (PERF.md). The earlier candidate peaked at 95.9 MiB in shorter sessions at 250 ms. If you see steady growth, note how many keys and dials are visible and the **Read every** value, and attach the log.
 3. **A plugin process stays after the Stream Deck app quits.** The plugin checks for the app every 30 seconds. After two checks in a row find the app's process gone, it asks the app directly and exits if no answer comes within 15 seconds. The Stream Deck app starts its plugins when it launches; a real app restart with Mac Sensors has not been observed yet. If a Mac Sensors process keeps running well after that, keep the log and file an issue.
 
 
@@ -273,7 +273,7 @@ Useful lines:
 - `MacSensors: This model uses common typed sensors; its generation-specific catalog is not qualified.`: this model gets the common SMC table.
 - `Device connected: "…" (…, 8x4)` and `Device known: …`: one line per deck, with the name you gave it, its type and its key grid.
 - `Detail entry refused: …`: why a detail press showed the Stream Deck alert triangle.
-- `Parent probe failed […]`, `Parent watchdog disabled`, `watchdog standing down` and `Parent process gone, and the app did not answer: exiting.`: the check that ends the plugin when the Stream Deck app is gone. Seeing the exit line while the app is plainly running is worth reporting.
+- `Parent probe failed […]`, `Parent watchdog disabled`, `watchdog standing down` and `Parent process gone, and the app did not answer: exiting.`: the check that ends the plugin when the Stream Deck app is gone. Report the exit line if the app is still running.
 - `Uncaught exception` or `Unhandled rejection`: an unexpected error; please report it with the lines around it.
 
 The `MacSensors` warnings are logged once each time the reader starts. In the 24-hour observation on the M5 Pro the log had no WARN or ERROR lines (PERF.md).

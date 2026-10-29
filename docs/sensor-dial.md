@@ -14,7 +14,7 @@ Dial gestures have not yet been run on a physical Stream Deck +. The gesture map
 
 ![Three Sensor Dial faces: CPU super 1 at 62.4 °C in the one-reading view with its session low 39.9, high 63.7 and a range bar with amber and red zones at the right; the two-row view with CPU super 1 and GPU 1 and their trend lines; and the three-row view with CPU SUPER 1, GPU 1 and FAN 1 under a session line.](assets/img/dials.png)
 
-*Production-rendered sample data with Mac catalog readings under custom labels and illustrative values, drawn with **Accent colors** set to Theme accent everywhere. The minimum, maximum and session tag are local session statistics.*
+*Production-rendered sample data with Mac catalog readings under custom labels and illustrative values, drawn with **Accent colors** set to **Theme accent everywhere**. The minimum, maximum and session tag are local session statistics.*
 
 ## The touchscreen readout
 
@@ -49,7 +49,7 @@ A short message takes the whole stats line for about 1.6 seconds, then the line 
 
 ![The Sensor Dial settings panel with the dial face in its header showing three rows, the theme strip on Void, the Reading section with CPU super core 1 on the dial and a rotation of three readings, and the Display section on Overview, three rows with Row labels, Context line, Separators, Color numbers by sensor type and Reading colors.](assets/img/settings-dial.png)
 
-*Settings-panel capture of the staged 1.0.1.0 panel in a simulated host with sample data. Shared **Accent colors** set to Theme accent everywhere.*
+*Settings-panel capture of the staged 1.0.1.0 panel in a simulated host with sample data. Shared **Accent colors** set to **Theme accent everywhere**.*
 
 Three things keep short labels readable:
 
@@ -89,11 +89,11 @@ The list covers the rotation set (all groups), or the reading on the dial and th
 
 ![Two three-row dial faces with the same readings: on the left every number in the theme's text color, on the right the CPU SUPER 1 value in blue, the GPU 1 value in rose and the FAN 1 value in green, with identical labels, units and layout.](assets/img/reading-colors.png)
 
-*Production-rendered sample data, drawn with **Accent colors** set to Theme accent everywhere. Only the number colors differ between the two faces; geometry and words are the same.*
+*Production-rendered sample data, drawn with **Accent colors** set to **Theme accent everywhere**. Only the number colors differ between the two faces; geometry and words are the same.*
 
 ![The full Sensor Dial settings panel with View on Overview, three rows, Reading colors on Signal (four hues) with a color well and an Auto button for CPU super core 1, GPU 1 and Fan 1, then the Alerts, Controls and Advanced sections open.](assets/img/settings-reading-colors.png)
 
-*Settings-panel capture of the staged 1.0.1.0 panel in a simulated host with sample data, showing individual reading colors. Shared **Accent colors** set to Theme accent everywhere.*
+*Settings-panel capture of the staged 1.0.1.0 panel in a simulated host with sample data, showing individual reading colors. Shared **Accent colors** set to **Theme accent everywhere**.*
 
 **Color numbers by sensor type** is off by default. It needs **Text color** on **Theme text** or **Dimmed**, and **Accent colors** on **By sensor type** under **Advanced**, **Shared defaults**. Numbers then take their sensor type's accent color. On the Paper theme, and for readings whose type has no accent, numbers keep normal text.
 
@@ -114,7 +114,7 @@ Without a rotation set, a turn only walks readings from the same sensor group as
 
 ## Rotation set, Ignore turns, and Auto cycle
 
-Three settings control what rotation can reach.
+Three settings control how rotation moves.
 
 **Rotation set.** Tick readings in the **Readings to rotate through** search (in the **Rotation** group under **Reading**) to build a list. The dial then rotates through only those readings, in list order, wrapping at both ends. Ticking never changes the reading on the dial; the **On the dial now** picker above it does that. The set can mix readings from different sensor groups.
 
@@ -131,7 +131,7 @@ Three settings control what rotation can reach.
 
 **Auto cycle.** A select under **Controls**: **Off** (default), **Every 5 seconds**, **Every 10 seconds**, **Every 30 seconds**, **Every minute** or **Every 5 minutes**. It steps to the next reading in the rotation set, or in the sensor group when there is no set.
 
-- It runs even while turns are ignored, which makes a hands-off tour: build a set, tick **Ignore turns**, set a cycle time.
+- It runs even while turns are ignored. For hands-off rotation, build a set, tick **Ignore turns** and set a cycle time.
 - Any move of the selection, by hand or by the cycle, restarts the timer for a full interval.
 - Each step clears a custom title just like a manual turn, unless **Title when the dial moves on** is **Stays for this dial**.
 - Timing follows **Read every**: the cycle checks on each read, so a step can land up to one read late.
@@ -152,7 +152,7 @@ A dial calculates its own local min, max and average for each reading from the o
 
 ### How a dial's statistics can differ from a key's
 
-A dial and a Sensor Reading key showing the same reading both count one sample per acquisition and average without time weighting, and both start over when the reading goes missing, when its unit or type changes, and when the plugin stops reading sensors, 2 seconds after the last Sensor Reading key, Sensor Dial or detail tile disappears. Their numbers can still differ:
+A dial and a Sensor Reading key both count one sample per acquisition and average without time weighting. Both start over when the reading goes missing, when its unit or type changes, and when the plugin stops reading sensors. Their numbers can still differ:
 
 | Difference | Sensor Reading key and detail tile | Sensor Dial |
 | --- | --- | --- |
@@ -170,7 +170,7 @@ The theme strip, **Reading** and **Display** start open; the other sections star
 | Section | Setting | What it does |
 | --- | --- | --- |
 | Theme strip | **Theme** | **Default** follows the shared theme; a named theme (Void, Graphite, Ultraviolet, Midnight, Forest, Ember, Paper) applies to this dial only. On **Default**, **Change** opens the shared **Theme** under **Advanced**, **Shared defaults**. On a theme picked for this dial, **Make shared** makes it the shared theme and sets this dial back to **Default**. See [Themes and colors](themes.html). |
-| Reading | **On the dial now** | A searchable picker over every reading this Mac reports, each with its value when the list loaded; the button beside it reloads the sensor list. The line under it names what else changes the reading on this dial, from the dial's control map, for example *Turns change this too.* Arrow keys browse, Enter picks, Tab or a click elsewhere closes without changing anything. |
+| Reading | **On the dial now** | A searchable picker over every reading this Mac reports, each with its value when the list loaded; the button beside it reloads the sensor list. The line under it names what else changes the reading on this dial, from the dial's control map, for example *Turns change this too.* Arrow keys browse, Return picks, Tab or a click elsewhere closes without changing anything. |
 | Reading | **Readings to rotate through** | The **Rotation** group: a search whose results tick readings in or out, then the ticked readings in rotation order with the **Earlier**, **Later**, **Rename** and **Remove** toolbar, and **Split into groups**. Empty means every reading of the picked reading's sensor group. See [Rotation set](#rotation-set-ignore-turns-and-auto-cycle). |
 | Reading | **Title on the dial** | A custom title. Blank uses the reading's own name, or the name given with **Rename**. |
 | Reading | **Title when the dial moves on** | **Clears (default)**: a custom title clears whenever the dial moves on to another reading, by a turn, a press or touch set to step, a Sensor Control key or the auto cycle. Picking a reading in the settings panel keeps it. **Stays for this dial** keeps it as a fixed title. |
@@ -202,7 +202,7 @@ Alerts check the current value in the reading's own unit (°F when °F is on). F
 
 By default (both fields blank), the bar spans the **session low to high**, so the fill uses the whole width of the range you have actually seen and grows as new extremes appear. Set **Bar from** and **Bar to** to fix the scale instead, for example `0` and `100` for a percentage, or `30` and `90` for a temperature, so the fill position means the same thing every time you look. You can set one end only; the other stays automatic. A range with no width yet (one observation so far) draws the fill at half.
 
-With **Warn at** or **Critical at** set, the bar's track also marks the threshold zones in muted amber and red, toward the alarmed end (the low end when alerts fire on a drop). An automatic end widens just enough to keep the zones visible, with a little headroom past the threshold. A manual **Bar from** or **Bar to** is never widened; zones outside it are cut off. The zones show where the thresholds sit on the track and keep their muted color. The fill is the live value at full strength: the accent color normally, amber or red while alerting.
+With **Warn at** or **Critical at** set, the bar's track also marks the threshold zones in muted amber and red, toward the alarmed end (the low end when alerts fire on a drop). An automatic end widens to keep the zones visible, with a small margin past the threshold. A manual **Bar from** or **Bar to** is never widened; zones outside it are cut off. The zones show where the thresholds sit on the track and keep their muted color. The fill is the live value at full strength: the accent color normally, amber or red while alerting.
 
 ## Alerts on a dial
 
@@ -213,8 +213,6 @@ Dials take the same **Warn at** and **Critical at** thresholds as keys, compared
 
 Alert colors take priority over individual reading colors and a custom text color. See [Thresholds and alerts](thresholds.html).
 
-The one-reading view has no trend line; its range bar is the indicator there. The two-row overview draws trend lines for its visible readings.
-
 ## Status screens
 
 When sensor data is not available, the touchscreen shows a short two-line message in place of a reading:
@@ -222,12 +220,12 @@ When sensor data is not available, the touchscreen shows a short two-line messag
 | Touchscreen | Meaning and next step |
 | --- | --- |
 | **Reading sensors** / please wait | No reading has arrived since sensor reading started, or every reading lapsed or failed before a full read had completed. Readings appear after the next successful read. |
-| **Source busy** / retrying | The source is still busy. Choose **Check again** in the settings panel to request another check. |
-| **No sensor data** / copy report | No readable sensors were found. Choose **Copy support report** under **Advanced**, **Support**. |
-| **Needs macOS** / check requirements | This build needs a supported Mac and app version. See [Installation and requirements](installation.html). |
-| **Bridge failed** / reinstall | The native reader could not load. Quit and reopen Stream Deck. If it persists, remove Mac Sensors and install it again; opening the same version over itself changes nothing. See [Removing](installation.html#removing) and [Troubleshooting](troubleshooting.html#keys-show-bridge-failed). |
+| **Source busy** / retrying | The first read has not finished 15 seconds after reading started. Choose **Check again** in the settings panel. |
+| **No sensor data** / copy report | Every source answered, but no reading is current. Choose **Check again**; if it stays, choose **Copy support report** under **Advanced**, **Support**. |
+| **Needs macOS** / check requirements | The Node runtime is not macOS on arm64 or x86_64. See [Installation and requirements](installation.html). |
+| **Bridge failed** / reinstall | The native reader could not load. Quit and reopen Stream Deck. If it persists, see [Keys show Bridge failed](troubleshooting.html#keys-show-bridge-failed). |
 | **Tahoma needed** / Open Font Book | A fixed image, drawn without Tahoma. Install Tahoma Bold in Font Book, then choose **Check again**. |
-| **Source error** / copy report | The sensor source could not be read. Choose **Copy support report** under **Advanced**, **Support**. |
+| **Source error** / copy report | A read failed in a way no other screen covers. Choose **Check again**; if it stays, choose **Copy support report** under **Advanced**, **Support**. |
 
 Before you pick a reading, the dial shows **Mac Sensors** / **rotate to pick** with the hint *or use the settings panel*; the first turn picks a reading. If the saved reading is not reported by this Mac, the dial shows **Sensor missing** / **waiting** with the hint *reselect in settings*. Turns are ignored there so your saved pick survives; pick another reading in the panel if it is gone for good. The full list of status screens is on [Status screens](status-screens.html).
 

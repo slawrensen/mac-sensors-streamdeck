@@ -8,7 +8,7 @@ nav_order: 3
 
 Put one live reading on a key, then customize it.
 
-**You need:** macOS 13.5 or later, the Stream Deck app 7.1 or later (it supplies the Node 24 runtime), and Tahoma Bold, which ships with macOS. These are declared floors; [Hardware compatibility](hardware.html) lists what has actually run on which Mac and deck.
+**You need:** macOS 13.5 or later, the Stream Deck app 7.1 or later (it supplies the Node 24 runtime), and Tahoma Bold, which ships with macOS.
 
 ## 1. Install the plugin
 
@@ -30,9 +30,9 @@ Until the first read completes, the key shows **Reading sensors**. Then it shows
 
 ## 4. Select a reading
 
-Click **Reading**, type part of a reading or sensor name such as `cpu super` or `fan`, and choose a result. The list groups readings under CPU, GPU, Memory, Storage, Network, Battery, Fans and System, as far as this Mac reports them.
+Click **Reading**, type part of a reading or group name such as `cpu super` or `fan`, and choose a result. The list groups readings under CPU, GPU, Memory, Storage, Network, Battery, Fans and System, as far as this Mac reports them.
 
-Arrow keys browse, Enter picks, and Tab or a click elsewhere closes the list without changing anything. The button beside the box, **Reload the sensor list**, asks the plugin for the list again. Opening the panel saves nothing.
+Arrow keys browse, Return picks, and Tab or a click elsewhere closes the list without changing anything. The button beside the box, **Reload the sensor list**, asks the plugin for the list again. Opening the panel saves nothing.
 
 ![The Sensor Reading settings panel with cpu typed in the Reading search and the results open under the CPU group: CPU super core 1, 62.4 °C, highlighted, and CPU usage, 37.5 %](assets/img/settings-picker.png)
 
@@ -40,7 +40,7 @@ Arrow keys browse, Enter picks, and Tab or a click elsewhere closes the list wit
 
 ## 5. Confirm a value
 
-The key shows a number and unit, and the settings header shows **Live · Mac sensors**. Readings update once per **Read every** interval, set under **Advanced**, **Connection**: 1 second by default, from 250 ms to 5 seconds. CPU usage and transfer rates are computed from two reads, so they appear about a quarter second after the key appears when it starts reading: the first Mac Sensors key, dial or detail tile shown, or the first after none was shown for 2 seconds. After a page change inside those 2 seconds they continue without a pause.
+The key shows a number and unit, and the settings header shows **Live · Mac sensors**. Readings update once per **Read every** interval, set under **Advanced**, **Connection**: 1 second by default, from 250 ms to 5 seconds. CPU usage and transfer rates need two reads, so they appear about a quarter second after reading starts ([When reading starts and stops](data-sources.html#when-reading-starts-and-stops)).
 
 ![Sensor Reading settings panel: the header with the key face, CPU super 1, CPU super core 1 · CPU and Live · Mac sensors, the theme chips, Reading with Label on the key and Readings on this key, and Display with Text color, Value shown, Decimals, Temperature and Graph under the value set to Sparkline](assets/img/settings-key.png)
 

@@ -9,7 +9,7 @@
 <h1 align="center">Mac Sensors for Stream Deck</h1>
 
 <p align="center">
-  <b>Your Mac, on your keys and dials.</b><br>
+  <b>Live Mac readings on your keys and dials.</b><br>
   Temperatures, fans, power, CPU activity, memory and transfer rates through read-only macOS interfaces.
 </p>
 
@@ -20,20 +20,20 @@
 </p>
 
 <p align="center">
-  <a href="#try-mac-sensors">Try it</a> ·
-  <a href="#give-each-reading-its-space">Keys</a> ·
-  <a href="#open-the-details">Details</a> ·
-  <a href="#keep-a-reading-set-on-a-dial">Dials</a> ·
-  <a href="#share-a-look-keep-local-choices">Themes</a> ·
-  <a href="#choose-readings-and-make-it-yours">Settings</a>
+  <a href="#install">Install</a> ·
+  <a href="#keys">Keys</a> ·
+  <a href="#sensor-details">Details</a> ·
+  <a href="#dials">Dials</a> ·
+  <a href="#themes">Themes</a> ·
+  <a href="#settings">Settings</a>
 </p>
 
 > [!NOTE]
 > **Mac Sensors 1.0.1.0.** This repository and its releases require access. The hosted documentation is public; product source remains private. Physical-device and Intel validation status is recorded in the compatibility guide.
 
-## Try Mac Sensors
+## Install
 
-1. Open Stream Deck and select **Virtual Stream Deck**, or use a connected physical deck.
+1. Install `com.lawrensen.mac.streamDeckPlugin` from the release, then open Stream Deck and select **Virtual Stream Deck** or a connected deck.
 2. Add **Mac Sensors → Sensor Reading** to a key and choose a reading from this Mac's catalog.
 3. Pick a layout, theme and optional thresholds. Click a virtual key to use its configured action.
 
@@ -41,7 +41,7 @@ Needs macOS 13.5+, Stream Deck 7.1+ and Tahoma Bold. Availability varies by Mac;
 
 **More:** [Installation](https://docs.slawrensen.com/mac-streamdeck/installation.html) · [Getting started](https://docs.slawrensen.com/mac-streamdeck/getting-started.html) · [Hardware compatibility](https://docs.slawrensen.com/mac-streamdeck/hardware.html)
 
-## Give each reading its space
+## Keys
 
 Show a large number or put two, three or four readings on one key.
 
@@ -49,13 +49,13 @@ Show a large number or put two, three or four readings on one key.
 
 *Production-rendered sample data using Mac catalog readings and short custom labels.*
 
-- Pick each reading by its stable identity and give it a label you recognize.
+- Pick a reading by name and give it your own label; the key saves its identity, not its list position.
 - Use a sparkline, bar or ring where the layout supports it.
 - Keep a saved selection when a sensor is temporarily unavailable.
 
 **More:** [Sensor Reading](https://docs.slawrensen.com/mac-streamdeck/sensor-reading.html) · [Getting started](https://docs.slawrensen.com/mac-streamdeck/getting-started.html)
 
-## Open the details
+## Sensor details
 
 Put a group of readings behind one key and return through a configurable Back tile.
 
@@ -63,27 +63,27 @@ Put a group of readings behind one key and return through a configurable Back ti
 
 *Production-rendered sample data showing reading cells and navigation.*
 
-- Choose the sensor's group or build a custom list.
-- Mix tile densities while labels and colors travel with their readings.
+- Choose the sensor's group, a filter or a custom list.
+- Mix one- to four-reading tiles; labels and colors move with their readings.
 - Use the second Back tile at the opener's position where supported.
 
 **More:** [Sensor details](https://docs.slawrensen.com/mac-streamdeck/sensor-details.html)
 
-## Keep a reading set on a dial
+## Dials
 
-Turn through readings and groups with one-reading, two-row and overview views.
+Turn through readings and groups with one-reading, two-row and three-row views.
 
 <img src=".github/readme/dials.png" width="100%" alt="Production-rendered dial examples">
 
 *Production-rendered sample data with local session statistics.*
 
-- Keep missing members saved until the same identity returns.
-- Use local session min, max and average from genuine observations.
+- A missing reading keeps its place in the set until it returns.
+- Use local session min, max and average.
 - Choose a preset or assign the individual controls you need.
 
 **More:** [Sensor Dial](https://docs.slawrensen.com/mac-streamdeck/sensor-dial.html) · [Controls and presets](https://docs.slawrensen.com/mac-streamdeck/dial-controls.html)
 
-## Share a look, keep local choices
+## Themes
 
 Choose a theme for the whole deck or override it on one action.
 
@@ -91,13 +91,13 @@ Choose a theme for the whole deck or override it on one action.
 
 *Production-rendered sample data with the same reading in each theme.*
 
-- Seven themes include dark options and Paper.
+- Seven themes: six dark ones and Paper, a light one.
 - Make shared applies your choice as the shared default.
-- Custom text and per-reading colors remain subordinate to alerts.
+- Alert colors override custom text and reading colors.
 
 **More:** [Themes and colors](https://docs.slawrensen.com/mac-streamdeck/themes.html)
 
-## See a threshold crossing
+## Alerts
 
 Warning and critical colors mark the limits you choose for a reading.
 
@@ -106,12 +106,12 @@ Warning and critical colors mark the limits you choose for a reading.
 *Production-rendered sample data. Alert colors are fixed.*
 
 - Warning is amber and critical is red in every theme.
-- Gauge zones stay muted the same way the device draws them.
+- Bars and rings show muted zones at each threshold.
 - Alerts change the display; hardware remains read-only.
 
 **More:** [Thresholds and alerts](https://docs.slawrensen.com/mac-streamdeck/thresholds.html)
 
-## Know when data is unavailable
+## Status screens
 
 Status screens preserve your selection and name the condition the plugin can establish.
 
@@ -120,12 +120,12 @@ Status screens preserve your selection and name the condition the plugin can est
 *Production-rendered sample scenarios.*
 
 - Failed or expired readings do not stay live.
-- Check again requests a new eligible read.
+- Check again asks for a new read.
 - A fixed setup image remains available when Tahoma Bold is missing.
 
 **More:** [Status screens](https://docs.slawrensen.com/mac-streamdeck/status-screens.html) · [Troubleshooting](https://docs.slawrensen.com/mac-streamdeck/troubleshooting.html)
 
-## Give each dial reading its own color
+## Dial reading colors
 
 Keep the same reading set and assign a distinct number color to each row.
 
@@ -134,12 +134,12 @@ Keep the same reading set and assign a distinct number color to each row.
 *Production-rendered sample data. The readings and geometry stay the same.*
 
 - Set individual colors or start with a preset.
-- Keep shared themes and local reading choices together.
+- Reading colors work with every theme, Paper included.
 - Warning and critical colors take priority when thresholds are crossed.
 
 **More:** [Themes and colors](https://docs.slawrensen.com/mac-streamdeck/themes.html) · [Sensor Dial](https://docs.slawrensen.com/mac-streamdeck/sensor-dial.html)
 
-## Choose readings and make it yours
+## Settings
 
 Search this Mac's available readings, then adjust the layout, graph and colors in the settings panel.
 
@@ -148,7 +148,6 @@ Search this Mac's available readings, then adjust the layout, graph and colors i
 *Settings-panel captures from the shipped panel on a simulated host, with sample readings.*
 
 - Search by reading name or browse the grouped catalog.
-- Keep saved selections when a source is temporarily unavailable.
 - Apply a shared look or customize one action.
 
 **More:** [Getting started](https://docs.slawrensen.com/mac-streamdeck/getting-started.html) · [Dial controls](https://docs.slawrensen.com/mac-streamdeck/dial-controls.html)
@@ -157,9 +156,9 @@ Search this Mac's available readings, then adjust the layout, graph and colors i
 
 macOS 13.5 or later, Stream Deck 7.1 or later, and Tahoma Bold. The package includes separate arm64 and x86_64 readers and uses the app's Node 24 runtime. No privileged helper or separate sensor application is installed.
 
-Measured on Apple silicon: an M5 Pro with macOS 27.0.1 and Stream Deck 7.5.0 on the Virtual Stream Deck. The x86_64 reader in 1.0.1 is byte-identical to the one in 1.0.0. Hosted Intel CI runners (a virtual machine with an emulated SMC) loaded that exact file and read live system and SMC values for both 1.0.0 and the 1.0.1 release candidate. Physical Intel validation is in progress.
+Measured on Apple silicon: an M5 Pro with macOS 27.0.1 and Stream Deck 7.5.0 and 7.6.0 on the Virtual Stream Deck. Intel ran only on hosted virtual machines with an emulated SMC; physical Intel validation is in progress.
 
-Sensor availability varies by Mac. The measured M5 Pro catalog includes temperatures, fans, system power, DC input voltage and current, CPU activity, named memory counters, storage space, aggregate transfer rates, battery cycles and health, the internal SSD temperature, and a CPU average, hottest CPU core and fan average computed from SMC readings. CPU/GPU clocks and unqualified private GPU usage are not offered. Keys show minimum, maximum and average that Mac Sensors keeps from its own reads since the plugin started reading sensors; each dial keeps separate session statistics.
+Sensor availability varies by Mac. The measured M5 Pro catalog includes temperatures, fans, system power, DC input voltage and current, CPU activity, named memory counters, storage space, aggregate transfer rates, battery cycles and health, the internal SSD temperature, and a CPU average, hottest CPU core and fan average computed from SMC readings. CPU/GPU clocks and unqualified private GPU usage are not offered. Keys show minimum, maximum and average that Mac Sensors keeps from its own reads since the plugin last started reading sensors; each dial keeps separate session statistics.
 
 [Hardware compatibility](https://docs.slawrensen.com/mac-streamdeck/hardware.html) distinguishes actual app, hosted CI, Rosetta and physical-device evidence. [PERF.md](PERF.md) records timing windows and their limits. Images above use sample data and do not represent a hardware photograph.
 
