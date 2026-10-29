@@ -18,9 +18,9 @@ No. Mac Sensors runs only on macOS. Its manifest declares macOS as the only plat
 
 - macOS 13.5 or later
 - Stream Deck app 7.1 or later, with the Node 24 runtime the app supplies
-- Tahoma Bold installed. It ships with macOS. The plugin checks for it by name on every system read. If it is missing, Sensor Reading keys, Sensor Dials and detail tiles show **Tahoma needed** until it is installed in Font Book; the next read clears the screen, and **Check again** checks at once.
+- Tahoma Bold, which ships with macOS ([Tahoma Bold prerequisite](installation.html#tahoma-bold-prerequisite)).
 
-These are declared floors, not versions that were all run. Measured: Apple silicon M5 Pro, macOS 27.0.1, Stream Deck app 7.5.0 on the Virtual Stream Deck. Physical Stream Deck key checks and Stream Deck + dial gestures are pending. See [Hardware compatibility](hardware.html) and [Installation](installation.html).
+These are declared floors. Measured: Apple silicon M5 Pro, macOS 27.0.1, Stream Deck app 7.5.0 and 7.6.0 on the Virtual Stream Deck. Physical Stream Deck key checks and Stream Deck + dial gestures are pending. See [Hardware compatibility](hardware.html) and [Installation](installation.html).
 
 **Sensor Reading** goes on keys. **Sensor Dial** needs a deck with dials, such as Stream Deck + or Stream Deck + XL.
 
@@ -44,9 +44,9 @@ On the measured Mac17,9 with an M5 Pro, the catalog has 38 SMC readings (tempera
 
 ### Does it run on Intel Mac computers or under Rosetta?
 
-The package carries a separate x86_64 reader, and the plugin loads it whenever its Node runtime is x86_64. The x86_64 native reader in 1.0.1 is byte-identical to the one in 1.0.0. Hosted Intel CI runners (a virtual machine with an emulated SMC) loaded that exact file and read live system and SMC values for both 1.0.0 and the 1.0.1 release candidate. Physical Intel validation is in progress.
+The package carries a separate x86_64 reader, and the plugin loads it whenever its Node runtime is x86_64. Hosted Intel virtual machines with an emulated SMC have loaded it and read values; physical Intel validation is in progress ([Hardware compatibility](hardware.html#mac)).
 
-On Apple silicon the plugin loads its arm64 reader when the Stream Deck app's Node runtime is arm64. Every Node runtime the Stream Deck app supplied on the measured M5 Pro is an arm64-only file, so it does not run under Rosetta. When Node runs as x86_64, the plugin loads the x86_64 reader and the support report's `translation` field says `translated`. Outside the Stream Deck app, x86_64 Node 20, 22 and 24 running under Rosetta loaded that reader and read live values on the M5 Pro. The Stream Deck app itself has not been run under Rosetta, and Rosetta results are not Intel results. See [Hardware compatibility](hardware.html).
+On Apple silicon the plugin loads its arm64 reader when the Stream Deck app's Node runtime is arm64. Every Node runtime the Stream Deck app supplied on the measured M5 Pro is an arm64-only file, so it does not run under Rosetta. When Node runs as x86_64 under Rosetta, the plugin loads the x86_64 reader and the support report's `translation` field says `translated`. Outside the Stream Deck app, x86_64 Node 20, 22 and 24 running under Rosetta loaded that reader and read live values on the M5 Pro. The Stream Deck app itself has not been run under Rosetta, and Rosetta results are not Intel results. See [Hardware compatibility](hardware.html).
 
 ### Why is a reading missing?
 
@@ -60,7 +60,7 @@ If values are shown but do not seem to change, see [Values do not seem to update
 
 ### How are MIN, MAX and AVG calculated on a key?
 
-macOS reports current values only, so Mac Sensors keeps its own statistics for every reading. MIN and MAX are the lowest and highest value accepted for the reading since the plugin last started reading sensors, and AVG is the arithmetic mean of those reads: one sample per read, including a read that repeats the last value, not weighted by time. The plugin starts reading sensors when a Sensor Reading key, Sensor Dial or detail tile becomes visible while reading is stopped, and stops 2 seconds after the last one disappears if none appears again, so changing to a page that has one, opening sensor details or pressing Back keeps them.
+macOS reports current values only, so Mac Sensors keeps its own statistics for every reading. MIN and MAX are the lowest and highest value accepted for the reading since the plugin last started reading sensors, and AVG is the arithmetic mean of those reads: one sample per read, including a read that repeats the last value, not weighted by time. Changing pages, opening sensor details and pressing Back keep them ([When reading starts and stops](data-sources.html#when-reading-starts-and-stops)).
 
 The statistics belong to the reading, so every key and detail tile that shows it shows the same numbers. They start over after a gap in that reading (a read where it is missing, withheld or failed, or the reading expiring 15 seconds after its last read), when its unit or type changes, and when the plugin stops reading sensors (2 seconds after the last one disappears) or restarts. After a sleep, CPU usage and the transfer rates skip one read, so theirs start over. Changing **Read every** keeps them. A key has no command that resets them. The full rules are under [Value shown](sensor-reading.html#value-shown-stat-mode).
 
@@ -96,14 +96,14 @@ Switching **°F** on or off does not clear it: samples are stored in the reading
 
 ### How much CPU and memory does it use?
 
-PERF.md in the product repository records each measurement with its build, host and harness; that repository requires access. The figures below are for the final 1.0.1 release candidate, run as a development copy in the Stream Deck app 7.5.0 on the M5 Pro (macOS 27.0.1), with 32 single-reading keys on an 8 by 4 Virtual Stream Deck. The harness was the development process observer, sampling the plugin process every 5 seconds in back-to-back runs against 1.0.0. CPU is the mean of two runs; RSS is the maximum of each run.
+PERF.md in the product repository records each measurement with its build, host and harness; that repository requires access. The figures below are for an earlier 1.0.1 candidate, built before key statistics and the 2 second hold, run as a development copy in the Stream Deck app 7.5.0 on the M5 Pro (macOS 27.0.1), with 32 single-reading keys on an 8 by 4 Virtual Stream Deck. The harness was the development process observer, sampling the plugin process every 5 seconds in back-to-back runs against 1.0.0. CPU is the mean of two runs; RSS is the maximum of each run.
 
 | Read every | Plugin CPU, one core | Maximum RSS |
 | --- | --- | --- |
 | 1 second (default) | 0.668% | 88.2 and 89.3 MiB |
 | 250 ms | 2.478% | 95.9 and 94.6 MiB |
 
-A 24-hour observation of the final 1.0.1 release candidate, run as a development copy in the Stream Deck app with the 24-hour soak harness and 32 single-reading keys at 1 second, started at 76.94 MiB of RSS, closed at 82.08 MiB and peaked at 89.25 MiB. Its fitted slope was -0.011 MiB per 30 minutes, with 49 file descriptors at start and close.
+A 24-hour observation of the published 1.0.1.0, run as a development copy in the Stream Deck app 7.6.0 with 32 single-reading keys at 1 second, used 0.704% of one core, peaked at 92.55 MiB of RSS and closed at 50.41 MiB while the Mac was under memory pressure. It kept 12 threads and 49 to 50 file descriptors and logged no warnings or errors.
 
 Limits: one build's CPU differed by 35% between two sessions in the same harness, other development work ran during the measurements, and dials, detail views and keys that mix system and SMC readings were not measured in the app. These are recorded results on one Mac, not a promise for another.
 
@@ -134,7 +134,7 @@ The current value reached a threshold set under **Alerts** in that key's setting
 
 By default a higher value is worse. Tick **Alert when the value drops to or below these numbers** where low is the problem, such as fan speed. Alerts check the current value in the reading's own unit (°F when **°F** is on), even when **Value shown** names a statistic; for bytes and rates they check the source's number and unit, which the key may show rescaled. On a key with several readings, only reading 1 is checked, and it recolors the whole key.
 
-With **Graph under the value** set to **Bar** or **Ring**, muted amber and red zones mark the thresholds on the track whenever they are set, crossed or not. A zone is a landmark; the key's color change is the alert.
+With **Graph under the value** set to **Bar** or **Ring**, muted amber and red zones mark the thresholds on the track whenever they are set, crossed or not. A zone marks where a threshold sits; the alert is the key's color change.
 
 On a dial the face keeps its theme: the bar takes the alert color, or in an overview the row's value does. Once thresholds are set, the one-reading bar's track also marks the warning and critical zones in muted amber and red. Dial thresholds apply only to readings in the unit that was on the dial when you last changed them. Alert colors are the same in every theme. To turn alerts off, clear **Warn at** and **Critical at**. How the colors look on a physical deck has not been checked yet. See [Thresholds and alerts](thresholds.html).
 
@@ -180,13 +180,7 @@ It leaves out user names, serial numbers, hardware UUIDs, raw device identifiers
 
 The two native reader files, `bin/hwmac-arm64.node` and `bin/hwmac-x86_64.node`, are ad-hoc signed. An ad-hoc signature checks that a file is intact. It is not a Developer ID certificate, and the files are not notarized. Before it loads a reader, the plugin checks the file's SHA-256 against the list in its own package and checks its architecture and protocol; a mismatch shows **Bridge failed**.
 
-Each GitHub release publishes `SHA256SUMS.txt` beside the package and `native-manifest.json`; the releases require repository access. In the folder where you saved the package, run:
-
-```sh
-shasum -a 256 com.lawrensen.mac.streamDeckPlugin
-```
-
-The hash must match the package's line in `SHA256SUMS.txt`. To check the installed readers, compare these hashes with the `sha256` entries in the same release's `native-manifest.json`, then inspect the signature:
+Check the package as described in [Check the download](installation.html#check-the-download). To check the installed readers, compare the hashes the commands below print with the `sha256` entries in the same release's `native-manifest.json`, then inspect the signature:
 
 ```sh
 cd ~/Library/Application\ Support/com.elgato.StreamDeck/Plugins/com.lawrensen.mac.sdPlugin/bin
@@ -195,7 +189,7 @@ codesign --verify --strict hwmac-arm64.node
 codesign -dv --verbose=4 hwmac-arm64.node
 ```
 
-The last command reports `Signature=adhoc`. Mac Sensors is not on the Elgato Marketplace yet. Elgato repackages Marketplace copies, so a GitHub hash does not apply to a Marketplace download. A checksum identifies bytes; it does not establish that a file is safe.
+The last command reports `Signature=adhoc`. A checksum identifies bytes; it does not establish that a file is safe.
 
 ## Hardware access
 

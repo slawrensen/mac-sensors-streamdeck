@@ -10,13 +10,13 @@ Set **Warn at**, **Critical at** or both to change the display when the live val
 
 Open **Alerts** in the key or dial settings. Thresholds use the current value, even while a key shows MIN, MAX or AVG.
 
-Both fields are optional and independent: set one, the other, or neither. A key with neither set shows its themed value.
+Both fields are optional and independent. A key with neither set shows its themed value.
 
 Alerts change only what the plugin shows: colors, and with **Auto cycle jumps to a critical reading** ticked, which reading a dial shows. They never write to the Mac. The SMC transport accepts read and key-information requests only, so an alert cannot change a fan speed or a power limit.
 
 ![Four key faces labeled CPU super 1 and CPU usage: CPU super core 1 at 62.4 °C on the normal theme with a sparkline, the same reading on an amber warning face with a bar, the same reading on a red critical face with a bar, and a CPU usage bar with amber and red zones](assets/img/alerts.png)
 
-*Production-rendered sample data: Mac catalog readings with the custom label CPU super 1 on the first three faces, and illustrative values. Warn at 60 and Critical at 80 for the amber face, Warn at 40 and Critical at 60 for the red face, both with a bar, and Warn at 65 and Critical at 85 for the CPU usage bar. Rendered with **Accent colors** set to Theme accent everywhere, so the normal faces use the Void accent instead of the default type accents.*
+*Production-rendered sample data: Mac catalog readings with the custom label CPU super 1 on the first three faces, and illustrative values. Warn at 60 and Critical at 80 for the amber face, Warn at 40 and Critical at 60 for the red face, both with a bar, and Warn at 65 and Critical at 85 for the CPU usage bar. Rendered with **Accent colors** set to **Theme accent everywhere**, so the normal faces use the Void accent instead of the default type accents.*
 
 ## The two fields
 
@@ -28,7 +28,7 @@ Alerts change only what the plugin shows: colors, and with **Auto cycle jumps to
 
 An empty field shows *Off*. On a dial the fields say what will change, such as *Off (bar turns amber)* in the single view and *Off (row value turns amber)* in an overview view.
 
-Thresholds also mark the range on any face that draws one. A key whose **Graph under the value** is **Bar** or **Ring**, a one-reading setting, shows a muted amber zone from **Warn at** and a muted red zone from **Critical at**, running toward the alarmed end: the low end when the direction box is ticked. A dial's range bar marks them the same way. Zones are the alert colors blended toward the face background, and the live fill draws over them. A key's range is always automatic and widens just enough to keep a zone visible. A dial with **Bar from** or **Bar to** set keeps those bounds, and a zone outside them is cut off. See [Graph under the value](sensor-reading.html#graph-under-the-value-sparkline-bar-ring).
+Thresholds also mark the range on any face that draws one. A key whose **Graph under the value** is **Bar** or **Ring**, a one-reading setting, shows a muted amber zone from **Warn at** and a muted red zone from **Critical at**, running toward the alarmed end: the low end when the direction box is ticked. A dial's range bar marks them the same way. Zones are the alert colors blended toward the face background, and the live fill draws over them. A key's range is always automatic and widens to keep a zone visible. A dial with **Bar from** or **Bar to** set keeps those bounds, and a zone outside them is cut off. See [Graph under the value](sensor-reading.html#graph-under-the-value-sparkline-bar-ring).
 
 ## How the comparison works
 
@@ -49,7 +49,7 @@ One exception: **Data units** rescales bytes and transfer rates for display only
 | Memory total, free, active, inactive, wired and compressed; Swap used; Startup volume total and available | B (bytes) |
 | Network receive and send; Storage read and write | B/s (bytes per second), also when the key shows Mbps |
 
-> **Note:** Alert color always tracks the live value. A key whose press cycled to MIN, MAX or AVG turns amber or red only while the live value is past a limit, so a MAX above **Critical at** draws on the normal face once the live value is back under **Warn at**.
+> **Note:** A key showing a MAX above **Critical at** draws on the normal face once the live value is back under **Warn at**.
 
 ### The trigger is at or past the limit
 

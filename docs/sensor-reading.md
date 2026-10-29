@@ -20,7 +20,7 @@ Show one to four Mac readings on a display key. Add a graph to the one-reading l
 
 ![Eight key faces: one reading with a sparkline, two stacked readings, three rows, a four-cell grid with small labels, a CPU usage bar and ring with amber and red zones, and Memory active and Network receive keys with sparklines](assets/img/key-layouts.png)
 
-*Production-rendered sample data: Mac catalog readings, some with custom labels such as CPU super 1 and Network RX, and illustrative values. Rendered with **Accent colors** set to Theme accent everywhere, so every graph uses the Void accent instead of the default type accents.*
+*Production-rendered sample data: Mac catalog readings, some with custom labels such as CPU super 1 and Network RX, and illustrative values. Rendered with **Accent colors** set to **Theme accent everywhere**, so every graph uses the Void accent instead of the default type accents.*
 
 ## Settings
 
@@ -134,9 +134,9 @@ What the number on the key shows:
 
 *Production-rendered sample data with sample session statistics, drawn with **Accent colors** set to **Theme accent everywhere**.*
 
-macOS reports current values only, so Mac Sensors keeps these statistics itself, for every reading this Mac reports. The plugin starts reading sensors when a Sensor Reading key (the Back tile of a detail page included), Sensor Dial or detail tile becomes visible while reading is stopped, and stops 2 seconds after the last one disappears, if none has appeared again; Sensor Control keys do not count. Changing to a page that has one, opening sensor details or pressing Back therefore keeps the statistics ([When reading starts and stops](data-sources.html#when-reading-starts-and-stops)). Each accepted read adds one sample, including a read that repeats the last value, so the average counts reads and is not weighted by time. On the first read after the plugin starts reading sensors, MIN, MAX and AVG all equal the current value. The statistics follow **Decimals**, **°F** and **Data units** the same way the live value does.
+macOS reports current values only, so Mac Sensors keeps these statistics itself, for every reading this Mac reports. Changing pages, opening sensor details and pressing Back keep the statistics, because reading continues for 2 seconds after the last Sensor Reading key, Sensor Dial or detail tile disappears ([When reading starts and stops](data-sources.html#when-reading-starts-and-stops)). Each accepted read adds one sample, including a read that repeats the last value, so the average counts reads and is not weighted by time. On the first read after the plugin starts reading sensors, MIN, MAX and AVG all equal the current value. The statistics follow **Decimals**, **°F** and **Data units** the same way the live value does.
 
-The statistics belong to the reading, not the key. Every Sensor Reading key and detail tile that shows the same reading shows the same MIN, MAX and AVG. A key you add, or switch to another reading, shows that reading's statistics at once, including reads made before the change.
+Statistics are kept per reading. Every Sensor Reading key and detail tile that shows the same reading shows the same MIN, MAX and AVG. A key you add, or switch to another reading, shows that reading's statistics at once, including reads made before the change.
 
 A reading's statistics start over:
 
@@ -163,7 +163,7 @@ Choose **Readings on this key → Two readings, stacked**, then pick **Reading 2
 - **The same stat as row 1** *(default)*: a press cycles both rows together, with one badge in the divider.
 - **Always the current value**, **Always the minimum**, **Always the maximum** or **Always the average**: row 2 stays put while a press cycles row 1. Each row that shows a statistic gets its own badge on its label line; matching statistics share the divider badge.
 
-Each row shows its own reading's statistics. The panel's hint names a minimum and maximum pair: with **Value shown** on **Minimum** and **Row 2 shows** on **Always the maximum**, row 1 shows its reading's minimum and row 2 its reading's maximum. **Always the current value** keeps row 2 live while a press cycles row 1. Useful pairs are CPU super core 1 above GPU 1, or Network receive above Network send.
+Each row shows its own reading's statistics. For a minimum and maximum pair, set **Value shown** to **Minimum** and **Row 2 shows** to **Always the maximum**. Useful pairs are CPU super core 1 above GPU 1, or Network receive above Network send.
 
 **Rules for every multi-reading layout:**
 
@@ -267,7 +267,7 @@ On a two-reading key with **Row 2 shows** at its default, a press cycles both ro
 
 - **Cycles current, min, max, avg** *(default)*: the cycle above.
 - **Opens sensor details**: on key down, the deck switches to a bundled detail view listing every reading in this reading's group, a custom list, or the readings matching a filter.
-- **Tap cycles; hold opens details**: a press released within half a second cycles the statistic; holding for 500 ms opens details once.
+- **Tap cycles; hold opens details**: a press released within half a second cycles the statistic; holding for half a second opens details once.
 
 The first time details open on each kind of deck, Stream Deck asks to install the bundled detail view, and again after an update that changes it. On a deck with no fitting detail view, the panel says *Sensor details are not available on this deck* and a press shows the Stream Deck alert triangle instead. [Sensor details](sensor-details.html) covers what the view shows, its settings and which decks it supports.
 
@@ -289,7 +289,7 @@ A two-line status replaces the value when the key cannot show a reading. The sav
 | **Source busy** / retrying | 15 seconds after reading started, the first read has still not finished. | Choose **Check again**. |
 | **No sensor data** / copy report | Both sources answered, but no reading is current. | Choose **Check again**. If it stays, choose **Copy support report** under **Advanced → Support**. |
 | **Tahoma needed** / Open Font Book | The plugin could not find the font Tahoma Bold. | Install Tahoma Bold in Font Book, then choose **Check again**. |
-| **Bridge failed** / reinstall | The native reader for the Node runtime's architecture could not be used. | Quit and reopen Stream Deck. If it persists, remove Mac Sensors and install it again; opening the same version over itself changes nothing. See [Removing](installation.html#removing). |
+| **Bridge failed** / reinstall | The native reader for the Node runtime's architecture could not be used. | Quit and reopen Stream Deck. If it persists, see [Keys show Bridge failed](troubleshooting.html#keys-show-bridge-failed). |
 | **Source error** / copy report | A read failed in a way that has no more specific screen. | Choose **Check again**. If it stays, choose **Copy support report** under **Advanced → Support**. |
 | **Needs macOS** / check requirements | The plugin is not running on macOS with an arm64 or x86_64 Node runtime. | See [Installation and requirements](installation.html#system-requirements). |
 
