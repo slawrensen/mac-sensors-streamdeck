@@ -27,3 +27,9 @@ test('the grace never holds a stop open while actions are still visible',()=>{
 		r.poller.retain();assert.equal(r.opened(),2);r.poller.release();mock.timers.tick(RELEASE_GRACE_MS);
 	} finally { mock.timers.reset(); }
 });
+test('the source observation trace gives every key family its own rows, revision and oldest acquisition',async()=>{
+	const { sourceObservations } = await import('../../src/mac/poller');
+	const reading=(key:string,observationRevision:number,observationTime:number)=>({key,type:1,sensorIndex:0,id:0,label:key,unit:'°C',value:1,valueMin:1,valueMax:1,valueAvg:1,observationRevision,observationTime});
+	const readings=[reading('mac:v1:system:memory-total',3,100),reading('mac:v1:smc:Mac17%2C9:54423154:temp.v1',5,90),reading('mac:v1:computed:Mac17%2C9:cpu-average:temp.v1',6,80)];
+	assert.deepEqual(sourceObservations({pollTime:1,version:1,revision:1,sensors:[],readings,byKey:new Map(readings.map(item=>[item.key,item]))}).map(item=>[item.source,item.rows,item.observation,item.acquired]),[['system',1,3,100],['smc',1,5,90],['computed',1,6,80]]);
+});

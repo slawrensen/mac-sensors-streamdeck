@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import { mock, test } from 'node:test';
 import { MacProvider, TTL_MS, counterRows, encodeModel, measurementKey } from '../../src/mac/provider';
 import { readingStatBadge, statValue } from '../../src/ui/format';
@@ -159,5 +160,70 @@ test('a failed source read is a gap for every reading of that source',async()=>{
 	const failed=smcAt(r,0);failed.error=12;r.clock.now=2100;r.provider.read();await publish(r,'public',packet('public',2100));await publish(r,'smc',failed);
 	assert.equal(r.provider.current()!.byKey.get(smcKey),undefined);
 	const reading=(await readSmc(r,3100,55)).byKey.get(smcKey)!;assert.deepEqual([reading.valueMin,reading.valueMax,reading.valueAvg],[55,55,55]);
+	r.provider.close();
+});
+// Computed readings (TG Pro parity tier B): CPU average, hottest CPU core and fan average on the qualified Mac17,9 table.
+const catalogRows=(JSON.parse(fs.readFileSync('native/hwmac/catalog.json','utf8')) as {rows:{key:string;label:string;scope:string}[]}).rows;
+/** The 18 Mac17,9 core keys, taken from the native catalog so the provider's input set cannot drift from it. */
+const CORE_KEYS=catalogRows.filter(row=>row.scope==='m5'&&/^CPU (super|performance) core [0-9]+$/.test(row.label)).map(row=>row.key);
+const CPU_AVERAGE='mac:v1:computed:Mac17%2C9:cpu-average:temp.v1',CPU_HOTTEST='mac:v1:computed:Mac17%2C9:cpu-hottest:temp.v1',FAN_AVERAGE='mac:v1:computed:Mac17%2C9:fan-average:rpm.v1';
+const COMPUTED=[CPU_AVERAGE,CPU_HOTTEST,FAN_AVERAGE];
+function smcRow(key:string,group:string,kind:string,unit:string,value:number,at:number):NativeRow {return {key,label:key,group,kind,unit,value,valid:true,continuousMs:at,wallSeconds:1700000000+at/1000,error:0,systemCode:0};}
+/** One Mac17,9 SMC packet: cores read 40 to 57 C (mean 48.5, hottest 57), fans 2000 and 3000 RPM, and fan target, minimum and maximum rows that must never enter the fan average. */
+function m5Packet(at:number):NativePacket {
+	const next=packet('smc',at);
+	next.rows=[...CORE_KEYS.map((key,index)=>smcRow(key,'CPU','temperature','°C',40+index,at)),smcRow('F0Ac','Fans','fan','RPM',2000,at),smcRow('F1Ac','Fans','fan','RPM',3000,at),
+		smcRow('F0Tg','Fans','fan','RPM',9000,at),smcRow('F1Tg','Fans','fan','RPM',9000,at),smcRow('F0Mn','Fans','fan','RPM',2317,at),smcRow('F1Mn','Fans','fan','RPM',2317,at),smcRow('F0Mx','Fans','fan','RPM',7826,at),smcRow('F1Mx','Fans','fan','RPM',7826,at)];
+	return next;
+}
+async function readM5(r:ReturnType<typeof rig>,at:number,change:(next:NativePacket)=>void=()=>{}):Promise<SensorSnapshot>{r.clock.now=at;r.provider.read();await publish(r,'public',packet('public',at));const next=m5Packet(at);change(next);await publish(r,'smc',next);return r.provider.current()!;}
+const groupOf=(snapshot:SensorSnapshot,key:string):string|undefined=>{const reading=snapshot.byKey.get(key);return reading?snapshot.sensors[reading.sensorIndex]?.name:undefined;};
+test('Mac17,9 gets a CPU average, hottest CPU core and fan average from the actual speeds only',async()=>{
+	assert.equal(CORE_KEYS.length,18);
+	const r=rig();const snapshot=await readM5(r,100);
+	assert.equal(snapshot.byKey.get(CPU_AVERAGE)?.value,48.5);assert.equal(snapshot.byKey.get(CPU_HOTTEST)?.value,57);assert.equal(snapshot.byKey.get(FAN_AVERAGE)?.value,2500,'target, minimum and maximum rows stay out of the fan average');
+	assert.deepEqual(COMPUTED.map(key=>[snapshot.byKey.get(key)?.label,groupOf(snapshot,key),snapshot.byKey.get(key)?.type,snapshot.byKey.get(key)?.unit]),[['CPU average','CPU',1,'°C'],['CPU hottest core','CPU',1,'°C'],['Fan average','Fans',3,'RPM']]);
+	assert.deepEqual(r.provider.facts().sourceRows,{public:1,smc:CORE_KEYS.length+8});assert.equal(r.provider.facts().computedRows,3,'computed readings are counted apart from the SMC rows they come from');
+	r.provider.close();
+});
+test('a computed reading is as old as its oldest input and keeps its own session',async()=>{
+	const r=rig();let snapshot=await readM5(r,1000,next=>{next.rows[3]!.continuousMs=970;next.rows[3]!.wallSeconds=1700000000.97;});
+	assert.equal(snapshot.byKey.get(CPU_AVERAGE)?.observationTime,970);assert.equal(snapshot.byKey.get(CPU_HOTTEST)?.observationTime,970);assert.equal(snapshot.byKey.get(FAN_AVERAGE)?.observationTime,1000,'the fans are not older than their own read');
+	snapshot=await readM5(r,2000,next=>{for(const row of next.rows)if(CORE_KEYS.includes(row.key))row.value+=10;});
+	const average=snapshot.byKey.get(CPU_AVERAGE)!;assert.deepEqual([average.value,average.valueMin,average.valueMax,average.valueAvg,average.statistics],[58.5,48.5,58.5,53.5,'producer']);
+	r.provider.close();
+});
+test('a computed reading is withheld unless every input is fresh and valid in the same read',async()=>{
+	const cases:Array<[string,(next:NativePacket)=>void,string[]]>=[
+		['core invalid',next=>{next.rows[5]!.valid=false;},[FAN_AVERAGE]],
+		['core missing',next=>{next.rows.splice(7,1);},[FAN_AVERAGE]],
+		['core out of range',next=>{next.rows[2]!.value=151;},[FAN_AVERAGE]],
+		['core not finite',next=>{next.rows[2]!.value=NaN;},[FAN_AVERAGE]],
+		['core duplicated',next=>{next.rows.push({...next.rows[0]!});},[FAN_AVERAGE]],
+		['core expired',next=>{next.rows[4]!.continuousMs=next.continuousMs-TTL_MS;},[FAN_AVERAGE]],
+		['core from the future',next=>{next.rows[4]!.continuousMs=next.continuousMs+1;},[FAN_AVERAGE]],
+		['fan invalid',next=>{next.rows.find(row=>row.key==='F1Ac')!.valid=false;},[CPU_AVERAGE,CPU_HOTTEST]],
+		['fan missing, target still read',next=>{next.rows=next.rows.filter(row=>row.key!=='F0Ac');},[CPU_AVERAGE,CPU_HOTTEST]],
+		['unqualified model',next=>{next.model='Mac16,1';},[]],
+		['unqualified chip',next=>{next.chip='t6041';},[]],
+		['source error',next=>{next.error=12;},[]]
+	];
+	for(const [name,change,expected] of cases) {
+		const r=rig();await readM5(r,100);const snapshot=await readM5(r,1100,change);
+		assert.deepEqual(COMPUTED.filter(key=>snapshot.byKey.has(key)),expected,name);
+		r.provider.close();
+	}
+});
+test('a stale input is never reused: a read missing one core removes the CPU readings instead of averaging the old value',async()=>{
+	const r=rig();await readM5(r,100);
+	const gap=await readM5(r,1100,next=>{next.rows=next.rows.filter(row=>row.key!==CORE_KEYS[0]);});
+	assert.equal(gap.byKey.get(CPU_AVERAGE),undefined);assert.equal(gap.byKey.get(CPU_HOTTEST),undefined);assert.equal(gap.byKey.get(FAN_AVERAGE)?.value,2500);
+	const back=await readM5(r,2100);const average=back.byKey.get(CPU_AVERAGE)!;assert.deepEqual([average.valueMin,average.valueMax,average.valueAvg],[48.5,48.5,48.5],'a gap starts the computed session over');
+	r.provider.close();
+});
+test('computed readings expire with their oldest input when SMC stops answering',async()=>{
+	const r=rig();await readM5(r,100,next=>{next.rows[0]!.continuousMs=90;});
+	r.clock.now=90+TTL_MS-1;r.provider.read();await publish(r,'public',packet('public',r.clock.now));assert.ok(r.provider.current()!.byKey.has(CPU_AVERAGE));
+	r.clock.now=90+TTL_MS;assert.equal(r.provider.current()!.byKey.get(CPU_AVERAGE),undefined,'the oldest core expired, so the average did too');
 	r.provider.close();
 });

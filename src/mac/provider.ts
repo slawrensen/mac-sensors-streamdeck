@@ -26,10 +26,43 @@ const KIND:Record<string,{type:SensorType;meaning:string;minimum:number;maximum:
 	other:{type:SensorType.Other,meaning:'other.v1',minimum:0,maximum:Number.MAX_SAFE_INTEGER}
 };
 const SYSTEM_KEYS=new Set(['cpu-total','memory-total','memory-free','memory-active','memory-inactive','memory-wired','memory-compressed','swap-used','disk-root-total','disk-root-available','network-receive','network-send','storage-read','storage-write']);
+/** A reading this provider computes from other readings of one SMC packet. */
+interface ComputedSpec { name:string; label:string; group:string; kind:'temperature'|'fan'; unit:string; reduce:'mean'|'max'; inputs:readonly string[]; }
+/** Mac17,9 core keys, as named in native/hwmac/catalog.json (CPU super cores 1 to 6, then performance cores 1 to 12). */
+const M5_PRO_CORES=['Tp00','Tp04','Tp08','Tp0C','Tp0G','Tp0K','Tp0O','Tp0R','Tp0U','Tp0X','Tp0a','Tp0d','Tp0g','Tp0j','Tp0m','Tp0p','Tp0u','Tp0y'] as const;
+/**
+ * Computed readings exist only where their input set is qualified, as the native model tables are: a fixed
+ * list of keys per model and chip, so a missing input can never quietly change what an average covers.
+ * TG Pro's CPU Average is within 1 C of the 18 core mean in 99.98 % of its log rows on Mac17,9; its Fan Average
+ * covers the two actual speeds. Fan target, minimum and maximum are never inputs.
+ */
+const COMPUTED_TABLES:ReadonlyArray<{model:string;chip:string;readings:readonly ComputedSpec[]}>=[{model:'Mac17,9',chip:'t6050',readings:[
+	{name:'cpu-average',label:'CPU average',group:'CPU',kind:'temperature',unit:'°C',reduce:'mean',inputs:M5_PRO_CORES},
+	{name:'cpu-hottest',label:'CPU hottest core',group:'CPU',kind:'temperature',unit:'°C',reduce:'max',inputs:M5_PRO_CORES},
+	{name:'fan-average',label:'Fan average',group:'Fans',kind:'fan',unit:'RPM',reduce:'mean',inputs:['F0Ac','F1Ac']}
+]}];
+/**
+ * Computed rows from the rows accepted out of one SMC packet, keyed by their SMC key. A reading is produced only when
+ * every input was accepted from that same packet (valid, finite, in range, unique and inside the TTL), so it is never
+ * computed from a stale or failed value; it is as old as its oldest input, so it expires no later than that input.
+ */
+export function computedRows(model:string,chip:string,inputs:ReadonlyMap<string,NativeRow>):NativeRow[] {
+	const table=COMPUTED_TABLES.find(item=>item.model===model&&item.chip===chip);if(!table)return [];
+	const rows:NativeRow[]=[];
+	for(const spec of table.readings) {
+		const values=spec.inputs.map(key=>inputs.get(key));
+		if(values.some(row=>row===undefined||row.kind!==spec.kind||row.unit!==spec.unit))continue;
+		const present=values as NativeRow[],oldest=present.reduce((a,b)=>b.continuousMs<a.continuousMs?b:a);
+		const value=spec.reduce==='max'?Math.max(...present.map(row=>row.value)):present.reduce((sum,row)=>sum+row.value,0)/present.length;
+		rows.push({key:spec.name,label:spec.label,group:spec.group,kind:spec.kind,unit:spec.unit,value,valid:Number.isFinite(value),continuousMs:oldest.continuousMs,wallSeconds:oldest.wallSeconds,error:0,systemCode:0});
+	}
+	return rows;
+}
 /** Minimum, maximum and running mean of one reading's accepted values since its row last appeared: every gap deletes the row, so it starts over. */
 interface Session { min: number; max: number; mean: number; count: number; }
-interface Accepted { row: NativeRow; reading: Reading; source: NativeSource; session: Session; }
-export interface ProviderFacts { model:string;chip:string;appleSilicon:boolean|null;translation:'native'|'translated'|'unknown';translationError:number;sourceRows:Record<NativeSource,number>; sourceErrors:Partial<Record<NativeSource,{code:string;operation:string;systemCode:number}>>; }
+/** source is the packet that produced the row, so a failed or expired read of it removes computed readings too. */
+interface Accepted { row: NativeRow; reading: Reading; source: NativeSource; session: Session; computed: boolean; }
+export interface ProviderFacts { model:string;chip:string;appleSilicon:boolean|null;translation:'native'|'translated'|'unknown';translationError:number;sourceRows:Record<NativeSource,number>;computedRows:number; sourceErrors:Partial<Record<NativeSource,{code:string;operation:string;systemCode:number}>>; }
 export function encodeModel(model:string): string | null {
 	if(!model||model.length>128||[...model].some(character=>character.charCodeAt(0)<32||character.charCodeAt(0)===127)||Buffer.from(model,'utf8').toString('utf8')!==model)return null;
 	return [...Buffer.from(model,'utf8')].map(byte=>/[A-Za-z0-9._~-]/.test(String.fromCharCode(byte))?String.fromCharCode(byte):'%'+byte.toString(16).toUpperCase().padStart(2,'0')).join('');
@@ -42,6 +75,11 @@ export function measurementKey(source:NativeSource,row:NativeRow,model:string):s
 	const encoded=lastModel.encoded,kind=KIND[row.kind];
 	if(encoded===null||!/^[\x20-\x7e]{4}$/.test(row.key)||!kind)return null;
 	return `mac:v1:smc:${encoded}:${Buffer.from(row.key,'ascii').toString('hex')}:${kind.meaning}`;
+}
+/** Computed readings depend on the model's input table, so their key carries the model like an SMC key does. */
+export function computedKey(row:NativeRow,model:string):string|null {
+	const encoded=encodeModel(model),kind=KIND[row.kind];
+	return encoded!==null&&kind&&/^[a-z0-9-]{1,32}$/.test(row.key)?`mac:v1:computed:${encoded}:${row.key}:${kind.meaning}`:null;
 }
 function counter(value:string):bigint|null { if(!/^(0|[1-9][0-9]{0,19})$/.test(value))return null;const result=BigInt(value);return result<=18446744073709551615n?result:null; }
 function derived(packet:NativePacket,key:string,label:string,group:string,kind:string,unit:string,value:number):NativeRow {
@@ -102,7 +140,7 @@ export class MacProvider implements SnapshotProvider {
 	private dirty=true;
 	private catalogDirty=true;
 	private catalogRevision=0;
-	private factsValue:ProviderFacts={model:'unknown',chip:'unknown',appleSilicon:null,translation:'unknown',translationError:0,sourceRows:{public:0,smc:0},sourceErrors:{}};
+	private factsValue:ProviderFacts={model:'unknown',chip:'unknown',appleSilicon:null,translation:'unknown',translationError:0,sourceRows:{public:0,smc:0},computedRows:0,sourceErrors:{}};
 	constructor(private readonly native:NativeBridge,private readonly ready:()=>void,private readonly report:(facts:ProviderFacts)=>void=()=>{}) {this.startedAt=native.now();this.session=native.open();}
 	facts():ProviderFacts{return structuredClone(this.factsValue);}
 	/** Reads requested and not yet settled; the poller publishes a read once none remain. */
@@ -132,27 +170,35 @@ export class MacProvider implements SnapshotProvider {
 		const counts=new Map<string,number>();
 		for(const key of keys)if(key)counts.set(key,(counts.get(key)??0)+1);
 		const accepted=new Map<string,Accepted>();
-		for(let index=0;index<rows.length;index++) {
-			const row=rows[index]!,key=keys[index],kind=KIND[row.kind];
-			if(!key||counts.get(key)!==1||!kind||!row.valid||!Number.isFinite(row.value)||row.value<kind.minimum||row.value>kind.maximum||!Number.isFinite(row.continuousMs)||row.continuousMs<0||row.continuousMs>now||now-row.continuousMs>=TTL_MS||!Number.isFinite(row.wallSeconds))continue;
-			const previous=this.rows.get(key);
-			// macOS reports current values only, so the session statistics are this provider's own: a unit or kind change starts them over.
-			const prior=previous&&previous.reading.unit===row.unit&&previous.reading.type===kind.type?previous.session:null;
-			const count=(prior?.count??0)+1,session:Session={min:Math.min(prior?.min??row.value,row.value),max:Math.max(prior?.max??row.value,row.value),mean:prior?prior.mean+(row.value-prior.mean)/count:row.value,count};
-			const reading:Reading={key,type:kind.type,sensorIndex:0,id:0,label:row.label,unit:row.unit,value:row.value,valueMin:session.min,valueMax:session.max,valueAvg:session.mean,statistics:'producer',observationTime:row.continuousMs,observationRevision:++this.observation};
-			if(previous&&previous.reading.value!==reading.value)this.freshnessRevision++;
-			const changedCatalog=!previous||previous.reading.unit!==reading.unit||previous.reading.type!==reading.type||previous.reading.label!==reading.label||previous.row.group!==row.group;
-			if(changedCatalog)this.catalogDirty=true;
-			// A repeated value cannot move the minimum or maximum, but it can move the mean, which an AVG face shows.
-			if(changedCatalog||previous?.reading.value!==reading.value||previous.reading.valueAvg!==reading.valueAvg)this.dirty=true;
-			accepted.set(key,{row,reading,source,session});
+		for(let index=0;index<rows.length;index++){const key=keys[index];if(key&&counts.get(key)===1)this.admit(key,rows[index]!,source,now,false,accepted);}
+		// Computed readings see only what this packet just had accepted, never a row kept from an earlier read.
+		if(source==='smc'){
+			const inputs=new Map<string,NativeRow>();for(const item of accepted.values())inputs.set(item.row.key,item.row);
+			for(const row of computedRows(packet.model,packet.chip,inputs)){const key=computedKey(row,packet.model);if(key)this.admit(key,row,source,now,true,accepted);}
 		}
 		for(const [key,item] of this.rows)if(item.source===source&&!accepted.has(key)){this.rows.delete(key);this.dirty=true;this.catalogDirty=true;}
 		for(const [key,item] of accepted)this.rows.set(key,item);
-		this.factsValue={model:packet.model||'unknown',chip:packet.chip||'unknown',appleSilicon:packet.appleSilicon<0?null:packet.appleSilicon===1,translation:translationOf(packet.translated,packet.translationError),translationError:packet.translationError,sourceErrors:this.factsValue.sourceErrors,sourceRows:{...this.factsValue.sourceRows,[source]:accepted.size}};
+		let direct=0;for(const item of accepted.values())if(!item.computed)direct++;
+		this.factsValue={model:packet.model||'unknown',chip:packet.chip||'unknown',appleSilicon:packet.appleSilicon<0?null:packet.appleSilicon===1,translation:translationOf(packet.translated,packet.translationError),translationError:packet.translationError,sourceErrors:this.factsValue.sourceErrors,sourceRows:{...this.factsValue.sourceRows,[source]:direct},computedRows:this.factsValue.computedRows};
 		if(packet.translated===1)this.notice('Node is running under translation; sensor interfaces follow the detected hardware.');
 		if(source==='smc'&&(packet.model!=='Mac17,9'||packet.chip!=='t6050'))this.notice('This model uses common typed sensors; its generation-specific catalog is not qualified.');
 		this.rebuild();
+	}
+	/** Accepts one keyed row of the current packet into `accepted` when it is valid, in range and inside the TTL; anything else is withheld. */
+	private admit(key:string,row:NativeRow,source:NativeSource,now:number,computed:boolean,accepted:Map<string,Accepted>):void {
+		const kind=KIND[row.kind];
+		if(!kind||!row.valid||!Number.isFinite(row.value)||row.value<kind.minimum||row.value>kind.maximum||!Number.isFinite(row.continuousMs)||row.continuousMs<0||row.continuousMs>now||now-row.continuousMs>=TTL_MS||!Number.isFinite(row.wallSeconds))return;
+		const previous=this.rows.get(key);
+		// macOS reports current values only, so the session statistics are this provider's own: a unit or kind change starts them over.
+		const prior=previous&&previous.reading.unit===row.unit&&previous.reading.type===kind.type?previous.session:null;
+		const count=(prior?.count??0)+1,session:Session={min:Math.min(prior?.min??row.value,row.value),max:Math.max(prior?.max??row.value,row.value),mean:prior?prior.mean+(row.value-prior.mean)/count:row.value,count};
+		const reading:Reading={key,type:kind.type,sensorIndex:0,id:0,label:row.label,unit:row.unit,value:row.value,valueMin:session.min,valueMax:session.max,valueAvg:session.mean,statistics:'producer',observationTime:row.continuousMs,observationRevision:++this.observation};
+		if(previous&&previous.reading.value!==reading.value)this.freshnessRevision++;
+		const changedCatalog=!previous||previous.reading.unit!==reading.unit||previous.reading.type!==reading.type||previous.reading.label!==reading.label||previous.row.group!==row.group;
+		if(changedCatalog)this.catalogDirty=true;
+		// A repeated value cannot move the minimum or maximum, but it can move the mean, which an AVG face shows.
+		if(changedCatalog||previous?.reading.value!==reading.value||previous.reading.valueAvg!==reading.valueAvg)this.dirty=true;
+		accepted.set(key,{row,reading,source,session,computed});
 	}
 	/**
 	 * Once per generation: the first accepted public packet only sets the counter baseline, so read public again
@@ -186,7 +232,7 @@ export class MacProvider implements SnapshotProvider {
 	}
 	private rebuild():void {
 		if(this.catalogDirty){this.catalogRevision++;this.catalogDirty=false;}
-		this.factsValue.sourceRows={public:0,smc:0};for(const item of this.rows.values())this.factsValue.sourceRows[item.source]++;
+		this.factsValue.sourceRows={public:0,smc:0};this.factsValue.computedRows=0;for(const item of this.rows.values())if(item.computed)this.factsValue.computedRows++;else this.factsValue.sourceRows[item.source]++;
 		this.report(this.facts());
 		if(this.dirty){this.valueRevision++;this.dirty=false;}
 		const groups=[...new Set([...this.rows.values()].map(item=>Object.hasOwn(GROUPS,item.row.group)?item.row.group:'System'))].sort((a,b)=>GROUPS[a]!-GROUPS[b]!);
@@ -210,5 +256,5 @@ export class MacProvider implements SnapshotProvider {
 	/** Ms until the next row expires. No deadline while the clock is not finite: current() has already cleared the rows, and the interval tick rechecks, so a NaN clock cannot drive a 1 ms expiry loop. */
 	untilExpiry():number|null {if(this.closed)return null;const now=this.native.now();if(!Number.isFinite(now))return null;if(!this.rows.size)return !this.fontKnown&&this.completed.size<2&&now-this.startedAt<TTL_MS?this.startedAt+TTL_MS-now:null;return Math.max(0,Math.min(...[...this.rows.values()].map(item=>item.row.continuousMs+TTL_MS-now)));}
 	age():number|null {if(this.closed||!this.rows.size)return null;const now=this.native.now();return Number.isFinite(now)?Math.max(...[...this.rows.values()].map(item=>now-item.row.continuousMs)):null;}
-	close():void {if(this.closed)return;this.closed=true;for(const retry of this.retries.values())clearTimeout(retry);this.retries.clear();if(this.rebaseline)clearTimeout(this.rebaseline);this.rebaseline=null;this.rows.clear();this.snapshot=null;this.previousPublic=null;this.factsValue.sourceRows={public:0,smc:0};this.report(this.facts());this.session.close();}
+	close():void {if(this.closed)return;this.closed=true;for(const retry of this.retries.values())clearTimeout(retry);this.retries.clear();if(this.rebaseline)clearTimeout(this.rebaseline);this.rebaseline=null;this.rows.clear();this.snapshot=null;this.previousPublic=null;this.factsValue.sourceRows={public:0,smc:0};this.factsValue.computedRows=0;this.report(this.facts());this.session.close();}
 }

@@ -55,6 +55,15 @@ const TRUSTED_READS = 8;
  * over. Longer than an app page switch, short enough that a deck put away stops reading almost at once.
  */
 export const RELEASE_GRACE_MS = 2000;
+/** Key families in the source observation trace: the native sources' key prefixes and the provider's computed readings. */
+const TRACE_SOURCES = ['system', 'smc', 'computed'] as const;
+/** Per key family: row count, newest observation revision and oldest acquisition, as the soak freshness check reads them. */
+export function sourceObservations(snapshot: SensorSnapshot): Array<{ source: string; rows: number; observation: number; acquired: number | null }> {
+	return TRACE_SOURCES.map(source => {
+		const rows = snapshot.readings.filter(reading => reading.key.startsWith(`mac:v1:${source}:`));
+		return { source, rows: rows.length, observation: Math.max(0, ...rows.map(reading => reading.observationRevision ?? 0)), acquired: rows.length ? Math.min(...rows.map(reading => reading.observationTime ?? 0)) : null };
+	});
+}
 export class MacPoller extends EventEmitter {
 	private readonly logger = streamDeck.logger.createScope('MacSensors');
 	private provider: MacSnapshotProvider | null = null;
@@ -135,11 +144,7 @@ export class MacPoller extends EventEmitter {
 			const revision = Math.max(0, ...snapshot.readings.map(reading => reading.observationRevision ?? 0));
 			if (revision !== this.tracedObservation) {
 				this.tracedObservation = revision;
-				const sources = ['system', 'smc'].map(source => {
-					const rows = snapshot.readings.filter(reading => reading.key.startsWith(`mac:v1:${source}:`));
-					return { source, rows: rows.length, observation: Math.max(0, ...rows.map(reading => reading.observationRevision ?? 0)), acquired: rows.length ? Math.min(...rows.map(reading => reading.observationTime ?? 0)) : null };
-				});
-				trace({ event: 'sourceObservation', note: JSON.stringify({ catalog: snapshot.catalogRevision, sources }) });
+				trace({ event: 'sourceObservation', note: JSON.stringify({ catalog: snapshot.catalogRevision, sources: sourceObservations(snapshot) }) });
 			}
 		}
 		for (const [key, ring] of this.series) {
