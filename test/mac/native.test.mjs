@@ -35,7 +35,10 @@ test('typed decoders preserve zero, signed and fractional values, and refuse bad
 test('generation tables require the qualified runtime model, chip and hardware family',()=>{
 	assert.deepEqual(native.testCatalog('Mac17,9','t6050',1),{common:true,apple:true,m5:true});
 	for(const [model,chip,family] of [['Unknown','t6050',1],['Mac17,9','unknown',1],['Mac17,9','t6050',0],['Mac17,9','t6050',-1]])assert.equal(native.testCatalog(model,chip,family).m5,false);
-	const catalog=JSON.parse(fs.readFileSync('native/hwmac/catalog.json','utf8'));assert.equal(new Set(catalog.rows.map(r=>r.key)).size,catalog.rows.length);assert.equal(catalog.rows.filter(r=>r.scope==='m5').length,26);
+	const catalog=JSON.parse(fs.readFileSync('native/hwmac/catalog.json','utf8'));assert.equal(new Set(catalog.rows.map(r=>r.key)).size,catalog.rows.length);assert.equal(catalog.rows.filter(r=>r.scope==='m5').length,39);
+	// TG Pro parity on Mac17,9: each key was matched to a TG Pro reading or is a fan limit TG Pro reads; all stay read-only rows of existing kinds.
+	const parity={TaTP:['Airflow top','System','temperature'],TCHP:['Charger proximity','System','temperature'],TPSP:['Power supply proximity','System','temperature'],TaLT:['Thunderbolt left','System','temperature'],TaRT:['Thunderbolt right','System','temperature'],Ts0P:['Trackpad','System','temperature'],Ts1P:['Trackpad actuator','System','temperature'],F0Tg:['Fan 1 target','Fans','fan'],F1Tg:['Fan 2 target','Fans','fan'],F0Mn:['Fan 1 minimum','Fans','fan'],F1Mn:['Fan 2 minimum','Fans','fan'],F0Mx:['Fan 1 maximum','Fans','fan'],F1Mx:['Fan 2 maximum','Fans','fan']};
+	for(const [key,[label,group,type]] of Object.entries(parity))assert.deepEqual((({label,group,type,scope})=>({label,group,type,scope}))(catalog.rows.find(r=>r.key===key)??{}),{label,group,type,scope:'m5'},key);
 });
 test('type tags, arguments and idempotent close fail closed',()=>{
 	const session=native.open();

@@ -49,5 +49,5 @@ for(const kind of ['production','test','wrong-protocol'])for(const architecture 
 	records.push({kind,architecture,file:path.relative(out,finalFile),unsignedSha256,sha256:createHash('sha256').update(fs.readFileSync(finalFile)).digest('hex'),bytes:fs.statSync(finalFile).size});
 }
 fs.writeFileSync(path.join(out,'build-record.json'),JSON.stringify({sourceId,sourceFiles,nodeHeaders:version,headerArchiveSha256:headerHash,compiler:execFileSync(compiler,['--version'],{encoding:'utf8'}).split('\n')[0],sdk:execFileSync('xcrun',['--sdk','macosx','--show-sdk-version'],{encoding:'utf8'}).trim(),deploymentTarget:'13.5',records},null,2)+'\n');
-fs.writeFileSync('src/mac/native-contract.ts',`// Generated from the native source inputs by scripts/build-native.mjs.\nexport const NATIVE_PROTOCOL = 1;\nexport const NATIVE_VERSION = '1.0.0';\nexport const NATIVE_SOURCE_ID = '${sourceId}';\n`);
+fs.writeFileSync('src/mac/native-contract.ts',`// Generated from the native source inputs by scripts/build-native.mjs.\nexport const NATIVE_PROTOCOL = 1;\nexport const NATIVE_VERSION = '1.0.1';\nexport const NATIVE_SOURCE_ID = '${sourceId}';\n`);
 console.log(JSON.stringify({sourceId,artifacts:records.map(r=>({file:r.file,bytes:r.bytes,sha256:r.sha256}))}));

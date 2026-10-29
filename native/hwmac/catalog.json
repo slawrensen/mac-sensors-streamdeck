@@ -494,6 +494,110 @@
       "type": "fan",
       "scope": "common",
       "sourceLine": null
+    },
+    {
+      "key": "TaTP",
+      "label": "Airflow top",
+      "group": "System",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": null
+    },
+    {
+      "key": "TCHP",
+      "label": "Charger proximity",
+      "group": "System",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": null
+    },
+    {
+      "key": "TPSP",
+      "label": "Power supply proximity",
+      "group": "System",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": null
+    },
+    {
+      "key": "TaLT",
+      "label": "Thunderbolt left",
+      "group": "System",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": null
+    },
+    {
+      "key": "TaRT",
+      "label": "Thunderbolt right",
+      "group": "System",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": null
+    },
+    {
+      "key": "Ts0P",
+      "label": "Trackpad",
+      "group": "System",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": null
+    },
+    {
+      "key": "Ts1P",
+      "label": "Trackpad actuator",
+      "group": "System",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": null
+    },
+    {
+      "key": "F0Tg",
+      "label": "Fan 1 target",
+      "group": "Fans",
+      "type": "fan",
+      "scope": "m5",
+      "sourceLine": null
+    },
+    {
+      "key": "F1Tg",
+      "label": "Fan 2 target",
+      "group": "Fans",
+      "type": "fan",
+      "scope": "m5",
+      "sourceLine": null
+    },
+    {
+      "key": "F0Mn",
+      "label": "Fan 1 minimum",
+      "group": "Fans",
+      "type": "fan",
+      "scope": "m5",
+      "sourceLine": null
+    },
+    {
+      "key": "F1Mn",
+      "label": "Fan 2 minimum",
+      "group": "Fans",
+      "type": "fan",
+      "scope": "m5",
+      "sourceLine": null
+    },
+    {
+      "key": "F0Mx",
+      "label": "Fan 1 maximum",
+      "group": "Fans",
+      "type": "fan",
+      "scope": "m5",
+      "sourceLine": null
+    },
+    {
+      "key": "F1Mx",
+      "label": "Fan 2 maximum",
+      "group": "Fans",
+      "type": "fan",
+      "scope": "m5",
+      "sourceLine": null
     }
   ]
 }

@@ -62,7 +62,7 @@
     "destination": "native/hwmac/catalog.json",
     "license": "MIT",
     "notice": "NOTICE.md",
-    "fanKeys": "Independent fixed key-name construction; read actual speed only.",
+    "fanKeys": "Independent fixed key-name construction; read actual, minimum, maximum and target speed only, never written.",
     "privateDeclarations": "None copied; transport expressed as independently verified byte offsets."
   }
 ]

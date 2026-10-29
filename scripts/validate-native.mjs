@@ -15,7 +15,7 @@ export function validateNativeFiles(directory,sourceId,{bin=false}={}) {
 		const facts=readMachO(file),info=facts.metadata;
 		if(facts.architecture!==architecture||info.arch!==architecture)throw new Error('Wrong native architecture');
 		if(info.testHooks!==0)throw new Error('Test native artifacts cannot ship');
-		if(info.protocol!==1||info.napi!==8||info.version!=='1.0.0'||info.platform!=='darwin'||info.sourceId!==sourceId)throw new Error('Native protocol or source identity mismatch');
+		if(info.protocol!==1||info.napi!==8||info.version!=='1.0.1'||info.platform!=='darwin'||info.sourceId!==sourceId)throw new Error('Native protocol or source identity mismatch');
 		if(facts.minimumOS>((13<<16)|(5<<8)))throw new Error('Native deployment minimum exceeds macOS13.5');
 		execFileSync('codesign',['--verify','--strict',file],{stdio:['ignore','pipe','pipe']});
 		results.push({file:filename,architecture,minimumMacOS:versionText(facts.minimumOS),sdk:versionText(facts.sdk),uuid:facts.uuid,sha256:createHash('sha256').update(facts.bytes).digest('hex'),metadata:info});

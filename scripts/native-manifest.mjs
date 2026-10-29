@@ -19,5 +19,5 @@ for(const architecture of ['arm64','x86_64']) {
 	const sha256=createHash('sha256').update(bytes).digest('hex');
 	entries.push({file:path.basename(file),architecture,slices,minimumMacOS:minimum,sdk,uuid,linked,signature:signature.includes('Signature=adhoc')?'ad-hoc':'other',hardenedRuntime:/flags=.*runtime/.test(signature),cdHash:signature.match(/CDHash=(\S+)/)?.[1],sha256,sliceSha256:sha256,bytes:bytes.length});
 }
-const output={schema:1,protocol:1,nativeVersion:'1.0.0',sourceId:record.sourceId,sourceFiles:record.sourceFiles,nodeHeaders:record.nodeHeaders,compiler:record.compiler,sdk:record.sdk,entries};
+const output={schema:1,protocol:1,nativeVersion:'1.0.1',sourceId:record.sourceId,sourceFiles:record.sourceFiles,nodeHeaders:record.nodeHeaders,compiler:record.compiler,sdk:record.sdk,entries};
 const destination=process.argv[3]??'build/native-manifest.json';fs.mkdirSync(path.dirname(destination),{recursive:true});fs.writeFileSync(destination,JSON.stringify(output,null,2)+'\n');console.log(JSON.stringify({manifest:destination,entries:entries.length}));
