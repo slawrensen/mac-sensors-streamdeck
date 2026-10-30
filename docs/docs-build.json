@@ -1,0 +1,13 @@
+---
+layout: null
+search_exclude: true
+nav_exclude: true
+---
+{% include docs_identity.html %}{
+  "schema": 1,
+  "kind": "documentation-production",
+  "source_commit": {{ docs_source_sha | jsonify }},
+  "build_id": {{ docs_build_id | jsonify }},
+  "base_path": {{ site.baseurl | jsonify }},
+  "source_plugin_version": {{ site.plugin_release.package_version | jsonify }}
+}

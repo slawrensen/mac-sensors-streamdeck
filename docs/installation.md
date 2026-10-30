@@ -2,9 +2,8 @@
 layout: default
 title: Installation and requirements
 nav_order: 2
+description: "Install the plugin, then confirm that Tahoma Bold is present. No separate sensor app is needed."
 ---
-
-# Installation and requirements
 
 Install the plugin, then confirm that Tahoma Bold is present. No separate sensor app is needed. If it is already installed, [get your first reading](getting-started.html).
 
