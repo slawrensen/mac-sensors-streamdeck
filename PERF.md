@@ -1,6 +1,6 @@
 # Performance
 
-The native collector budget is a 25 ms p99 acquisition time at one-second and 250 ms read intervals. Cold discovery is measured separately. Run `node scripts/bench-native.mjs <output directory>` under the Stream Deck app's Node runtime to reproduce the benchmark, and record external CPU and memory samples.
+The native collector budget is a 25 ms p99 acquisition time at one-second and 250 ms read intervals. Cold discovery is measured separately. Run `node scripts/bench-native.mjs <output directory> --control <shipped reader>` under the Stream Deck app's Node runtime to reproduce the benchmark, and record external CPU and memory samples. The control is the published package's reader for the same architecture, `bin/hwmac-arm64.node` or `bin/hwmac-x86_64.node`. Another app that reads the SMC on a schedule can push both readers over 25 ms, so a candidate p99 over budget passes only when the control in the same run is over budget too and the candidate stays within 1.25 times the control's p99.
 
 On an M5 Pro running macOS 27.0.1 and Node 24.13.1, 1,000 reads at each interval measured p99 acquisition of 14.63 ms and 15.01 ms. Every sample contained nine direct system readings and 38 SMC readings. This is native-component evidence in a terminal, not the installed plugin's total rendering cost or a physical Intel measurement.
 
