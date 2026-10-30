@@ -4,7 +4,7 @@ import path from 'node:path';
 import {createHash} from 'node:crypto';
 import {test} from 'node:test';
 import sharp from 'sharp';
-import {composeScenes,sampleReadings,sampleSnapshot,sampleGroups,PROVIDER_GROUPS,boardDefinitions} from '../../scripts/lib/mac-scenes';
+import {composeScenes,sampleReadings,sampleSnapshot,sampleGroups,PROVIDER_GROUPS,boardDefinitions,boardFooter} from '../../scripts/lib/mac-scenes';
 import {DETAIL_PROFILES} from '../../src/detail/managed-profiles';
 const hash=(bytes:Buffer|string)=>createHash('sha256').update(bytes).digest('hex');
 const pngsIn=(dir:string)=>fs.readdirSync(dir).filter(file=>file.endsWith('.png')).sort();
@@ -32,6 +32,18 @@ test('panel captures and marketing artwork retain their recorded sources',()=>{
 	assert.deepEqual(pngsIn('marketing'),marketing.assets.map(asset=>asset.file).sort());
 });
 
+
+test('board text names the dial views as the panel does and says when faces show custom labels',()=>{
+ // The View options in the shipped panel source, without the panel's parenthetical help.
+ const panel=fs.readFileSync('com.lawrensen.mac.sdPlugin/ui/sensor-dial.html','utf8'),dials=boardDefinitions.find(board=>board.id==='dials')!;
+ for(const value of ['single','tworow','overview']){const name=new RegExp(`<option value="${value}">([^<(]+)`).exec(panel)?.[1]?.trim();assert.ok(name&&dials.subtitle.includes(name),value+': '+name);}
+ const scenes=composeScenes(),custom=(id:string)=>scenes.find(scene=>scene.id===id)!.customLabel;
+ // Typed labels (CPU super 1, CPU activity, the opener on the Back tile) count; catalog labels and status faces do not.
+ for(const id of ['reading-0','reading-4','layout-triple','back','dial-overview','detail-page-back'])assert.equal(custom(id),true,id);
+ for(const id of ['reading-1','bar','ring','status-missing','detail-page-title','detail-page-tile-0'])assert.equal(custom(id),false,id);
+ assert.match(boardFooter(boardDefinitions.find(board=>board.id==='key-layouts')!,scenes),/custom labels/);
+ assert.doesNotMatch(boardFooter(boardDefinitions.find(board=>board.id==='status')!,scenes),/custom/);
+});
 
 test('individual dial colors change fills while preserving all geometry and words',()=>{
  const scenes=composeScenes(),plain=scenes.find(scene=>scene.id==='dial-overview')!,colored=scenes.find(scene=>scene.id==='dial-overview-colored')!;

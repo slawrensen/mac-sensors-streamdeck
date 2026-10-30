@@ -5,7 +5,7 @@ import path from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {createHash} from 'node:crypto';
 import sharp from 'sharp';
-import {composeScenes,boardDefinitions,sampleReadings} from './lib/mac-scenes.ts';
+import {composeScenes,boardDefinitions,boardFooter,sampleReadings} from './lib/mac-scenes.ts';
 const rendererPath=process.env.MACSENSORS_RENDERER_MODULE;
 if(!rendererPath)throw new Error('Set MACSENSORS_RENDERER_MODULE to the measured local renderer adapter');
 const renderer=await import(pathToFileURL(path.resolve(rendererPath)).href),out=process.argv[2]??'docs/assets/img';fs.mkdirSync(out,{recursive:true});
@@ -14,8 +14,8 @@ const scenes=composeScenes(),byId=new Map(scenes.map(scene=>[scene.id,scene])),a
 const frame=async(scene,width)=>{const w=width,h=scene.kind==='key'?width:Math.round(width/2),pixels=renderer.renderBGRA(scene.svg,w,h),rgba=Buffer.alloc(pixels.length);for(let i=0;i<pixels.length;i+=4){const a=pixels[i+3],un=value=>a?Math.min(255,Math.round(value*255/a)):0;rgba[i]=un(pixels[i+2]);rgba[i+1]=un(pixels[i+1]);rgba[i+2]=un(pixels[i]);rgba[i+3]=a;}return sharp(rgba,{raw:{width:w,height:h,channels:4}}).png().toBuffer();};
 try{
  for(const board of boardDefinitions){
-  const overview=board.id==='readme-hero',W=overview?1600:1280,H=overview?1040:720,layers=[],title=escape(board.title),subtitle=escape(board.subtitle);
-  const background=`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><rect width="${W}" height="${H}" rx="26" fill="#111720"/><path d="M64 154H${W-64}" stroke="#293547"/><g font-family="Arial" fill="#F2F5FA"><text x="64" y="82" font-size="${board.title.length>46?38:44}" font-weight="700">${title}</text><text x="64" y="124" font-size="23" fill="#B3C0D2">${subtitle}</text><text x="64" y="${H-32}" font-size="16" fill="#9CABBD">Production-rendered sample data. Mac catalog labels, illustrative values.</text></g></svg>`;
+  const overview=board.id==='readme-hero',W=overview?1600:1280,H=overview?1040:720,layers=[],title=escape(board.title),subtitle=escape(board.subtitle),footer=escape(boardFooter(board,scenes));
+  const background=`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><rect width="${W}" height="${H}" rx="26" fill="#111720"/><path d="M64 154H${W-64}" stroke="#293547"/><g font-family="Arial" fill="#F2F5FA"><text x="64" y="82" font-size="${board.title.length>46?38:44}" font-weight="700">${title}</text><text x="64" y="124" font-size="23" fill="#B3C0D2">${subtitle}</text><text x="64" y="${H-32}" font-size="16" fill="#9CABBD">${footer}</text></g></svg>`;
   const keys=board.scenes.filter(id=>byId.get(id).kind==='key'),dials=board.scenes.filter(id=>byId.get(id).kind==='dial');
   // A board may set tile, gap and top (a device grid such as the 15-key detail page); the defaults keep every other board's bytes.
   const tile=board.tile??(overview?160:board.id==='hero'?200:196),gap=board.gap??(overview?20:28),rowGap=board.gap??(overview?20:32),top=board.top??190;

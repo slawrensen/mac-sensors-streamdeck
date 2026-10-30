@@ -1,6 +1,6 @@
 # Marketing assets
 
-The boards use the production Mac renderers with fixed sample values and labels from the measured Mac catalog. They are not physical photographs. Panel images are captures of the staged Mac panel in Chromium with a simulated host. Provenance records source and output hashes. Faces are rasterized through the installed app's measured Qt renderer in Tahoma.
+The boards use the production Mac renderers with fixed sample values. Readings come from the measured Mac catalog, and boards that show custom labels say so in their footer. They are not physical photographs. Panel images are captures of the staged Mac panel in Chromium with a simulated host. Provenance records source and output hashes. Faces are rasterized through the installed app's measured Qt renderer in Tahoma.
 
 | File | Use | Dimensions |
 | --- | --- | --- |
