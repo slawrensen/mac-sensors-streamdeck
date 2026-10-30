@@ -55,7 +55,9 @@
     "changelog:page": "node scripts/gen-changelog-page.mjs",
     "docs:validate": "node scripts/validate-docs.mjs",
     "docs:crawl": "node scripts/docs-crawl.mjs",
-    "docs:shots": "node scripts/docs-site-shots.mjs"
+    "docs:shots": "node scripts/docs-site-shots.mjs",
+    "docs:test": "node --test test/mac/docs-crawl.test.mjs test/mac/docs-tools.test.mjs",
+    "docs:test:browser": "node --test test/mac/docs-browser.test.mjs"
   },
   "dependencies": {
     "@elgato/streamdeck": "^2.1.2",

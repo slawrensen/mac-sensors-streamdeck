@@ -2,9 +2,8 @@
 layout: default
 title: Changelog
 nav_order: 15
+description: "Changes in each Mac Sensors release, newest first."
 ---
-
-# Changelog
 
 ## 1.0.1.0 - 2026-10-27
 

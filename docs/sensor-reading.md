@@ -2,9 +2,8 @@
 layout: default
 title: Sensor Reading
 nav_order: 4
+description: "Show one to four Mac readings on a display key. Add a graph to the one-reading layout, set warning and critical colors, or make a press open a page of related readings."
 ---
-
-# Sensor Reading
 
 Show one to four Mac readings on a display key. Add a graph to the one-reading layout, set warning and critical colors, or make a press open a page of related readings.
 

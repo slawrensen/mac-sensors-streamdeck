@@ -2,13 +2,14 @@
 layout: default
 title: Data sources
 nav_order: 10
+description: "Every reading on a key, dial or detail tile comes from one of two local sources on this Mac: macOS system counters, or SMC readings taken by the plugin's own native reader."
 ---
-
-# Data sources
 
 Every reading on a key, dial or detail tile comes from one of three local sources on this Mac: macOS system counters, SMC readings taken by the plugin's own native reader, or battery and drive health from public IOKit interfaces. A few more readings are computed by the plugin from SMC readings of the same read. Each read asks the system counters and the SMC, and asks the health source when at least 1.5 seconds have passed since it was last asked. There is no source setting to choose and no separate sensor application. Which readings exist depends on the Mac model and macOS version.
 
 For requirements and the Tahoma Bold prerequisite, see [Installation and requirements](installation.html). For what was measured on which Mac, see [Hardware compatibility](hardware.html).
+
+<span id="system-counters-and-smc-readings"></span>
 
 ## System counters, SMC readings and battery and drive health
 

@@ -2,9 +2,8 @@
 layout: default
 title: Sensor details
 nav_order: 5
+description: "Press a Sensor Reading key to open related readings on a detail page. The key you pressed stays live on the page as a Back tile."
 ---
-
-# Sensor details
 
 Press a Sensor Reading key to open related readings on a detail page. The key you pressed stays live on the page as a Back tile.
 

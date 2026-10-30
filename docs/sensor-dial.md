@@ -2,9 +2,8 @@
 layout: default
 title: Sensor Dial
 nav_order: 6
+description: "The Sensor Dial action shows Mac Sensors readings on the touchscreen above a Stream Deck + or Stream Deck + XL dial."
 ---
-
-# Sensor Dial
 
 The **Sensor Dial** action shows Mac Sensors readings on the touchscreen above a Stream Deck + or Stream Deck + XL dial. Choose one reading with a range bar, two readings with trend lines, or three compact rows. Turn the dial to change the reading; push and touch it to control the display.
 

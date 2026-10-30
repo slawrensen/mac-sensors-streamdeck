@@ -2,9 +2,8 @@
 layout: default
 title: Hardware compatibility
 nav_order: 12
+description: "Check your Mac and deck and the evidence behind each row. A result from one Mac or one release does not qualify another."
 ---
-
-# Hardware compatibility
 
 Check your Mac and deck and the evidence behind each row. A result from one Mac or one release does not qualify another.
 

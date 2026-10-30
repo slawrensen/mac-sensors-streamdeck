@@ -2,9 +2,8 @@
 layout: default
 title: FAQ and privacy
 nav_order: 13
+description: "Requirements, statistics, performance and privacy."
 ---
-
-# FAQ and privacy
 
 For a status on a key or dial, see [Status screens](status-screens.html) and [Troubleshooting](troubleshooting.html). For changes by version, see the [changelog](changelog.html).
 

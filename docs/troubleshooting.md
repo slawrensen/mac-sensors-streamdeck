@@ -2,9 +2,8 @@
 layout: default
 title: Troubleshooting
 nav_order: 14
+description: "Start with the exact text on your key, dial or settings panel header. Mac Sensors reads this Mac directly; there is no separate sensor application to start or configure."
 ---
-
-# Troubleshooting
 
 Start with the exact text on your key, dial or settings panel header. Mac Sensors reads this Mac directly; there is no separate sensor application to start or configure.
 

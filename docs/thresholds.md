@@ -2,9 +2,8 @@
 layout: default
 title: Thresholds and alerts
 nav_order: 9
+description: "Set Warn at, Critical at or both to change the display when the live value reaches a limit: amber for warning, red for critical."
 ---
-
-# Thresholds and alerts
 
 Set **Warn at**, **Critical at** or both to change the display when the live value reaches a limit: amber for warning, red for critical.
 

@@ -1,0 +1,36 @@
+---
+layout: table_wrappers
+---
+<!DOCTYPE html>
+<html lang="en">
+{% include head.html %}
+<body class="docs-site{% if page.url == '/' %} docs-home{% endif %}">
+	<a class="skip-to-main" href="#main-content">Skip to main content</a>
+	{% include icons/icons.html %}
+	{% include components/sidebar.html %}
+	<div class="main" id="top">
+		{% include components/header.html %}
+		<div class="main-content-wrap">
+			<main id="main-content" tabindex="-1">
+				{% unless page.url == '/' %}
+				<header class="article-header">
+					{% for group in site.data.navigation %}{% for item in group.pages %}{% if item.url == page.url %}<p class="eyebrow">{{ group.title }}</p>{% endif %}{% endfor %}{% endfor %}
+					<h1 id="{{ page.title | slugify }}">{{ page.title | escape }}</h1>
+				</header>
+				{% unless page.url == '/404.html' %}<p class="release-note">Mac Sensors {{ site.plugin_release.package_version }}. Release downloads require repository access, and the Elgato Marketplace listing is not available yet. <a href="{{ '/hardware.html' | relative_url }}">Hardware compatibility</a> lists what has been measured and what is still pending.</p>{% endunless %}
+				{% endunless %}
+				<div class="doc-layout">
+					<div class="main-content">
+						{% if site.heading_anchors != false and page.url != '/' %}
+							{% include vendor/anchor_headings.html html=content beforeHeading="true" anchorBody="<svg viewBox=\"0 0 16 16\" aria-hidden=\"true\"><use xlink:href=\"#svg-link\"></use></svg>" anchorClass="anchor-heading" anchorAttrs="aria-labelledby=\"%html_id%\"" %}
+						{% else %}{{ content }}{% endif %}
+					</div>
+					{% unless page.url == '/' %}<aside class="page-toc" aria-label="Page contents" hidden></aside>{% endunless %}
+				</div>
+			</main>
+			{% include components/footer.html %}
+		</div>
+		{% if site.search_enabled != false %}{% include components/search_footer.html %}{% endif %}
+	</div>
+</body>
+</html>
