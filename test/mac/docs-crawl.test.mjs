@@ -276,6 +276,13 @@ describe("docs crawler catches redesigned-site and deployment regressions", () =
 		assert.equal(softResult.code, 1);
 		assert.match(softResult.stderr, /missing page: does not serve the site's 404\.html/);
 	});
+
+	it("accepts the host's not-found page with --host-404", async t => {
+		const notFound = "<title>Page not found | Docs</title><a href=\"/\">Home</a>";
+		const hosted = await fixture(t, { "/": { html: "Public page" }, "/404.html": { html: notFound } });
+		const hostedResult = await crawl(hosted.root, "--host-404");
+		assert.equal(hostedResult.code, 0, hostedResult.stderr);
+	});
 });
 
 // A closing HTTP/1.0 peer exercises the response-stream failure seen with an

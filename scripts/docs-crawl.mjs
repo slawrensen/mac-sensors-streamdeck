@@ -6,7 +6,7 @@
 // reachable from navigation. Browser interaction and rendering are separate.
 //
 //   node scripts/docs-crawl.mjs <root> --manifest scripts/docs-route-contract.json
-//   node scripts/docs-crawl.mjs https://docs.slawrensen.com/mac-streamdeck/ --build-id docs-<source> --source-sha <sha>
+//   node scripts/docs-crawl.mjs https://docs.slawrensen.com/mac-streamdeck/ --build-id docs-<source> --source-sha <sha> --host-404
 //
 // Exit 1 on any broken link, image, srcset candidate or anchor, a missing
 // route-contract page or fragment, private material in a page or the search
@@ -74,7 +74,9 @@ async function main() {
 		manifest: { type: "string" },
 		"build-id": { type: "string" },
 		"source-sha": { type: "string" },
-		"search-index": { type: "string", default: "assets/js/search-data.json" }
+		"search-index": { type: "string", default: "assets/js/search-data.json" },
+		// A subfolder of a GitHub Pages user site gets the host's not-found page, never its own 404.html.
+		"host-404": { type: "boolean", default: false }
 	} });
 	const root = positionals[0];
 	if (positionals.length !== 1 || typeof root !== "string" || !/^https?:\/\//.test(root)) {
@@ -299,7 +301,7 @@ async function main() {
 	// page, that page is what a reader sees there.
 	const missing = await fetchPage(new URL(`docs-crawl-missing-${Date.now().toString(36)}.html`, base).href);
 	if (missing.status !== 404) problems.push(`missing page: HTTP ${missing.status}, expected 404`);
-	if (notFound.status === 200 && notFound.html) {
+	if (notFound.status === 200 && notFound.html && !values["host-404"]) {
 		const title = /<title>([^<]*)<\/title>/i.exec(notFound.html)?.[1];
 		if (title && !missing.html.includes(`<title>${title}</title>`)) problems.push(`missing page: does not serve the site's 404.html (${title})`);
 	}
