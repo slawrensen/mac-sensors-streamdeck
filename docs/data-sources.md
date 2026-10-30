@@ -2,7 +2,7 @@
 layout: default
 title: Data sources
 nav_order: 10
-description: "Every reading on a key, dial or detail tile comes from one of two local sources on this Mac: macOS system counters, or SMC readings taken by the plugin's own native reader."
+description: "Where each reading comes from, macOS system counters or the SMC, and when a value counts as fresh."
 ---
 
 Every reading on a key, dial or detail tile comes from one of two local sources on this Mac: macOS system counters, or SMC readings taken by the plugin's own native reader. Each read asks both sources. There is no source setting to choose and no separate sensor application. Which readings exist depends on the Mac model and macOS version.

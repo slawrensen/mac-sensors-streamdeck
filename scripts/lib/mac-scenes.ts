@@ -10,7 +10,7 @@ import {composeBackFace,composeChunkFace,composePagerFace,composeTitleFace,type 
 import {pageOf,projectDetailTiles,resolveDetailGroup} from '../../src/detail/detail-group';
 import {DETAIL_PROFILES,readingSlotCapacity,type DetailNavRole} from '../../src/detail/managed-profiles';
 import type {DetailPresentation,DeviceDetailState} from '../../src/detail/navigation';
-export type Scene={id:string;kind:'key'|'dial';svg:string;description:string};
+export type Scene={id:string;kind:'key'|'dial';svg:string;description:string;customLabel:boolean};
 const smc=(key:string,meaning:string)=>`mac:v1:smc:Mac17%2C9:${Buffer.from(key).toString('hex')}:${meaning}.v1`;
 /** The shipped provider's groups in its GROUPS order (src/mac/provider.ts); each group's sensor id is its position plus one. */
 export const PROVIDER_GROUPS=['CPU','GPU','Memory','Storage','Network','Battery','Fans','System'] as const;
@@ -49,6 +49,11 @@ export function sampleSnapshot():SensorSnapshot {
 const docsGlobals={theme:'void',textMode:'theme',typeAccents:'off',dataUnits:'decimal',textFont:'tahoma'} as const;
 const STAT_CYCLE=['current','min','max','avg'] as const;
 const readingFaceLabels=['CPU super 1','GPU 1','Fan 1','System Total','CPU activity','Memory active','Network RX','Free space'];
+/** True when a face draws a typed label instead of the reading's catalog label, so its board footer can say custom labels are shown. */
+const typedLabel=(pairs:[string|undefined,string|undefined][])=>pairs.some(([key,label])=>!!label&&label!==sampleReadings.find(row=>row.key===key)?.label);
+/** The labelled slots a key layout draws: one reading, or the first two, three or four. */
+const KEY_LAYOUT_SLOTS:Record<string,number>={dual:2,triple:3,quad:4};
+const keyLabels=(settings:ReadingSettings)=>typedLabel(([[settings.readingKey,settings.label],[settings.secondaryReadingKey,settings.secondaryLabel],[settings.quadReadingKey3,settings.quadLabel3],[settings.quadReadingKey4,settings.quadLabel4]] as [string|undefined,string|undefined][]).slice(0,KEY_LAYOUT_SLOTS[settings.keyLayout??'']??1));
 // The bundled 15-key detail profile, read from the one registry the runtime and profile generator use.
 const standardDetail=DETAIL_PROFILES.find(profile=>profile.key==='standard')!;
 type DetailCell={id:string;role:DetailNavRole}|{id:string;index:number};
@@ -70,7 +75,7 @@ export function composeScenes():Scene[] {
 		// Fixture-only history in this rendering process; no provider is opened.
 		poller.subscribeSeries(row.key);const series=poller.getSeries(row.key) as number[];series.length=0;series.push(...history);
 	}
-	const scenes:Scene[]=[],key=(id:string,settings:ReadingSettings,description:string,back=false)=>scenes.push({id,kind:'key',svg:compose(settings,status,back),description});
+	const scenes:Scene[]=[],key=(id:string,settings:ReadingSettings,description:string,back=false)=>scenes.push({id,kind:'key',svg:compose(settings,status,back),description,customLabel:keyLabels(settings)});
 	for(const [index,row] of sampleReadings.entries())key('reading-'+index,{readingKey:row.key,label:readingFaceLabels[index],displayMode:'sparkline'},row.label);
 	const primary={readingKey:sampleReadings[0]!.key,label:'CPU super 1',secondaryReadingKey:sampleReadings[1]!.key,secondaryLabel:'GPU 1',quadReadingKey3:sampleReadings[2]!.key,quadLabel3:'Fan 1',quadReadingKey4:sampleReadings[4]!.key,quadLabel4:'CPU'};
 	for(const keyLayout of ['dual','triple','quad'])key('layout-'+keyLayout,{...primary,keyLayout,quadLabels:true,...(keyLayout==='triple'?{label:'CPU',secondaryLabel:'GPU',quadLabel3:'Fan'}:{})},keyLayout+' layout');
@@ -82,13 +87,13 @@ export function composeScenes():Scene[] {
 	for(const theme of ['void','graphite','ultraviolet','midnight','forest','ember','paper'])key('theme-'+theme,{readingKey:sampleReadings[0]!.key,label:'CPU super 1',theme,displayMode:'sparkline'},theme+' theme');
 	for(const dialView of ['single','tworow','overview']){
 		const settings:DialSettings={readingKey:sampleReadings[0]!.key,label:'CPU super 1',rotationKeys:sampleReadings.slice(0,3).map(row=>row.key),dialView,overviewLabels:'full',theme:'void',...(dialView==='single'?{warnValue:'75',critValue:'90'}:{})};
-		const state:DialRenderState={settings,stats,statMode:'current',overlay:null,pinned:false,cyclePaused:false};scenes.push({id:'dial-'+dialView,kind:'dial',svg:composeDialSvg(state,status,key=>histories.get(key)??[]),description:dialView+' dial view'});
+		const state:DialRenderState={settings,stats,statMode:'current',overlay:null,pinned:false,cyclePaused:false};scenes.push({id:'dial-'+dialView,kind:'dial',svg:composeDialSvg(state,status,key=>histories.get(key)??[]),description:dialView+' dial view',customLabel:typedLabel([[settings.readingKey,settings.label]])});
 	}
 	const colored:DialRenderState={settings:{readingKey:sampleReadings[0]!.key,label:'CPU super 1',rotationKeys:sampleReadings.slice(0,3).map(row=>row.key),dialView:'overview',overviewLabels:'full',theme:'void',readingColors:Object.fromEntries(sampleReadings.slice(0,3).map((row,index)=>[row.key,['#4CC2FF','#FF7E8E','#38CD89'][index]!]))},stats,statMode:'current',overlay:null,pinned:false,cyclePaused:false};
-	scenes.push({id:'dial-overview-colored',kind:'dial',svg:composeDialSvg(colored,status,key=>histories.get(key)??[]),description:'Individual number colors'});
+	scenes.push({id:'dial-overview-colored',kind:'dial',svg:composeDialSvg(colored,status,key=>histories.get(key)??[]),description:'Individual number colors',customLabel:typedLabel([[colored.settings.readingKey,colored.settings.label]])});
 	// No Mac code path raises access-denied, so it has no scene.
-	for(const reason of ['pending','busy','no-readable-sensors','unsupported-platform','bridge-failed','font-missing','source-error'] as const)scenes.push({id:'status-'+reason,kind:'key',svg:compose({readingKey:sampleReadings[0]!.key},{state:'unavailable',reason,message:''}),description:reason});
-	scenes.push({id:'status-missing',kind:'key',svg:compose({readingKey:'mac:v1:system:missing'},status),description:'Saved sensor missing'});
+	for(const reason of ['pending','busy','no-readable-sensors','unsupported-platform','bridge-failed','font-missing','source-error'] as const)scenes.push({id:'status-'+reason,kind:'key',svg:compose({readingKey:sampleReadings[0]!.key},{state:'unavailable',reason,message:''}),description:reason,customLabel:false});
+	scenes.push({id:'status-missing',kind:'key',svg:compose({readingKey:'mac:v1:system:missing'},status),description:'Saved sensor missing',customLabel:false});
 	// The detail page as DetailController paints it: an opener on CPU super 1 whose Press opens A custom list of the other
 	// seven sample readings with Title tile text left blank, so the title is resolveDetailGroup's own default.
 	// Opened from the top-left key, so no reading cell becomes a second Back tile.
@@ -100,10 +105,11 @@ export function composeScenes():Scene[] {
 	for(const cell of detailCells()){
 		if('role' in cell){
 			const svg=cell.role==='back'?composeBackFace(state,status,ctx):cell.role==='title'?composeTitleFace(state,page,ctx):composePagerFace(cell.role,page,state,ctx);
-			scenes.push({id:cell.id,kind:'key',svg,description:'Detail page '+cell.role+' tile'});
+			// The Back tile draws the opener's own label; the title and pagers draw no reading label.
+			scenes.push({id:cell.id,kind:'key',svg,description:'Detail page '+cell.role+' tile',customLabel:cell.role==='back'&&typedLabel([[opener.readingKey,opener.label]])});
 		}else{
 			const chunk=page.chunks[cell.index]??[];
-			scenes.push({id:cell.id,kind:'key',svg:composeChunkFace(state,chunk,'current',status,ctx,page.specs[cell.index]),description:chunk.length?'Detail page reading tile: '+chunk.map(key=>snapshot.byKey.get(key)?.label).join(', '):'Detail page empty tile'});
+			scenes.push({id:cell.id,kind:'key',svg:composeChunkFace(state,chunk,'current',status,ctx,page.specs[cell.index]),description:chunk.length?'Detail page reading tile: '+chunk.map(key=>snapshot.byKey.get(key)?.label).join(', '):'Detail page empty tile',customLabel:false});
 		}
 	}
 	// The shipped default, Accent colors: By sensor type, on the same reading faces.
@@ -117,15 +123,20 @@ export function composeScenes():Scene[] {
 	}
 	return scenes;
 }
+/** The footer under a board: it says custom labels are shown when any face on the board draws one. */
+export function boardFooter(board:{scenes:string[]},scenes:Scene[]):string {
+	const custom=board.scenes.some(id=>scenes.find(scene=>scene.id===id)?.customLabel);
+	return 'Production-rendered sample data. '+(custom?'Mac catalog readings, custom labels where set':'Mac catalog labels')+', illustrative values.';
+}
 export const boardDefinitions=[
 	{id:'readme-hero',title:'Mac Sensors',subtitle:'Seven themes. Live readings on keys and dials. Hardware stays read-only.',scenes:['theme-void','theme-graphite','theme-ultraviolet','theme-midnight','theme-forest','theme-ember','theme-paper','layout-quad','reading-0','reading-1','reading-2','reading-3','reading-4','reading-5','reading-6','reading-7','layout-dual','layout-triple','ring','bar','warn','crit','back','detail-page-title','dial-single','dial-tworow','dial-overview','dial-overview-colored'],columns:8},
 	{id:'hero',title:'Mac Sensors',subtitle:'Your Mac, on your keys and dials.',scenes:['reading-0','reading-1','reading-2','reading-4','dial-tworow'],columns:4},
-	{id:'key-layouts',title:'Give each reading the space it needs',subtitle:'One, two, three or four readings on a key.',scenes:['reading-0','layout-dual','layout-triple','layout-quad','bar','ring','reading-5','reading-6'],columns:4},
+	{id:'key-layouts',title:'Sensor Reading key layouts',subtitle:'One, two, three or four readings on a key.',scenes:['reading-0','layout-dual','layout-triple','layout-quad','bar','ring','reading-5','reading-6'],columns:4},
 	{id:'details',title:'Detail page on a 15-key Stream Deck',subtitle:'Back, title, Previous and Next, then a custom list of seven readings. The last four cells are empty.',scenes:detailCells().map(cell=>cell.id),columns:standardDetail.layout.columns,tile:144,gap:24,top:175},
-	{id:'dials',title:'Turn through your reading set',subtitle:'Single, two-row and overview views with local session statistics.',scenes:['dial-single','dial-tworow','dial-overview'],columns:3},
-	{id:'themes',title:'Choose the look that fits your desk',subtitle:'A shared default, with local choices when you want them.',scenes:['theme-void','theme-graphite','theme-ultraviolet','theme-midnight','theme-forest','theme-ember','theme-paper'],columns:4},
-	{id:'alerts',title:'See when a reading crosses your threshold',subtitle:'Normal, warning and critical states. Hardware remains read-only.',scenes:['reading-0','warn','crit','bar'],columns:4},
-	{id:'reading-colors',title:'Give readings their own number colors',subtitle:'The same readings and geometry. Only numeric fills change.',scenes:['dial-overview','dial-overview-colored'],columns:2},
+	{id:'dials',title:'Sensor Dial views',subtitle:'One reading · Overview, two rows · Overview, three rows. Local session statistics.',scenes:['dial-single','dial-tworow','dial-overview'],columns:3},
+	{id:'themes',title:'Seven themes',subtitle:'One shared theme, or a theme for each key or dial.',scenes:['theme-void','theme-graphite','theme-ultraviolet','theme-midnight','theme-forest','theme-ember','theme-paper'],columns:4},
+	{id:'alerts',title:'Warning and critical colors',subtitle:'Normal, warning and critical states set by Warn at and Critical at.',scenes:['reading-0','warn','crit','bar'],columns:4},
+	{id:'reading-colors',title:'Reading colors on a Sensor Dial',subtitle:'The same readings and layout. Only the number colors differ.',scenes:['dial-overview','dial-overview-colored'],columns:2},
 	{id:'status',title:'Status screens on a key',subtitle:'Shown in place of the reading when there is no live value to draw.',scenes:['status-pending','status-busy','status-missing','status-no-readable-sensors','status-bridge-failed','status-font-missing','status-source-error'],columns:4},
 	{id:'accents',title:'Accent colors by sensor type',subtitle:'The default setting. Trend lines take the reading type\'s color; Free space keeps the theme accent.',scenes:['accent-reading-0','accent-reading-1','accent-reading-2','accent-reading-3','accent-reading-4','accent-reading-5','accent-reading-6','accent-reading-7'],columns:4},
 	{id:'stat-modes',title:'Pressing a key cycles current, MIN, MAX and AVG',subtitle:'MIN, MAX and AVG come from this session\'s reads. Below, two readings share one badge.',scenes:[...STAT_CYCLE.map(mode=>'stat-single-'+mode),...STAT_CYCLE.map(mode=>'stat-dual-'+mode)],columns:4}

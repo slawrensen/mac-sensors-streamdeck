@@ -2,7 +2,7 @@
 layout: default
 title: Themes and colors
 nav_order: 8
-description: "Pick a theme in the strip under a key's or dial's settings header. Choose Default to follow the shared theme, or a named preset for that key or dial only."
+description: "Seven themes, shared or per key, with text colors, type accents and dial reading colors."
 ---
 
 Pick a theme in the strip under a key's or dial's settings header. Choose **Default** to follow the shared theme, or a named preset for that key or dial only.

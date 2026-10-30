@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "source_commit": "f70c087d12490df3f7519d0dd0f4a67adfc55fe0",
-  "note": "The 15 published routes and every article heading fragment from the Jekyll build of source_commit. Keep each destination, or add an explicit alias when a heading changes.",
+  "note": "The 15 published routes and every article heading fragment from the Jekyll build of source_commit, plus routes added since. Keep each destination, or add an explicit alias when a heading changes. The homepage release section moved to whats-new-1.0.1.html; its old ids are aliases on the sentence that links there, and license-and-trademarks is the homepage footer's license line.",
   "routes": [
     {
       "path": "",
@@ -21,6 +21,7 @@
       "anchors": [
         "changelog",
         "1010---2026-10-27",
+        "1010---2026-10-28",
         "1000---2026-10-13"
       ]
     },
@@ -297,6 +298,12 @@
         "what-stays-on-this-mac",
         "before-you-file-an-issue",
         "where-to-go-next"
+      ]
+    },
+    {
+      "path": "whats-new-1.0.1.html",
+      "anchors": [
+        "what-changed-in-1-0-1"
       ]
     }
   ]

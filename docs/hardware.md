@@ -2,7 +2,7 @@
 layout: default
 title: Hardware compatibility
 nav_order: 12
-description: "Check your Mac and deck and the evidence behind each row. A result from one Mac or one release does not qualify another."
+description: "Which Macs and Stream Deck models have run Mac Sensors, and the evidence behind each row."
 ---
 
 Check your Mac and deck and the evidence behind each row. A result from one Mac or one release does not qualify another.
@@ -26,13 +26,13 @@ Check your Mac and deck and the evidence behind each row. A result from one Mac 
 | macOS 26.6 | **Hosted VM** | Hosted Apple silicon runners on macOS 26.6.2 and Intel runners on macOS 26.6.1 ran the full test suite and loaded and read the exact shipped native readers. No physical Mac has run Mac Sensors on macOS 26. |
 | macOS 13.5 to 15 | **Pending** | 13.5 is the declared floor. Mac Sensors has not run on these versions. |
 
-The package requires Stream Deck 7.1 or later, which plugins that use the Node 24 runtime need. The app supplies that runtime and chooses its version; the measured app ran the plugin on 24.13.1.
+The package requires Stream Deck 7.1 or later, which plugins that use the Node 24 runtime need. The app supplies that runtime and chooses its version: 24.13.1 with app 7.5.0 and 24.22.1 with app 7.6.0 on the measured Mac.
 
 ### Stream Deck models
 
 | Deck | Keys | Dials | Evidence |
 | --- | --- | --- | --- |
-| Virtual Stream Deck | Yes | No | **Measured** at 8 by 4 on the M5 Pro with app 7.5.0. The plugin takes the grid the app reports and treats this deck as having no dials. |
+| Virtual Stream Deck | Yes | No | **Measured** at 8 by 4 on the M5 Pro with apps 7.5.0 and 7.6.0. The plugin takes the grid the app reports and treats this deck as having no dials. |
 | Stream Deck, 15 keys (5 by 3) | Yes | n/a | **Software tests**: the mock host registers a 5 by 3 deck and drives keys on it. Physical key checks are pending. |
 | Stream Deck + | Yes | Yes, 4 | **Software tests**: the model table gives it four dials and a touch strip of 200 by 100 per dial. Dial events run in the mock host on a + XL, which uses the same dial code. Physical dial gestures are pending. |
 | Stream Deck + XL | Yes | Yes, 6 | **Software tests**: the mock host registers a + XL, draws six dials on it and sends dial turns. Synthetic gesture traces replay through the production gesture code. Physical dial gestures are pending. |
