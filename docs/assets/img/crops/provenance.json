@@ -64,7 +64,7 @@
       "file": "crops/settings-control-header.png",
       "source": {
         "file": "docs/assets/img/settings-control.png",
-        "sha256": "2ab9838139ee40644a26744fae7bdba491abf615916eef66e7ba40243dd8f2ae"
+        "sha256": "3fe6218129e947f23e25b61bc9a593b837553d180289f4c57666d4daae1397b9"
       },
       "regions": [
         {
@@ -178,7 +178,7 @@
       "file": "crops/settings-reading-colors-display.png",
       "source": {
         "file": "docs/assets/img/settings-reading-colors.png",
-        "sha256": "d5d01780e22ac4551b13fb9e3dcbddcdb83eb58c54f5d46f7e0848130409d3ff"
+        "sha256": "6a352a447d6305989e38dfd27fc088fb0d3b002a84a4f4f1afbd544352ebaf6a"
       },
       "regions": [
         {
@@ -190,14 +190,14 @@
       ],
       "width": 756,
       "height": 1184,
-      "bytes": 74238,
-      "sha256": "3f2aa6db6c9e32aa3fe7e53695005e13c5c3879fed918a6f5322878be3134024"
+      "bytes": 74237,
+      "sha256": "7a532d8ab46af473751408fea5fe76d18aa9c8da7f952119160f1043e9a526ae"
     },
     {
       "file": "crops/settings-dial-display.png",
       "source": {
         "file": "docs/assets/img/settings-dial.png",
-        "sha256": "6014f4d5e090bc20736776c31a830ac6d39697b0666599ae9a2cf744ba603dbc"
+        "sha256": "c30d32186573e0bdb188f0f9044e07bd86ced97f7f38d70d5bb55343094e6fb5"
       },
       "regions": [
         {
@@ -215,8 +215,8 @@
       ],
       "width": 756,
       "height": 1462,
-      "bytes": 97712,
-      "sha256": "2432cfa57b08173543f2f19dc2632e76269e05e04c200604ed4e08ffc9a0a179"
+      "bytes": 97715,
+      "sha256": "f67b7f2703478b213d000f9d4d79d4cd6469f130ffe975860da491999ce0a625"
     },
     {
       "file": "brand/mac-sensors-icon-16.png",
