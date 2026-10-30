@@ -1,6 +1,7 @@
 {% include docs_identity.html %}
 <footer class="docs-footer">
 	<div class="footer-links"><a href="{{ '/troubleshooting.html' | relative_url }}">Troubleshooting</a><a href="{{ '/faq.html#privacy' | relative_url }}">Privacy</a><a href="{{ site.bug_reports }}">Report a bug</a><a href="#top">Back to top <span aria-hidden="true">↑</span></a></div>
-	<p>{{ site.footer_content }}</p>
+	<p{% if page.url == '/' %} id="license-and-trademarks"{% endif %}>{{ site.footer_content }}</p>
+	<p>{{ site.footer_trademarks }}</p>
 	<p class="footer-meta">Built with <a href="https://github.com/just-the-docs/just-the-docs">Just the Docs</a>.{% if docs_build_id %} <span data-build-id="{{ docs_build_id }}">Build {{ docs_build_id }}</span>.{% endif %}</p>
 </footer>

@@ -1,11 +1,11 @@
-# Groups the existing routes. Labels are the page titles; no route is renamed.
+# Groups the existing routes. Short labels; each page keeps its own title, heading and anchors. No route is renamed.
 - title: Start
   pages:
-    - title: Home
+    - title: Overview
       url: /
-    - title: Installation and requirements
+    - title: Install
       url: /installation.html
-    - title: Getting started
+    - title: Get started
       url: /getting-started.html
 - title: Customize
   pages:
@@ -35,5 +35,7 @@
       url: /data-sources.html
     - title: Hardware compatibility
       url: /hardware.html
+    - title: What changed in 1.0.1
+      url: /whats-new-1.0.1.html
     - title: Changelog
       url: /changelog.html

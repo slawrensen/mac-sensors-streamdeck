@@ -2,7 +2,7 @@
 layout: default
 title: Sensor Reading
 nav_order: 4
-description: "Show one to four Mac readings on a display key. Add a graph to the one-reading layout, set warning and critical colors, or make a press open a page of related readings."
+description: "Show one to four readings on a key, add a graph, set alert colors or open a detail page."
 ---
 
 Show one to four Mac readings on a display key. Add a graph to the one-reading layout, set warning and critical colors, or make a press open a page of related readings.
@@ -17,7 +17,7 @@ Show one to four Mac readings on a display key. Add a graph to the one-reading l
 | Alerts | [Warn at and Critical at](#warn-at-and-critical-at) |
 | Press behavior | [Cycle the statistic or open details](#pressing-the-key) |
 
-![Eight key faces: one reading with a sparkline, two stacked readings, three rows, a four-cell grid with small labels, a CPU usage bar and ring with amber and red zones, and Memory active and Network receive keys with sparklines](assets/img/key-layouts.png)
+![Eight key faces: one reading with a sparkline, two stacked readings, three rows, a four-cell grid with small labels, a CPU usage bar and ring with amber and red zones, and Memory active and Network RX keys with sparklines](assets/img/key-layouts.png)
 
 *Production-rendered sample data: Mac catalog readings, some with custom labels such as CPU super 1 and Network RX, and illustrative values. Rendered with **Accent colors** set to **Theme accent everywhere**, so every graph uses the Void accent instead of the default type accents.*
 

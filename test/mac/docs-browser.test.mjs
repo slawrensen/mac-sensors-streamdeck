@@ -12,7 +12,7 @@ import { launch } from "../../scripts/lib/cdp.mjs";
 
 const base = process.env.DOCS_TEST_URL ? new URL(process.env.DOCS_TEST_URL.endsWith("/") ? process.env.DOCS_TEST_URL : `${process.env.DOCS_TEST_URL}/`) : null;
 const options = { skip: base ? false : "UNAVAILABLE: set DOCS_TEST_URL to a served Jekyll build or the published site", timeout: 60_000 };
-const PAGES = ["", "installation.html", "getting-started.html", "sensor-reading.html", "sensor-details.html", "sensor-dial.html", "dial-controls.html", "themes.html", "thresholds.html", "data-sources.html", "status-screens.html", "hardware.html", "faq.html", "troubleshooting.html", "changelog.html"];
+const PAGES = ["", "installation.html", "getting-started.html", "sensor-reading.html", "sensor-details.html", "sensor-dial.html", "dial-controls.html", "themes.html", "thresholds.html", "data-sources.html", "status-screens.html", "hardware.html", "faq.html", "troubleshooting.html", "whats-new-1.0.1.html", "changelog.html"];
 let browser;
 let exceptions = [];
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -63,7 +63,7 @@ for (const viewport of [{ width: 320, height: 640 }, { width: 390, height: 844 }
 				};
 			})()`);
 			assert.equal(facts.lang, "en", page);
-			assert.match(facts.title, /\| Mac Sensors$/, page);
+			assert.match(facts.title, /\| Mac Sensors for Stream Deck$/, page);
 			assert.ok(facts.description.length > 20, `${page} has its own description`);
 			assert.equal(facts.h1, 1, `${page} has exactly one h1`);
 			assert.equal(facts.skip, "#main-content", page);
@@ -91,7 +91,7 @@ test("text and controls keep a 14px minimum and WCAG AA contrast against their s
 				}
 				return parse(getComputedStyle(document.body).backgroundColor);
 			};
-			const selector = ".main-content p, .main-content li, .main-content td, .main-content th, .main-content figcaption, .main-content a, .main-content code, .eyebrow, .release-note, .nav-list-link, .nav-group-title, .site-footer a, .site-footer span, .docs-footer p, .docs-footer a, .gallery-position, .search-input, .button";
+			const selector = ".main-content p, .main-content li, .main-content td, .main-content th, .main-content figcaption, .main-content a, .main-content code, .eyebrow, .nav-list-link, .nav-group-title, .site-footer a, .site-footer span, .docs-footer p, .docs-footer a, .gallery-position, .search-input, .button";
 			const out = [];
 			for (const element of document.querySelectorAll(selector)) {
 				if (!element.textContent.trim() && element.tagName !== "INPUT") continue;
@@ -211,7 +211,7 @@ test("navigation, articles and full-image links work without JavaScript", option
 			images: [...document.querySelectorAll(".main-content img")].length
 		})`);
 		assert.notEqual(facts.nav, "none", "the navigation is visible without the menu script");
-		assert.equal(facts.links, 15);
+		assert.equal(facts.links, 16);
 		assert.ok(facts.headings > 3);
 		assert.ok(facts.images > 0);
 		await open("", { width: 1280, height: 800, script: false });
@@ -250,11 +250,11 @@ for (const [viewport, target] of [[{ width: 1280, height: 800 }, "themes.html#ty
 }
 
 test("reference tables stack into labeled rows on phones and stay tables on desktop", options, async () => {
-	await open("", { width: 390, height: 844 });
+	await open("whats-new-1.0.1.html", { width: 390, height: 844 });
 	const phone = await browser.evaluate(`(() => { const table = [...document.querySelectorAll(".main-content table")].find(item => item.tHead.textContent.includes("What you see")); const cell = table.tBodies[0].rows[0].cells[1]; return { stacked: table.classList.contains("stacked"), role: table.getAttribute("role"), cellRole: cell.getAttribute("role"), label: cell.querySelector(".cell-label")?.textContent, hidden: cell.querySelector(".cell-label")?.getAttribute("aria-hidden"), wrapperOverflow: table.parentElement.scrollWidth - table.parentElement.clientWidth, height: Math.round(table.getBoundingClientRect().height) }; })()`);
 	assert.deepEqual({ ...phone, height: undefined }, { stacked: true, role: "table", cellRole: "cell", label: "What you see", hidden: "true", wrapperOverflow: 0, height: undefined });
 	assert.ok(phone.height < 4000, `the stacked change table stays readable (${phone.height}px)`);
-	await open("", { width: 1280, height: 800 });
+	await open("whats-new-1.0.1.html", { width: 1280, height: 800 });
 	assert.equal(await browser.evaluate("document.querySelector('.main-content table.stacked')"), null);
 	assert.equal(await browser.evaluate("getComputedStyle(document.querySelector('.main-content .cell-label')).display"), "none");
 });

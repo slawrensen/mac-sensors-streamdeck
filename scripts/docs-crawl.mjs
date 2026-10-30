@@ -270,7 +270,8 @@ async function main() {
 		for (const anchor of expected.get(url) ?? []) if (!present.has(anchor)) problems.push(`${url}: required route-contract anchor #${anchor} not on the page`);
 		const elements = tags(page.html);
 		const meta = new Map(elements.filter(tag => tag.name === "meta").map(tag => [tag.attributes.name?.toLowerCase(), tag.attributes.content ?? ""]));
-		if (/(?:^|[\s,])noindex(?:[\s,]|$)/i.test(meta.get("robots") ?? "")) problems.push(`${url}: production page must be indexable, found noindex`);
+		// The site's own not-found page may stay out of search; every other page must be indexable.
+		if (url !== notFoundUrl.href && /(?:^|[\s,])noindex(?:[\s,]|$)/i.test(meta.get("robots") ?? "")) problems.push(`${url}: production page must be indexable, found noindex`);
 		if (htmlBuildId && meta.get("docs-build-id") !== htmlBuildId) problems.push(`${url}: build meta does not match ${htmlBuildId}`);
 		if (buildManifest && meta.get("docs-source-sha") !== buildManifest.source_commit) problems.push(`${url}: source meta does not match build manifest`);
 		for (const tag of elements) if (tag.name === "a" && tag.attributes.href) await checkLink(url, tag.attributes.href);
