@@ -1,0 +1,14 @@
+{%- comment -%}
+Build identity shared by the head, footer and docs-build.json. GitHub Pages
+supplies the source commit. A local build without a 40-character commit leaves
+both values unset instead of emitting an empty or truncated identity.
+{%- endcomment -%}
+{%- assign docs_source_sha = site.docs_source_sha | default: site.github.build_revision | default: '' | strip -%}
+{%- assign docs_build_id = nil -%}
+{%- if docs_source_sha.size == 40 -%}
+{%- assign source_short = docs_source_sha | slice: 0, 12 -%}
+{%- assign docs_build_id = 'docs-' | append: source_short -%}
+{%- if site.docs_build_id -%}{%- assign docs_build_id = site.docs_build_id -%}{%- endif -%}
+{%- else -%}
+{%- assign docs_source_sha = nil -%}
+{%- endif -%}

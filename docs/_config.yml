@@ -1,13 +1,42 @@
 title: Mac Sensors
 description: Read-only Mac sensor readings on Stream Deck keys and dials.
+# Served at https://docs.slawrensen.com/mac-streamdeck/ beneath the umbrella
+# site's custom domain. This folder carries no CNAME.
 url: https://docs.slawrensen.com
 baseurl: /mac-streamdeck
 remote_theme: just-the-docs/just-the-docs@v0.10.1
 plugins:
   - jekyll-remote-theme
+  - jekyll-seo-tag
 color_scheme: dark
 search_enabled: true
 heading_anchors: true
+search:
+  heading_level: 3
+  previews: 2
+  preview_words_before: 5
+  preview_words_after: 12
+  rel_url: false
+  focus_shortcut_key: k
+enable_copy_code_button: true
+
+# The product repository is private: no GitHub aux links, edit-this-page links
+# or release download links. The footer links only public destinations.
+plugin_release:
+  version: 1.0.1
+  package_version: 1.0.1.0
+bug_reports: https://github.com/slawrensen/slawrensen.github.io/issues
+
+# Link previews use the production-rendered overview board.
+defaults:
+  - scope:
+      path: ""
+    values:
+      image:
+        path: /assets/img/readme-hero.png
+        alt: "Board of Mac Sensors keys and dials: one temperature key in each of the seven themes, a four-reading key, single keys for temperature, fan, power, CPU, memory, network and free space, two- and three-reading keys, a ring and a bar, warning and critical keys, a Back tile, a detail title tile and four dial views"
+
+# Internal release runbooks: kept next to the docs, never published.
 exclude:
   - release/
 footer_content: >-

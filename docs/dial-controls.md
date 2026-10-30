@@ -2,9 +2,8 @@
 layout: default
 title: Dial controls and presets
 nav_order: 7
+description: "Choose what turning, pressing and touching a Sensor Dial does."
 ---
-
-# Dial controls and presets
 
 Choose what turning, pressing and touching a Sensor Dial does. Open its **Controls** section for **Gestures**, **Touch zones**, **Ignore turns**, **Auto cycle**, **A stats reset clears** and **Link ID**. Rotation groups are under **Reading**. Thresholds and **Auto cycle jumps to a critical reading** are under **Alerts**.
 

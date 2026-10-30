@@ -2,9 +2,8 @@
 layout: default
 title: Getting started
 nav_order: 3
+description: "Put one live reading on a key, then customize it."
 ---
-
-# Getting started
 
 Put one live reading on a key, then customize it.
 

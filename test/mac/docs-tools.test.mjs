@@ -41,3 +41,33 @@ test('owner photo preparation preserves the input and measures supplied color pa
  const meta=await sharp(output).metadata(),report=JSON.parse(fs.readFileSync(output+'.json'));assert.equal(meta.width,1920);assert.equal(meta.height,960);assert.equal(meta.exif,undefined);assert.ok(report.measurements.every(row=>row.absoluteDifference.every(value=>value===0)&&row.clippedPixelFraction===0));
  const repeated=spawnSync(process.execPath,['scripts/prepare-hardware-photo.mjs',original,output],{encoding:'utf8'});assert.notEqual(repeated.status,0);assert.deepEqual(fs.readFileSync(original),before);
 });
+
+test('docs screenshots refuse a malformed extra viewport before a browser is launched',()=>{
+ const result=spawnSync(process.execPath,['scripts/docs-site-shots.mjs',os.tmpdir(),'http://127.0.0.1:9/docs/'],{encoding:'utf8',env:{...process.env,DOCS_SHOTS_VIEWPORTS:'390x844,wide'}});assert.notEqual(result.status,0);assert.match(result.stderr,/DOCS_SHOTS_VIEWPORTS/);
+});
+
+test('the docs brand mark and favicon are the shipped plugin icon, byte for byte',()=>{
+ assert.deepEqual(fs.readFileSync('docs/assets/img/brand/mac-sensors-icon-256.png'),fs.readFileSync('com.lawrensen.mac.sdPlugin/imgs/plugin/marketplace.png'));
+ assert.deepEqual(fs.readdirSync('docs/assets/img/brand'),['mac-sensors-icon-256.png'],'no unpinned brand image is published');
+});
+
+test('the shared docs frontend keeps the theme license and names no sibling product or private repository',()=>{
+ assert.match(fs.readFileSync('docs/assets/js/just-the-docs.LICENSE.txt','utf8'),/MIT License[\s\S]*Patrick Marsceill/);
+ assert.match(fs.readFileSync('docs/assets/js/just-the-docs.js','utf8'),/^---\nlayout: null\n---\n\/\/ Just the Docs v0\.10\.1/);
+ for(const file of ['docs/assets/css/docs.css','docs/assets/js/docs.js','docs/assets/js/just-the-docs.js',...fs.readdirSync('docs/_includes/components').map(name=>'docs/_includes/components/'+name),'docs/_layouts/default.html','docs/_includes/head_custom.html','docs/_config.yml']){
+  const text=fs.readFileSync(file,'utf8');assert.doesNotMatch(text,/HWiNFO|REALiX|—/,file);assert.doesNotMatch(text,/github\.com[/:]slawrensen\/mac-(?:sensors-)?streamdeck/i,file);
+ }
+ assert.doesNotMatch(fs.readFileSync('docs/_config.yml','utf8'),/^(?:aux_links|gh_edit_link):/m,'a private repository has no edit or aux links');
+});
+
+test('the docs source validator rejects broken Liquid links, kindless figure captions and a body h1',t=>{
+ const directory=fs.mkdtempSync(path.join(os.tmpdir(),'mac-docs-validate-'));t.after(()=>fs.rmSync(directory,{recursive:true,force:true}));
+ fs.cpSync('docs',path.join(directory,'docs'),{recursive:true,filter:source=>!source.includes(path.join('docs','release'))});
+ const run=()=>spawnSync(process.execPath,[path.join(root,'scripts/validate-docs.mjs')],{cwd:directory,encoding:'utf8'});
+ assert.equal(run().status,0,run().stderr);
+ const home=path.join(directory,'docs/index.md'),original=fs.readFileSync(home,'utf8');
+ fs.writeFileSync(home,original.replace("{{ '/getting-started.html' | relative_url }}","{{ '/getting-startd.html' | relative_url }}").replace('<figcaption>Settings-panel capture.</figcaption>','<figcaption>The Sensor Control panel.</figcaption>'));
+ const broken=run();assert.notEqual(broken.status,0);assert.match(broken.stderr,/index\.md: missing \{\{ '\/getting-startd\.html' \| relative_url \}\}/);assert.match(broken.stderr,/figure caption lacks kind/);
+ fs.writeFileSync(home,original);const faq=path.join(directory,'docs/faq.md');fs.writeFileSync(faq,fs.readFileSync(faq,'utf8').replace('\n---\n\n','\n---\n\n# FAQ and privacy\n\n'));
+ assert.match(run().stderr,/faq\.md: the layout renders the page title/);
+});

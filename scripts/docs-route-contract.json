@@ -1,0 +1,303 @@
+{
+  "schema": 1,
+  "source_commit": "f70c087d12490df3f7519d0dd0f4a67adfc55fe0",
+  "note": "The 15 published routes and every article heading fragment from the Jekyll build of source_commit. Keep each destination, or add an explicit alias when a heading changes.",
+  "routes": [
+    {
+      "path": "",
+      "anchors": [
+        "mac-sensors-for-stream-deck",
+        "what-goes-on-the-deck",
+        "what-it-does-not-do",
+        "mac-sensors-1010",
+        "what-changed-in-101",
+        "what-is-still-pending",
+        "license-and-trademarks",
+        "find-what-you-need"
+      ]
+    },
+    {
+      "path": "changelog.html",
+      "anchors": [
+        "changelog",
+        "1010---2026-10-27",
+        "1000---2026-10-13"
+      ]
+    },
+    {
+      "path": "data-sources.html",
+      "anchors": [
+        "data-sources",
+        "system-counters-and-smc-readings",
+        "system-counters",
+        "smc-readings",
+        "reading-identity",
+        "how-a-read-works",
+        "one-redraw-per-read",
+        "counter-rebaseline",
+        "read-every",
+        "when-reading-starts-and-stops",
+        "freshness-and-local-history",
+        "sleep-and-wake",
+        "where-to-go-next"
+      ]
+    },
+    {
+      "path": "dial-controls.html",
+      "anchors": [
+        "dial-controls-and-presets",
+        "control-presets",
+        "custom",
+        "rotation-groups",
+        "touch-zones",
+        "pause-pin-and-reset-reach",
+        "session-stats-are-per-reading",
+        "thresholds-and-mixed-units",
+        "the-sensor-control-key-action",
+        "page-swipe",
+        "stored-settings",
+        "where-to-go-next"
+      ]
+    },
+    {
+      "path": "faq.html",
+      "anchors": [
+        "faq-and-privacy",
+        "platform-and-requirements",
+        "does-it-work-on-other-operating-systems",
+        "what-are-the-exact-requirements",
+        "is-mac-sensors-affiliated-with-apple-or-elgato",
+        "do-i-need-a-separate-sensor-app",
+        "mac-models-and-readings",
+        "which-mac-models-and-readings-are-supported",
+        "does-it-run-on-intel-mac-computers-or-under-rosetta",
+        "why-is-a-reading-missing",
+        "statistics",
+        "how-are-min-max-and-avg-calculated-on-a-key",
+        "how-do-dial-session-statistics-differ",
+        "sparklines",
+        "why-does-a-sparkline-start-empty-and-fill-in",
+        "performance-and-resource-use",
+        "how-much-cpu-and-memory-does-it-use",
+        "what-does-read-every-change",
+        "does-adding-keys-add-more-sensor-reads",
+        "can-several-keys-show-the-same-reading",
+        "alerts-thresholds-and-colors",
+        "why-is-a-key-amber-or-red",
+        "how-do-i-reset-a-dials-session-statistics",
+        "themes",
+        "why-isnt-default-the-same-as-void",
+        "why-doesnt-a-key-follow-my-shared-theme",
+        "can-i-choose-another-font",
+        "privacy",
+        "is-my-data-sent-anywhere-any-telemetry",
+        "what-is-in-a-support-report",
+        "is-the-native-reader-signed-how-do-i-verify-what-i-installed",
+        "hardware-access",
+        "does-it-need-administrator-access-a-helper-or-a-kernel-extension",
+        "can-it-change-fan-speeds-or-write-smc-values",
+        "setup-and-portability",
+        "do-keys-survive-restarts-and-sensor-changes",
+        "can-i-move-settings-to-another-mac",
+        "what-happens-when-my-mac-sleeps",
+        "what-do-the-two-line-screens-on-my-keys-mean",
+        "how-do-updates-arrive",
+        "help-and-reports",
+        "where-do-i-report-a-bug-or-a-security-issue",
+        "where-to-go-next"
+      ]
+    },
+    {
+      "path": "getting-started.html",
+      "anchors": [
+        "getting-started",
+        "1-install-the-plugin",
+        "2-confirm-tahoma-bold",
+        "3-add-sensor-reading",
+        "4-select-a-reading",
+        "5-confirm-a-value",
+        "where-to-go-next"
+      ]
+    },
+    {
+      "path": "hardware.html",
+      "anchors": [
+        "hardware-compatibility",
+        "compatibility-matrix",
+        "mac",
+        "stream-deck-models",
+        "readings-measured-on-the-m5-pro",
+        "sensor-details-support",
+        "page-swipe-and-page-changes",
+        "hardware-test-procedure",
+        "event-recorder",
+        "support-report",
+        "where-to-go-next"
+      ]
+    },
+    {
+      "path": "installation.html",
+      "anchors": [
+        "installation-and-requirements",
+        "system-requirements",
+        "install-the-plugin",
+        "get-the-package",
+        "install-from-a-streamdeckplugin-file",
+        "check-the-download",
+        "elgato-marketplace",
+        "updating",
+        "removing",
+        "where-it-installs",
+        "tahoma-bold-prerequisite",
+        "verify-it-works",
+        "next-steps"
+      ]
+    },
+    {
+      "path": "sensor-details.html",
+      "anchors": [
+        "sensor-details",
+        "what-it-is-and-is-not",
+        "turning-it-on",
+        "choosing-the-list",
+        "editing-custom-tiles",
+        "the-detail-page",
+        "configuring-the-back-tile",
+        "filter-patterns",
+        "when-a-press-does-not-open-the-page",
+        "supported-decks",
+        "privacy",
+        "where-to-go-next"
+      ]
+    },
+    {
+      "path": "sensor-dial.html",
+      "anchors": [
+        "sensor-dial",
+        "the-touchscreen-readout",
+        "views",
+        "what-the-overview-lists",
+        "reading-colors",
+        "gestures",
+        "rotation-set-ignore-turns-and-auto-cycle",
+        "session-stats-are-the-dials-own-per-reading",
+        "how-a-dials-statistics-can-differ-from-a-keys",
+        "settings",
+        "bar-range-fixed-vs-session",
+        "alerts-on-a-dial",
+        "status-screens",
+        "advanced-shared-by-all-keys-and-dials",
+        "where-to-go-next"
+      ]
+    },
+    {
+      "path": "sensor-reading.html",
+      "anchors": [
+        "sensor-reading",
+        "settings",
+        "settings-at-a-glance",
+        "reading",
+        "label-on-the-key",
+        "theme",
+        "text-color",
+        "value-shown-stat-mode",
+        "layout-two-readings-on-one-key",
+        "layout-three-readings-in-rows",
+        "layout-four-readings-in-a-quad-grid",
+        "decimals",
+        "temperature-unit",
+        "graph-under-the-value-sparkline-bar-ring",
+        "warn-at-and-critical-at",
+        "direction",
+        "pressing-the-key",
+        "a-press-can-open-details",
+        "status-screens",
+        "advanced-shared-by-keys-and-dials",
+        "configuration-documents",
+        "data-units",
+        "where-to-go-next"
+      ]
+    },
+    {
+      "path": "status-screens.html",
+      "anchors": [
+        "status-screens",
+        "key-screens",
+        "screens-101-does-not-report",
+        "dial-screens-stream-deck-",
+        "in-the-settings-panel",
+        "recovery",
+        "where-to-go-next"
+      ]
+    },
+    {
+      "path": "themes.html",
+      "anchors": [
+        "themes-and-colors",
+        "the-seven-presets",
+        "contrast",
+        "shared-and-per-key-themes",
+        "precedence",
+        "the-default-chip",
+        "text-theme-dimmed-or-custom",
+        "text-font",
+        "type-accents",
+        "reading-colors-on-dials",
+        "alert-colors-take-priority",
+        "where-to-go-next"
+      ]
+    },
+    {
+      "path": "thresholds.html",
+      "anchors": [
+        "thresholds-and-alerts",
+        "the-two-fields",
+        "how-the-comparison-works",
+        "thresholds-are-in-the-displayed-unit",
+        "the-trigger-is-at-or-past-the-limit",
+        "decimal-commas-are-accepted",
+        "direction-alert-when-high-or-when-low",
+        "alert-colors",
+        "worked-examples",
+        "cpu-temperature-warn-80-critical-90",
+        "fan-speed-alert-when-it-drops",
+        "free-space-on-the-startup-volume",
+        "network-rate-in-bits",
+        "where-thresholds-live",
+        "where-to-go-next"
+      ]
+    },
+    {
+      "path": "troubleshooting.html",
+      "anchors": [
+        "troubleshooting",
+        "how-to-read-a-status-screen",
+        "keys-show-reading-sensors",
+        "keys-show-source-busy",
+        "keys-show-no-sensor-data",
+        "keys-show-tahoma-needed",
+        "keys-show-bridge-failed",
+        "keys-show-source-error",
+        "keys-show-needs-macos",
+        "keys-show-sensor-missing",
+        "keys-show-access-denied-or-not-updating",
+        "the-panel-says-the-plugin-is-not-responding",
+        "the-picker-is-empty",
+        "a-reading-is-absent-on-this-mac",
+        "values-do-not-seem-to-update",
+        "a-reading-shows-the-wrong-unit",
+        "thresholds-do-not-fire",
+        "detail-view-problems",
+        "dial-gestures-do-nothing",
+        "mac-sensors-is-missing-after-install",
+        "opening-the-same-version-again-does-nothing",
+        "high-cpu-memory-or-a-lingering-process",
+        "reading-the-plugin-log",
+        "copy-a-support-report",
+        "what-stays-on-this-mac",
+        "before-you-file-an-issue",
+        "where-to-go-next"
+      ]
+    }
+  ]
+}
