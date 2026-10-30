@@ -2,7 +2,7 @@
 layout: default
 title: Status screens
 nav_order: 11
-description: "When a key or dial cannot show a current reading, it shows a two-line status screen instead. The first line names the condition; the second names the next step."
+description: "What each two-line status screen on a key or dial means and what to do next."
 ---
 
 When a key or dial cannot show a current reading, it shows a two-line status screen instead. The first line names the condition; the second names the next step. [In the settings panel](#in-the-settings-panel) explains what the panel shows at the same time, and [Troubleshooting](troubleshooting.html) has the full repair path.

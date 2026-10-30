@@ -163,7 +163,7 @@ describe("docs crawler catches redesigned-site and deployment regressions", () =
 		assert.equal(contract.schema, 1);
 		assert.match(contract.source_commit, /^[a-f0-9]{40}$/);
 		const paths = contract.routes.map(route => route.path).sort();
-		assert.deepEqual(paths, ["", "changelog.html", "data-sources.html", "dial-controls.html", "faq.html", "getting-started.html", "hardware.html", "installation.html", "sensor-details.html", "sensor-dial.html", "sensor-reading.html", "status-screens.html", "themes.html", "thresholds.html", "troubleshooting.html"]);
+		assert.deepEqual(paths, ["", "changelog.html", "data-sources.html", "dial-controls.html", "faq.html", "getting-started.html", "hardware.html", "installation.html", "sensor-details.html", "sensor-dial.html", "sensor-reading.html", "status-screens.html", "themes.html", "thresholds.html", "troubleshooting.html", "whats-new-1.0.1.html"]);
 		for (const route of contract.routes) assert.equal(new Set(route.anchors).size, route.anchors.length, `${route.path} lists each fragment once`);
 		assert.ok(contract.routes.reduce((sum, route) => sum + route.anchors.length, 0) >= 221);
 	});
@@ -202,6 +202,15 @@ describe("docs crawler catches redesigned-site and deployment regressions", () =
 		const result = await crawl(root);
 		assert.equal(result.code, 1);
 		assert.match(result.stderr, /must be indexable/);
+	});
+
+	it("lets the site's own not-found page stay out of search, and no other page", async t => {
+		const notFound = '<title>Page not found | Docs</title><meta name="robots" content="noindex"><a href="guide.html">Guide</a>';
+		const { root } = await fixture(t, { "/": { html: '<a href="guide.html">Guide</a>' }, "/guide.html": { html: '<meta name="robots" content="noindex">Guide' }, "/404.html": { html: notFound } });
+		const result = await crawl(root, "--host-404");
+		assert.equal(result.code, 1);
+		assert.match(result.stderr, /guide\.html: production page must be indexable/);
+		assert.doesNotMatch(result.stderr, /404\.html: production page must be indexable/);
 	});
 
 	it("checks every picture and img srcset candidate rather than only the fallback image", async t => {

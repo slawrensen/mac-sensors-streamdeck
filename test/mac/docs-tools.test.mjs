@@ -46,9 +46,13 @@ test('docs screenshots refuse a malformed extra viewport before a browser is lau
  const result=spawnSync(process.execPath,['scripts/docs-site-shots.mjs',os.tmpdir(),'http://127.0.0.1:9/docs/'],{encoding:'utf8',env:{...process.env,DOCS_SHOTS_VIEWPORTS:'390x844,wide'}});assert.notEqual(result.status,0);assert.match(result.stderr,/DOCS_SHOTS_VIEWPORTS/);
 });
 
-test('the docs brand mark and favicon are the shipped plugin icon, byte for byte',()=>{
+test('the docs brand mark is the shipped plugin icon, byte for byte, and the favicon sizes are pinned resizes of it',()=>{
  assert.deepEqual(fs.readFileSync('docs/assets/img/brand/mac-sensors-icon-256.png'),fs.readFileSync('com.lawrensen.mac.sdPlugin/imgs/plugin/marketplace.png'));
- assert.deepEqual(fs.readdirSync('docs/assets/img/brand'),['mac-sensors-icon-256.png'],'no unpinned brand image is published');
+ // docs-crops.test.mjs recomputes each derived size from the shipped icon.
+ const derived=JSON.parse(fs.readFileSync('docs/assets/img/crops/provenance.json','utf8')).images.filter(image=>image.file.startsWith('brand/'));
+ assert.ok(derived.every(image=>image.source.file.startsWith('com.lawrensen.mac.sdPlugin/imgs/plugin/marketplace')),'favicon sizes come from the shipped icon');
+ assert.deepEqual(fs.readdirSync('docs/assets/img/brand').sort(),['mac-sensors-icon-256.png',...derived.map(image=>image.file.slice('brand/'.length))].sort(),'no unpinned brand image is published');
+ const head=fs.readFileSync('docs/_includes/head_custom.html','utf8');for(const size of [16,32,180])assert.match(head,new RegExp(`mac-sensors-icon-${size}\\.png`));
 });
 
 test('the shared docs frontend keeps the theme license and names no sibling product or private repository',()=>{

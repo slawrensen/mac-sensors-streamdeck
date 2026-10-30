@@ -26,13 +26,13 @@ jobs:
           from pathlib import Path
           import re
           root = Path('build/docs-static')
-          pages = {'index','installation','getting-started','sensor-reading','sensor-details','sensor-dial','dial-controls','themes','thresholds','data-sources','status-screens','hardware','faq','troubleshooting','changelog'}
+          pages = {'index','installation','getting-started','sensor-reading','sensor-details','sensor-dial','dial-controls','themes','thresholds','data-sources','status-screens','hardware','faq','troubleshooting','whats-new-1.0.1','changelog'}
           files = [p for p in root.rglob('*') if p.is_file()]
           for p in root.rglob('*'):
               if p.is_symlink(): raise SystemExit('Symlink in static export')
           for p in files:
               name = p.relative_to(root).as_posix()
-              allowed = name in {page + '.html' for page in pages} | {'404.html', 'docs-build.json'} or re.fullmatch(r'assets/(?:css|js|img|images)/(?:vendor/|brand/)?[A-Za-z0-9_.-]+\.(?:css|js|json|png|jpg|jpeg|webp|svg|txt)', name)
+              allowed = name in {page + '.html' for page in pages} | {'404.html', 'docs-build.json'} or re.fullmatch(r'assets/(?:css|js|img|images)/(?:vendor/|brand/|crops/)?[A-Za-z0-9_.-]+\.(?:css|js|json|png|jpg|jpeg|webp|svg|txt)', name)
               if not allowed: raise SystemExit('Unexpected exported file: ' + name)
               if p.suffix in {'.html','.css','.js','.json','.svg','.txt'}:
                   text = p.read_text()

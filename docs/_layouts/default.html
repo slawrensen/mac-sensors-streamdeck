@@ -17,7 +17,6 @@ layout: table_wrappers
 					{% for group in site.data.navigation %}{% for item in group.pages %}{% if item.url == page.url %}<p class="eyebrow">{{ group.title }}</p>{% endif %}{% endfor %}{% endfor %}
 					<h1 id="{{ page.title | slugify }}">{{ page.title | escape }}</h1>
 				</header>
-				{% unless page.url == '/404.html' %}<p class="release-note">Mac Sensors {{ site.plugin_release.package_version }}. Release downloads require repository access, and the Elgato Marketplace listing is not available yet. <a href="{{ '/hardware.html' | relative_url }}">Hardware compatibility</a> lists what has been measured and what is still pending.</p>{% endunless %}
 				{% endunless %}
 				<div class="doc-layout">
 					<div class="main-content">
