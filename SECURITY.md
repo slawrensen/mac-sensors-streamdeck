@@ -1,13 +1,51 @@
-# Security
+# Security policy
 
-Report suspected vulnerabilities through [private vulnerability reporting](https://github.com/slawrensen/slawrensen.github.io/security/advisories/new). The reporting form is hosted in the documentation repository so it is available while product source remains private. Name Mac Sensors and the affected version in the report. Do not post exploit details, profile exports or private logs in a public issue. The first reply target is seven days.
+## Reporting a vulnerability
 
-Security fixes target the latest published 1.x release. The plugin has no update channel of its own; updates arrive as GitHub releases. Mac Sensors is not on the Elgato Marketplace yet. Install a newer published version when a fix is announced.
+Report privately through GitHub's vulnerability reporting for this
+repository: <https://github.com/slawrensen/mac-sensors-streamdeck/security/advisories/new>
+(the repository's **Security** tab, then **Report a vulnerability**). Name
+Mac Sensors and the affected version. I am the only maintainer; expect a
+first reply within seven days. Please do not describe an exploitable problem,
+or post profile exports or logs, in a public issue before I have had a chance
+to ship a fix.
 
-Mac Sensors reads local macOS system interfaces and a bounded set of typed SMC keys. It exposes no sensor-register setter or fan control. It installs no privileged helper, daemon or kernel extension and requires no administrator access for normal reads. Settings are stored through the Stream Deck app. Logs stay local. The plugin makes no internet requests and sends no telemetry; its SDK connection is to the local app.
+Fixes ship on the newest 1.x release. The plugin has no update channel of its
+own; updates arrive through the Elgato Marketplace or the GitHub release page.
 
-The native files are ad-hoc signed. That checks file integrity but is not a Developer ID publisher certificate or notarization claim. Verify a downloaded package against the release's SHA256SUMS.txt with `shasum -a 256`. For extracted native files, use `codesign --verify --strict <file>` and `codesign -dv --verbose=4 <file>`. The native manifest records architecture, deployment floor, source identity and file hashes.
+## What the plugin touches
 
-Elgato repackages Marketplace copies, so a GitHub checksum does not apply to a Marketplace download.
+The plugin runs inside Elgato's Stream Deck app on macOS. It reads local
+macOS system interfaces and a bounded set of typed SMC keys, read-only, on the
+local machine only. It has no sensor-register setter and no fan control. It
+installs no privileged helper, daemon or kernel extension and needs no
+administrator access for its reads. Settings are stored through the Stream Deck app and logs
+stay local. It makes no network requests and has no telemetry; its only
+connection is the local one to the Stream Deck app.
 
-A support report omits user names, serial numbers, hardware UUIDs, raw device IDs and sensor values. Review any report before sharing it. Keep profile backups and development traces private.
+A support report leaves out user names, serial numbers, hardware UUIDs, raw
+device IDs and sensor values. Review a report before you share it.
+
+## The native readers are ad-hoc signed
+
+`bin/hwmac-arm64.node` and `bin/hwmac-x86_64.node` are ad-hoc signed. That
+checks file integrity; it is not a Developer ID certificate or notarization.
+The bytes are checkable. Every release attaches `SHA256SUMS.txt` for the
+package and `native-manifest.json`, which records each reader's architecture,
+deployment floor, source identity and hash. To check a download, put the files
+in one folder and run:
+
+```bash
+shasum -a 256 -c SHA256SUMS.txt
+```
+
+For an extracted reader:
+
+```bash
+codesign --verify --strict hwmac-arm64.node
+codesign -dv --verbose=4 hwmac-arm64.node
+```
+
+A GitHub-release install matches its published hash byte for byte. Elgato
+repackages Marketplace copies, so a GitHub checksum does not apply to a
+Marketplace download.
