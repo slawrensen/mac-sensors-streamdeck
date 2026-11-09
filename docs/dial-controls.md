@@ -7,7 +7,7 @@ description: "Choose what turning, pressing and touching a Sensor Dial does."
 
 Choose what turning, pressing and touching a Sensor Dial does. Open its **Controls** section for **Gestures**, **Touch zones**, **Ignore turns**, **Auto cycle**, **A stats reset clears** and **Link ID**. Rotation groups are under **Reading**. Thresholds and **Auto cycle jumps to a critical reading** are under **Alerts**.
 
-Dial gestures have not yet been run on a physical Stream Deck +. Everything on this page is what the code implements and its tests check, including synthetic gesture traces replayed through the production gesture code. See [Hardware compatibility](hardware.html).
+Dial gestures have been checked only by software tests and synthetic gesture traces replayed through the production gesture code, not on a physical Stream Deck + or + XL ([Hardware compatibility](hardware.html)).
 
 ## Control presets
 
@@ -17,7 +17,7 @@ Dial gestures have not yet been run on a physical Stream Deck +. Everything on t
 | **Elite** | Cycle readings | Switch sensor or [rotation group](#rotation-groups) | Short: pause or resume the auto cycle. Long (held half a second or more): reset session stats | Cycle stat mode, or [touch zones](#touch-zones) | Back to current value |
 | **Custom** | Your pick | Your pick | Your pick, short and long separately | Your pick, or touch zones | Your pick |
 
-New dials use **Legacy** until you choose another preset. A dial with no saved preset, or with a value this version does not know, also runs Legacy. Moving to another reading clears a custom title by default; set **Title when the dial moves on** to **Stays for this dial** to keep a fixed title.
+New dials use **Legacy** until you choose another preset. Moving to another reading clears a custom title by default; set **Title when the dial moves on** to **Stays for this dial** to keep a fixed title.
 
 Legacy details:
 
@@ -42,7 +42,7 @@ With **Custom** selected, one select per gesture appears. **Touch zones** stays 
 
 ![The Controls section of the Sensor Dial settings with Gestures on Custom: Turn and Pressed turn on Cycle readings, Short push and Long push on Reset session stats, Touch tap on Cycle stat mode, Long touch on Back to current value, Touch zones Off, Ignore turns unticked, Auto cycle Off and an empty Link ID](assets/img/settings-dial-controls.png)
 
-*Settings-panel capture of the staged 1.0.1.0 panel on a simulated host with sample readings and **Accent colors** set to **Theme accent everywhere**. It is not the Stream Deck app's own window.*
+*Settings-panel capture of the shipped 1.0.1.0 panel on a simulated host with sample readings and **Accent colors** set to **Theme accent everywhere**. It is not the Stream Deck app's own window.*
 
 | Gesture | Choices | Unset |
 | --- | --- | --- |
@@ -95,7 +95,7 @@ The tap command is **Touch tap** on Custom and stat cycling on Elite. With two z
 
 - **Pause/resume auto cycle** stops the auto cycle until you resume it. Resuming waits one full interval before the next step. While an auto cycle is set, the dial shows `cycle paused` where it normally says `session`.
 - **Pin/unpin this reading** locks the selection: turns, touch-zone steps, the auto cycle and Sensor Control selection commands cannot move the dial off its reading until you unpin. Stat cycling, resets and pause still work from a push, a touch or a Sensor Control key. A turn does nothing while the dial is pinned or **Ignore turns** is on, even a turn set to **Cycle stat mode** on Custom. The dial shows `pinned` where it normally says `session`.
-- **A stats reset clears** chooses what a reset clears: **This reading only** (default), **The whole rotation set**, or **Every dial, everywhere (use with care)**. *Every dial, everywhere* includes dials parked on other pages and profiles. No default gesture uses it; you have to pick it on purpose. After a reset the dial says `stats reset`, `set stats reset` or `all dials reset` for a moment.
+- **A stats reset clears** chooses what a reset clears: **This reading only** (default), **The whole rotation set**, or **Every dial, everywhere (use with care)**. *Every dial, everywhere* includes dials parked on other pages and profiles. After a reset the dial says `stats reset`, `set stats reset` or `all dials reset` for a moment.
 
 Pause and pin survive page switches and profile changes for up to 30 minutes off screen; the plugin keeps the state of the 64 most recently hidden dials, and past either limit a returning dial starts fresh. They are kept in memory only, so they reset when the plugin restarts, for example when the Stream Deck app restarts.
 
@@ -117,7 +117,7 @@ Alert-aware cycling is opt-in, with **Auto cycle jumps to a critical reading in 
 
 ![The Sensor Control settings panel at its defaults: the header reads Next reading, Sends to every dial; When pressed is on Next reading, Target is empty and shows Every dial, and Advanced is folded](assets/img/settings-control.png)
 
-*Settings-panel capture of the staged 1.0.1.0 panel on a simulated host with sample readings and **Accent colors** set to **Theme accent everywhere**. It is not the Stream Deck app's own window.*
+*Settings-panel capture of the shipped 1.0.1.0 panel on a simulated host with sample readings and **Accent colors** set to **Theme accent everywhere**. It is not the Stream Deck app's own window.*
 
 Pick a command under **When pressed**:
 
@@ -157,7 +157,7 @@ These rules decide how a dial reads what is stored in its settings, whoever wrot
 - On Custom, a gesture with no valid command uses its Legacy command.
 - **Touch zones** other than the exact two- or three-zone values mean off.
 - Rotation groups are optional. Fewer than two groups that hold readings means no groups, and the flat rotation set drives the dial. The panel keeps the flat set equal to all grouped readings.
-- The threshold unit anchor (`alertUnit`) is written by the plugin when you edit a threshold or bar end, from the reading on screen at that moment. Until then a threshold applies to every reading.
+- The threshold unit anchor (`alertUnit`) is written by the plugin when you edit a threshold or bar end, from the reading on screen at that moment.
 - The dial's **View** (`dialView`) switches face only on its exact markers, `overview` and `tworow`. Anything else draws the one-reading face.
 - Per-reading names (`rotationNames`) are written only by **Rename**. An entry that is empty, blank or not text is ignored.
 - **Row labels** (`overviewLabels`) shortens shared words unless it is exactly `full`. **Context line** moves below the rows only on exactly `bottom`; **Separators** hide only on exactly `off`.

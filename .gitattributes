@@ -1,0 +1,6 @@
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.node binary
+*.streamDeckPlugin binary
+*.streamDeckProfile binary

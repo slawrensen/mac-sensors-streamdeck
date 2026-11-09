@@ -19,9 +19,9 @@ Check your Mac and deck and the evidence behind each row. A result from one Mac 
 
 | Mac | Evidence | What ran |
 | --- | --- | --- |
-| Apple silicon: Mac17,9 with M5 Pro, macOS 27.0.1 | **Measured** | Stream Deck app 7.5.0 with its Node 24.13.1 on the 8 by 4 Virtual Stream Deck: the 1.0.0.0 package installed from Finder, and 14 system and 38 SMC readings. Stream Deck app 7.6.0 with its Node 24.22.1: a 24-hour observation of the published 1.0.1.0 build, run as a development copy with 32 keys at the 1 second default (24.017 hours, 1,442 samples, no warnings or errors, every plugin measure within its limit). Two faults of a macOS text service during that window were reviewed as unrelated (PERF.md). |
+| Apple silicon: Mac17,9 with M5 Pro, macOS 27.0.1 | **Measured** | Stream Deck app 7.5.0 with its Node 24.13.1 on the 8 by 4 Virtual Stream Deck: the 1.0.0.0 package installed from Finder, and 14 system and 38 SMC readings. Stream Deck app 7.6.0 with its Node 24.22.1: a 24-hour observation of the published 1.0.1.0 build, run as a development copy with 32 keys at the 1 second default (24.017 hours, 1,442 samples, no warnings or errors, every plugin measure within its limit). Two faults of a macOS text service during that window were reviewed as unrelated ([PERF.md](https://github.com/slawrensen/mac-sensors-streamdeck/blob/main/PERF.md)). |
 | Other Apple silicon models | **Pending** | Not run. The table of generation-specific SMC readings is qualified only for Mac17,9 with the M5 Pro chip. On another Apple silicon model the plugin offers the 31 common and 4 Apple silicon SMC keys its SMC answers, and the system counters the Mac reports. |
-| Intel | **Hosted VM** | The x86_64 native reader in 1.0.1 is byte-identical to the one in 1.0.0. Hosted Intel CI runners (a virtual machine with an emulated SMC) loaded that exact file and read live system and SMC values for both 1.0.0 and the 1.0.1 release candidate. Physical Intel validation is in progress. |
+| Intel | **Hosted VM** | The x86_64 native reader in 1.0.1 is byte-identical to the one in 1.0.0. Hosted Intel CI runners (a virtual machine with an emulated SMC) loaded that exact file and read live system and SMC values for both 1.0.0 and the 1.0.1 release candidate. Physical Intel validation has not been done. |
 | Rosetta on the M5 Pro | **Pending** in the app | Outside the Stream Deck app, x86_64 Node 20, 22 and 24 running under Rosetta loaded the x86_64 reader and read live values on this Mac. Running the whole Stream Deck app under Rosetta has not been checked. The Node runtimes the Stream Deck app supplies on this Mac are arm64 files. |
 | macOS 26.6 | **Hosted VM** | Hosted Apple silicon runners on macOS 26.6.2 and Intel runners on macOS 26.6.1 ran the full test suite and loaded and read the exact shipped native readers. No physical Mac has run Mac Sensors on macOS 26. |
 | macOS 13.5 to 15 | **Pending** | 13.5 is the declared floor. Mac Sensors has not run on these versions. |
@@ -33,7 +33,7 @@ The package requires Stream Deck 7.1 or later, which plugins that use the Node 2
 | Deck | Keys | Dials | Evidence |
 | --- | --- | --- | --- |
 | Virtual Stream Deck | Yes | No | **Measured** at 8 by 4 on the M5 Pro with apps 7.5.0 and 7.6.0. The plugin takes the grid the app reports and treats this deck as having no dials. |
-| Stream Deck, 15 keys (5 by 3) | Yes | n/a | **Software tests**: the mock host registers a 5 by 3 deck and drives keys on it. Physical key checks are pending. |
+| Stream Deck, 15 keys (5 by 3) | Yes | n/a | **Measured** on a Stream Deck MK.2 with the M5 Pro on 2026-10-28: production keys drew live readings, presses on 11 keys cycled MIN, MAX and AVG, and a details press opened the bundled 15-key detail page and the deck returned to the key page. Not checked yet: legibility at arm's length, Back by eye, page switching, unplug and replug, app quit and reopen, and sleep and wake. **Software tests**: the mock host registers a 5 by 3 deck and drives keys on it. |
 | Stream Deck + | Yes | Yes, 4 | **Software tests**: the model table gives it four dials and a touch strip of 200 by 100 per dial. Dial events run in the mock host on a + XL, which uses the same dial code. Physical dial gestures are pending. |
 | Stream Deck + XL | Yes | Yes, 6 | **Software tests**: the mock host registers a + XL, draws six dials on it and sends dial turns. Synthetic gesture traces replay through the production gesture code. Physical dial gestures are pending. |
 | Stream Deck XL, Mini, Neo | Yes | n/a | **Software tests**: their grids (8 by 4, 3 by 2, 4 by 2) are locked by capability tests, and each has a bundled detail view. Not run on hardware. The Neo detail page's device model comes from the Stream Deck app's own device table, not from a Neo profile export, so its install has not been checked even in software. The plugin does not use the Neo's info bar or touch points. |
@@ -66,7 +66,7 @@ The [sensor detail view](sensor-details.html) ships one bundled page per deck ty
 
 The Virtual Stream Deck borrows the page with the most reading tiles whose key grid fits its size, from every page except the + page; a virtual deck at least 9 keys wide and 4 keys high runs the + XL page. The first time details open on each kind of deck, Stream Deck asks to install the bundled detail view, and asks again after an update that changes it.
 
-The bundled pages are checked by archive tests and by a mock-host detail run on the 15-key page. The detail view and Back on a physical deck are pending.
+The bundled pages are checked by archive tests and by a mock-host detail run on the 15-key page. On a physical Stream Deck MK.2, a details press opened the 15-key page and the deck returned to the key page; Back has not been checked by eye. The other pages have not run on a physical deck.
 
 Decks without a bundled page (Mobile, Studio, Galleon, Corsair Voyager, Pedal, G-Keys, and a Virtual Stream Deck too small for the 3 by 2 Mini page) do not open details: the key shows the Stream Deck alert triangle and the deck stays on its page.
 
@@ -78,7 +78,7 @@ A hidden dial keeps its pause and pin for up to 30 minutes, and its session stat
 
 The Stream Deck app removes the old page's actions before it shows the new page's, so a page change leaves a moment with nothing visible. Reading continues for 2 seconds, so a page change keeps key MIN, MAX and AVG, sparklines, CPU usage, the rates and dial sessions. After 2 seconds with no Sensor Reading key, Sensor Dial or detail tile visible, reading stops, sparkline history is cleared and every reading's MIN, MAX and AVG end. When a page with one returns after that, keys show **Reading sensors** until the first read, and CPU usage and transfer rates appear about a quarter second later. A dial that returns this way starts a new session and says **stats reset: data gap** once live data arrives. See [When reading starts and stops](data-sources.html#when-reading-starts-and-stops).
 
-Physical swipes are pending; this behavior comes from the code and its software tests.
+This behavior comes from the code and its software tests. Swipes and page changes on a physical deck have not been checked.
 
 ## Hardware test procedure
 
@@ -89,7 +89,7 @@ You can check a deck yourself and report the result:
 3. On keys: judge at arm's length whether each label and value is readable. Set **Warn at** just below the current value and leave **Critical at** blank to see the warning color, then set **Critical at** just below the current value to see the critical color. Set the key's **A press** to **Opens sensor details** and press it. The first time on each kind of deck, accept the app's prompt to install the detail view within 30 seconds. Then press **Back**. Switch to another page and back.
 4. On dials, in this order: **Turn** two slow turns each way and one fast spin; **Short push**; **Long push**; **Pressed turn**; **Touch tap**; **Long touch**; then a page swipe away and back. Note what the dial did for each step. [Dial controls](dial-controls.html) says what each gesture does in your preset.
 5. Open the dial's settings, then **Advanced**, **Support**, and choose **Copy support report**. The report keeps only the most recent 24 events, so copy one report after the turns and another after the pushes and touches.
-6. Open an issue on [the documentation repository](https://github.com/slawrensen/slawrensen.github.io/issues) titled `Hardware report: Mac Sensors 1.0.1.0, [Mac model], [deck]` with your notes and the reports.
+6. Open an issue in [GitHub Issues](https://github.com/slawrensen/mac-sensors-streamdeck/issues) titled `Hardware report: Mac Sensors 1.0.1.0, [Mac model], [deck]` with your notes and the reports.
 
 ## Event recorder
 

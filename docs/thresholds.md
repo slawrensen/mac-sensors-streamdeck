@@ -27,7 +27,7 @@ Alerts change only what the plugin shows: colors, and with **Auto cycle jumps to
 
 An empty field shows *Off*. On a dial the fields say what will change, such as *Off (bar turns amber)* in the single view and *Off (row value turns amber)* in an overview view.
 
-Thresholds also mark the range on any face that draws one. A key whose **Graph under the value** is **Bar** or **Ring**, a one-reading setting, shows a muted amber zone from **Warn at** and a muted red zone from **Critical at**, running toward the alarmed end: the low end when the direction box is ticked. A dial's range bar marks them the same way. Zones are the alert colors blended toward the face background, and the live fill draws over them. A key's range is always automatic and widens to keep a zone visible. A dial with **Bar from** or **Bar to** set keeps those bounds, and a zone outside them is cut off. See [Graph under the value](sensor-reading.html#graph-under-the-value-sparkline-bar-ring).
+Thresholds also mark the range on any face that draws one. A key whose **Graph under the value** is **Bar** or **Ring** (one-reading layout only) shows a muted amber zone from **Warn at** and a muted red zone from **Critical at**, running toward the alarmed end: the low end when the direction box is ticked. A dial's range bar marks them the same way. Zones are the alert colors blended toward the face background, and the live fill draws over them. A key's range is always automatic and widens to keep a zone visible. A dial with **Bar from** or **Bar to** set keeps those bounds, and a zone outside them is cut off. See [Graph under the value](sensor-reading.html#graph-under-the-value-sparkline-bar-ring).
 
 ## How the comparison works
 
@@ -48,8 +48,6 @@ One exception: **Data units** rescales bytes and transfer rates for display only
 | Memory total, free, active, inactive, wired and compressed; Swap used; Startup volume total and available | B (bytes) |
 | Network receive and send; Storage read and write | B/s (bytes per second), also when the key shows Mbps |
 
-> **Note:** A key showing a MAX above **Critical at** draws on the normal face once the live value is back under **Warn at**.
-
 ### The trigger is at or past the limit
 
 Reaching the number is enough:
@@ -61,11 +59,11 @@ Critical is checked before warning, so a reading past both limits shows critical
 
 ### Decimal commas are accepted
 
-Both fields accept a period or a comma as the decimal point, so `70.5` and `70,5` both mean seventy and a half. Only the first comma counts, so do not group digits: `50,000` means 50, and a value with two commas is not a number. Blank means no threshold.
+Both fields accept a period or a comma as the decimal point, so `70.5` and `70,5` both mean 70.5. Do not group digits with commas: `50,000` means 50, and a value with two commas is not a number. Blank means no threshold.
 
 Anything that is not a number is kept as typed but ignored, and the field says so under it: *Not a number. Alerts ignore this field until it is one.* The folded Alerts title then names the field, such as *warn value is not a number*, or reads *Off: the values entered are not numbers* when neither field is a number.
 
-The fields also accept exponent notation: `50e9` means 50000000000. That helps with byte thresholds.
+The fields also accept exponent notation, which helps with byte thresholds: `50e9` means 50000000000.
 
 ## Direction: alert when high or when low
 

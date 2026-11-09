@@ -23,7 +23,7 @@ Pick a theme in the strip under a key's or dial's settings header. Choose **Defa
 | **Ember** | `#000000` | `#FFB84D` | `#E0912F` | Black with amber text and accents. |
 | **Paper** | `#E9E6DE` | `#14120D` | `#3B382E` | Light with dark text. Keeps its own accent. |
 
-A theme changes colors only: the layout, sizes and positions stay the same when you switch. Key status screens such as **Pick a sensor** draw on black in every theme. A dial's status and prompt faces use the dial's theme background, except the fixed **Tahoma needed** image, which is black on keys and dials. [Sensor Dial reading colors](#reading-colors-on-dials) can tell readings apart within one theme.
+A theme changes colors only; layout, sizes and positions stay the same. Key status screens such as **Pick a sensor** draw on black in every theme. A dial's status and prompt faces use the dial's theme background, except the fixed **Tahoma needed** image, which is black on keys and dials. [Sensor Dial reading colors](#reading-colors-on-dials) can tell readings apart within one theme.
 
 ## Contrast
 
@@ -34,17 +34,17 @@ The built-in text colors are checked by calculation against their own background
 - Every type accent reaches at least 4:1 on each theme it can appear on.
 - Alert value text calculates to about 7.6:1 on the warning amber and about 5.6:1 on the critical red.
 
-These floors do not cover a **Custom color** for text, or cell and reading colors you pick for a quad grid or a dial: those draw exactly as chosen. The automatic quad cell colors are lifted to 4.5:1 when needed.
+These floors do not cover a **Custom color** for text, which draws exactly as chosen, or cell and reading colors you pick for a quad grid or a dial, which draw exactly with Theme text and are only blended toward the background with Dimmed. The automatic quad cell colors are lifted to 4.5:1 when needed.
 
-Contrast is a calculation. Physical Stream Deck key checks are pending, so legibility on a device is not established; see [Hardware compatibility](hardware.html). Check a custom color on your own deck.
+Contrast is a calculation. Legibility at arm's length on a physical Stream Deck has not been checked; see [Hardware compatibility](hardware.html). Check a custom color on your own deck.
 
 ## Shared and per-key themes
 
-Set the shared theme in **Advanced → Shared defaults → Theme**. It applies to every Mac Sensors key and dial set to **Default**, on every Stream Deck. The panel says so: *Used by every Mac Sensors key and dial, on every Stream Deck, that is set to Default. A key or dial with its own choice keeps it.*
+Set the shared theme in **Advanced → Shared defaults → Theme**. It applies to every Mac Sensors key and dial set to **Default**, on every Stream Deck.
 
 A named preset stays local. One dial can keep Ember while the rest follow Midnight. On a key, the strip and **Text color** are described in [Sensor Reading](sensor-reading.html#theme); on a dial, in [Sensor Dial](sensor-dial.html#settings).
 
-A new install starts with Void as the shared theme. If no shared theme was ever saved and the plugin finds existing settings at its first start, such as a profile with configured keys imported into a new install, the shared theme starts as Graphite instead. Pick any theme to replace it.
+If no shared theme was ever saved and the plugin finds existing settings at its first start, such as a profile with configured keys imported into a new install, the shared theme starts as Graphite instead of Void. Pick any theme to replace it.
 
 ### Precedence
 
@@ -63,7 +63,7 @@ Folding the strip keeps the chosen chip and its source on screen. A key with no 
 
 ![The theme strip with Void set on this key, the Default chip with its dashed frame, and the Text color select set to Default (shared: Theme text)](assets/img/settings-key.png)
 
-*Settings-panel capture of the staged 1.0.1.0 panel in a simulated host with sample data and **Accent colors** set to **Theme accent everywhere**. Void is set on this key while the shared theme is also Void, so **Make shared** is hidden.*
+*Settings-panel capture of the shipped 1.0.1.0 panel in a simulated host with sample data and **Accent colors** set to **Theme accent everywhere**. Void is set on this key while the shared theme is also Void, so **Make shared** is hidden.*
 
 ## Text: Theme, Dimmed or Custom
 
@@ -82,17 +82,15 @@ A valid custom color takes priority over quad cell colors, dial reading colors a
 
 Text and accents are separate. **Text color** changes numbers, labels and units. Sparklines, bars, rings and tracks keep their accent. The stat badge counts as text: it takes the accent with Theme text, a dimmed accent with Dimmed, and the custom color with Custom color.
 
-The automatic quad cell colors are lifted for their background. Colors you pick for cells stay exact with Theme text and are only blended with Dimmed, so they can fall below the contrast floor.
-
 ## Text font
 
-Faces use Tahoma Bold. **Advanced → Shared defaults** shows **Text font: Tahoma Bold**, and there is no second font to choose. The line under it reads *Tahoma Bold is used on every face.* A different font choice saved in the shared settings, for example by a configuration document, is kept and not used: the line then reads *Tahoma Bold is used. Your saved font setting is kept.* and the folded summary says *Tahoma (saved font kept)*.
+Faces use Tahoma Bold. **Advanced → Shared defaults** shows **Text font: Tahoma Bold**, and there is no second font to choose. A different font choice saved in the shared settings, for example by a configuration document, is kept and not used: the line under **Text font: Tahoma Bold** then reads *Tahoma Bold is used. Your saved font setting is kept.* and the folded summary says *Tahoma (saved font kept)*.
 
-Tahoma Bold ships with macOS and must be installed. The plugin asks macOS for the font named Tahoma-Bold on each read of the system counters. If that font does not resolve, keys show **Tahoma needed** / Open Font Book from a pre-rendered image, and dials show a matching setup image, instead of drawing readings in a substitute font. Install Tahoma Bold in Font Book, then choose **Check again**. See [Installation](installation.html).
+Tahoma Bold ships with macOS. The plugin asks macOS for the font named Tahoma-Bold on each read of the system counters. If that font does not resolve, keys show **Tahoma needed** / Open Font Book from a pre-rendered image, and dials show a matching setup image, instead of drawing readings in a substitute font. Install Tahoma Bold in Font Book, then choose **Check again**. See [Tahoma Bold prerequisite](installation.html#tahoma-bold-prerequisite).
 
 ## Type accents
 
-**Advanced → Shared defaults → Accent colors → By sensor type** *(default)* colors sparklines, bars, rings and stat badges by reading category. Numbers, labels and units keep their Text color. **Theme accent everywhere** turns category accents off. The Sensor Reading panel says: *Accents color graphs, bars and stat badges, never the numbers (Text color does that). Paper keeps its own accent.* On a dial, numbers take type accents only with **Color numbers by sensor type** on; see [Reading colors on dials](#reading-colors-on-dials).
+**Advanced → Shared defaults → Accent colors → By sensor type** *(default)* colors sparklines, bars, rings and stat badges by reading category. Numbers, labels and units keep their Text color. **Theme accent everywhere** turns category accents off. On a dial, numbers take type accents only with **Color numbers by sensor type** on; see [Reading colors on dials](#reading-colors-on-dials).
 
 ![Eight Sensor Reading keys whose trend lines take their sensor type's color: CPU super 1 and GPU 1 in rose, Fan 1 in cyan, System Total in gold, CPU activity in violet, Memory active in magenta, Network RX in blue, and Free space in the Void theme's sky-blue accent](assets/img/accents.png)
 

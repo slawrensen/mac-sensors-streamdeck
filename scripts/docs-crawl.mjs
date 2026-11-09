@@ -22,8 +22,8 @@ const PRIVATE = [
 	"release/RELEASE_RUNBOOK.md", "release/COPY_RULES.md", "release/STREAM_DECK_MARKETPLACE.md", "release/OWNER-MEDIA.md",
 	"release/", "release/evidence/", "README.html"
 ];
-/** Strings that never belong in a public page. The product repository is private, so any link into it is a 404 for public readers. */
-const LEAK = [/\/Users\//, /HWiNFO|REALiX/, /C:\\Users\\/i, /RELEASE_RUNBOOK/, /COPY_RULES/, /STREAM_DECK_MARKETPLACE/, /\.private\b/, /hwinfoden|hwinfospk/, /ghp_[A-Za-z0-9]{20,}/, /github\.com[/:]slawrensen\/mac-(?:sensors-)?streamdeck/i];
+/** Strings that never belong in a public page. The product repository is public; its private mirror is not. */
+const LEAK = [/\/Users\//, /HWiNFO|REALiX/, /C:\\Users\\/i, /RELEASE_RUNBOOK/, /COPY_RULES/, /STREAM_DECK_MARKETPLACE/, /\.private\b/, /hwinfoden|hwinfospk/, /ghp_[A-Za-z0-9]{20,}/, /github\.com[/:]slawrensen\/mac-streamdeck-private/i];
 
 function decode(value) {
 	return value.replace(/&(?:amp|quot|apos|lt|gt|#\d+|#x[0-9a-f]+);/gi, entity => {
