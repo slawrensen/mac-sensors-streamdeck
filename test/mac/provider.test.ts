@@ -72,6 +72,15 @@ test('counter deltas reset on member changes, resets, zero denominator and sleep
 	assert.ok(!counterRows(before,{...after,cpuTicks:before.cpuTicks}).some(row=>row.key==='cpu-total'));
 	assert.ok(!counterRows(before,{...after,cpuTicks:[[1,20,40,0]]}).some(row=>row.key==='cpu-total'));
 });
+test('64-bit network counters across 4 GiB give exact rates, while any decrease still withholds both rows',()=>{
+	const WRAP=2n**32n,before=packet('public',100),after=packet('public',1100);for(const p of [before,after])p.networkValid=true;
+	before.networkIn=String(WRAP-1000n);before.networkOut=String(WRAP-300n);after.networkIn=String(WRAP+500n);after.networkOut=String(WRAP+400n);
+	const network=(next:NativePacket)=>counterRows(before,next).filter(row=>row.key.startsWith('network')).map(row=>[row.key,row.value]);
+	assert.deepEqual(network(after),[['network-receive',1500],['network-send',700]]);
+	assert.deepEqual(network({...after,networkIn:String(3n*WRAP+500n)}),[['network-receive',Number(2n*WRAP+1500n)],['network-send',700]],'more than 4 GiB in one interval is exact, not aliased');
+	// What a 32-bit source reported after the wrap: a decrease is a reset, never a modulo guess.
+	assert.deepEqual(network({...after,networkIn:'500'}),[]);
+});
 
 test('initial work that never returns becomes busy without claiming a measurement',()=>{
 	const r=rig();assert.equal(r.provider.read(),null);assert.equal(r.provider.untilExpiry(),15000);r.clock.now=15100;assert.throws(()=>r.provider.current(),{reason:'busy'});assert.equal(r.provider.age(),null);assert.equal(r.provider.untilExpiry(),null);r.provider.close();

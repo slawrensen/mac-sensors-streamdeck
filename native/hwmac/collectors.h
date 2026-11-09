@@ -39,7 +39,12 @@ typedef struct {
 	uint32_t types[HWMAC_MAX_ROWS], sizes[HWMAC_MAX_ROWS];
 	bool catalog_ready;
 } smc_context;
+#define HWMAC_LINK_NAME 16
+/* The name and full 64-bit byte counters the system reports for one interface index. */
+typedef bool (*hwmac_link_counters)(unsigned index, char name[HWMAC_LINK_NAME], uint64_t *received, uint64_t *sent, void *context);
+struct ifaddrs;
 bool hwmac_catalog_applies(unsigned scope, const char *model, const char *chip, int apple_silicon);
+void hwmac_network_from(source_packet *packet, const struct ifaddrs *list, hwmac_link_counters counters, void *context);
 double hwmac_continuous_ms(void);
 double hwmac_awake_ms(void);
 void hwmac_facts(source_packet *packet);

@@ -40,6 +40,36 @@ test('generation tables require the qualified runtime model, chip and hardware f
 	const parity={TaTP:['Airflow top','System','temperature'],TCHP:['Charger proximity','System','temperature'],TPSP:['Power supply proximity','System','temperature'],TaLT:['Thunderbolt left','System','temperature'],TaRT:['Thunderbolt right','System','temperature'],Ts0P:['Trackpad','System','temperature'],Ts1P:['Trackpad actuator','System','temperature'],F0Tg:['Fan 1 target','Fans','fan'],F1Tg:['Fan 2 target','Fans','fan'],F0Mn:['Fan 1 minimum','Fans','fan'],F1Mn:['Fan 2 minimum','Fans','fan'],F0Mx:['Fan 1 maximum','Fans','fan'],F1Mx:['Fan 2 maximum','Fans','fan']};
 	for(const [key,[label,group,type]] of Object.entries(parity))assert.deepEqual((({label,group,type,scope})=>({label,group,type,scope}))(catalog.rows.find(r=>r.key===key)??{}),{label,group,type,scope:'m5'},key);
 });
+// getifaddrs if_data byte counters are 32-bit (SDK net/if_var.h); a fixture link carries its true 64-bit counters and the hook stores only their low 32 bits there.
+const WRAP=2n**32n,link=(name,index,received,sent,extra={})=>({name,index,received,sent,...extra});
+/** Mirrors membership() in native/hwmac/collectors.c byte for byte, including its offset basis: an FNV-1a style hash of the sorted en unit numbers, 8 little-endian bytes each. */
+const membership=units=>{let hash=1469598103934665603n;for(const unit of [...units].sort((a,b)=>a-b))for(let shift=0n;shift<64n;shift+=8n){hash^=(BigInt(unit)>>shift)&255n;hash=(hash*1099511628211n)%(2n**64n);}return hash.toString();};
+test('network byte counters cross a 4 GiB boundary as an increase, never as a decrease',()=>{
+	const before=native.testNetwork([link('en0',15,WRAP-1000n,WRAP-300n),link('en1',10,5000n,7000n)]);
+	const after=native.testNetwork([link('en0',15,WRAP+500n,WRAP+400n),link('en1',10,5000n,7000n)]);
+	assert.equal(before.networkValid,true);assert.equal(after.networkValid,true);assert.equal(after.networkMembers,before.networkMembers);
+	assert.equal(BigInt(after.networkIn)-BigInt(before.networkIn),1500n);assert.equal(BigInt(after.networkOut)-BigInt(before.networkOut),700n);
+	// More than 4 GiB in one interval stays exact instead of aliasing to the residue.
+	const far=native.testNetwork([link('en0',15,3n*WRAP+500n,WRAP+400n),link('en1',10,5000n,7000n)]);assert.equal(BigInt(far.networkIn)-BigInt(before.networkIn),2n*WRAP+1500n);
+});
+test('network eligibility and membership are unchanged: each en<digits> Ethernet link once, hashed by unit number',()=>{
+	const links=[link('en0',15,100n,200n),link('en1',10,1n,2n),link('en01',20,1000n,1000n),link('bridge0',13,1000n,1000n),link('en2',12,1000n,1000n,{type:209}),link('en3a',7,1000n,1000n),link('en',8,1000n,1000n),link('en4',9,1000n,1000n,{inet:true}),link('en5',11,1000n,1000n,{noData:true})];
+	assert.deepEqual(native.testNetwork(links),{networkValid:true,networkIn:'101',networkOut:'202',networkMembers:membership([0,1])});
+	assert.deepEqual(native.testNetwork([]),{networkValid:false,networkIn:'0',networkOut:'0',networkMembers:membership([])});
+	assert.throws(()=>native.testNetwork([link('en0',15,1,2)]),{code:'HWMAC_ARGUMENT'});assert.throws(()=>native.testNetwork([link('en0',15,-1n,2n)]),{code:'HWMAC_ARGUMENT'});
+});
+test('a link whose 64-bit counters cannot be read, or whose index now names another link, withholds network counters',()=>{
+	for(const extra of [{readable:false},{reported:'en9'},{index:0}])assert.equal(native.testNetwork([link('en1',10,1n,2n),link('en0',15,100n,200n,extra)]).networkValid,false,JSON.stringify(extra));
+	assert.equal(native.testNetwork([link('en0',15,2n**64n-1n,1n),link('en1',10,1n,1n)]).networkValid,false,'a sum past 2^64 is refused, not wrapped');
+});
+test('live public network counters equal the 64-bit link totals netstat reports',async t=>{
+	// netstat holds a private statistics entitlement; the addon must reach the same totals without one. Link rows only; address rows repeat the counters.
+	const totals=()=>{let received=0n,sent=0n,largest=0n;for(const line of execFileSync('/usr/sbin/netstat',['-ibn'],{encoding:'utf8'}).split('\n').slice(1)){const fields=line.trim().split(/\s+/);if(fields.length<10||!/^en[0-9]+\*?$/.test(fields[0])||!/^<Link#[0-9]+>$/.test(fields[2]))continue;const ibytes=BigInt(fields.at(-5)),obytes=BigInt(fields.at(-2));received+=ibytes;sent+=obytes;for(const value of [ibytes,obytes])if(value>largest)largest=value;}return {received,sent,largest};};
+	const before=totals(),session=production.open();let packet;try{packet=await session.read('public');}finally{session.close();}const after=totals();
+	t.diagnostic(`largest en counter ${after.largest} bytes, ${after.largest>=WRAP?'past':'below'} 2^32`);
+	assert.equal(packet.networkValid,true);
+	for(const [key,field] of [['networkIn','received'],['networkOut','sent']]){const value=BigInt(packet[key]);assert.ok(before[field]<=value&&value<=after[field],`${key} ${value} outside netstat ${before[field]} to ${after[field]}`);}
+});
 test('type tags, arguments and idempotent close fail closed',()=>{
 	const session=native.open();
 	assert.throws(()=>session.read.call({},'smc'),{code:'HWMAC_RECEIVER'});assert.throws(()=>session.close.call({}),{code:'HWMAC_RECEIVER'});

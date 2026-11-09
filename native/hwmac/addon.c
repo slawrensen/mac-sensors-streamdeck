@@ -14,6 +14,12 @@
 #ifndef HWMAC_TEST_BUILD
 #define HWMAC_TEST_BUILD 0
 #endif
+#if HWMAC_TEST_BUILD
+#include <ifaddrs.h>
+#include <net/if.h>
+#include <net/if_dl.h>
+#include <net/if_types.h>
+#endif
 #if defined(__aarch64__)
 #define HWMAC_ARCH "arm64"
 #elif defined(__x86_64__)
@@ -337,6 +343,52 @@ static napi_value test_decode(napi_env env, napi_callback_info info) {
 	double value; if (size > 32 || !smc_decode(smc_key(type), (uint32_t)size, bytes, &value)) { napi_value none; napi_get_null(env, &none); return none; }
 	return number_value(env, value);
 }
+#define HWMAC_TEST_LINKS 16
+/* What the kernel answers for one interface index: its name and its 64-bit counters, or nothing. */
+typedef struct { unsigned index; char reported[HWMAC_LINK_NAME]; uint64_t received, sent; bool readable; } fake_link;
+typedef struct { fake_link links[HWMAC_TEST_LINKS]; size_t count; } fake_links;
+static bool fake_counters(unsigned index, char name[HWMAC_LINK_NAME], uint64_t *received, uint64_t *sent, void *context) {
+	const fake_links *fixture = context;
+	for (size_t i = 0; i < fixture->count; i++) if (fixture->links[i].index == index) {
+		if (!fixture->links[i].readable) return false;
+		memcpy(name, fixture->links[i].reported, HWMAC_LINK_NAME); *received = fixture->links[i].received; *sent = fixture->links[i].sent; return true;
+	}
+	return false;
+}
+static bool fixture_property(napi_env env, napi_value object, const char *key, napi_value *value) {
+	bool present = false; return napi_has_named_property(env, object, key, &present) == napi_ok && present && napi_get_named_property(env, object, key, value) == napi_ok;
+}
+static napi_value test_network(napi_env env, napi_callback_info info) {
+	size_t argc = 1; napi_value args[1]; CHECK(napi_get_cb_info(env, info, &argc, args, NULL, NULL));
+	bool array = false; uint32_t count = 0;
+	if (argc != 1 || napi_is_array(env, args[0], &array) != napi_ok || !array || napi_get_array_length(env, args[0], &count) != napi_ok || count > HWMAC_TEST_LINKS) return fail(env, "HWMAC_ARGUMENT", "testNetwork", "Up to 16 link fixtures required.");
+	struct ifaddrs items[HWMAC_TEST_LINKS]; struct sockaddr_dl addresses[HWMAC_TEST_LINKS]; struct if_data data[HWMAC_TEST_LINKS]; char names[HWMAC_TEST_LINKS][HWMAC_LINK_NAME];
+	fake_links fixture; memset(items, 0, sizeof(items)); memset(addresses, 0, sizeof(addresses)); memset(data, 0, sizeof(data)); memset(&fixture, 0, sizeof(fixture)); fixture.count = count;
+	for (uint32_t i = 0; i < count; i++) {
+		napi_value link, value; size_t length; uint32_t number; bool flag, lossless; fake_link *answer = &fixture.links[i];
+		CHECK(napi_get_element(env, args[0], i, &link));
+		if (!fixture_property(env, link, "name", &value) || napi_get_value_string_utf8(env, value, names[i], sizeof(names[i]), &length) != napi_ok || length == 0 || length >= sizeof(names[i])) return fail(env, "HWMAC_ARGUMENT", "testNetwork", "Link name required.");
+		memcpy(answer->reported, names[i], sizeof(answer->reported));
+		if (fixture_property(env, link, "reported", &value) && napi_get_value_string_utf8(env, value, answer->reported, sizeof(answer->reported), &length) != napi_ok) return fail(env, "HWMAC_ARGUMENT", "testNetwork", "Reported name must be a string.");
+		if (!fixture_property(env, link, "index", &value) || napi_get_value_uint32(env, value, &number) != napi_ok || number > UINT16_MAX) return fail(env, "HWMAC_ARGUMENT", "testNetwork", "Link index required.");
+		answer->index = number; addresses[i].sdl_index = (u_short)number;
+		if (!fixture_property(env, link, "received", &value) || napi_get_value_bigint_uint64(env, value, &answer->received, &lossless) != napi_ok || !lossless) return fail(env, "HWMAC_ARGUMENT", "testNetwork", "Received bytes must be a 64-bit BigInt.");
+		if (!fixture_property(env, link, "sent", &value) || napi_get_value_bigint_uint64(env, value, &answer->sent, &lossless) != napi_ok || !lossless) return fail(env, "HWMAC_ARGUMENT", "testNetwork", "Sent bytes must be a 64-bit BigInt.");
+		answer->readable = !(fixture_property(env, link, "readable", &value) && napi_get_value_bool(env, value, &flag) == napi_ok && !flag);
+		number = IFT_ETHER; if (fixture_property(env, link, "type", &value) && (napi_get_value_uint32(env, value, &number) != napi_ok || number > UINT8_MAX)) return fail(env, "HWMAC_ARGUMENT", "testNetwork", "Link type must be a byte.");
+		/* getifaddrs if_data keeps only the low 32 bits of each byte counter. */
+		data[i].ifi_type = (u_char)number; data[i].ifi_ibytes = (u_int32_t)answer->received; data[i].ifi_obytes = (u_int32_t)answer->sent;
+		bool inet = fixture_property(env, link, "inet", &value) && napi_get_value_bool(env, value, &flag) == napi_ok && flag;
+		bool bare = fixture_property(env, link, "noData", &value) && napi_get_value_bool(env, value, &flag) == napi_ok && flag;
+		addresses[i].sdl_len = sizeof(addresses[i]); addresses[i].sdl_family = inet ? AF_INET : AF_LINK;
+		items[i].ifa_name = names[i]; items[i].ifa_addr = (struct sockaddr *)&addresses[i]; items[i].ifa_data = bare ? NULL : &data[i]; items[i].ifa_next = i + 1 < count ? &items[i + 1] : NULL;
+	}
+	source_packet *packet = calloc(1, sizeof(*packet)); if (packet == NULL) return fail(env, "HWMAC_MEMORY", "testNetwork", "Native allocation failed.");
+	hwmac_network_from(packet, count > 0 ? &items[0] : NULL, fake_counters, &fixture);
+	napi_value object; napi_status status = napi_create_object(env, &object);
+	if (status == napi_ok) { set_bool(env, object, "networkValid", packet->network_valid); set_u64(env, object, "networkIn", packet->network_in); set_u64(env, object, "networkOut", packet->network_out); set_u64(env, object, "networkMembers", packet->network_members); }
+	free(packet); if (status != napi_ok) return fail(env, "HWMAC_API", "testNetwork", "Could not create the result."); return object;
+}
 #endif
 NAPI_MODULE_INIT() {
 	module_state *state = calloc(1, sizeof(*state)); if (state == NULL) return fail(env, "HWMAC_MEMORY", "initialize", "Native allocation failed.");
@@ -355,6 +407,7 @@ NAPI_MODULE_INIT() {
 		{ "testDecode", NULL, test_decode, NULL, NULL, NULL, napi_default, NULL },
 		{ "testTransport", NULL, test_transport_result, NULL, NULL, NULL, napi_default, NULL },
 		{ "testCatalog", NULL, test_catalog, NULL, NULL, NULL, napi_default, NULL },
+		{ "testNetwork", NULL, test_network, NULL, NULL, NULL, napi_default, NULL },
 #endif
 	};
 	CHECK(napi_define_properties(env, exports, sizeof(methods) / sizeof(methods[0]), methods));

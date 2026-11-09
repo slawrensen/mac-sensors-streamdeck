@@ -118,7 +118,7 @@ Causes, most lasting first:
 
 1. **This Mac does not have that reading.** An SMC reading's identity includes the Mac model, so a selection saved on another model, or copied in a configuration document from another Mac, is missing here. An SMC key that this model does not have is never reported. See [Data sources](data-sources.html#reading-identity).
 2. **Its last read failed or was withheld.** When the SMC read fails, the SMC readings drop out while the system counters keep working. When a system counter read fails after an earlier one succeeded, the system readings drop out and the SMC readings keep working. If no system counter read has succeeded since reading started, keys show **Source error**, or **Source busy** while a read is still out after 15 seconds, because the font has not been checked yet. A value outside its accepted range is withheld.
-3. **It is a worked-out reading waiting for its pair.** CPU usage and the transfer rates show this for about a quarter second after reading starts, for one read after a sleep, and network rates for one read when an interface counter starts over at 4 GiB. See [Counter rebaseline](data-sources.html#counter-rebaseline).
+3. **It is a worked-out reading waiting for its pair.** CPU usage and the transfer rates show this for about a quarter second after reading starts, and for one read after a sleep. See [Counter rebaseline](data-sources.html#counter-rebaseline).
 
 The settings panel tells this apart from a source problem. Its header says **Saved reading not found**, and the message under it says the key keeps the saved reading with its label and colors and shows it again when this Mac reports it, with **Reload sensor list** and **Pick another reading** buttons.
 

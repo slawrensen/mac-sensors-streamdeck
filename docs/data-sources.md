@@ -51,11 +51,11 @@ The five worked-out readings (CPU usage and the four rates) need two reads, so t
 - a change in which interfaces or storage drivers are counted;
 - a sleep between the two reads, detected when the time elapsed and the time awake differ by more than 50 ms;
 - for the storage rates, any block storage driver that reports no byte counts, on every read where it does so;
-- for the network rates, no interface named `en` followed by a number.
+- for the network rates, no interface named `en` followed by a number, or a counted interface whose byte counters macOS does not return.
 
 When a worked-out reading is left out, a key showing only that reading shows **Sensor missing** until the next read brings it back. Its sparkline starts again.
 
-**Known limit in 1.0.1: network counters start over at 4 GiB.** macOS gives the plugin 32-bit byte counters for each interface. When one passes 4 GiB it starts again from zero, and the read in which that happens shows no network rate. At a sustained 1 Gbit/s that is about every 34 seconds for each direction and interface. At **Read every** 5 seconds, a transfer of more than 4 GiB within one read would also be undercounted.
+**Network counters are 64-bit from 1.0.2.0.** The plugin reads each interface's 64-bit byte counters from the kernel's interface table, so the network rates carry on when an interface passes 4 GiB. 1.0.1.0 and earlier read 32-bit counters, which start again from zero at 4 GiB, and showed no network rate for the read in which that happened.
 
 ### SMC readings
 

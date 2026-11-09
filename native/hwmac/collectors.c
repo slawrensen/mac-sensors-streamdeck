@@ -14,9 +14,11 @@
 #include <sys/mount.h>
 #include <net/if.h>
 #include <net/if_dl.h>
+#include <net/if_mib.h>
 #include <net/if_types.h>
 #include <ifaddrs.h>
 #include <errno.h>
+#include <limits.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -155,11 +157,21 @@ static uint64_t membership(uint64_t *members, size_t count) {
 	for (size_t i = 0; i < count; i++) for (unsigned shift = 0; shift < 64; shift += 8) { hash ^= (members[i] >> shift) & 255; hash *= UINT64_C(1099511628211); }
 	return hash;
 }
-static void network(source_packet *packet) {
-	struct ifaddrs *list = NULL;
-	if (getifaddrs(&list) != 0) return;
+_Static_assert(sizeof(((struct ifmibdata *)0)->ifmd_name) == HWMAC_LINK_NAME, "interface name width");
+/* getifaddrs if_data byte counters are u_int32_t and wrap every 4 GiB. The IFMIB
+ * row for the same index carries if_data64, readable without an entitlement. */
+static bool ifmib_counters(unsigned index, char name[HWMAC_LINK_NAME], uint64_t *received, uint64_t *sent, void *context) {
+	(void)context;
+	if (index > (unsigned)INT_MAX) return false;
+	int mib[6] = { CTL_NET, PF_LINK, NETLINK_GENERIC, IFMIB_IFDATA, (int)index, IFDATA_GENERAL };
+	struct ifmibdata data; size_t length = sizeof(data);
+	if (sysctl(mib, 6, &data, &length, NULL, 0) != 0 || length != sizeof(data)) return false;
+	memcpy(name, data.ifmd_name, HWMAC_LINK_NAME); *received = data.ifmd_data.ifi_ibytes; *sent = data.ifmd_data.ifi_obytes;
+	return true;
+}
+void hwmac_network_from(source_packet *packet, const struct ifaddrs *list, hwmac_link_counters counters, void *context) {
 	uint64_t members[128]; size_t count = 0; bool valid = true;
-	for (struct ifaddrs *item = list; item != NULL; item = item->ifa_next) {
+	for (const struct ifaddrs *item = list; item != NULL; item = item->ifa_next) {
 		if (item->ifa_addr == NULL || item->ifa_addr->sa_family != AF_LINK || item->ifa_data == NULL || item->ifa_name == NULL) continue;
 		const struct if_data *data = (const struct if_data *)item->ifa_data;
 		if (data->ifi_type != IFT_ETHER || strncmp(item->ifa_name, "en", 2) != 0 || item->ifa_name[2] == 0) continue;
@@ -170,11 +182,20 @@ static void network(source_packet *packet) {
 		uint64_t member = (uint64_t)index; bool duplicate = false;
 		for (size_t i = 0; i < count; i++) if (members[i] == member) duplicate = true;
 		if (duplicate) continue;
-		if (count == 128 || UINT64_MAX - packet->network_in < data->ifi_ibytes || UINT64_MAX - packet->network_out < data->ifi_obytes) { valid = false; break; }
-		members[count++] = member; packet->network_in += data->ifi_ibytes; packet->network_out += data->ifi_obytes;
+		const struct sockaddr_dl *address = (const struct sockaddr_dl *)(const void *)item->ifa_addr;
+		unsigned link_index = item->ifa_addr->sa_len >= offsetof(struct sockaddr_dl, sdl_index) + sizeof(address->sdl_index) ? address->sdl_index : 0;
+		char name[HWMAC_LINK_NAME] = {0}; uint64_t received = 0, sent = 0;
+		/* Any unreadable eligible link withholds the aggregate. An index reused since getifaddrs reports another name. */
+		if (count == 128 || link_index == 0 || !counters(link_index, name, &received, &sent, context) || strncmp(name, item->ifa_name, sizeof(name)) != 0 || UINT64_MAX - packet->network_in < received || UINT64_MAX - packet->network_out < sent) { valid = false; break; }
+		members[count++] = member; packet->network_in += received; packet->network_out += sent;
 	}
-	freeifaddrs(list);
 	packet->network_valid = valid && count > 0; packet->network_members = membership(members, count);
+}
+static void network(source_packet *packet) {
+	struct ifaddrs *list = NULL;
+	if (getifaddrs(&list) != 0) return;
+	hwmac_network_from(packet, list, ifmib_counters, NULL);
+	freeifaddrs(list);
 }
 static bool dictionary_counter(CFDictionaryRef dictionary, CFStringRef key, uint64_t *value) {
 	CFTypeRef property = CFDictionaryGetValue(dictionary, key); int64_t number = -1;
