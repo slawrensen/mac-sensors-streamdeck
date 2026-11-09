@@ -23,11 +23,37 @@ for(const file of inputs.sort()) {const bytes=fs.readFileSync(file);hash.update(
 const sourceId=hash.digest('hex');const generated=path.join(out,'generated');fs.mkdirSync(generated,{recursive:true});
 fs.writeFileSync(path.join(generated,'source-id.h'),`#define HWMAC_SOURCE_ID "${sourceId}"\n`);
 const catalog=JSON.parse(fs.readFileSync('native/hwmac/catalog.json','utf8'));
-if(catalog.rows.length>128||new Set(catalog.rows.map(row=>row.key)).size!==catalog.rows.length)throw new Error('Ambiguous or oversized SMC catalog');
-const bounds={temperature:[-50,150],fan:[0,30000],voltage:[0,100],current:[-500,500],power:[-1000,2000]};
-const entries=catalog.rows.map(row=>{if(!/^[\x20-\x7e]{4}$/.test(row.key)||!bounds[row.type])throw new Error('Invalid catalog row');return `\t{${[row.key,row.label,row.group,row.type].map(x=>JSON.stringify(x)).join(',')},${row.scope==='m5'?5:row.scope==='apple'?1:0},${bounds[row.type].join(',')}}`;});
-const models=Object.entries(catalog.modelTables).map(([model,facts])=>{if(facts.table!=='m5')throw new Error('Unknown model table');return `\t{${JSON.stringify(model)},${JSON.stringify(facts.chip)},5}`;});
-fs.writeFileSync(path.join(generated,'catalog.inc'),`static const struct { const char *model; const char *chip; unsigned scope; } HWMAC_MODELS[] = {\n${models.join(',\n')}\n};\nstatic const sensor_spec HWMAC_CATALOG[] = {\n${entries.join(',\n')}\n};\n`);
+// Schema 2: a row applies to every Mac (common), every Apple silicon Mac (apple), one chip family named by its CPU brand
+// string (optionally only some variants), or one measured model. Limits mirror HWMAC_MAX_CATALOG and HWMAC_MAX_ROWS.
+const MAX_CATALOG_ROWS=256,MAX_PACKET_ROWS=128,VARIANTS=['base','pro','max','ultra'];
+const variantMask=names=>names.reduce((mask,name)=>{if(!VARIANTS.includes(name))throw new Error('Unknown chip variant');return mask|(1<<VARIANTS.indexOf(name));},0);
+if(catalog.schema!==2||catalog.rows.length>MAX_CATALOG_ROWS)throw new Error('Unsupported or oversized SMC catalog');
+const families=Object.entries(catalog.families),modelTables=Object.entries(catalog.models),bounds={temperature:[-50,150],fan:[0,30000],voltage:[0,100],current:[-500,500],power:[-1000,2000]};
+
+for(const [name,family] of families)if(!/^[a-z0-9]{1,15}$/.test(name)||['common','apple'].includes(name)||!/^Apple [A-Z][A-Za-z0-9 ]{1,40}$/.test(family.brand)||variantMask(family.variants)===0)throw new Error('Invalid chip family');
+// Every CPU name a family answers to must be its own: the native side takes the first family that matches.
+const brandNames=families.flatMap(([,family])=>family.variants.map(variant=>family.brand+(variant==='base'?'':' '+variant[0].toUpperCase()+variant.slice(1))));
+if(new Set(brandNames).size!==brandNames.length)throw new Error('Two chip families answer to one CPU name');
+for(const [model,facts] of modelTables)if(!Object.hasOwn(catalog.families,facts.family)||!catalog.families[facts.family].variants.includes(facts.variant)||!/^[\x21-\x7e]{1,63}$/.test(facts.chip)||!/^[\x21-\x7e]{1,127}$/.test(model)||Object.hasOwn(catalog.families,model)||['common','apple'].includes(model))throw new Error('Invalid model table');
+const scopeOf=row=>{
+	if(row.scope==='common')return [0,0,0];
+	if(row.scope==='apple')return [1,0,0];
+	const family=families.findIndex(([name])=>name===row.scope);
+	if(family>=0){if(row.variants&&(row.variants.length===0||row.variants.some(name=>!families[family][1].variants.includes(name))))throw new Error('Row variant outside its family');return [2,family,row.variants?variantMask(row.variants):0];}
+	const model=modelTables.findIndex(([name])=>name===row.scope);
+	if(model>=0&&!row.variants)return [3,model,0];
+	throw new Error('Unknown catalog scope');
+};
+const entries=catalog.rows.map(row=>{if(!/^[\x20-\x7e]{4}$/.test(row.key)||!bounds[row.type])throw new Error('Invalid catalog row');const scope=scopeOf(row);if(scope[0]===2&&row.type!=='temperature')throw new Error('Chip family rows are temperatures');return `\t{${[row.key,row.label,row.group,row.type].map(x=>JSON.stringify(x)).join(',')},${scope.join(',')},${bounds[row.type].join(',')}}`;});
+// No Mac may get two rows for one key or more rows than a packet holds: check every family variant with and without each measured model.
+const applies=(row,family,variant,model)=>row.scope==='common'||row.scope==='apple'||(row.scope===family&&(!row.variants||row.variants.includes(variant)))||row.scope===model;
+for(const [family,spec] of [[null,{variants:[null]}],...families])for(const variant of spec.variants)for(const model of [null,...modelTables.filter(([,facts])=>facts.family===family&&facts.variant===variant).map(([name])=>name)]) {
+	const keys=catalog.rows.filter(row=>applies(row,family,variant,model)).map(row=>row.key);
+	if(keys.length>MAX_PACKET_ROWS||new Set(keys).size!==keys.length)throw new Error(`Ambiguous or oversized SMC table for ${family??'common'} ${variant??''} ${model??''}`);
+}
+const familyRows=families.map(([name,family])=>`\t{${JSON.stringify(name)},${JSON.stringify(family.brand)},${variantMask(family.variants)}}`);
+const models=modelTables.map(([model,facts])=>`\t{${JSON.stringify(model)},${JSON.stringify(facts.chip)},${families.findIndex(([name])=>name===facts.family)},${variantMask([facts.variant])}}`);
+fs.writeFileSync(path.join(generated,'catalog.inc'),`static const struct { const char *name; const char *brand; unsigned variants; } HWMAC_FAMILIES[] = {\n${familyRows.join(',\n')}\n};\nstatic const struct { const char *model; const char *chip; unsigned family; unsigned variant; } HWMAC_MODELS[] = {\n${models.join(',\n')}\n};\nstatic const sensor_spec HWMAC_CATALOG[] = {\n${entries.join(',\n')}\n};\n`);
 const sdk=execFileSync('xcrun',['--sdk','macosx','--show-sdk-path'],{encoding:'utf8'}).trim();
 const compiler=execFileSync('xcrun',['--find','clang'],{encoding:'utf8'}).trim();
 const records=[];

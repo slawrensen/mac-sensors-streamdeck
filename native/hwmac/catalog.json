@@ -1,9 +1,70 @@
 {
-  "schema": 1,
-  "modelTables": {
+  "schema": 2,
+  "families": {
+    "m1": {
+      "brand": "Apple M1",
+      "variants": [
+        "base",
+        "pro",
+        "max",
+        "ultra"
+      ]
+    },
+    "m2": {
+      "brand": "Apple M2",
+      "variants": [
+        "base",
+        "pro",
+        "max",
+        "ultra"
+      ]
+    },
+    "m3": {
+      "brand": "Apple M3",
+      "variants": [
+        "base",
+        "pro",
+        "max",
+        "ultra"
+      ]
+    },
+    "m4": {
+      "brand": "Apple M4",
+      "variants": [
+        "base",
+        "pro",
+        "max"
+      ]
+    },
+    "m5": {
+      "brand": "Apple M5",
+      "variants": [
+        "base",
+        "pro",
+        "max",
+        "ultra"
+      ]
+    },
+    "m6": {
+      "brand": "Apple M6",
+      "variants": [
+        "base",
+        "pro",
+        "max"
+      ]
+    },
+    "a18pro": {
+      "brand": "Apple A18 Pro",
+      "variants": [
+        "base"
+      ]
+    }
+  },
+  "models": {
     "Mac17,9": {
       "chip": "t6050",
-      "table": "m5"
+      "family": "m5",
+      "variant": "pro"
     }
   },
   "rows": [
@@ -62,214 +123,6 @@
       "type": "temperature",
       "scope": "common",
       "sourceLine": 365
-    },
-    {
-      "key": "Tp00",
-      "label": "CPU super core 1",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "m5",
-      "sourceLine": 488
-    },
-    {
-      "key": "Tp04",
-      "label": "CPU super core 2",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "m5",
-      "sourceLine": 489
-    },
-    {
-      "key": "Tp08",
-      "label": "CPU super core 3",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "m5",
-      "sourceLine": 490
-    },
-    {
-      "key": "Tp0C",
-      "label": "CPU super core 4",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "m5",
-      "sourceLine": 491
-    },
-    {
-      "key": "Tp0G",
-      "label": "CPU super core 5",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "m5",
-      "sourceLine": 492
-    },
-    {
-      "key": "Tp0K",
-      "label": "CPU super core 6",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "m5",
-      "sourceLine": 493
-    },
-    {
-      "key": "Tp0O",
-      "label": "CPU performance core 1",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "m5",
-      "sourceLine": 495
-    },
-    {
-      "key": "Tp0R",
-      "label": "CPU performance core 2",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "m5",
-      "sourceLine": 496
-    },
-    {
-      "key": "Tp0U",
-      "label": "CPU performance core 3",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "m5",
-      "sourceLine": 497
-    },
-    {
-      "key": "Tp0X",
-      "label": "CPU performance core 4",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "m5",
-      "sourceLine": 498
-    },
-    {
-      "key": "Tp0a",
-      "label": "CPU performance core 5",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "m5",
-      "sourceLine": 499
-    },
-    {
-      "key": "Tp0d",
-      "label": "CPU performance core 6",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "m5",
-      "sourceLine": 500
-    },
-    {
-      "key": "Tp0g",
-      "label": "CPU performance core 7",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "m5",
-      "sourceLine": 501
-    },
-    {
-      "key": "Tp0j",
-      "label": "CPU performance core 8",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "m5",
-      "sourceLine": 502
-    },
-    {
-      "key": "Tp0m",
-      "label": "CPU performance core 9",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "m5",
-      "sourceLine": 503
-    },
-    {
-      "key": "Tp0p",
-      "label": "CPU performance core 10",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "m5",
-      "sourceLine": 504
-    },
-    {
-      "key": "Tp0u",
-      "label": "CPU performance core 11",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "m5",
-      "sourceLine": 505
-    },
-    {
-      "key": "Tp0y",
-      "label": "CPU performance core 12",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "m5",
-      "sourceLine": 506
-    },
-    {
-      "key": "Tg0U",
-      "label": "GPU 1",
-      "group": "GPU",
-      "type": "temperature",
-      "scope": "m5",
-      "sourceLine": 508
-    },
-    {
-      "key": "Tg0X",
-      "label": "GPU 2",
-      "group": "GPU",
-      "type": "temperature",
-      "scope": "m5",
-      "sourceLine": 509
-    },
-    {
-      "key": "Tg0d",
-      "label": "GPU 3",
-      "group": "GPU",
-      "type": "temperature",
-      "scope": "m5",
-      "sourceLine": 510
-    },
-    {
-      "key": "Tg0g",
-      "label": "GPU 4",
-      "group": "GPU",
-      "type": "temperature",
-      "scope": "m5",
-      "sourceLine": 511
-    },
-    {
-      "key": "Tg0j",
-      "label": "GPU 5",
-      "group": "GPU",
-      "type": "temperature",
-      "scope": "m5",
-      "sourceLine": 512
-    },
-    {
-      "key": "Tg1Y",
-      "label": "GPU 6",
-      "group": "GPU",
-      "type": "temperature",
-      "scope": "m5",
-      "sourceLine": 513
-    },
-    {
-      "key": "Tg1c",
-      "label": "GPU 7",
-      "group": "GPU",
-      "type": "temperature",
-      "scope": "m5",
-      "sourceLine": 514
-    },
-    {
-      "key": "Tg1g",
-      "label": "GPU 8",
-      "group": "GPU",
-      "type": "temperature",
-      "scope": "m5",
-      "sourceLine": 515
     },
     {
       "key": "TaLP",
@@ -496,108 +349,1269 @@
       "sourceLine": null
     },
     {
+      "key": "Tp09",
+      "label": "CPU efficiency core 1",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m1",
+      "sourceLine": 389
+    },
+    {
+      "key": "Tp0T",
+      "label": "CPU efficiency core 2",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m1",
+      "sourceLine": 390
+    },
+    {
+      "key": "Tp01",
+      "label": "CPU performance core 1",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m1",
+      "sourceLine": 391
+    },
+    {
+      "key": "Tp05",
+      "label": "CPU performance core 2",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m1",
+      "sourceLine": 392
+    },
+    {
+      "key": "Tp0D",
+      "label": "CPU performance core 3",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m1",
+      "sourceLine": 393
+    },
+    {
+      "key": "Tp0H",
+      "label": "CPU performance core 4",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m1",
+      "sourceLine": 394
+    },
+    {
+      "key": "Tp0L",
+      "label": "CPU performance core 5",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m1",
+      "sourceLine": 395
+    },
+    {
+      "key": "Tp0P",
+      "label": "CPU performance core 6",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m1",
+      "sourceLine": 396
+    },
+    {
+      "key": "Tp0X",
+      "label": "CPU performance core 7",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m1",
+      "sourceLine": 397
+    },
+    {
+      "key": "Tp0b",
+      "label": "CPU performance core 8",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m1",
+      "sourceLine": 398
+    },
+    {
+      "key": "Tg05",
+      "label": "GPU 1",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m1",
+      "sourceLine": 400
+    },
+    {
+      "key": "Tg0D",
+      "label": "GPU 2",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m1",
+      "sourceLine": 401
+    },
+    {
+      "key": "Tg0L",
+      "label": "GPU 3",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m1",
+      "sourceLine": 402
+    },
+    {
+      "key": "Tg0T",
+      "label": "GPU 4",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m1",
+      "sourceLine": 403
+    },
+    {
+      "key": "Tm02",
+      "label": "Memory 1",
+      "group": "System",
+      "type": "temperature",
+      "scope": "m1",
+      "sourceLine": 405
+    },
+    {
+      "key": "Tm06",
+      "label": "Memory 2",
+      "group": "System",
+      "type": "temperature",
+      "scope": "m1",
+      "sourceLine": 406
+    },
+    {
+      "key": "Tm08",
+      "label": "Memory 3",
+      "group": "System",
+      "type": "temperature",
+      "scope": "m1",
+      "sourceLine": 407
+    },
+    {
+      "key": "Tm09",
+      "label": "Memory 4",
+      "group": "System",
+      "type": "temperature",
+      "scope": "m1",
+      "sourceLine": 408
+    },
+    {
+      "key": "Tp1h",
+      "label": "CPU efficiency core 1",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m2",
+      "sourceLine": 411
+    },
+    {
+      "key": "Tp1t",
+      "label": "CPU efficiency core 2",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m2",
+      "sourceLine": 412
+    },
+    {
+      "key": "Tp1p",
+      "label": "CPU efficiency core 3",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m2",
+      "sourceLine": 413
+    },
+    {
+      "key": "Tp1l",
+      "label": "CPU efficiency core 4",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m2",
+      "sourceLine": 414
+    },
+    {
+      "key": "Tp01",
+      "label": "CPU performance core 1",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m2",
+      "sourceLine": 416
+    },
+    {
+      "key": "Tp05",
+      "label": "CPU performance core 2",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m2",
+      "sourceLine": 417
+    },
+    {
+      "key": "Tp09",
+      "label": "CPU performance core 3",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m2",
+      "sourceLine": 418
+    },
+    {
+      "key": "Tp0D",
+      "label": "CPU performance core 4",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m2",
+      "sourceLine": 419
+    },
+    {
+      "key": "Tp0X",
+      "label": "CPU performance core 5",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m2",
+      "sourceLine": 420
+    },
+    {
+      "key": "Tp0b",
+      "label": "CPU performance core 6",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m2",
+      "sourceLine": 421
+    },
+    {
+      "key": "Tp0f",
+      "label": "CPU performance core 7",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m2",
+      "sourceLine": 422
+    },
+    {
+      "key": "Tp0j",
+      "label": "CPU performance core 8",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m2",
+      "sourceLine": 423
+    },
+    {
+      "key": "Tg0f",
+      "label": "GPU 1",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m2",
+      "sourceLine": 425
+    },
+    {
+      "key": "Tg0j",
+      "label": "GPU 2",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m2",
+      "sourceLine": 426
+    },
+    {
+      "key": "Te05",
+      "label": "CPU efficiency core 1",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m3",
+      "sourceLine": 429
+    },
+    {
+      "key": "Te0L",
+      "label": "CPU efficiency core 2",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m3",
+      "sourceLine": 430
+    },
+    {
+      "key": "Te0P",
+      "label": "CPU efficiency core 3",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m3",
+      "sourceLine": 431
+    },
+    {
+      "key": "Te0S",
+      "label": "CPU efficiency core 4",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m3",
+      "sourceLine": 432
+    },
+    {
+      "key": "Tf04",
+      "label": "CPU performance core 1",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m3",
+      "sourceLine": 434
+    },
+    {
+      "key": "Tf09",
+      "label": "CPU performance core 2",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m3",
+      "sourceLine": 435
+    },
+    {
+      "key": "Tf0A",
+      "label": "CPU performance core 3",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m3",
+      "sourceLine": 436
+    },
+    {
+      "key": "Tf0B",
+      "label": "CPU performance core 4",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m3",
+      "sourceLine": 437
+    },
+    {
+      "key": "Tf0D",
+      "label": "CPU performance core 5",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m3",
+      "sourceLine": 438
+    },
+    {
+      "key": "Tf0E",
+      "label": "CPU performance core 6",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m3",
+      "sourceLine": 439
+    },
+    {
+      "key": "Tf44",
+      "label": "CPU performance core 7",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m3",
+      "sourceLine": 440
+    },
+    {
+      "key": "Tf49",
+      "label": "CPU performance core 8",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m3",
+      "sourceLine": 441
+    },
+    {
+      "key": "Tf4A",
+      "label": "CPU performance core 9",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m3",
+      "sourceLine": 442
+    },
+    {
+      "key": "Tf4B",
+      "label": "CPU performance core 10",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m3",
+      "sourceLine": 443
+    },
+    {
+      "key": "Tf4D",
+      "label": "CPU performance core 11",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m3",
+      "sourceLine": 444
+    },
+    {
+      "key": "Tf4E",
+      "label": "CPU performance core 12",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m3",
+      "sourceLine": 445
+    },
+    {
+      "key": "Tf14",
+      "label": "GPU 1",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m3",
+      "sourceLine": 447
+    },
+    {
+      "key": "Tf18",
+      "label": "GPU 2",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m3",
+      "sourceLine": 448
+    },
+    {
+      "key": "Tf19",
+      "label": "GPU 3",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m3",
+      "sourceLine": 449
+    },
+    {
+      "key": "Tf1A",
+      "label": "GPU 4",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m3",
+      "sourceLine": 450
+    },
+    {
+      "key": "Tf24",
+      "label": "GPU 5",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m3",
+      "sourceLine": 451
+    },
+    {
+      "key": "Tf28",
+      "label": "GPU 6",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m3",
+      "sourceLine": 452
+    },
+    {
+      "key": "Tf29",
+      "label": "GPU 7",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m3",
+      "sourceLine": 453
+    },
+    {
+      "key": "Tf2A",
+      "label": "GPU 8",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m3",
+      "sourceLine": 454
+    },
+    {
+      "key": "Te05",
+      "label": "CPU efficiency core 1",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m4",
+      "sourceLine": 457
+    },
+    {
+      "key": "Te0S",
+      "label": "CPU efficiency core 2",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m4",
+      "sourceLine": 458
+    },
+    {
+      "key": "Te09",
+      "label": "CPU efficiency core 3",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m4",
+      "sourceLine": 459
+    },
+    {
+      "key": "Te0H",
+      "label": "CPU efficiency core 4",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m4",
+      "sourceLine": 460
+    },
+    {
+      "key": "Tp01",
+      "label": "CPU performance core 1",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m4",
+      "sourceLine": 462
+    },
+    {
+      "key": "Tp05",
+      "label": "CPU performance core 2",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m4",
+      "sourceLine": 463
+    },
+    {
+      "key": "Tp09",
+      "label": "CPU performance core 3",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m4",
+      "sourceLine": 464
+    },
+    {
+      "key": "Tp0D",
+      "label": "CPU performance core 4",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m4",
+      "sourceLine": 465
+    },
+    {
+      "key": "Tp0V",
+      "label": "CPU performance core 5",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m4",
+      "sourceLine": 466
+    },
+    {
+      "key": "Tp0Y",
+      "label": "CPU performance core 6",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m4",
+      "sourceLine": 467
+    },
+    {
+      "key": "Tp0b",
+      "label": "CPU performance core 7",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m4",
+      "sourceLine": 468
+    },
+    {
+      "key": "Tp0e",
+      "label": "CPU performance core 8",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m4",
+      "sourceLine": 469
+    },
+    {
+      "key": "Tg0G",
+      "label": "GPU 1",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m4",
+      "variants": [
+        "base"
+      ],
+      "sourceLine": 471
+    },
+    {
+      "key": "Tg0H",
+      "label": "GPU 2",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m4",
+      "variants": [
+        "base"
+      ],
+      "sourceLine": 472
+    },
+    {
+      "key": "Tg1U",
+      "label": "GPU 1",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m4",
+      "variants": [
+        "pro",
+        "max"
+      ],
+      "sourceLine": 473
+    },
+    {
+      "key": "Tg1k",
+      "label": "GPU 2",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m4",
+      "variants": [
+        "pro",
+        "max"
+      ],
+      "sourceLine": 474
+    },
+    {
+      "key": "Tg0K",
+      "label": "GPU 3",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m4",
+      "sourceLine": 476
+    },
+    {
+      "key": "Tg0L",
+      "label": "GPU 4",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m4",
+      "sourceLine": 477
+    },
+    {
+      "key": "Tg0d",
+      "label": "GPU 5",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m4",
+      "sourceLine": 478
+    },
+    {
+      "key": "Tg0e",
+      "label": "GPU 6",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m4",
+      "sourceLine": 479
+    },
+    {
+      "key": "Tg0j",
+      "label": "GPU 7",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m4",
+      "sourceLine": 480
+    },
+    {
+      "key": "Tg0k",
+      "label": "GPU 8",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m4",
+      "sourceLine": 481
+    },
+    {
+      "key": "Tm0p",
+      "label": "Memory proximity 1",
+      "group": "System",
+      "type": "temperature",
+      "scope": "m4",
+      "sourceLine": 483
+    },
+    {
+      "key": "Tm1p",
+      "label": "Memory proximity 2",
+      "group": "System",
+      "type": "temperature",
+      "scope": "m4",
+      "sourceLine": 484
+    },
+    {
+      "key": "Tm2p",
+      "label": "Memory proximity 3",
+      "group": "System",
+      "type": "temperature",
+      "scope": "m4",
+      "sourceLine": 485
+    },
+    {
+      "key": "Tp00",
+      "label": "CPU super core 1",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 488
+    },
+    {
+      "key": "Tp04",
+      "label": "CPU super core 2",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 489
+    },
+    {
+      "key": "Tp08",
+      "label": "CPU super core 3",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 490
+    },
+    {
+      "key": "Tp0C",
+      "label": "CPU super core 4",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 491
+    },
+    {
+      "key": "Tp0G",
+      "label": "CPU super core 5",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 492
+    },
+    {
+      "key": "Tp0K",
+      "label": "CPU super core 6",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 493
+    },
+    {
+      "key": "Tp0O",
+      "label": "CPU performance core 1",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 495
+    },
+    {
+      "key": "Tp0R",
+      "label": "CPU performance core 2",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 496
+    },
+    {
+      "key": "Tp0U",
+      "label": "CPU performance core 3",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 497
+    },
+    {
+      "key": "Tp0X",
+      "label": "CPU performance core 4",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 498
+    },
+    {
+      "key": "Tp0a",
+      "label": "CPU performance core 5",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 499
+    },
+    {
+      "key": "Tp0d",
+      "label": "CPU performance core 6",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 500
+    },
+    {
+      "key": "Tp0g",
+      "label": "CPU performance core 7",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 501
+    },
+    {
+      "key": "Tp0j",
+      "label": "CPU performance core 8",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 502
+    },
+    {
+      "key": "Tp0m",
+      "label": "CPU performance core 9",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 503
+    },
+    {
+      "key": "Tp0p",
+      "label": "CPU performance core 10",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 504
+    },
+    {
+      "key": "Tp0u",
+      "label": "CPU performance core 11",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 505
+    },
+    {
+      "key": "Tp0y",
+      "label": "CPU performance core 12",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 506
+    },
+    {
+      "key": "Tg0U",
+      "label": "GPU 1",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 508
+    },
+    {
+      "key": "Tg0X",
+      "label": "GPU 2",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 509
+    },
+    {
+      "key": "Tg0d",
+      "label": "GPU 3",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 510
+    },
+    {
+      "key": "Tg0g",
+      "label": "GPU 4",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 511
+    },
+    {
+      "key": "Tg0j",
+      "label": "GPU 5",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 512
+    },
+    {
+      "key": "Tg1Y",
+      "label": "GPU 6",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 513
+    },
+    {
+      "key": "Tg1c",
+      "label": "GPU 7",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 514
+    },
+    {
+      "key": "Tg1g",
+      "label": "GPU 8",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 515
+    },
+    {
+      "key": "Tp0j",
+      "label": "CPU super core 1",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m6",
+      "sourceLine": 519
+    },
+    {
+      "key": "Tp0g",
+      "label": "CPU super core 2",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m6",
+      "sourceLine": 520
+    },
+    {
+      "key": "Tp09",
+      "label": "CPU super core 3",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m6",
+      "sourceLine": 521
+    },
+    {
+      "key": "Tp07",
+      "label": "CPU super core 4",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m6",
+      "sourceLine": 522
+    },
+    {
+      "key": "Tp0m",
+      "label": "CPU performance core 1",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m6",
+      "sourceLine": 524
+    },
+    {
+      "key": "Tp0L",
+      "label": "CPU performance core 2",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m6",
+      "sourceLine": 525
+    },
+    {
+      "key": "Tp0I",
+      "label": "CPU performance core 3",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m6",
+      "sourceLine": 526
+    },
+    {
+      "key": "Tp0d",
+      "label": "CPU performance core 4",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m6",
+      "sourceLine": 527
+    },
+    {
+      "key": "Tp0E",
+      "label": "CPU performance core 5",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m6",
+      "sourceLine": 528
+    },
+    {
+      "key": "Tp0G",
+      "label": "CPU performance core 6",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m6",
+      "sourceLine": 529
+    },
+    {
+      "key": "Tp0b",
+      "label": "CPU performance core 7",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m6",
+      "sourceLine": 530
+    },
+    {
+      "key": "Tp05",
+      "label": "CPU performance core 8",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m6",
+      "sourceLine": 531
+    },
+    {
+      "key": "Te07",
+      "label": "CPU efficiency core 1",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m6",
+      "sourceLine": 533
+    },
+    {
+      "key": "Te08",
+      "label": "CPU efficiency core 2",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m6",
+      "sourceLine": 534
+    },
+    {
+      "key": "Te09",
+      "label": "CPU efficiency core 3",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m6",
+      "sourceLine": 535
+    },
+    {
+      "key": "Te0c",
+      "label": "CPU efficiency core 4",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m6",
+      "sourceLine": 536
+    },
+    {
+      "key": "Te0h",
+      "label": "CPU efficiency core 5",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m6",
+      "sourceLine": 537
+    },
+    {
+      "key": "Te0i",
+      "label": "CPU efficiency core 6",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m6",
+      "sourceLine": 538
+    },
+    {
+      "key": "Tg1e",
+      "label": "GPU 1",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m6",
+      "sourceLine": 540
+    },
+    {
+      "key": "Tg0d",
+      "label": "GPU 2",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m6",
+      "sourceLine": 541
+    },
+    {
+      "key": "Tg0c",
+      "label": "GPU 3",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m6",
+      "sourceLine": 542
+    },
+    {
+      "key": "Tg0b",
+      "label": "GPU 4",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m6",
+      "sourceLine": 543
+    },
+    {
+      "key": "Tg1c",
+      "label": "GPU 5",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m6",
+      "sourceLine": 544
+    },
+    {
+      "key": "Tg1d",
+      "label": "GPU 6",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m6",
+      "sourceLine": 545
+    },
+    {
+      "key": "Tg07",
+      "label": "GPU 7",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m6",
+      "sourceLine": 546
+    },
+    {
+      "key": "Tg1f",
+      "label": "GPU 8",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m6",
+      "sourceLine": 547
+    },
+    {
+      "key": "Tg09",
+      "label": "GPU 9",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m6",
+      "sourceLine": 548
+    },
+    {
+      "key": "Tg0a",
+      "label": "GPU 10",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m6",
+      "sourceLine": 549
+    },
+    {
+      "key": "Tg1g",
+      "label": "GPU 11",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m6",
+      "sourceLine": 550
+    },
+    {
+      "key": "Tg1h",
+      "label": "GPU 12",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "m6",
+      "sourceLine": 551
+    },
+    {
+      "key": "Te05",
+      "label": "CPU efficiency core 1",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "a18pro",
+      "sourceLine": 554
+    },
+    {
+      "key": "Te0S",
+      "label": "CPU efficiency core 2",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "a18pro",
+      "sourceLine": 555
+    },
+    {
+      "key": "Tp05",
+      "label": "CPU performance core 1",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "a18pro",
+      "sourceLine": 557
+    },
+    {
+      "key": "Tp0D",
+      "label": "CPU performance core 2",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "a18pro",
+      "sourceLine": 558
+    },
+    {
+      "key": "Tg05",
+      "label": "GPU 1",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "a18pro",
+      "sourceLine": 560
+    },
+    {
+      "key": "Tg0D",
+      "label": "GPU 2",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "a18pro",
+      "sourceLine": 561
+    },
+    {
+      "key": "Tg0L",
+      "label": "GPU 3",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "a18pro",
+      "sourceLine": 562
+    },
+    {
+      "key": "Tg0e",
+      "label": "GPU 4",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "a18pro",
+      "sourceLine": 563
+    },
+    {
       "key": "TaTP",
       "label": "Airflow top",
       "group": "System",
       "type": "temperature",
-      "scope": "m5",
-      "sourceLine": null
+      "scope": "Mac17,9"
     },
     {
       "key": "TCHP",
       "label": "Charger proximity",
       "group": "System",
       "type": "temperature",
-      "scope": "m5",
-      "sourceLine": null
+      "scope": "Mac17,9"
     },
     {
       "key": "TPSP",
       "label": "Power supply proximity",
       "group": "System",
       "type": "temperature",
-      "scope": "m5",
-      "sourceLine": null
+      "scope": "Mac17,9"
     },
     {
       "key": "TaLT",
       "label": "Thunderbolt left",
       "group": "System",
       "type": "temperature",
-      "scope": "m5",
-      "sourceLine": null
+      "scope": "Mac17,9"
     },
     {
       "key": "TaRT",
       "label": "Thunderbolt right",
       "group": "System",
       "type": "temperature",
-      "scope": "m5",
-      "sourceLine": null
+      "scope": "Mac17,9"
     },
     {
       "key": "Ts0P",
       "label": "Trackpad",
       "group": "System",
       "type": "temperature",
-      "scope": "m5",
-      "sourceLine": null
+      "scope": "Mac17,9"
     },
     {
       "key": "Ts1P",
       "label": "Trackpad actuator",
       "group": "System",
       "type": "temperature",
-      "scope": "m5",
-      "sourceLine": null
+      "scope": "Mac17,9"
     },
     {
       "key": "F0Tg",
       "label": "Fan 1 target",
       "group": "Fans",
       "type": "fan",
-      "scope": "m5",
-      "sourceLine": null
+      "scope": "Mac17,9"
     },
     {
       "key": "F1Tg",
       "label": "Fan 2 target",
       "group": "Fans",
       "type": "fan",
-      "scope": "m5",
-      "sourceLine": null
+      "scope": "Mac17,9"
     },
     {
       "key": "F0Mn",
       "label": "Fan 1 minimum",
       "group": "Fans",
       "type": "fan",
-      "scope": "m5",
-      "sourceLine": null
+      "scope": "Mac17,9"
     },
     {
       "key": "F1Mn",
       "label": "Fan 2 minimum",
       "group": "Fans",
       "type": "fan",
-      "scope": "m5",
-      "sourceLine": null
+      "scope": "Mac17,9"
     },
     {
       "key": "F0Mx",
       "label": "Fan 1 maximum",
       "group": "Fans",
       "type": "fan",
-      "scope": "m5",
-      "sourceLine": null
+      "scope": "Mac17,9"
     },
     {
       "key": "F1Mx",
       "label": "Fan 2 maximum",
       "group": "Fans",
       "type": "fan",
-      "scope": "m5",
-      "sourceLine": null
+      "scope": "Mac17,9"
     }
   ]
 }

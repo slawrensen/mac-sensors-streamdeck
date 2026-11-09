@@ -147,6 +147,7 @@ static napi_value packet_value(napi_env env, const read_job *job) {
 	set_number(env, result, "error", packet->error); set_number(env, result, "systemCode", (double)packet->system_error);
 	set_string(env, result, "operation", job->source == 0 ? "public.read" : job->source == 2 ? "health.read" : packet->error == 10 ? "smc.matchService" : packet->error == 11 ? "smc.open" : "smc.read");
 	set_string(env, result, "model", packet->model); set_string(env, result, "chip", packet->chip);
+	set_string(env, result, "cpu", packet->cpu); set_string(env, result, "table", packet->table); set_bool(env, result, "tableMeasured", packet->model_table != 0);
 	set_number(env, result, "appleSilicon", packet->apple_silicon); set_number(env, result, "translated", packet->translated); set_number(env, result, "translationError", packet->translation_error);
 	set_bool(env, result, "fontAvailable", packet->font_available);
 	for (unsigned i = 0; i < packet->count; i++) {
@@ -177,8 +178,8 @@ static void execute_read(napi_env env, void *data) {
 #if HWMAC_TEST_BUILD
 	if (job->fake.delay_ms != 0) { struct timespec delay = { job->fake.delay_ms / 1000, (long)(job->fake.delay_ms % 1000) * 1000000 }; nanosleep(&delay, NULL); }
 	source_packet *packet = &job->packet;
-	snprintf(packet->model, sizeof(packet->model), "Mac17,9"); snprintf(packet->chip, sizeof(packet->chip), "t6050");
-	packet->apple_silicon = 1; packet->font_available = job->fake.fault != 4;
+	snprintf(packet->model, sizeof(packet->model), "Mac17,9"); snprintf(packet->chip, sizeof(packet->chip), "t6050"); snprintf(packet->cpu, sizeof(packet->cpu), "Apple M5 Pro");
+	packet->apple_silicon = 1; hwmac_resolve_platform(packet); packet->font_available = job->fake.fault != 4;
 	/* Fixture data was acquired when the job copied its configured values. */
 	if (job->fake.fault == 1) { packet->error = 10; return; }
 	static const char *const FAKE_ROWS[HWMAC_SOURCES][5] = {
@@ -327,12 +328,69 @@ static napi_value test_transport_result(napi_env env, napi_callback_info info) {
 	napi_value object; CHECK(napi_create_object(env, &object)); set_number(env, object, "error", result.code); set_number(env, object, "systemCode", result.system_code); set_number(env, object, "firmwareCode", result.firmware_code);
 	fake_reply_length = 80; fake_system_status = 0; fake_firmware_status = 0; return object;
 }
+/* Fills a packet's hardware facts from (model, chip, Apple silicon flag, CPU brand string) and resolves its tables. */
+static bool platform_arguments(napi_env env, napi_value *args, source_packet *packet) {
+	size_t length; int32_t family;
+	if (napi_get_value_string_utf8(env, args[0], packet->model, sizeof(packet->model), &length) != napi_ok || napi_get_value_string_utf8(env, args[1], packet->chip, sizeof(packet->chip), &length) != napi_ok
+		|| napi_get_value_int32(env, args[2], &family) != napi_ok || napi_get_value_string_utf8(env, args[3], packet->cpu, sizeof(packet->cpu), &length) != napi_ok) return false;
+	packet->apple_silicon = family; hwmac_resolve_platform(packet); return true;
+}
+/* Which catalog rows a Mac with these facts reads, without touching any SMC. */
 static napi_value test_catalog(napi_env env, napi_callback_info info) {
-	size_t argc = 3; napi_value args[3]; CHECK(napi_get_cb_info(env, info, &argc, args, NULL, NULL));
-	if (argc != 3) return fail(env, "HWMAC_ARGUMENT", "testCatalog", "Model, chip and family required.");
-	char model[128], chip[64]; size_t length; int32_t family;
-	CHECK(napi_get_value_string_utf8(env, args[0], model, sizeof(model), &length)); CHECK(napi_get_value_string_utf8(env, args[1], chip, sizeof(chip), &length)); CHECK(napi_get_value_int32(env, args[2], &family));
-	napi_value object; CHECK(napi_create_object(env, &object)); set_bool(env, object, "common", hwmac_catalog_applies(0, model, chip, family)); set_bool(env, object, "apple", hwmac_catalog_applies(1, model, chip, family)); set_bool(env, object, "m5", hwmac_catalog_applies(5, model, chip, family)); return object;
+	size_t argc = 4; napi_value args[4]; CHECK(napi_get_cb_info(env, info, &argc, args, NULL, NULL));
+	if (argc != 4) return fail(env, "HWMAC_ARGUMENT", "testCatalog", "Model, chip, Apple silicon flag and CPU brand required.");
+	source_packet *packet = calloc(1, sizeof(*packet)); if (packet == NULL) return fail(env, "HWMAC_MEMORY", "testCatalog", "Native allocation failed.");
+	if (!platform_arguments(env, args, packet)) { free(packet); return fail(env, "HWMAC_ARGUMENT", "testCatalog", "Invalid platform facts."); }
+	napi_value object, rows; napi_create_object(env, &object); napi_create_array(env, &rows);
+	set_string(env, object, "table", packet->table); set_number(env, object, "variant", packet->variant); set_bool(env, object, "measured", packet->model_table != 0);
+	uint32_t count = 0;
+	for (size_t i = 0; i < hwmac_catalog_count(); i++) {
+		const sensor_spec *spec = hwmac_catalog_row(i); if (!hwmac_row_applies(spec, packet)) continue;
+		napi_value row; napi_create_object(env, &row); set_string(env, row, "key", spec->key); set_string(env, row, "label", spec->label); set_string(env, row, "group", spec->group); set_string(env, row, "kind", spec->kind);
+		napi_set_element(env, rows, count++, row);
+	}
+	napi_set_named_property(env, object, "rows", rows); free(packet); return object;
+}
+#define HWMAC_TEST_KEYS 128
+/* A scripted SMC: the keys one Mac has, each with its type, size and value bytes. Any other key answers "key not found" (0x84). */
+typedef struct { uint32_t key, type, size; uint8_t bytes[32]; } scripted_key;
+typedef struct { scripted_key keys[HWMAC_TEST_KEYS]; size_t count; } scripted_smc;
+static _Thread_local const scripted_smc *scripted;
+static kern_return_t scripted_transport(io_connect_t connection, uint32_t selector, const void *request, size_t size, void *reply, size_t *length) {
+	(void)connection; (void)selector;
+	if (size != 80 || *length != 80 || scripted == NULL) return KERN_FAILURE;
+	const uint8_t *bytes = request; uint8_t *answer = reply; uint32_t key; memcpy(&key, bytes, sizeof(key)); memset(answer, 0, 80);
+	for (size_t i = 0; i < scripted->count; i++) if (scripted->keys[i].key == key) {
+		const scripted_key *entry = &scripted->keys[i];
+		if (bytes[42] == 9) { memcpy(answer + 28, &entry->size, sizeof(entry->size)); memcpy(answer + 32, &entry->type, sizeof(entry->type)); }
+		else memcpy(answer + 48, entry->bytes, entry->size);
+		return KERN_SUCCESS;
+	}
+	answer[40] = HWMAC_SMC_KEY_NOT_FOUND; return KERN_SUCCESS;
+}
+/* Runs the production read loop for a Mac with the given facts against a scripted SMC and returns the packet as a read would. */
+static napi_value test_smc(napi_env env, napi_callback_info info) {
+	size_t argc = 5; napi_value args[5]; CHECK(napi_get_cb_info(env, info, &argc, args, NULL, NULL));
+	bool array = false; uint32_t count = 0;
+	if (argc != 5 || napi_is_array(env, args[4], &array) != napi_ok || !array || napi_get_array_length(env, args[4], &count) != napi_ok || count > HWMAC_TEST_KEYS) return fail(env, "HWMAC_ARGUMENT", "testSmc", "Platform facts and up to 128 scripted keys required.");
+	scripted_smc *fixture = calloc(1, sizeof(*fixture)); read_job *job = calloc(1, sizeof(*job)); smc_context *context = calloc(1, sizeof(*context));
+	napi_value result = NULL;
+	if (fixture == NULL || job == NULL || context == NULL) { result = fail(env, "HWMAC_MEMORY", "testSmc", "Native allocation failed."); goto done; }
+	if (!platform_arguments(env, args, &job->packet)) { result = fail(env, "HWMAC_ARGUMENT", "testSmc", "Invalid platform facts."); goto done; }
+	for (uint32_t i = 0; i < count; i++) {
+		napi_value entry, value; char key[8], type[8]; size_t length; void *data; scripted_key *target = &fixture->keys[i];
+		if (napi_get_element(env, args[4], i, &entry) != napi_ok || napi_get_named_property(env, entry, "key", &value) != napi_ok || napi_get_value_string_utf8(env, value, key, sizeof(key), &length) != napi_ok || length != 4
+			|| napi_get_named_property(env, entry, "type", &value) != napi_ok || napi_get_value_string_utf8(env, value, type, sizeof(type), &length) != napi_ok || length != 4
+			|| napi_get_named_property(env, entry, "bytes", &value) != napi_ok || napi_get_buffer_info(env, value, &data, &length) != napi_ok || length == 0 || length > sizeof(target->bytes)) { result = fail(env, "HWMAC_ARGUMENT", "testSmc", "Each key needs a 4-byte key, a 4-byte type and 1 to 32 value bytes."); goto done; }
+		target->key = smc_key(key); target->type = smc_key(type); target->size = (uint32_t)length; memcpy(target->bytes, data, length);
+	}
+	fixture->count = count; job->source = 1; scripted = fixture;
+	hwmac_read_smc_rows(context, &job->packet, scripted_transport);
+	scripted = NULL;
+	job->packet.continuous_ms = hwmac_continuous_ms(); job->packet.awake_ms = hwmac_awake_ms();
+	result = packet_value(env, job);
+done:
+	free(fixture); free(job); free(context); return result;
 }
 static napi_value test_decode(napi_env env, napi_callback_info info) {
 	size_t argc = 2; napi_value args[2]; CHECK(napi_get_cb_info(env, info, &argc, args, NULL, NULL));
@@ -407,6 +465,7 @@ NAPI_MODULE_INIT() {
 		{ "testDecode", NULL, test_decode, NULL, NULL, NULL, napi_default, NULL },
 		{ "testTransport", NULL, test_transport_result, NULL, NULL, NULL, napi_default, NULL },
 		{ "testCatalog", NULL, test_catalog, NULL, NULL, NULL, napi_default, NULL },
+		{ "testSmc", NULL, test_smc, NULL, NULL, NULL, napi_default, NULL },
 		{ "testNetwork", NULL, test_network, NULL, NULL, NULL, napi_default, NULL },
 #endif
 	};

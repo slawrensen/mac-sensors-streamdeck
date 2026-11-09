@@ -54,7 +54,7 @@ function rig(delay: { public: Delay; smc: Delay; health?: Delay }, options: { sm
 	const packet = (source: NativeSource, n: number, at: number): NativePacket => ({
 		source, continuousMs: at, awakeMs: at - (options.asleepMs?.() ?? 0), wallSeconds: 1.7e9 + at / 1000, durationMs: 1, error: (source === 'smc' && options.smcError) || (source === 'public' && options.publicError?.(n)) ? 12 : 0, systemCode: 0, operation: 'fixture',
 		rows: source === 'public' ? [row('memory-free', 'other', 'B', 1e9 + n * 4096, at)] : source === 'health' || options.smcError ? [] : [row('TB1T', 'temperature', '°C', 40 + (n % 9), at)],
-		model: 'Mac17,9', chip: 't6050', appleSilicon: 1, translated: 0, translationError: 0, fontAvailable: true, cpuValid: options.cpu === true, cpuTicks: [[Math.floor(at / CPU_TICK_MS) * 3, 0, Math.floor(at / CPU_TICK_MS) * 7, 0]],
+		model: 'Mac17,9', chip: 't6050', cpu: 'Apple M5 Pro', table: 'm5', tableMeasured: true, appleSilicon: 1, translated: 0, translationError: 0, fontAvailable: true, cpuValid: options.cpu === true, cpuTicks: [[Math.floor(at / CPU_TICK_MS) * 3, 0, Math.floor(at / CPU_TICK_MS) * 7, 0]],
 		networkValid: options.network !== undefined, networkIn: String(options.network?.(n) ?? 0n), networkOut: String(options.network?.(n) ?? 0n), networkMembers: '1', storageValid: false, storageRead: '0', storageWrite: '0', storageMembers: '1'
 	});
 	const bridge: NativeBridge = {

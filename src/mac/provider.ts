@@ -52,28 +52,55 @@ const COMPUTED_TABLES:ReadonlyArray<{model:string;chip:string;readings:readonly 
 	{name:'cpu-hottest',label:'CPU hottest core',group:'CPU',kind:'temperature',unit:'°C',reduce:'max',inputs:M5_PRO_CORES},
 	{name:'fan-average',label:'Fan average',group:'Fans',kind:'fan',unit:'RPM',reduce:'mean',inputs:['F0Ac','F1Ac']}
 ]}];
+/** How a chip family table names a per-core CPU temperature (native/hwmac/catalog.json; test/mac/provider.test.ts pins the match). */
+export const CORE_LABEL=/^CPU (?:super|performance|efficiency) core [1-9][0-9]?$/;
+/** The two CPU readings a chip family table yields on a Mac whose own model was not measured. */
+const FAMILY_COMPUTED=[
+	{name:'cpu-average',label:'CPU average',reduce:'mean'},
+	{name:'cpu-hottest',label:'CPU hottest core',reduce:'max'}
+] as const;
+function reduced(spec:{name:string;label:string;reduce:'mean'|'max'},group:string,kind:string,unit:string,present:readonly NativeRow[]):NativeRow {
+	const oldest=present.reduce((a,b)=>b.continuousMs<a.continuousMs?b:a);
+	const value=spec.reduce==='max'?Math.max(...present.map(row=>row.value)):present.reduce((sum,row)=>sum+row.value,0)/present.length;
+	return {key:spec.name,label:spec.label,group,kind,unit,value,valid:Number.isFinite(value),continuousMs:oldest.continuousMs,wallSeconds:oldest.wallSeconds,error:0,systemCode:0};
+}
 /**
- * Computed rows from the rows accepted out of one SMC packet, keyed by their SMC key. A reading is produced only when
- * every input was accepted from that same packet (valid, finite, in range, unique and inside the TTL), so it is never
- * computed from a stale or failed value; it is as old as its oldest input, so it expires no later than that input.
+ * Computed rows from the rows accepted out of one SMC packet, keyed by their SMC key. They are never computed from a
+ * stale or failed value, and each is as old as its oldest input, so it expires no later than that input.
+ *
+ * On a model with a fixed input list a reading is produced only when every input was accepted from that packet.
+ * On any other Mac that reads a chip family table (familyTable true) the table lists a fixed set of core rows, which
+ * of them a chip has is not known ahead, and a core can fail a read on its own, so CPU average and CPU hottest core
+ * cover the per-core temperatures accepted from that packet, and are left out when none was.
  */
-export function computedRows(model:string,chip:string,inputs:ReadonlyMap<string,NativeRow>):NativeRow[] {
-	const table=COMPUTED_TABLES.find(item=>item.model===model&&item.chip===chip);if(!table)return [];
+export function computedRows(model:string,chip:string,inputs:ReadonlyMap<string,NativeRow>,familyTable=false):NativeRow[] {
+	const table=COMPUTED_TABLES.find(item=>item.model===model&&item.chip===chip);
+	if(!table) {
+		if(!familyTable)return [];
+		const cores=[...inputs.values()].filter(row=>row.kind==='temperature'&&row.unit==='°C'&&row.group==='CPU'&&CORE_LABEL.test(row.label));
+		return cores.length===0?[]:FAMILY_COMPUTED.map(spec=>reduced(spec,'CPU','temperature','°C',cores));
+	}
 	const rows:NativeRow[]=[];
 	for(const spec of table.readings) {
 		const values=spec.inputs.map(key=>inputs.get(key));
 		if(values.some(row=>row===undefined||row.kind!==spec.kind||row.unit!==spec.unit))continue;
-		const present=values as NativeRow[],oldest=present.reduce((a,b)=>b.continuousMs<a.continuousMs?b:a);
-		const value=spec.reduce==='max'?Math.max(...present.map(row=>row.value)):present.reduce((sum,row)=>sum+row.value,0)/present.length;
-		rows.push({key:spec.name,label:spec.label,group:spec.group,kind:spec.kind,unit:spec.unit,value,valid:Number.isFinite(value),continuousMs:oldest.continuousMs,wallSeconds:oldest.wallSeconds,error:0,systemCode:0});
+		rows.push(reduced(spec,spec.group,spec.kind,spec.unit,values as NativeRow[]));
 	}
 	return rows;
 }
+/** The SMC firmware status for a key this Mac's SMC does not have; such a key answers it to every key information request. */
+const SMC_KEY_NOT_FOUND=0x84;
+/** HWMAC_FIRMWARE in native/hwmac/addon.c: the SMC answered with a firmware status. */
+const NATIVE_FIRMWARE_ERROR=5;
+/** Where this Mac's SMC rows come from: its own measured model table, a chip family table not measured on this model, or the common keys only. */
+export type SmcTableEvidence='measured'|'source'|'none';
+/** Catalog keys of one SMC read by outcome, space separated: accepted, not on this Mac's SMC, and present but failed or out of range. Key names only, never values. */
+export interface SmcKeyFacts { answered:string; absent:string; withheld:string; }
 /** Minimum, maximum and running mean of one reading's accepted values since its row last appeared: every gap deletes the row, so it starts over. */
 interface Session { min: number; max: number; mean: number; count: number; }
 /** source is the packet that produced the row, so a failed or expired read of it removes computed readings too. */
 interface Accepted { row: NativeRow; reading: Reading; source: NativeSource; session: Session; computed: boolean; }
-export interface ProviderFacts { model:string;chip:string;appleSilicon:boolean|null;translation:'native'|'translated'|'unknown';translationError:number;sourceRows:Record<NativeSource,number>;computedRows:number; sourceErrors:Partial<Record<NativeSource,{code:string;operation:string;systemCode:number}>>; }
+export interface ProviderFacts { model:string;chip:string;cpu:string;smcTable:string;smcTableEvidence:SmcTableEvidence;smcKeys:SmcKeyFacts;appleSilicon:boolean|null;translation:'native'|'translated'|'unknown';translationError:number;sourceRows:Record<NativeSource,number>;computedRows:number; sourceErrors:Partial<Record<NativeSource,{code:string;operation:string;systemCode:number}>>; }
 export function encodeModel(model:string): string | null {
 	if(!model||model.length>128||[...model].some(character=>character.charCodeAt(0)<32||character.charCodeAt(0)===127)||Buffer.from(model,'utf8').toString('utf8')!==model)return null;
 	return [...Buffer.from(model,'utf8')].map(byte=>/[A-Za-z0-9._~-]/.test(String.fromCharCode(byte))?String.fromCharCode(byte):'%'+byte.toString(16).toUpperCase().padStart(2,'0')).join('');
@@ -154,7 +181,7 @@ export class MacProvider implements SnapshotProvider {
 	private dirty=true;
 	private catalogDirty=true;
 	private catalogRevision=0;
-	private factsValue:ProviderFacts={model:'unknown',chip:'unknown',appleSilicon:null,translation:'unknown',translationError:0,sourceRows:{public:0,smc:0,health:0},computedRows:0,sourceErrors:{}};
+	private factsValue:ProviderFacts={model:'unknown',chip:'unknown',cpu:'unknown',smcTable:'',smcTableEvidence:'none',smcKeys:{answered:'',absent:'',withheld:''},appleSilicon:null,translation:'unknown',translationError:0,sourceRows:{public:0,smc:0,health:0},computedRows:0,sourceErrors:{}};
 	constructor(private readonly native:NativeBridge,private readonly ready:()=>void,private readonly report:(facts:ProviderFacts)=>void=()=>{}) {this.startedAt=native.now();this.session=native.open();}
 	facts():ProviderFacts{return structuredClone(this.factsValue);}
 	/** Reads requested and not yet settled; the poller publishes a read once none remain. */
@@ -170,7 +197,7 @@ export class MacProvider implements SnapshotProvider {
 		if(packet.error!==0)this.factsValue.sourceErrors[source]={code:packet.error===10?'HWMAC_NO_SERVICE':packet.error===11?'HWMAC_OPEN':'HWMAC_SOURCE',operation:packet.error===10?'smc.matchService':packet.error===11?'smc.open':`${source}.read`,systemCode:packet.systemCode};
 		else delete this.factsValue.sourceErrors[source];
 		const now=this.native.now();
-		if(packet.source!==source||packet.error!==0||!Number.isFinite(now)||!Number.isFinite(packet.continuousMs)||packet.continuousMs>now||now-packet.continuousMs>=TTL_MS||packet.rows.length>128){this.removeSource(source);if(source==='public')this.previousPublic=null;this.notice(`${source} readings unavailable; other sources continue.`);return;}
+		if(packet.source!==source||packet.error!==0||!Number.isFinite(now)||!Number.isFinite(packet.continuousMs)||packet.continuousMs>now||now-packet.continuousMs>=TTL_MS||packet.rows.length>128){this.removeSource(source);if(source==='public')this.previousPublic=null;if(source==='smc')this.factsValue.smcKeys={answered:'',absent:'',withheld:''};this.notice(`${source} readings unavailable; other sources continue.`);return;}
 		// A read that settles after a long sleep can land before current() has expired the rows it would continue: expire them first, so a gap always starts a new session.
 		for(const [key,item] of this.rows)if(now-item.row.continuousMs>=TTL_MS||now<item.row.continuousMs){this.rows.delete(key);this.dirty=true;this.catalogDirty=true;}
 		if(source==='public'){this.fontKnown=true;this.fontAvailable=packet.fontAvailable===true;}
@@ -188,14 +215,27 @@ export class MacProvider implements SnapshotProvider {
 		// Computed readings see only what this packet just had accepted, never a row kept from an earlier read.
 		if(source==='smc'){
 			const inputs=new Map<string,NativeRow>();for(const item of accepted.values())inputs.set(item.row.key,item.row);
-			for(const row of computedRows(packet.model,packet.chip,inputs)){const key=computedKey(row,packet.model);if(key)this.admit(key,row,source,now,true,accepted);}
+			for(const row of computedRows(packet.model,packet.chip,inputs,Boolean(packet.table))){const key=computedKey(row,packet.model);if(key)this.admit(key,row,source,now,true,accepted);}
 		}
 		for(const [key,item] of this.rows)if(item.source===source&&!accepted.has(key)){this.rows.delete(key);this.dirty=true;this.catalogDirty=true;}
 		for(const [key,item] of accepted)this.rows.set(key,item);
 		let direct=0;for(const item of accepted.values())if(!item.computed)direct++;
-		this.factsValue={model:packet.model||'unknown',chip:packet.chip||'unknown',appleSilicon:packet.appleSilicon<0?null:packet.appleSilicon===1,translation:translationOf(packet.translated,packet.translationError),translationError:packet.translationError,sourceErrors:this.factsValue.sourceErrors,sourceRows:{...this.factsValue.sourceRows,[source]:direct},computedRows:this.factsValue.computedRows};
+		const evidence:SmcTableEvidence=packet.tableMeasured===true?'measured':packet.table?'source':'none';
+		let smcKeys=this.factsValue.smcKeys;
+		if(source==='smc') {
+			const answered:string[]=[],absent:string[]=[],withheld:string[]=[];
+			for(let index=0;index<packet.rows.length;index++) {
+				const row=packet.rows[index]!,key=keys[index];
+				if(key&&accepted.has(key))answered.push(row.key);
+				else if(row.error===NATIVE_FIRMWARE_ERROR&&row.firmwareCode===SMC_KEY_NOT_FOUND&&row.operation==='smc.keyInfo')absent.push(row.key);
+				else withheld.push(row.key);
+			}
+			smcKeys={answered:answered.join(' '),absent:absent.join(' '),withheld:withheld.join(' ')};
+		}
+		this.factsValue={model:packet.model||'unknown',chip:packet.chip||'unknown',cpu:packet.cpu||'unknown',smcTable:packet.table||'',smcTableEvidence:evidence,smcKeys,appleSilicon:packet.appleSilicon<0?null:packet.appleSilicon===1,translation:translationOf(packet.translated,packet.translationError),translationError:packet.translationError,sourceErrors:this.factsValue.sourceErrors,sourceRows:{...this.factsValue.sourceRows,[source]:direct},computedRows:this.factsValue.computedRows};
 		if(packet.translated===1)this.notice('Node is running under translation; sensor interfaces follow the detected hardware.');
-		if(source==='smc'&&(packet.model!=='Mac17,9'||packet.chip!=='t6050'))this.notice('This model uses common typed sensors; its generation-specific catalog is not qualified.');
+		if(source==='smc'&&evidence==='source')this.notice(`This Mac reads the ${packet.table} chip family sensor table, which has not been measured on this model.`);
+		if(source==='smc'&&evidence==='none')this.notice('This model uses common typed sensors; its generation-specific catalog is not qualified.');
 		this.rebuild();
 	}
 	/** Accepts one keyed row of the current packet into `accepted` when it is valid, in range and inside the TTL; anything else is withheld. */

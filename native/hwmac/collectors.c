@@ -26,14 +26,38 @@
 #include <time.h>
 #include "catalog.inc"
 
-bool hwmac_catalog_applies(unsigned scope, const char *model, const char *chip, int apple_silicon) {
-	if (scope == 0) return true;
-	if (apple_silicon != 1) return false;
-	if (scope == 1) return true;
+_Static_assert(sizeof(HWMAC_CATALOG) / sizeof(HWMAC_CATALOG[0]) <= HWMAC_MAX_CATALOG, "catalog rows");
+size_t hwmac_catalog_count(void) { return sizeof(HWMAC_CATALOG) / sizeof(HWMAC_CATALOG[0]); }
+const sensor_spec *hwmac_catalog_row(size_t index) { return index < hwmac_catalog_count() ? &HWMAC_CATALOG[index] : NULL; }
+/* Chip variant bits: the brand string is the family's brand alone, or the brand followed by one of these names. */
+static unsigned brand_variant(const char *cpu, const char *brand) {
+	size_t length = strlen(brand);
+	if (strncmp(cpu, brand, length) != 0) return 0;
+	const char *rest = cpu + length;
+	return rest[0] == 0 ? 1u : strcmp(rest, " Pro") == 0 ? 2u : strcmp(rest, " Max") == 0 ? 4u : strcmp(rest, " Ultra") == 0 ? 8u : 0;
+}
+void hwmac_resolve_platform(source_packet *packet) {
+	packet->family = 0; packet->model_table = 0; packet->variant = 0; packet->table[0] = 0;
+	if (packet->apple_silicon != 1) return;
+	/* A measured model names its own family, so it keeps its table when the brand string is not the chip's (a translated process reads another). */
 	for (size_t i = 0; i < sizeof(HWMAC_MODELS) / sizeof(HWMAC_MODELS[0]); i++) {
-		if (scope == HWMAC_MODELS[i].scope && strcmp(model, HWMAC_MODELS[i].model) == 0 && strcmp(chip, HWMAC_MODELS[i].chip) == 0) return true;
+		if (strcmp(packet->model, HWMAC_MODELS[i].model) == 0 && strcmp(packet->chip, HWMAC_MODELS[i].chip) == 0) { packet->model_table = (unsigned)i + 1; packet->family = HWMAC_MODELS[i].family + 1; packet->variant = HWMAC_MODELS[i].variant; break; }
 	}
-	return false;
+	/* Otherwise the whole string must be a listed brand and variant: "Apple M1 (Virtual)" or a later chip matches none. */
+	for (size_t i = 0; packet->family == 0 && i < sizeof(HWMAC_FAMILIES) / sizeof(HWMAC_FAMILIES[0]); i++) {
+		unsigned variant = brand_variant(packet->cpu, HWMAC_FAMILIES[i].brand);
+		if ((variant & HWMAC_FAMILIES[i].variants) != 0) { packet->family = (unsigned)i + 1; packet->variant = variant; }
+	}
+	if (packet->family != 0) snprintf(packet->table, sizeof(packet->table), "%s", HWMAC_FAMILIES[packet->family - 1].name);
+}
+bool hwmac_row_applies(const sensor_spec *spec, const source_packet *packet) {
+	switch (spec->scope) {
+		case 0: return true;
+		case 1: return packet->apple_silicon == 1;
+		case 2: return packet->family == spec->selector + 1 && (spec->variants == 0 || (spec->variants & packet->variant) != 0);
+		case 3: return packet->model_table == spec->selector + 1;
+		default: return false;
+	}
 }
 static double tick_ms(uint64_t ticks) {
 	mach_timebase_info_data_t base;
@@ -71,6 +95,10 @@ void hwmac_facts(source_packet *packet) {
 		if (property != NULL) CFRelease(property);
 		IOObjectRelease(entry);
 	}
+	length = sizeof(packet->cpu);
+	if (sysctlbyname("machdep.cpu.brand_string", packet->cpu, &length, NULL, 0) != 0 || length == 0 || length > sizeof(packet->cpu)) packet->cpu[0] = 0;
+	packet->cpu[sizeof(packet->cpu) - 1] = 0;
+	hwmac_resolve_platform(packet);
 }
 static const char *unit_for(const char *kind) {
 	if (strcmp(kind, "temperature") == 0) return "°C";
@@ -113,10 +141,15 @@ void hwmac_collect_smc(smc_context *context, source_packet *packet) {
 		IOObjectRelease(service);
 		if (status != KERN_SUCCESS) { packet->error = 11; packet->system_error = status; context->connection = 0; goto done; }
 	}
+	hwmac_read_smc_rows(context, packet, IOConnectCallStructMethod);
+ done:
+	packet->continuous_ms = hwmac_continuous_ms(); packet->awake_ms = hwmac_awake_ms(); packet->wall_seconds = wall_now(); packet->duration_ms = packet->continuous_ms - start;
+}
+void hwmac_read_smc_rows(smc_context *context, source_packet *packet, smc_transport transport) {
 	bool broken = false;
 	for (size_t i = 0; i < sizeof(HWMAC_CATALOG) / sizeof(HWMAC_CATALOG[0]); i++) {
 		const sensor_spec *spec = &HWMAC_CATALOG[i];
-		if (!hwmac_catalog_applies(spec->scope, packet->model, packet->chip, packet->apple_silicon)) continue;
+		if (!hwmac_row_applies(spec, packet)) continue;
 		sensor_row *row = new_row(packet, spec->key, spec->label, spec->group, spec->kind, unit_for(spec->kind));
 		if (row == NULL) { packet->error = 12; break; }
 		uint8_t reply[80]; smc_result result = {0};
@@ -124,28 +157,27 @@ void hwmac_collect_smc(smc_context *context, source_packet *packet) {
 		/* Metadata is bounded discovery, cached only for this connection. Missing keys retry. */
 		if (context->sizes[i] == 0) {
 			row->operation = 9;
-			result = smc_read_request(context->connection, 9, key, 0, 0, reply, IOConnectCallStructMethod);
+			result = smc_read_request(context->connection, 9, key, 0, 0, reply, transport);
 			if (result.code == 0) {
 				context->types[i] = smc_u32(reply + 32); context->sizes[i] = smc_u32(reply + 28);
 				if (context->sizes[i] == 0 || context->sizes[i] > 32) { result.code = 2; context->sizes[i] = 0; }
 			}
 		}
 		double acquired = NAN, acquired_wall = NAN;
-		if (result.code == 0) { row->operation = 5; acquired = hwmac_continuous_ms(); acquired_wall = wall_now(); result = smc_read_request(context->connection, 5, key, context->sizes[i], 0, reply, IOConnectCallStructMethod); }
+		if (result.code == 0) { row->operation = 5; acquired = hwmac_continuous_ms(); acquired_wall = wall_now(); result = smc_read_request(context->connection, 5, key, context->sizes[i], 0, reply, transport); }
 		if (result.code != 0) {
 			row->error = result.code; row->system_error = result.system_code; row->firmware_error = result.firmware_code;
 			if (result.code == 3) broken = true;
 			continue;
 		}
-		double value;
-		if (!smc_decode(context->types[i], context->sizes[i], reply + 48, &value) || value < spec->minimum || value > spec->maximum) { row->error = 13; continue; }
+		double value, minimum = spec->minimum, maximum = spec->maximum;
+		if (spec->scope == 2 && packet->model_table == 0) { minimum = HWMAC_FAMILY_MINIMUM_C; maximum = HWMAC_FAMILY_MAXIMUM_C; }
+		if (!smc_decode(context->types[i], context->sizes[i], reply + 48, &value) || value < minimum || value > maximum) { row->error = 13; continue; }
 		observed(row, value);
 		/* Age from the start of the actual read, never from a delayed return. */
 		row->continuous_ms = acquired; row->wall_seconds = acquired_wall;
 	}
 	if (broken) hwmac_close_smc(context);
- done:
-	packet->continuous_ms = hwmac_continuous_ms(); packet->awake_ms = hwmac_awake_ms(); packet->wall_seconds = wall_now(); packet->duration_ms = packet->continuous_ms - start;
 }
 static int compare_u64(const void *a, const void *b) {
 	uint64_t aa = *(const uint64_t *)a, bb = *(const uint64_t *)b;
