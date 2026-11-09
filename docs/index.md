@@ -13,7 +13,7 @@ description: Temperatures, fan speeds, power, CPU usage, memory, storage and net
     <a class="button button-secondary" href="{{ '/installation.html' | relative_url }}">Install <span aria-hidden="true">→</span></a>
   </div>
   <p class="home-requirements"><strong>macOS 13.5 or later</strong> · Stream Deck app 7.1 or later and its Node 24 runtime · Tahoma Bold, which ships with macOS. No separate sensor app. <a href="{{ '/installation.html' | relative_url }}">Requirements and installation</a></p>
-  <p class="home-release">Version {{ site.plugin_release.package_version }} is on GitHub, where downloads need repository access. It is not on the Elgato Marketplace yet.</p>
+  <p class="home-release">Version {{ site.plugin_release.package_version }} is on the <a href="{{ site.plugin_release.marketplace }}">Elgato Marketplace</a> and <a href="https://github.com/slawrensen/mac-sensors-streamdeck/releases/latest">GitHub releases</a>.</p>
 </header>
 
 <section class="hero-gallery" data-gallery aria-label="Production-rendered boards">
@@ -77,7 +77,7 @@ description: Temperatures, fan speeds, power, CPU usage, memory, storage and net
         <figcaption>Production-rendered sample data.</figcaption>
       </figure>
       <h3><a href="{{ '/sensor-dial.html' | relative_url }}">Sensor Dial <span aria-hidden="true">→</span></a></h3>
-      <p>One reading, two rows or three rows on the touch strip. Turn through a reading set; local session min, max and average.</p>
+      <p>One reading, two rows or three rows on the touch strip. Turn the dial to step through a set of readings. Each dial keeps its own local session min, max and average.</p>
       <p class="deck-where"><strong>Where it goes:</strong> A dial on a Stream Deck + or + XL</p>
     </li>
     <li class="deck-card">
@@ -104,7 +104,7 @@ description: Temperatures, fan speeds, power, CPU usage, memory, storage and net
 
 ## What it does not do
 
-Mac Sensors reads. It has no fan control and cannot write a sensor register. It installs no privileged helper, daemon or kernel extension and needs no administrator password. It makes no internet requests and sends no telemetry. You choose when to copy and share a support report. [Privacy](faq.html#privacy) has the details.
+Mac Sensors has no fan control and cannot write a sensor register. It installs no privileged helper, daemon or kernel extension and needs no administrator password. It makes no internet requests and sends no telemetry. A support report goes only where you paste it. [Privacy](faq.html#privacy) has the details.
 
 <section class="home-paths" aria-labelledby="find-what-you-need">
   <h2 id="find-what-you-need">Find what you need</h2>

@@ -19,13 +19,13 @@ No. Mac Sensors runs only on macOS. Its manifest declares macOS as the only plat
 - Stream Deck app 7.1 or later, with the Node 24 runtime the app supplies
 - Tahoma Bold, which ships with macOS ([Tahoma Bold prerequisite](installation.html#tahoma-bold-prerequisite)).
 
-These are declared floors. Measured: Apple silicon M5 Pro, macOS 27.0.1, Stream Deck app 7.5.0 and 7.6.0 on the Virtual Stream Deck. Physical Stream Deck key checks and Stream Deck + dial gestures are pending. See [Hardware compatibility](hardware.html) and [Installation](installation.html).
+These are declared floors. Measured: Apple silicon M5 Pro, macOS 27.0.1, Stream Deck app 7.5.0 and 7.6.0 on the Virtual Stream Deck. On a Stream Deck MK.2, keys, presses and opening details were checked; [Hardware compatibility](hardware.html#stream-deck-models) lists the physical checks not done yet, including Stream Deck + dial gestures. See also [Installation](installation.html).
 
 **Sensor Reading** goes on keys. **Sensor Dial** needs a deck with dials, such as Stream Deck + or Stream Deck + XL.
 
 ### Is Mac Sensors affiliated with Apple or Elgato?
 
-No. Mac Sensors is an independent project by Stephen Lawrensen, free and MIT licensed, with no ads. It is not affiliated with Apple or Elgato. Mac and macOS are trademarks of Apple Inc. Stream Deck is a trademark of Corsair Memory, Inc.
+No. Mac Sensors is an independent project by Stephen Lawrensen, free and MIT licensed, with no ads. Its [source](https://github.com/slawrensen/mac-sensors-streamdeck) is on GitHub. It is not affiliated with Apple or Elgato. Mac and macOS are trademarks of Apple Inc. Stream Deck is a trademark of Corsair Memory, Inc.
 
 ### Do I need a separate sensor app?
 
@@ -43,9 +43,9 @@ On the measured Mac17,9 with an M5 Pro, the catalog has 38 SMC readings (tempera
 
 ### Does it run on Intel Mac computers or under Rosetta?
 
-The package carries a separate x86_64 reader, and the plugin loads it whenever its Node runtime is x86_64. Hosted Intel virtual machines with an emulated SMC have loaded it and read values; physical Intel validation is in progress ([Hardware compatibility](hardware.html#mac)).
+The package carries a separate x86_64 reader, and the plugin loads it whenever its Node runtime is x86_64. Hosted Intel virtual machines with an emulated SMC have loaded it and read values; physical Intel validation has not been done ([Hardware compatibility](hardware.html#mac)).
 
-On Apple silicon the plugin loads its arm64 reader when the Stream Deck app's Node runtime is arm64. Every Node runtime the Stream Deck app supplied on the measured M5 Pro is an arm64-only file, so it does not run under Rosetta. When Node runs as x86_64 under Rosetta, the plugin loads the x86_64 reader and the support report's `translation` field says `translated`. Outside the Stream Deck app, x86_64 Node 20, 22 and 24 running under Rosetta loaded that reader and read live values on the M5 Pro. The Stream Deck app itself has not been run under Rosetta, and Rosetta results are not Intel results. See [Hardware compatibility](hardware.html).
+On Apple silicon the plugin loads its arm64 reader when the Stream Deck app's Node runtime is arm64. Every Node runtime the Stream Deck app supplied on the measured M5 Pro is an arm64-only file, so it does not run under Rosetta. When Node runs as x86_64 under Rosetta, the plugin loads the x86_64 reader and the support report's `translation` field says `translated`. Outside the Stream Deck app, x86_64 Node 20, 22 and 24 running under Rosetta loaded that reader and read live values on the M5 Pro. The Stream Deck app itself has not been run under Rosetta, and Rosetta results are not Intel results.
 
 ### Why is a reading missing?
 
@@ -95,7 +95,7 @@ Switching **°F** on or off does not clear it: samples are stored in the reading
 
 ### How much CPU and memory does it use?
 
-PERF.md in the product repository records each measurement with its build, host and harness; that repository requires access. The figures below are for an earlier 1.0.1 candidate, built before key statistics and the 2 second hold, run as a development copy in the Stream Deck app 7.5.0 on the M5 Pro (macOS 27.0.1), with 32 single-reading keys on an 8 by 4 Virtual Stream Deck. The harness was the development process observer, sampling the plugin process every 5 seconds in back-to-back runs against 1.0.0. CPU is the mean of two runs; RSS is the maximum of each run.
+[PERF.md](https://github.com/slawrensen/mac-sensors-streamdeck/blob/main/PERF.md) records each measurement with its build, host and harness. The figures below are for an earlier 1.0.1 candidate, built before key statistics and the 2 second hold, run as a development copy in the Stream Deck app 7.5.0 on the M5 Pro (macOS 27.0.1), with 32 single-reading keys on an 8 by 4 Virtual Stream Deck. The harness was the development process observer, sampling the plugin process every 5 seconds in back-to-back runs against 1.0.0. CPU is the mean of two runs; RSS is the maximum of each run.
 
 | Read every | Plugin CPU, one core | Maximum RSS |
 | --- | --- | --- |
@@ -224,15 +224,15 @@ They name the condition the plugin can establish and the next step: for example 
 
 ### How do updates arrive?
 
-Open a newer `.streamDeckPlugin` package. The plugin has no update channel of its own and downloads nothing. Packages come from the project's GitHub releases, which require repository access. Mac Sensors is not on the Elgato Marketplace yet. Opening a package with the same version as the installed one does nothing; see [Opening the same version again does nothing](troubleshooting.html#opening-the-same-version-again-does-nothing).
+From the [Elgato Marketplace]({{ site.plugin_release.marketplace }}), or as a newer `.streamDeckPlugin` package from [GitHub releases](https://github.com/slawrensen/mac-sensors-streamdeck/releases/latest) that you open. The plugin itself has no update channel and downloads nothing. Opening a package with the same version as the installed one does nothing; see [Opening the same version again does nothing](troubleshooting.html#opening-the-same-version-again-does-nothing).
 
 ## Help and reports
 
 ### Where do I report a bug or a security issue?
 
-Report a bug as a [public issue on the documentation repository](https://github.com/slawrensen/slawrensen.github.io/issues). Name Mac Sensors and its version, the status on the key, and where you got the package; a reviewed support report helps.
+Report a bug in [GitHub Issues](https://github.com/slawrensen/mac-sensors-streamdeck/issues). Include the Mac Sensors version, the status on the key and where you got the package; a reviewed support report helps.
 
-Report a suspected vulnerability through the [private security-report form](https://github.com/slawrensen/slawrensen.github.io/security/advisories/new), naming Mac Sensors and the affected version. Do not post exploit details, profile exports or private logs in a public issue. The first reply target for a security report is seven days.
+Report a suspected vulnerability through the [private security-report form](https://github.com/slawrensen/mac-sensors-streamdeck/security/advisories/new), naming the affected version. Do not post exploit details, profile exports or private logs in a public issue. The first reply target for a security report is seven days.
 
 ## Where to go next
 

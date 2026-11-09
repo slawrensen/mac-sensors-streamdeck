@@ -5,7 +5,7 @@ nav_order: 11
 description: "What each two-line status screen on a key or dial means and what to do next."
 ---
 
-When a key or dial cannot show a current reading, it shows a two-line status screen instead. The first line names the condition; the second names the next step. [In the settings panel](#in-the-settings-panel) explains what the panel shows at the same time, and [Troubleshooting](troubleshooting.html) has the full repair path.
+When a key or dial cannot show a current reading, it shows a two-line status screen. The first line names the condition; the second names the next step. [Troubleshooting](troubleshooting.html) has the full repair path for each screen.
 
 A status screen never changes saved settings. The selected reading, its label, colors and every other setting stay as they were. **Pick a sensor** clears when you pick a reading, and **Sensor missing** when this Mac reports the saved reading again or you pick another. **Bridge failed** and **Needs macOS** last until the plugin restarts. Every other screen clears by itself on the first read that produces a current reading.
 
@@ -31,7 +31,7 @@ The three colors are blue `#4cc2ff` (waiting or setup), amber `#f5a623` (attenti
 
 **Reading sensors**, **Source busy**, **No sensor data** and **Source error** come from the two data sources (see [Data sources](data-sources.html)). **Pick a sensor** and **Sensor missing** are about this key's selection; other readings keep working. **Bridge failed** and **Needs macOS** are about the installation and the runtime. **Tahoma needed** is about the font prerequisite.
 
-**Sensor missing** can be temporary. A reading that failed its last read, or CPU usage and the transfer rates for about a quarter second after reading starts, also show it. On a key with two to four readings, the screen appears only when every configured reading is missing; a single missing row shows its label, or **Sensor missing**, with a placeholder dash.
+**Sensor missing** can be temporary: a reading whose last read failed shows it, and so do CPU usage and the transfer rates for about a quarter second after reading starts. On a key with two to four readings, the screen appears only when every configured reading is missing; a single missing row shows its label, or **Sensor missing**, with a placeholder dash.
 
 Detail tiles show the same screens. The Back tile keeps its return arrow on every status screen, including the fixed **Tahoma needed** image.
 
@@ -39,7 +39,7 @@ One screen is detail-only. After a plugin restart while a detail page is showing
 
 ### Screens 1.0.1 does not report
 
-Two more screens are defined in the plugin's status set. No read in version 1.0.1 reports either of them.
+Two more screens are defined in the plugin's status set, but no read in version 1.0.1 reports either of them.
 
 | Screen | Looks like | Panel sentence | In 1.0.1 |
 | --- | --- | --- | --- |
@@ -114,13 +114,13 @@ The reload button beside the **Reading** search box, labeled "Reload the sensor 
 
 A status screen does not require removing the key. While a Sensor Reading key (including the Back tile), Sensor Dial or detail tile is visible, the plugin keeps reading at the **Read every** interval:
 
-- Every read asks both sources again. A source that failed is asked again on the next read, and the other source keeps serving meanwhile. One exception: SMC readings wait for the first successful system counter read, which carries the font check. Until then keys show **Source error**, or **Source busy** if a read is still out after 15 seconds.
+- Every read asks both sources again, so a source that failed is asked again on the next read while the other keeps serving. One exception: SMC readings wait for the first successful system counter read, which carries the font check. Until then keys show **Source error**, or **Source busy** if a read is still out after 15 seconds.
 - If the SMC connection breaks, the next read opens it again.
-- The font check runs on every system counter read, so **Tahoma needed** clears on the first read after Tahoma Bold is available. **Check again** is not required; it only makes that read happen at once.
+- The font check runs on every system counter read, so **Tahoma needed** clears on the first read after Tahoma Bold is available, without **Check again**.
 - A read that starts while a status screen shows never waits more than 100 ms for a slow source, so readings return at most 100 ms after their own source answers.
 - A page you return to after no Sensor Reading key, Sensor Dial or detail tile was visible anywhere for 2 seconds starts reading again and shows **Reading sensors** until its first read completes. A page change, opening sensor details or pressing Back inside those 2 seconds shows readings at once ([When reading starts and stops](data-sources.html#when-reading-starts-and-stops)).
 
-**Bridge failed** and **Needs macOS** do not recover by themselves; the result is kept for the life of the plugin process. For **Bridge failed**, quit and reopen Stream Deck. **Needs macOS** means the Node runtime is not a supported macOS one, which a restart does not change; see [Installation and requirements](installation.html#system-requirements). A load failure alone does not establish whether a file is damaged, missing or blocked.
+**Bridge failed** and **Needs macOS** do not recover by themselves; the result is kept for the life of the plugin process. For **Bridge failed**, quit and reopen Stream Deck; a load failure alone does not establish whether a file is damaged, missing or blocked. **Needs macOS** means the Node runtime is not a supported macOS one, which a restart does not change; see [Installation and requirements](installation.html#system-requirements).
 
 ## Where to go next
 
