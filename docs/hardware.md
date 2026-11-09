@@ -10,6 +10,7 @@ Check your Mac and deck and the evidence behind each row. A result from one Mac 
 - **Measured**: ran in the Stream Deck app on my Mac, with a recorded result.
 - **Hosted VM**: ran on hosted CI runners in a virtual machine. This is software evidence, not a physical-device result.
 - **Software tests**: exercised by unit tests or a mock Stream Deck host that simulates device registration and events. Not a physical-device result.
+- **Source table**: the plugin reads a sensor table taken from a named source for that hardware, and software tests cover the code. Nobody has confirmed it on that hardware for me.
 - **Pending**: not run yet.
 - **Not claimed**: no support is claimed.
 
@@ -20,7 +21,8 @@ Check your Mac and deck and the evidence behind each row. A result from one Mac 
 | Mac | Evidence | What ran |
 | --- | --- | --- |
 | Apple silicon: Mac17,9 with M5 Pro, macOS 27.0.1 | **Measured** | Stream Deck app 7.5.0 with its Node 24.13.1 on the 8 by 4 Virtual Stream Deck: the 1.0.0.0 package installed from Finder, and 14 system and 38 SMC readings. Stream Deck app 7.6.0 with its Node 24.22.1: a 24-hour observation of the published 1.0.1.0 build, run as a development copy with 32 keys at the 1 second default (24.017 hours, 1,442 samples, no warnings or errors, every plugin measure within its limit). Two faults of a macOS text service during that window were reviewed as unrelated ([PERF.md](https://github.com/slawrensen/mac-sensors-streamdeck/blob/main/PERF.md)). A build of 1.0.2.0 read 71 readings on this Mac: 14 system, 51 SMC, 3 computed and 3 battery and drive health. |
-| Other Apple silicon models | **Pending** | Not run. The table of generation-specific SMC readings is qualified only for Mac17,9 with the M5 Pro chip. On another Apple silicon model the plugin offers the 31 common and 4 Apple silicon SMC keys its SMC answers, the system counters the Mac reports, and the battery and drive health readings its hardware has, but no computed readings. |
+| Other Apple silicon models | **Source table** | Not run. A Mac whose CPU name is Apple M1 to M6 (with Pro, Max or Ultra where the family has them) or Apple A18 Pro reads that chip family's table: per-core CPU temperatures and GPU temperatures, with CPU average and CPU hottest core computed from the cores that answer. The keys and names come from the Stats table for the family; a scripted SMC in the native tests reads every family's rows, and no such Mac has confirmed them. It also gets the 31 common and 4 Apple silicon SMC rows its SMC answers, the system counters the Mac reports, and the battery and drive health readings its hardware has. The 13 Mac17,9 rows and Fan average stay with the measured model. [Data sources](data-sources.html#smc-readings) lists each family. |
+| Apple silicon in a virtual machine, or a chip the table does not list | **Pending** | Not run on a physical Mac. The plugin offers the common and Apple silicon SMC rows that answer, the system counters, and battery and drive health, and no computed readings. |
 | Intel | **Hosted VM** | 1.0.2.0 ships a new x86_64 native reader. Hosted Intel CI runners (a virtual machine with an emulated SMC) built it, ran the test suite, and loaded that exact file under Node 20, 22 and 24 to read live values. They did the same for the reader that 1.0.0 and 1.0.1 share. Physical Intel validation has not been done. |
 | Rosetta on the M5 Pro | **Pending** in the app | Outside the Stream Deck app, x86_64 Node 20, 22 and 24 running under Rosetta loaded the x86_64 reader and read live values on this Mac. Running the whole Stream Deck app under Rosetta has not been checked. The Node runtimes the Stream Deck app supplies on this Mac are arm64 files. |
 | macOS 26.6 | **Hosted VM** | Hosted Apple silicon runners on macOS 26.6.2 and Intel runners on macOS 26.6.1 ran the full test suite and loaded and read the exact shipped native readers. No physical Mac has run Mac Sensors on macOS 26. |
@@ -79,6 +81,15 @@ A hidden dial keeps its pause and pin for up to 30 minutes, and its session stat
 The Stream Deck app removes the old page's actions before it shows the new page's, so a page change leaves a moment with nothing visible. Reading continues for 2 seconds, so a page change keeps key MIN, MAX and AVG, sparklines, CPU usage, the rates and dial sessions. After 2 seconds with no Sensor Reading key, Sensor Dial or detail tile visible, reading stops, sparkline history is cleared and every reading's MIN, MAX and AVG end. When a page with one returns after that, keys show **Reading sensors** until the first read, and CPU usage and transfer rates appear about a quarter second later. A dial that returns this way starts a new session and says **stats reset: data gap** once live data arrives. See [When reading starts and stops](data-sources.html#when-reading-starts-and-stops).
 
 This behavior comes from the code and its software tests. Swipes and page changes on a physical deck have not been checked.
+
+## Send a reading report from your Mac
+
+A chip family table becomes measured when a Mac of that family shows which keys it answers. The support report carries that, without any sensor value:
+
+1. Put one **Sensor Reading** key on a deck and pick any reading, so the plugin is reading sensors.
+2. Open the key's settings, then **Advanced**, **Support**, and choose **Copy support report**.
+3. In the report's `mac` section, `cpu` is the CPU name, `smcTable` the family table in use, and `smcTableEvidence` says `measured`, `source` or `none`. `smcKeys` lists the SMC keys of your table in three groups: `answered`, `absent` (your SMC does not have the key) and `withheld` (the key is there, but its type or value was not accepted).
+4. Open an issue in [GitHub Issues](https://github.com/slawrensen/mac-sensors-streamdeck/issues) titled `Reading report: Mac Sensors 1.0.2.0, [Mac model]` with the report. If a reading's name looks wrong for your Mac, for example more or fewer cores than the chip has, or a temperature that does not move with load, say which.
 
 ## Hardware test procedure
 

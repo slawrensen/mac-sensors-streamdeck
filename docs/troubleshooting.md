@@ -155,8 +155,9 @@ The **Reading** list shows the readings of the latest read, grouped by CPU, GPU,
 
 Available readings depend on the Mac model and macOS version:
 
-- The SMC table has 61 candidate SMC keys. Every Mac is asked for 31 common SMC keys, Mac computers with Apple silicon for 4 more, and only the Mac17,9 with the t6050 chip for the 26 model-specific core and GPU temperatures. Keys that the SMC on this Mac does not have are left out. On the measured M5 Pro, 38 answer.
-- On any other model the plugin log records `This model uses common typed sensors; its generation-specific catalog is not qualified.`
+- The SMC table lists 193 rows. Every Mac is asked for 31 common rows, Mac computers with Apple silicon for 4 more, a Mac with an Apple M1 to M6 or A18 Pro chip for its chip family's 8 to 30 rows, and the Mac17,9 with the t6050 chip for 13 more. Keys that the SMC on this Mac does not have are left out. On the measured M5 Pro, 51 of 74 answer.
+- A chip family table lists a fixed set of core rows. A chip with fewer cores shows fewer core readings, and on a chip with more cores the readings cover only the listed ones. On a Mac other than the measured one, a core, GPU or memory temperature below 10 °C or above 120 °C is withheld for that read.
+- On a Mac other than the measured one, the plugin log records which table it reads: `This Mac reads the … chip family sensor table, which has not been measured on this model.` or `This model uses common typed sensors; its generation-specific catalog is not qualified.`
 - A Mac without fans need not report fan readings.
 - If the SMC service is missing or cannot be opened, every SMC reading is absent while system counters work. The log says `smc readings unavailable; other sources continue.` and the support report's `sourceErrors` names the step that failed.
 - Network rates are one sum over the interfaces named `en` followed by a number; there is no reading for a single interface or drive.
@@ -265,7 +266,8 @@ Useful lines:
 - `MacSensors: smc readings unavailable; other sources continue.` (or `public` or `health`): a source answered with an error or with data that was already too old; its readings, and any computed from them, were removed and the other sources kept serving.
 - `MacSensors: smc read failed; retrying.` or `smc could not start; retrying.` (or `public`): a read did not complete or could not be queued.
 - `MacSensors: Node is running under translation; sensor interfaces follow the detected hardware.`: macOS reports the Node process as translated.
-- `MacSensors: This model uses common typed sensors; its generation-specific catalog is not qualified.`: this model gets the common SMC table.
+- `MacSensors: This Mac reads the … chip family sensor table, which has not been measured on this model.`: this Mac gets the per-core CPU and GPU rows of its chip family, taken from the Stats table and not measured on this model.
+- `MacSensors: This model uses common typed sensors; its generation-specific catalog is not qualified.`: this Mac's CPU name matches no chip family table, so it gets the common SMC rows only.
 - `Device connected: "…" (…, 8x4)` and `Device known: …`: one line per deck, with the name you gave it, its type and its key grid.
 - `Detail entry refused: …`: why a detail press showed the Stream Deck alert triangle.
 - `Parent probe failed […]`, `Parent watchdog disabled`, `watchdog standing down` and `Parent process gone, and the app did not answer: exiting.`: the check that ends the plugin when the Stream Deck app is gone. Report the exit line if the app is still running.
@@ -288,7 +290,7 @@ The report is JSON with these parts:
 | `plugin`, `streamDeckApp`, `macOS` | Installed plugin version, Stream Deck app version and macOS version |
 | `devices` | Each deck by model, type, key grid, encoders and touch strip, with a hashed identifier |
 | `recentEvents` | The last 24 recorded dial and Sensor Control events, with hashed device and reading identities |
-| `mac` | Node version, process architecture, platform, kernel release, the Node path with your home folder shown as `~`, Mac model, chip, Apple silicon, translation, and how many readings each source returned (`sourceRows`) and how many were computed (`computedRows`), with any source error (`sourceErrors`); `catalog: "not sampled"` before the first read |
+| `mac` | Node version, process architecture, platform, kernel release, the Node path with your home folder shown as `~`, Mac model, chip, CPU name (`cpu`), the chip family table in use and whether it was measured on this model (`smcTable`, `smcTableEvidence`), the SMC key names that answered, are absent or were withheld (`smcKeys`, names only), Apple silicon, translation, and how many readings each source returned (`sourceRows`) and how many were computed (`computedRows`), with any source error (`sourceErrors`); `catalog: "not sampled"` before the first read |
 | `dataSource` | Current state and reason, reading count, effective **Read every**, whether reading is running, how many actions keep it running, and the age of the oldest current reading |
 | `sensorDial`, `control`, `detailNav` | Dial presets, views and set sizes, visible Sensor Control keys, and detail view state, by hashed identifiers |
 

@@ -31,9 +31,9 @@
 </p>
 
 > [!NOTE]
-> **1.0.2** adds battery cycles, battery health and the internal SSD
-> temperature, more M5 Pro readings, and network rates that carry on past
-> 4 GiB. See [what changed in 1.0.2](https://docs.slawrensen.com/mac-streamdeck/whats-new-1.0.2.html).
+> **1.0.2** adds per-core CPU and GPU temperatures on Apple M1 to M6 chips
+> (measured so far only on the M5 Pro), battery cycles, battery health and
+> the internal SSD temperature, and network rates that carry on past 4 GiB. See [what changed in 1.0.2](https://docs.slawrensen.com/mac-streamdeck/whats-new-1.0.2.html).
 
 ## Install
 
