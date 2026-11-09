@@ -82,6 +82,43 @@ test('panel status copy never names the plugin as the source of sensor data and 
 	assert.match(shell,/announce\("check", picked \? "The reading is live again\." : "Readings are available again\.", \{ repeat: true \}\);/);
 	for(const [name,text] of [['pi-shell.js',shell],['pi-common.js',common],['pi-model.js',model]])assert.doesNotMatch(text,/No Mac Sensors data|no Mac Sensors data|not found in Mac Sensors|once Mac Sensors publishes|Mac Sensors restarts|Mac Sensors answered:|Mac Sensors is answering again|sensor source's current sensor list|Mac Sensors (?:publishes|lists|data returns|data is unavailable|is running but)/,name);
 }));
+/** Every filter example the panel shows must select something from the checked Mac catalog, or the example teaches a dead pattern. */
+test('alert direction and filter examples name readings the Mac catalog has',()=>withStaged((read)=>{
+	const LABEL='Alert when the value drops to or below these numbers (for fans and free space)';
+	for(const name of ['sensor-reading.html','sensor-dial.html']) {
+		const text=read(name);
+		assert.equal(text.split(LABEL).length-1,1,name);
+		assert.doesNotMatch(text,/clocks|4090|RTX|gpu\*fan/i,name);
+	}
+	// The panel's own matcher, cut from the staged bytes the way test/detail-filter-parity.test.ts cuts it.
+	const common=read('pi-common.js'),start=common.indexOf('const GLOB_STAR'),end=common.indexOf('function updateFilterCount');
+	assert.ok(start!==-1&&end>start,'panel matcher anchors moved');
+	const matcher=new Function(`${common.slice(start,end)}; return detailFilterMatcher;`)();
+	// A reading is tested as its group name, one space, then its label (docs/sensor-details.md, Filter patterns).
+	const catalog=JSON.parse(fs.readFileSync('native/hwmac/catalog.json','utf8')).rows.map(row=>`${row.group} ${row.label}`);
+	const panel=read('sensor-reading.html');
+	const placeholder=panel.match(/data-setting="detailFilter" placeholder="([^"]+)"/)?.[1],example=panel.match(/one character \(([^)]+)\)\./)?.[1];
+	assert.equal(placeholder,'*fan*');assert.equal(example,'*cpu*core*');
+	for(const pattern of [placeholder,example]) {
+		const hits=catalog.filter(matcher(pattern));
+		assert.ok(hits.length>0,`${pattern} matches no catalog reading`);
+	}
+	// The Windows samples these replaced select nothing here, which is why they went.
+	for(const pattern of ['*4090*','*gpu*fan*'])assert.equal(catalog.filter(matcher(pattern)).length,0,pattern);
+}));
+/** Help and tooltips name the Mac keyboard and only kinds of reading the Mac provider produces. */
+test('panel hints name the Option key and no Yes/No reading',()=>withStaged((read)=>{
+	for(const name of ['control.html','sensor-reading.html','sensor-dial.html']) {
+		const text=read(name);
+		assert.equal(text.split('(or Option-click a section title)').length-1,2,name);
+		assert.doesNotMatch(text,/Alt[- +]|Alt with|Yes\/No/,name);
+	}
+	assert.match(read('sensor-reading.html'),/id="display-help" hidden>Spans 0 to 100 for percentages, otherwise the observed range,/);
+	const common=read('pi-common.js');
+	assert.match(common,/const TOOL_KEYS = \{ earlier: "Option\+Left", later: "Option\+Right", rename: "F2", remove: "Delete" \};/);
+	// aria-keyshortcuts keeps the ARIA key name: the Option key is "Alt" there (WAI-ARIA 1.2, aria-keyshortcuts).
+	assert.match(common,/"aria-keyshortcuts", "Alt\+ArrowLeft Alt\+ArrowRight Alt\+Home Alt\+End F2 Delete"/);
+}));
 test('missing staging anchors fail before an output is packaged',()=>{
 	const source='core-patches/panel-stage.json';const saved=fs.readFileSync(source);const temp=fs.mkdtempSync(path.join(os.tmpdir(),'mac-panel-negative-'));
 	try {

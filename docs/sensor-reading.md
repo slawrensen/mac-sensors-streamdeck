@@ -25,7 +25,7 @@ Show one to four Mac readings on a display key. Add a graph to the one-reading l
 
 The header shows the face the plugin last drew for this key, the reading's name and group, and a data state such as **Live · Mac sensors** or **Saved reading not found**. When the data or the saved selection needs attention, a message under the header names the next step and offers buttons such as **Check again**, **Sensor setup**, **Reload sensor list** or **Pick another reading**.
 
-The theme strip, **Reading** and **Display** start open. **Alerts**, **Press** and **Advanced** start folded, and each folded title carries a one-line summary of what is in force, for example *Warn ≥ 75 °C · critical ≥ 90 °C*. The two buttons at the top right open or fold every section, and Option-click on a section title (the panel calls it Alt-click) does the same. The plugin remembers which sections you left open for each kind of panel while it runs. Folds are not saved with any key, and a restart shows the defaults again.
+The theme strip, **Reading** and **Display** start open. **Alerts**, **Press** and **Advanced** start folded, and each folded title carries a one-line summary of what is in force, for example *Warn ≥ 75 °C · critical ≥ 90 °C*. The two buttons at the top right open or fold every section, and Option-click on a section title does the same. The plugin remembers which sections you left open for each kind of panel while it runs. Folds are not saved with any key, and a restart shows the defaults again.
 
 ![The Sensor Reading settings panel with the header, the theme strip, the Reading and Display sections open, and Alerts, Press and Advanced folded with their summaries](assets/img/settings-key.png)
 
@@ -217,11 +217,9 @@ The **°F** box under **Temperature** converts °C readings to Fahrenheit for di
 
 Bar and Ring find their range automatically, and there are no bounds to type:
 
-- **Percentages** run 0 to 100. On Mac that is CPU usage.
+- **Percentages** run 0 to 100: CPU usage, and Battery health on a Mac that reports it.
 - Every other reading spans the values seen: the reading's MIN and MAX since the plugin last started reading sensors (see [Value shown](#value-shown-stat-mode)), the live value, and the recent samples the plugin holds for it, up to 36. The range therefore keeps its width when a **Read every** change clears the samples. While MIN and MAX are still equal, the range has no width, and the fill sits at the halfway point unless a threshold widens it.
 - **Warn at** and **Critical at** draw amber and red zones toward the alarmed end: the high end normally, the low end when the direction box is ticked. The range widens to keep a zone visible, with a small margin when a threshold sits at or past the edge.
-
-The panel's range sentence also mentions Yes/No readings, which run 0 to 1; the current Mac catalog has none.
 
 Zones draw as muted shades: the alert color blended 45 percent toward the key background. They mark positions; the fill on top shows the live value in the accent color. While the key alerts, the whole key takes the alert palette, and the fill and zones follow it.
 

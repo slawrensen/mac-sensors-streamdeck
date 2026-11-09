@@ -29,7 +29,7 @@ A status screen never changes saved settings. The selected reading, its label, c
 
 The three colors are blue `#4cc2ff` (waiting or setup), amber `#f5a623` (attention) and red `#ff5d52` (failure).
 
-**Reading sensors**, **Source busy**, **No sensor data** and **Source error** come from the two data sources (see [Data sources](data-sources.html)). **Pick a sensor** and **Sensor missing** are about this key's selection; other readings keep working. **Bridge failed** and **Needs macOS** are about the installation and the runtime. **Tahoma needed** is about the font prerequisite.
+**Reading sensors**, **Source busy**, **No sensor data** and **Source error** come from the data sources (see [Data sources](data-sources.html)). **Pick a sensor** and **Sensor missing** are about this key's selection; other readings keep working. **Bridge failed** and **Needs macOS** are about the installation and the runtime. **Tahoma needed** is about the font prerequisite.
 
 **Sensor missing** can be temporary: a reading whose last read failed shows it, and so do CPU usage and the transfer rates for about a quarter second after reading starts. On a key with two to four readings, the screen appears only when every configured reading is missing; a single missing row shows its label, or **Sensor missing**, with a placeholder dash.
 

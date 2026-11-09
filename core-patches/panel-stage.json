@@ -16,6 +16,11 @@
         "before": "\t\t\t\t\t<p class=\"hw-head-kind\">HWiNFO Control key</p>",
         "after": "\t\t\t\t\t<p class=\"hw-head-kind\">Sensor Control key</p>",
         "count": 1
+      },
+      {
+        "before": "(or Alt-click a section title)",
+        "after": "(or Option-click a section title)",
+        "count": 2
       }
     ],
     "pi-command.js": [
@@ -184,6 +189,11 @@
       {
         "before": "\t// The app never echoes a panel's own write, and several controls here",
         "after": "\t// Native textarea focus may expose its caret while leaving most of the\n\t// field behind the sticky header. Keep the focused control visible.\n\tdocument.addEventListener(\"focusin\", (event) => {\n\t\tconst target = event.target;\n\t\tif (!(target instanceof HTMLElement)) return;\n\t\trequestAnimationFrame(() => {\n\t\t\tif (document.activeElement !== target || !target.matches(\":focus-visible\") || target.getClientRects().length === 0) return;\n\t\t\tconst header = document.querySelector(\".hw-head[data-pin]\");\n\t\t\tif (!header || header.contains(target) || getComputedStyle(header).position !== \"sticky\") return;\n\t\t\tconst top = target.getBoundingClientRect().top;\n\t\t\tconst clear = header.getBoundingClientRect().bottom + 8;\n\t\t\tif (top < clear) window.scrollBy(0, top - clear);\n\t\t});\n\t});\n\n\t// The app never echoes a panel's own write, and several controls here",
+        "count": 1
+      },
+      {
+        "before": "const TOOL_KEYS = { earlier: \"Alt+Left\", later: \"Alt+Right\",",
+        "after": "const TOOL_KEYS = { earlier: \"Option+Left\", later: \"Option+Right\",",
         "count": 1
       }
     ],
@@ -418,6 +428,16 @@
         "before": "Alert when the value drops to or below these numbers (for fans and clocks)",
         "after": "Alert when the value drops to or below these numbers (for fans and free space)",
         "count": 1
+      },
+      {
+        "before": "(or Alt-click a section title)",
+        "after": "(or Option-click a section title)",
+        "count": 2
+      },
+      {
+        "before": "Alt with an arrow moves it, into the next group past a group's edge; Alt+Home and Alt+End move it to either end;",
+        "after": "Option with an arrow moves it, into the next group past a group's edge; Option+Home and Option+End move it to either end;",
+        "count": 1
       }
     ],
     "sensor-reading.html": [
@@ -443,7 +463,7 @@
       },
       {
         "before": "\t\t\t\t\t<p class=\"hw-help\" id=\"display-help\" hidden>Spans 0 to 100 for percentages and 0 to 1 for Yes/No readings, otherwise the observed range (Shared Memory: HWiNFO's session min and max; Gadget: the last 36 samples), with amber and red zones at your alert thresholds.</p>",
-        "after": "\t\t\t\t\t<p class=\"hw-help\" id=\"display-help\" hidden>Spans 0 to 100 for percentages and 0 to 1 for Yes/No readings, otherwise the observed range, with amber and red zones at your alert thresholds.</p>",
+        "after": "\t\t\t\t\t<p class=\"hw-help\" id=\"display-help\" hidden>Spans 0 to 100 for percentages, otherwise the observed range, with amber and red zones at your alert thresholds.</p>",
         "count": 1
       },
       {
@@ -485,6 +505,11 @@
         "before": "one character (*gpu*fan*).",
         "after": "one character (*cpu*core*).",
         "count": 1
+      },
+      {
+        "before": "(or Alt-click a section title)",
+        "after": "(or Option-click a section title)",
+        "count": 2
       }
     ]
   }
