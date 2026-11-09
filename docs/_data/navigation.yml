@@ -35,6 +35,8 @@
       url: /data-sources.html
     - title: Hardware compatibility
       url: /hardware.html
+    - title: What changed in 1.0.2
+      url: /whats-new-1.0.2.html
     - title: What changed in 1.0.1
       url: /whats-new-1.0.1.html
     - title: Changelog

@@ -12,7 +12,7 @@ import { launch } from "../../scripts/lib/cdp.mjs";
 
 const base = process.env.DOCS_TEST_URL ? new URL(process.env.DOCS_TEST_URL.endsWith("/") ? process.env.DOCS_TEST_URL : `${process.env.DOCS_TEST_URL}/`) : null;
 const options = { skip: base ? false : "UNAVAILABLE: set DOCS_TEST_URL to a served Jekyll build or the published site", timeout: 60_000 };
-const PAGES = ["", "installation.html", "getting-started.html", "sensor-reading.html", "sensor-details.html", "sensor-dial.html", "dial-controls.html", "themes.html", "thresholds.html", "data-sources.html", "status-screens.html", "hardware.html", "faq.html", "troubleshooting.html", "whats-new-1.0.1.html", "changelog.html"];
+const PAGES = ["", "installation.html", "getting-started.html", "sensor-reading.html", "sensor-details.html", "sensor-dial.html", "dial-controls.html", "themes.html", "thresholds.html", "data-sources.html", "status-screens.html", "hardware.html", "faq.html", "troubleshooting.html", "whats-new-1.0.1.html", "whats-new-1.0.2.html", "changelog.html"];
 let browser;
 let exceptions = [];
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));

@@ -305,6 +305,12 @@
       "anchors": [
         "what-changed-in-1-0-1"
       ]
+    },
+    {
+      "path": "whats-new-1.0.2.html",
+      "anchors": [
+        "what-changed-in-1-0-2"
+      ]
     }
   ]
 }

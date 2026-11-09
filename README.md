@@ -31,9 +31,9 @@
 </p>
 
 > [!NOTE]
-> **1.0.1** keeps MIN, MAX and AVG on keys: press a Sensor Reading key to
-> cycle them. Changing pages or opening sensor details no longer restarts
-> reading. See [what changed in 1.0.1](https://docs.slawrensen.com/mac-streamdeck/whats-new-1.0.1.html).
+> **1.0.2** adds battery cycles, battery health and the internal SSD
+> temperature, more M5 Pro readings, and network rates that carry on past
+> 4 GiB. See [what changed in 1.0.2](https://docs.slawrensen.com/mac-streamdeck/whats-new-1.0.2.html).
 
 ## Install
 

@@ -163,7 +163,7 @@ describe("docs crawler catches redesigned-site and deployment regressions", () =
 		assert.equal(contract.schema, 1);
 		assert.match(contract.source_commit, /^[a-f0-9]{40}$/);
 		const paths = contract.routes.map(route => route.path).sort();
-		assert.deepEqual(paths, ["", "changelog.html", "data-sources.html", "dial-controls.html", "faq.html", "getting-started.html", "hardware.html", "installation.html", "sensor-details.html", "sensor-dial.html", "sensor-reading.html", "status-screens.html", "themes.html", "thresholds.html", "troubleshooting.html", "whats-new-1.0.1.html"]);
+		assert.deepEqual(paths, ["", "changelog.html", "data-sources.html", "dial-controls.html", "faq.html", "getting-started.html", "hardware.html", "installation.html", "sensor-details.html", "sensor-dial.html", "sensor-reading.html", "status-screens.html", "themes.html", "thresholds.html", "troubleshooting.html", "whats-new-1.0.1.html", "whats-new-1.0.2.html"]);
 		for (const route of contract.routes) assert.equal(new Set(route.anchors).size, route.anchors.length, `${route.path} lists each fragment once`);
 		assert.ok(contract.routes.reduce((sum, route) => sum + route.anchors.length, 0) >= 221);
 	});

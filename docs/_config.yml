@@ -21,11 +21,11 @@ search:
 enable_copy_code_button: true
 
 plugin_release:
-  version: 1.0.1
-  package_version: 1.0.1.0
-  tag: v1.0.1
-  download: https://github.com/slawrensen/mac-sensors-streamdeck/releases/download/v1.0.1/com.lawrensen.mac.streamDeckPlugin
-  notes: https://github.com/slawrensen/mac-sensors-streamdeck/releases/tag/v1.0.1
+  version: 1.0.2
+  package_version: 1.0.2.0
+  tag: v1.0.2
+  download: https://github.com/slawrensen/mac-sensors-streamdeck/releases/download/v1.0.2/com.lawrensen.mac.streamDeckPlugin
+  notes: https://github.com/slawrensen/mac-sensors-streamdeck/releases/tag/v1.0.2
   marketplace: https://marketplace.elgato.com/product/mac-sensors-f04e345c-21c5-411c-9ecd-01864c3a8c3c
   marketplace_version: 1.0.1.0
   checked: 2026-11-09
