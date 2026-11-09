@@ -29,11 +29,11 @@ The theme strip, **Reading** and **Display** start open. **Alerts**, **Press** a
 
 ![The Sensor Reading settings panel with the header, the theme strip, the Reading and Display sections open, and Alerts, Press and Advanced folded with their summaries](assets/img/settings-key.png)
 
-*Settings-panel capture of the staged 1.0.1.0 panel in a simulated host with sample data and **Accent colors** set to **Theme accent everywhere**: Void set on this key, CPU super core 1 labeled CPU super 1, a sparkline, and sample thresholds of 75 and 90.*
+*Settings-panel capture of the shipped 1.0.1.0 panel in a simulated host with sample data and **Accent colors** set to **Theme accent everywhere**: Void set on this key, CPU super core 1 labeled CPU super 1, a sparkline, and sample thresholds of 75 and 90.*
 
 ### Settings at a glance
 
-The settings in panel order. Settings marked with a layout appear only for that layout. The detail view's custom tile editor is described on [Sensor details](sensor-details.html#editing-custom-tiles).
+The settings in panel order. Settings marked with a layout appear only for that layout. The detail view's custom tile editor is on [Sensor details](sensor-details.html#editing-custom-tiles).
 
 | Section | Setting | Default | Choices |
 | --- | --- | --- | --- |
@@ -71,11 +71,11 @@ The settings in panel order. Settings marked with a layout appear only for that 
 
 ### Reading
 
-Type part of a reading or group name in **Reading**. Every word you type must appear in the group name or the reading's label, so `airflow` lists Airflow left and Airflow right, and `gpu 3` finds GPU 3. Results are grouped under CPU, GPU, Memory, Storage, Network, Battery, Fans and System, and each row shows its value when the list loaded and, where it has one, its type, such as Temp, Fan or Power. **Reload the sensor list**, the button beside the box, fetches the list again.
+Type part of a reading or group name in **Reading**. Every word you type must appear in the group name or the reading's label, so `airflow` lists Airflow left and Airflow right, and `gpu 3` finds GPU 3. Results are grouped under CPU, GPU, Memory, Storage, Network, Battery, Fans and System. Each row shows its value when the list loaded and, where it has one, its type, such as Temp, Fan or Power. **Reload the sensor list**, the button beside the box, fetches the list again.
 
 ![The Sensor Reading settings panel with cpu typed in the Reading search and the results open under the CPU group: CPU super core 1, 62.4 °C, highlighted, and CPU usage, 37.5 %](assets/img/settings-picker.png)
 
-*Settings-panel capture of the staged 1.0.1.0 panel on a simulated host with sample readings and **Accent colors** set to **Theme accent everywhere**. It is not the Stream Deck app's own window.*
+*Settings-panel capture of the shipped 1.0.1.0 panel on a simulated host with sample readings and **Accent colors** set to **Theme accent everywhere**. It is not the Stream Deck app's own window.*
 
 Arrow keys move through the results and Return picks the highlighted one. Return with nothing typed and nothing highlighted closes the list and keeps the saved reading. Tab or a click elsewhere closes the list without changing anything.
 
@@ -93,7 +93,7 @@ When the whole source is unavailable, the key shows a [status screen](#status-sc
 
 ### Label on the key
 
-Custom text for the key. Leave it blank, or only spaces, to use the reading's own name from the Mac catalog. A short label draws at the largest of three sizes, a longer one steps down, and only a label too wide for the smallest size is cut with an ellipsis. Label sizes come from measured Tahoma Bold glyph widths. A MIN, MAX or AVG badge sits in its own gap under the label, so it never takes label width.
+Custom text for the key. Leave it blank, or only spaces, to use the reading's own name from the Mac catalog. A short label draws at the largest of three sizes, a longer one steps down, and only a label too wide for the smallest size is cut with an ellipsis. A MIN, MAX or AVG badge sits in its own gap under the label, so it never takes label width.
 
 In the quad grid with small labels turned on, each label becomes a cell label of at most four characters; see [the quad grid](#layout-four-readings-in-a-quad-grid).
 
@@ -133,7 +133,7 @@ What the number on the key shows:
 
 *Production-rendered sample data with sample session statistics, drawn with **Accent colors** set to **Theme accent everywhere**.*
 
-macOS reports current values only, so Mac Sensors keeps these statistics itself, for every reading this Mac reports. Changing pages, opening sensor details and pressing Back keep the statistics, because reading continues for 2 seconds after the last Sensor Reading key, Sensor Dial or detail tile disappears ([When reading starts and stops](data-sources.html#when-reading-starts-and-stops)). Each accepted read adds one sample, including a read that repeats the last value, so the average counts reads and is not weighted by time. On the first read after the plugin starts reading sensors, MIN, MAX and AVG all equal the current value. The statistics follow **Decimals**, **°F** and **Data units** the same way the live value does.
+macOS reports current values only, so Mac Sensors keeps these statistics itself for every reading this Mac reports. Changing pages, opening sensor details and pressing Back keep the statistics, because reading continues for 2 seconds after the last Sensor Reading key, Sensor Dial or detail tile disappears ([When reading starts and stops](data-sources.html#when-reading-starts-and-stops)). Each accepted read adds one sample, including a read that repeats the last value, so the average counts reads and is not weighted by time. On the first read after the plugin starts reading sensors, MIN, MAX and AVG all equal the current value. The statistics follow **Decimals**, **°F** and **Data units** the same way the live value does.
 
 Statistics are kept per reading. Every Sensor Reading key and detail tile that shows the same reading shows the same MIN, MAX and AVG. A key you add, or switch to another reading, shows that reading's statistics at once, including reads made before the change.
 
@@ -143,11 +143,9 @@ A reading's statistics start over:
 - when the reading expires, 15 seconds after its last accepted read, for example across a sleep longer than that;
 - when the reading's unit or type changes;
 - for CPU usage and the network and storage rates, after any sleep, because they skip one read; the rates also skip one when the set of network interfaces or storage devices changes;
-- when the plugin stops reading sensors, 2 seconds after the last Sensor Reading key, Sensor Dial or detail tile disappears, which ends every reading's statistics. They are kept in memory only, so a plugin restart also starts them over.
+- when the plugin stops reading sensors, 2 seconds after the last Sensor Reading key, Sensor Dial or detail tile disappears (Sensor Control keys do not count). Statistics are kept in memory only, so a plugin restart also starts them over.
 
 Changing **Read every** keeps them; it clears sparklines only. There is no reset for a key's statistics.
-
-With the default **A press**, the **How Display works** fold says: *Pressing the key cycles current, min, max and avg. Min, max and avg come from this session's reads; they start over after a gap in the reading, or when no Sensor Reading key, Sensor Dial or detail tile has been shown for 2 seconds.*
 
 A Sensor Dial keeps separate statistics of its own, which can differ from a key's for the same reading; see [Session stats are the dial's own, per reading](sensor-dial.html#session-stats-are-the-dials-own-per-reading).
 
@@ -155,7 +153,7 @@ Alert colors and Bar and Ring fills follow the live value whatever **Value shown
 
 ### Layout: two readings on one key
 
-Choose **Readings on this key → Two readings, stacked**, then pick **Reading 2** and an optional **Label 2**. Until Reading 2 is picked, the key keeps one reading and the panel says *This layout draws once another reading is picked below. Until then the key shows one reading.*
+Choose **Readings on this key → Two readings, stacked**, then pick **Reading 2** and an optional **Label 2**. Until Reading 2 is picked, the key keeps one reading.
 
 **Row 2 shows** sets the second row's statistic:
 
@@ -166,7 +164,7 @@ Each row shows its own reading's statistics. For a minimum and maximum pair, set
 
 **Rules for every multi-reading layout:**
 
-- **Warn at** and **Critical at** watch the first reading only and recolor the whole key. Put the reading you need alerts on first, or give it its own key. The Alerts help then adds *Only reading 1 is checked; it recolors the whole key.* and the folded summary ends in *first reading*.
+- **Warn at** and **Critical at** watch the first reading only and recolor the whole key. Put the reading you need alerts on first, or give it its own key.
 - **Decimals** and **°F** apply to every reading. The type accent follows the first reading.
 - **Graph under the value** is for one reading only. It stays saved while hidden.
 - A reading this Mac does not report shows a dash while the others continue. In two and three rows its row keeps its custom label, or reads *Sensor missing*. If every picked reading is missing, the key shows **Sensor missing** / pick again.
@@ -176,7 +174,7 @@ Each row shows its own reading's statistics. For a minimum and maximum pair, set
 
 Choose **Readings on this key → Three readings, rows**, then set **Reading 2** and **Reading 3**, with optional **Label 2** and **Label 3**. Each row has a left-aligned label and a right-aligned value with its unit. The layout needs the first reading and at least one more; an unpicked row stays empty.
 
-All rows show the same statistic and a press cycles them together; the badge appears once, on the first separator. Values share one size, and a long label shortens so its number stays whole. The panel says so: *A long name shortens so its number stays whole. Every row shows the same stat.* The [multi-reading rules](#layout-two-readings-on-one-key) apply, and this layout has no graph strip.
+All rows show the same statistic and a press cycles them together; the badge appears once, on the first separator. Values share one size, and a long label shortens so its number stays whole. The [multi-reading rules](#layout-two-readings-on-one-key) apply.
 
 ### Layout: four readings in a quad grid
 
@@ -193,7 +191,7 @@ Choose **Readings on this key → Four readings, quad grid**. The first reading 
 
 With small labels on, cell labels come from **Label on the key** and **Label 2**, **Label 3** and **Label 4**, or else from the first word of the reading's name. They are upper-cased and cut at four characters, and the label fields say *4 chars max* in this layout. Startup volume available becomes STAR, so give it a label such as FREE. Values compact to four characters at most: decimals drop first, then large numbers shorten, such as 48700 to 49k.
 
-A press cycles every cell through the same statistic, with one badge at the center. The [multi-reading rules](#layout-two-readings-on-one-key) apply, and the layout has no graph strip.
+A press cycles every cell through the same statistic, with one badge at the center. The [multi-reading rules](#layout-two-readings-on-one-key) apply.
 
 The automatic cell colors are lifted for contrast against the background when needed. Colors you pick draw exactly with Theme text and are only blended toward the background with Dimmed; they are never lifted for contrast, so check them on your deck. A **Custom color** text setting replaces the cell colors, and so does a warning or critical alert. [Themes and colors](themes.html#text-theme-dimmed-or-custom) explains color precedence.
 
@@ -206,7 +204,7 @@ Byte quantities and transfer rates rescale through their own units instead; see 
 
 ### Temperature unit
 
-The **°F** box under **Temperature** converts °C readings to Fahrenheit for display. Every Mac temperature arrives in °C; other units are unchanged. Thresholds compare against the displayed unit, so a key switched to °F needs its thresholds in °F (80 °C is 176 °F). A sparkline keeps its line through the switch.
+The **°F** box under **Temperature** converts °C readings to Fahrenheit for display. Every Mac temperature arrives in °C; other units are unchanged. Thresholds compare against the displayed unit, so a key switched to °F needs its thresholds in °F (80 °C is 176 °F).
 
 ### Graph under the value: sparkline, bar, ring
 
@@ -225,7 +223,7 @@ Bar and Ring find their range automatically, and there are no bounds to type:
 
 The panel's range sentence also mentions Yes/No readings, which run 0 to 1; the current Mac catalog has none.
 
-Zones draw as muted shades: the alert color blended 45 percent toward the key background. They mark positions; the fill on top shows the live value in the accent color. While the key alerts, the whole key takes the alert palette, and the fill and zones follow it. The fill follows the live value even while the text shows MIN, MAX or AVG.
+Zones draw as muted shades: the alert color blended 45 percent toward the key background. They mark positions; the fill on top shows the live value in the accent color. While the key alerts, the whole key takes the alert palette, and the fill and zones follow it.
 
 Sparkline notes:
 
@@ -252,7 +250,7 @@ See [Thresholds and alerts](thresholds.html) for the full behavior and worked ex
 
 ## Pressing the key
 
-By default a press cycles **Value shown**: current, MIN, MAX, AVG, then current again. The badge under the label follows, and the choice is saved to the key, the same as changing **Value shown**. MIN, MAX and AVG are the reading's statistics since the plugin last started reading sensors, as [Value shown](#value-shown-stat-mode) describes; a press changes only which one the key shows and resets nothing. With the default press, a key with no reading ignores it. Alert colors keep following the live value throughout.
+By default a press cycles **Value shown**: current, MIN, MAX, AVG, then current again. The badge under the label follows, and the choice is saved to the key, the same as changing **Value shown**. MIN, MAX and AVG are the reading's statistics since the plugin last started reading sensors, as [Value shown](#value-shown-stat-mode) describes; a press changes only which one the key shows and resets nothing. With the default press, a key with no reading ignores it.
 
 On a two-reading key with **Row 2 shows** at its default, a press cycles both rows together. A row pinned to a fixed statistic stays put while the first row cycles. On the three-row and quad layouts a press cycles every reading together.
 
@@ -260,7 +258,7 @@ On a two-reading key with **Row 2 shows** at its default, a press cycles both ro
 
 ![The Press section of the Sensor Reading settings with A press on Opens sensor details, Readings per tile on One, an empty Title tile text, Also go back from this key's own position ticked, and Details list on Every reading from this reading's sensor](assets/img/settings-press-details.png)
 
-*Settings-panel capture of the staged 1.0.1.0 panel on a simulated host with sample readings and **Accent colors** set to **Theme accent everywhere**. It is not the Stream Deck app's own window.*
+*Settings-panel capture of the shipped 1.0.1.0 panel on a simulated host with sample readings and **Accent colors** set to **Theme accent everywhere**. It is not the Stream Deck app's own window.*
 
 **Press → A press** sets what a press does:
 
@@ -278,7 +276,7 @@ A two-line status replaces the value when the key cannot show a reading. The sav
 
 ![Seven key status screens: Reading sensors / please wait, Source busy / retrying, Sensor missing / pick again, No sensor data / copy report, Bridge failed / reinstall, Tahoma needed / Open Font Book, and Source error / copy report](assets/img/status.png)
 
-*Production-rendered status screens with sample scenarios. Status screens use fixed colors, so the theme does not change them.*
+*Production-rendered status screens with sample scenarios.*
 
 | Key shows | Meaning | What to do |
 | --- | --- | --- |
@@ -299,7 +297,7 @@ Key status screens draw on black in every theme. [Status screens](status-screens
 **Advanced** holds four groups. **Shared defaults** and **Connection** are marked **All keys and dials**: they change every Mac Sensors key and dial on every Stream Deck. The folded title summarizes them, for example *Mac sensors · read every 1 s · decimal data units*.
 
 - **Shared defaults**: **Theme**, **Text color** (with **Shared custom text color** and **Dim labels, units and stats**), Text font, **Accent colors** and **Data units**. They apply to every key and dial left on Default; a key or dial with its own choice keeps it. See [Themes and colors](themes.html).
-- **Connection**: **Read every** sets how often the plugin reads the sensors on this Mac: 250 ms, 500 ms, 1 second *(default)*, 2 seconds or 5 seconds. Every reading key and dial updates from that one shared read. Changing it clears sparkline history, and shorter intervals read the sensors more often and use more processor time. [Data sources](data-sources.html) explains reads and timing. **Sensor setup** folds out three first-setup steps.
+- **Connection**: **Read every** sets how often the plugin reads the sensors on this Mac: 250 ms, 500 ms, 1 second *(default)*, 2 seconds or 5 seconds. Every reading key and dial updates from that one shared read. Changing it clears sparkline history, and shorter intervals use more processor time. [Data sources](data-sources.html) explains reads and timing. **Sensor setup** folds out three first-setup steps.
 - **Support**: **Copy support report** copies a redacted diagnostics report to the clipboard. Nothing is uploaded. See [Troubleshooting](troubleshooting.html).
 - **Configuration documents**: copy or replace this key's settings and the shared settings.
 

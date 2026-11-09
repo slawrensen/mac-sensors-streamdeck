@@ -9,7 +9,7 @@ Install the plugin, then confirm that Tahoma Bold is present. No separate sensor
 
 ## System requirements
 
-The declared floor is what the package asks for; **Actually run** lists the versions that ran on the measured Mac.
+The declared floor is what the package asks for. **Actually run** lists what ran on the measured Mac and on hosted CI.
 
 | Requirement | Declared floor | Actually run |
 | --- | --- | --- |
@@ -17,16 +17,16 @@ The declared floor is what the package asks for; **Actually run** lists the vers
 | **Stream Deck app** | 7.1 or later | 7.5.0 and 7.6.0 |
 | **Node runtime** | Node 24, supplied by the Stream Deck app. You install nothing. | 24.13.1 with app 7.5.0 and 24.22.1 with app 7.6.0, the runtimes the app chose. |
 | **Tahoma Bold** | Installed. It ships with macOS. | Present on the measured Mac |
-| **Processor** | The package carries an arm64 reader for Apple silicon and an x86_64 reader for Intel | Apple silicon measured. Intel ran only on hosted virtual machines; physical Intel validation is in progress ([Mac](hardware.html#mac)). |
-| **A deck** | **Sensor Reading** goes on a display key. **Sensor Dial** goes on a dial of a Stream Deck + or + XL. **Sensor Control** can go on any key, including a Stream Deck Pedal or Corsair G-Keys (not checked on hardware), and steers dials on another deck ([Stream Deck models](hardware.html#stream-deck-models)). | The 8 by 4 Virtual Stream Deck. Physical Stream Deck key checks and Stream Deck + dial gestures are pending. |
+| **Processor** | The package carries an arm64 reader for Apple silicon and an x86_64 reader for Intel | Apple silicon measured. Intel ran only on hosted virtual machines; physical Intel validation has not been done ([Mac](hardware.html#mac)). |
+| **A deck** | **Sensor Reading** goes on a display key. **Sensor Dial** goes on a dial of a Stream Deck + or + XL. **Sensor Control** can go on any key, including a Stream Deck Pedal or Corsair G-Keys (not checked on hardware), and steers dials on another deck ([Stream Deck models](hardware.html#stream-deck-models)). | The 8 by 4 Virtual Stream Deck, and a Stream Deck MK.2 for keys, presses and opening details. Other physical checks and Stream Deck + dial gestures have not run ([Stream Deck models](hardware.html#stream-deck-models)). |
 
-Mac Sensors needs no administrator password, privileged helper, daemon or kernel extension. Which readings appear depends on the Mac and its macOS version. The [compatibility matrix](hardware.html#compatibility-matrix) lists every Mac and deck row with its evidence.
+Mac Sensors needs no administrator password, privileged helper, daemon or kernel extension. Which readings appear depends on the Mac and its macOS version. The [compatibility matrix](hardware.html#compatibility-matrix) gives the evidence for each Mac and deck.
 
 ## Install the plugin
 
 ### Get the package
 
-Version 1.0.1.0 is published as a GitHub release, and its downloads require repository access. Mac Sensors is not on the Elgato Marketplace yet, so there is no public download link. The package file is named `com.lawrensen.mac.streamDeckPlugin`.
+Install from the [Elgato Marketplace]({{ site.plugin_release.marketplace }}), or download `com.lawrensen.mac.streamDeckPlugin` from the [latest GitHub release](https://github.com/slawrensen/mac-sensors-streamdeck/releases/latest). The current version is {{ site.plugin_release.package_version }} on both.
 
 ### Install from a .streamDeckPlugin file
 
@@ -34,36 +34,36 @@ Version 1.0.1.0 is published as a GitHub release, and its downloads require repo
 2. In Finder, double-click `com.lawrensen.mac.streamDeckPlugin`. The Stream Deck app asks whether to install it. Choose **Install**.
 3. Find the **Mac Sensors** category in the actions list. It holds **Sensor Reading**, **Sensor Dial** and **Sensor Control**.
 
-A browser download keeps the macOS quarantine flag. You do not need to clear it. On the measured Mac, Finder passed a quarantined package straight to the Stream Deck app.
+A browser download keeps the macOS quarantine flag, and you do not need to clear it. On the measured Mac, Finder passed a quarantined package straight to the Stream Deck app.
 
 ### Check the download
 
-Each GitHub release includes `SHA256SUMS.txt`. Put the package, `native-manifest.json` and `SHA256SUMS.txt` from the same release in one folder and run:
+Each GitHub release has `SHA256SUMS.txt` attached. Put the package, `native-manifest.json` and `SHA256SUMS.txt` from the same release in one folder and run:
 
 ```sh
 shasum -a 256 -c SHA256SUMS.txt
 ```
 
-Each line must end in `OK`. A matching checksum identifies the published bytes. It does not establish safety. The two native readers are ad-hoc signed: that checks file integrity, and it is not a Developer ID certificate or notarization. To inspect an extracted reader, run `codesign --verify --strict <file>` and `codesign -dv --verbose=4 <file>`.
+Each line must end in `OK`. A matching checksum identifies the published bytes; it does not establish safety. The two native readers are ad-hoc signed, which checks file integrity. They have no Developer ID certificate and are not notarized. To inspect an extracted reader, run `codesign --verify --strict <file>` and `codesign -dv --verbose=4 <file>`.
 
 Before loading a reader, the plugin compares the file's SHA-256 with the record inside the package. A file that does not match is not loaded, and keys show **Bridge failed**. Quit and reopen Stream Deck. If it persists, remove Mac Sensors and install it again ([Removing](#removing)).
 
 ### Elgato Marketplace
 
-Mac Sensors is not on the Elgato Marketplace yet. Elgato repackages Marketplace copies, so their checksums can differ from the GitHub package's. Do not compare the two.
+Install from the [Marketplace listing]({{ site.plugin_release.marketplace }}). Checked {{ site.plugin_release.checked | date: "%-d %B %Y" }}: the listing offers version {{ site.plugin_release.marketplace_version }}. Elgato repackages Marketplace copies, so their checksums can differ from the GitHub package's. Do not compare the two.
 
 ### Updating
 
-- **Newer version:** open the newer package the same way. The Stream Deck app replaces the installed plugin. Your keys, dials and their settings are kept by the Stream Deck app, not in the plugin folder, so they stay. On the measured Mac, 1.0.0.0 installed this way over an earlier build.
-- **Same version:** opening the package of the version that is already installed changes nothing. The app writes `AlreadyInstalled` to its log in `~/Library/Logs/ElgatoStreamDeck`, the running plugin keeps going, and its files stay as they were. To install the same version again, remove it first.
-- **Detail view:** after an update that changes the bundled detail view, the first time details open on each kind of deck, Stream Deck asks again to install it. 1.0.1.0 ships the 1.0.0.0 detail view files unchanged.
+- **Newer version:** open the newer package the same way. The Stream Deck app replaces the installed plugin. Your keys, dials and their settings stay, because the Stream Deck app stores them outside the plugin folder. On the measured Mac, 1.0.0.0 installed this way over an earlier build.
+- **Same version:** opening a package of the installed version changes nothing. The app writes `AlreadyInstalled` to its log in `~/Library/Logs/ElgatoStreamDeck`, the running plugin keeps going, and its files stay as they were. To install the same version again, remove it first.
+- **Detail view:** after an update that changes the bundled detail view, Stream Deck asks again to install it the first time details open on each kind of deck. 1.0.1.0 ships the 1.0.0.0 detail view files unchanged.
 
 ### Removing
 
 1. Export a backup of your Stream Deck profiles.
 2. Remove Mac Sensors from the Plugins list in the Stream Deck app's settings.
 
-The plugin itself writes only its logs, inside its own plugin folder. If you opened sensor details, the Stream Deck app also holds a **Mac Sensors Details** profile for each kind of deck you used, and one more after an update that changed the detail view. Whether removing the plugin removes those profiles has not been checked; to remove one, delete **Mac Sensors Details** from the app's profile list.
+The plugin itself writes only its logs, inside its own plugin folder. If you opened sensor details, the Stream Deck app also holds a **Mac Sensors Details** profile for each kind of deck you used, and one more after an update that changed the detail view. Whether removing the plugin also removes those profiles has not been checked. To remove one, delete **Mac Sensors Details** from the app's profile list.
 
 ### Where it installs
 

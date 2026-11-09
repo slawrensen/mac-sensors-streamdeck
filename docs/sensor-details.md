@@ -9,7 +9,7 @@ Press a Sensor Reading key to open related readings on a detail page. The key yo
 
 **Set it up:** open the key's **Press** section, choose **Opens sensor details** under **A press**, then choose a **Details list**. The first time details open on each kind of deck, Stream Deck asks to install the bundled detail view.
 
-Opening details, installing the detail profile and pressing Back have not yet been checked on a physical Stream Deck. What this page describes is what the code implements and its tests check. See [Sensor details support](hardware.html#sensor-details-support).
+A details press on a physical Stream Deck MK.2 opened the bundled 15-key detail page and the deck returned to the key page; Back is not yet checked by eye ([Sensor details support](hardware.html#sensor-details-support)).
 
 ## What it is (and is not)
 
@@ -19,9 +19,9 @@ The detail view is a **plugin-managed profile**, not a Stream Deck folder. A plu
 - The page is a normal, editable profile, but it ships with every cell filled: the Back tile, the title, the pagers and the reading tiles. Adding a key of your own means replacing one of those. The plugin never repairs or overwrites what you change. The shipped page holds no sensor choice of yours: every tile asks the plugin what to show while it is open.
 - What you change on that page is shared. There is one detail page per deck type, so a key you add or a tile you replace appears on every detail page you open on that deck, whichever key you pressed. What still follows the key you pressed is the live content: the reading tiles, the title, the page range and, until you pick a reading for it, the Back tile's face.
 - The plugin has no reset for the page, because a plugin cannot edit a profile you already have installed. Whether removing the **Mac Sensors Details** profile in the Stream Deck app brings the install prompt back on the next detail entry has not been checked.
-- If you want a page you lay out yourself, with your own multi-reading keys on it, use a Stream Deck folder instead. That is the app's own feature, and unlike the detail page it belongs to one key. A folder's opener key shows a static icon; a detail opener shows a live reading.
+- For a page you lay out yourself, with your own multi-reading keys on it, use a Stream Deck folder. Unlike the detail page, a folder belongs to one key, and its opener key shows a static icon; a detail opener shows a live reading.
 - The Stream Deck app never updates a profile that is already installed. When a plugin update changes the page itself, the change ships as a new profile revision with a new internal identity, the next detail entry asks once to install it, and the copy you already have stays in your profile list untouched.
-- Back asks the app for its previous profile; the plugin stores no profile history of its own, so where Back lands after a Stream Deck app restart is unknown.
+- The plugin stores no profile history of its own, so where Back lands after a Stream Deck app restart is unknown.
 - Opening details and pressing Back do not restart reading. MIN, MAX and AVG, sparklines, CPU usage and the rates carry on, and keys show readings at once ([When reading starts and stops](data-sources.html#when-reading-starts-and-stops)).
 
 ## Turning it on
@@ -30,7 +30,7 @@ Open **Press** in the Sensor Reading settings ([Pressing the key](sensor-reading
 
 ![The Press section of the Sensor Reading settings with A press on Opens sensor details, Readings per tile on One, an empty Title tile text, Also go back from this key's own position ticked, and Details list on Every reading from this reading's sensor](assets/img/settings-press-details.png)
 
-*Settings-panel capture of the staged 1.0.1.0 panel on a simulated host with sample readings and **Accent colors** set to **Theme accent everywhere**. It is not the Stream Deck app's own window.*
+*Settings-panel capture of the shipped 1.0.1.0 panel on a simulated host with sample readings and **Accent colors** set to **Theme accent everywhere**. It is not the Stream Deck app's own window.*
 
 | Setting | Choose |
 | --- | --- |

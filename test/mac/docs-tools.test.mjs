@@ -55,13 +55,15 @@ test('the docs brand mark is the shipped plugin icon, byte for byte, and the fav
  const head=fs.readFileSync('docs/_includes/head_custom.html','utf8');for(const size of [16,32,180])assert.match(head,new RegExp(`mac-sensors-icon-${size}\\.png`));
 });
 
-test('the shared docs frontend keeps the theme license and names no sibling product or private repository',()=>{
+test('the shared docs frontend keeps the theme license, names no sibling product and links the public repository',()=>{
  assert.match(fs.readFileSync('docs/assets/js/just-the-docs.LICENSE.txt','utf8'),/MIT License[\s\S]*Patrick Marsceill/);
  assert.match(fs.readFileSync('docs/assets/js/just-the-docs.js','utf8'),/^---\nlayout: null\n---\n\/\/ Just the Docs v0\.10\.1/);
  for(const file of ['docs/assets/css/docs.css','docs/assets/js/docs.js','docs/assets/js/just-the-docs.js',...fs.readdirSync('docs/_includes/components').map(name=>'docs/_includes/components/'+name),'docs/_layouts/default.html','docs/_includes/head_custom.html','docs/_config.yml']){
-  const text=fs.readFileSync(file,'utf8');assert.doesNotMatch(text,/HWiNFO|REALiX|—/,file);assert.doesNotMatch(text,/github\.com[/:]slawrensen\/mac-(?:sensors-)?streamdeck/i,file);
+  const text=fs.readFileSync(file,'utf8');assert.doesNotMatch(text,/HWiNFO|REALiX|—/,file);assert.doesNotMatch(text,/github\.com[/:]slawrensen\/mac-streamdeck-private/i,file);
  }
- assert.doesNotMatch(fs.readFileSync('docs/_config.yml','utf8'),/^(?:aux_links|gh_edit_link):/m,'a private repository has no edit or aux links');
+ const config=fs.readFileSync('docs/_config.yml','utf8');
+ assert.match(config,/^gh_edit_repository: https:\/\/github\.com\/slawrensen\/mac-sensors-streamdeck$/m,'header and edit links point at the public product repository');
+ assert.match(config,/^bug_reports: https:\/\/github\.com\/slawrensen\/mac-sensors-streamdeck\/issues$/m,'bug reports go to the product repository');
 });
 
 test('the docs source validator rejects broken Liquid links, kindless figure captions and a body h1',t=>{

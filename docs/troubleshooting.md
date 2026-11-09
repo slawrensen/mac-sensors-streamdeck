@@ -50,7 +50,7 @@ When a key cannot show a current reading, it shows a two-line status screen. Dia
 
 ## Keys show Reading sensors
 
-The first read after reading started has not returned yet. It clears when that read returns, with no action from you. Reading starts again when a page comes back after no Sensor Reading key, Sensor Dial or detail tile was visible for 2 seconds, so that page starts here too; a page change, opening details or Back inside those 2 seconds does not ([When reading starts and stops](data-sources.html#when-reading-starts-and-stops)).
+The first read since reading started has not returned yet. The screen clears by itself when it does. A page you return to after no Sensor Reading key, Sensor Dial or detail tile was visible for 2 seconds starts reading again, so it shows this screen too. A page change, opening details or Back inside those 2 seconds does not show it ([When reading starts and stops](data-sources.html#when-reading-starts-and-stops)).
 
 It can also return during use if every reading lapses or fails before the session's first SMC read has answered. If it stays for more than 15 seconds:
 
@@ -63,8 +63,8 @@ It can also return during use if every reading lapses or fails before the sessio
 15 seconds after reading started, the first read has still not finished: no system counter read has succeeded and at least one source has not answered. The plugin has not checked the font yet.
 
 1. Choose **Check again**. Each read asks the sources again; a source whose earlier call is still running is asked again once that call returns.
-2. If it stays, copy a support report before anything else: it describes the running plugin, and a restart replaces it. Its `dataSource` section shows the reason, and its `mac` section shows how many readings each source returned (`sourceRows`: `public`, `smc` and `health`), how many were computed from them (`computedRows`) and any source error (`sourceErrors`). Until a source has been accepted the `mac` section says `catalog: "not sampled"`, and a read that failed without answering leaves no `sourceErrors` entry; the plugin log then has a `read failed; retrying.` line.
-3. Then quit and reopen the Stream Deck app. A hardware call that is already running cannot be cancelled. Quitting and reopening the app starts a new plugin process; whether that clears a stuck call has not been tested.
+2. If it stays, copy a support report before you restart: it describes the running plugin, and a restart replaces it. Its `dataSource` section shows the reason; its `mac` section shows how many readings each source returned (`sourceRows`: `public`, `smc` and `health`), how many were computed from them (`computedRows`) and any source error (`sourceErrors`). Until a source has been accepted, `mac` says `catalog: "not sampled"`. A read that failed without answering leaves no `sourceErrors` entry, but the plugin log has a `read failed; retrying.` line.
+3. Then quit and reopen the Stream Deck app, which starts a new plugin process. A hardware call that is already running cannot be cancelled, and whether a restart clears a stuck call has not been tested.
 
 ## Keys show No sensor data
 
@@ -76,31 +76,27 @@ Every source has answered, but no reading is current: every reading failed, was 
 
 ## Keys show Tahoma needed
 
-On every system counter read, the native reader asks macOS for the font with the exact PostScript name Tahoma-Bold, with automatic font activation turned off. Any other answer, such as a substitute font, counts as missing. Readings are hidden while it is missing, because their text is fitted to Tahoma Bold. The **Tahoma needed** screen is stored as pixels, so it draws without the font, and the Back tile keeps its return arrow.
-
-Tahoma Bold ships with macOS; on the measured macOS 27.0.1 it is in `/System/Library/Fonts/Supplemental`.
+macOS did not return Tahoma Bold, so readings are hidden: their text is fitted to that font. The **Tahoma needed** screen is stored as pixels, so it draws without the font, and the Back tile keeps its return arrow. Tahoma Bold ships with macOS; on the measured macOS 27.0.1 it is in `/System/Library/Fonts/Supplemental`.
 
 1. Open Font Book and search for Tahoma.
 2. Make sure Tahoma Bold is installed and turned on. Install it if it is not listed.
 3. Wait for the next read, at most one **Read every** interval while a Sensor Reading key, Sensor Dial or detail tile is visible, or choose **Check again** in the key's settings to read at once.
 
-**Check again is not required.** The font check runs with every system counter read, so the screen clears on the first read after Tahoma Bold is available; **Check again** only makes that read happen now. The panel sentence still says "Install Tahoma Bold in Font Book, then choose Check again." Recovery after a real font install has been tested only with simulated reads; no system font was removed from the measured Mac.
+On every system counter read, the native reader asks macOS for the font with the exact PostScript name Tahoma-Bold, with automatic font activation turned off. Any other answer, such as a substitute font, counts as missing. The screen therefore clears on the first read after Tahoma Bold is available, and the same readings return. **Check again** is not required, although the panel sentence says "Install Tahoma Bold in Font Book, then choose Check again." Recovery after a real font install has been tested only with simulated reads; no system font was removed from the measured Mac.
 
-Your readings, labels, colors and other settings stay as they were, and the same readings return. The panel header says **No sensor data** while this screen shows; the message under it gives the font instruction. Do not remove or replace system fonts to test this.
+While this screen shows, the panel header says **No sensor data** and the message under it gives the font instruction. Do not remove or replace system fonts to test this.
 
 ## Keys show Bridge failed
 
-Before loading its native reader, the plugin checks it. When the Stream Deck app's Node runtime runs as arm64 it uses `bin/hwmac-arm64.node`, and as x86_64 it uses `bin/hwmac-x86_64.node`. The file's SHA-256 must match `bin/native-artifacts.json`, and its build information (protocol, version, source identity, Node-API level, architecture, macOS, not a test build) must match this plugin. **Bridge failed** means a check failed or macOS would not load the file. A load failure alone does not establish whether the file is damaged, missing or blocked.
-
-The result is kept for the life of the plugin process.
+The plugin could not use its native reader: a check failed or macOS would not load the file. A load failure alone does not establish whether the file is damaged, missing or blocked. The result is kept for the life of the plugin process.
 
 1. Quit and reopen Stream Deck. The new plugin process checks the reader again.
 2. If it persists, export a backup of your Stream Deck profiles, remove Mac Sensors as described in [Removing](installation.html#removing), then open the `.streamDeckPlugin` package again. Removing and reinstalling the same version has not been run on the measured Mac yet.
 3. If the screen returns, copy a support report and file an issue. Include the package's SHA-256 from `shasum -a 256` and the release you got it from.
 
-See also [Opening the same version again does nothing](#opening-the-same-version-again-does-nothing). Do not copy files over the installed plugin folder while the plugin is running.
+Do not copy files over the installed plugin folder while the plugin is running. See also [Opening the same version again does nothing](#opening-the-same-version-again-does-nothing).
 
-The native files are ad-hoc signed. `codesign --verify --strict` checks a file's integrity; it is not a Developer ID or notarization check.
+Before loading its native reader, the plugin checks it. When the Stream Deck app's Node runtime runs as arm64 it uses `bin/hwmac-arm64.node`, and as x86_64 it uses `bin/hwmac-x86_64.node`. The file's SHA-256 must match `bin/native-artifacts.json`, and its build information (protocol, version, source identity, Node-API level, architecture, macOS, not a test build) must match this plugin. The native files are ad-hoc signed. `codesign --verify --strict` checks a file's integrity; it is not a Developer ID or notarization check.
 
 ## Keys show Source error
 
@@ -136,10 +132,10 @@ These two screens are defined, but no read in version 1.0.1 reports them. When t
 
 The header reads **The plugin is not responding** when no answer comes within 3 seconds of the panel opening. The message under it says "The Mac Sensors plugin is not answering this panel. Settings you change here are still saved; restarting the Stream Deck app restarts the plugin." **Copy support report** changes to **Plugin not responding** when no report arrives within 3 seconds. Keys and dials can stop changing without any status screen.
 
-This combination says the plugin is not answering the app. It does not identify why.
+Together these mean the plugin is not answering the app; they do not identify why.
 
 1. Quit and reopen the Stream Deck app.
-2. Make sure the installed version is the current release.
+2. Make sure the installed version is the [latest release](https://github.com/slawrensen/mac-sensors-streamdeck/releases/latest).
 3. If it happens again, keep the plugin log from before the restart (the older numbered file) and file an issue.
 
 ## The picker is empty
@@ -148,7 +144,7 @@ The **Reading** list shows the readings of the latest read, grouped by CPU, GPU,
 
 ![The Sensor Reading settings panel with cpu typed in the Reading search and the results open under the CPU group: CPU super core 1, 62.4 °C, highlighted, and CPU usage, 37.5 %](assets/img/settings-picker.png)
 
-*Settings-panel capture of the staged 1.0.1.0 panel on a simulated host with sample readings and **Accent colors** set to **Theme accent everywhere**. It is not the Stream Deck app's own window.*
+*Settings-panel capture of the shipped 1.0.1.0 panel on a simulated host with sample readings and **Accent colors** set to **Theme accent everywhere**. It is not the Stream Deck app's own window.*
 
 1. **A status screen is showing.** The message under the panel header names the cause, with **Check again** and **Sensor setup**. Fix that first.
 2. **The search is too narrow.** The list then says `No readings match "…"` with your text. Clear the search box.
@@ -173,7 +169,7 @@ Every read takes new measurements, and a reading older than 15 seconds is remove
 
 1. **Read every is long.** At 5 seconds a key changes at most every 5 seconds. Change it under **Advanced**, **Connection**.
 2. **The value is steady.** Memory total and Startup volume total rarely change. How often the SMC itself refreshes a key is unknown, and a register that stopped changing internally cannot be told apart from a steady one.
-3. **The key is not visible.** Nothing is read while no Sensor Reading key, Sensor Dial or detail tile is visible anywhere, and after 2 seconds like that reading stops. A page you return to after that starts with **Reading sensors** and new sparklines; a page back within the 2 seconds continues where it was.
+3. **The key is not visible.** While no Sensor Reading key, Sensor Dial or detail tile is visible anywhere, nothing is read, and after 2 seconds reading stops. A page you return to after that starts with **Reading sensors** and new sparklines; a page back within the 2 seconds continues where it was.
 4. **The sparkline restarted.** It starts again when **Read every** changes, after a status screen, when its reading was missing, and when you return to a page after no Sensor Reading key, Sensor Dial or detail tile was visible anywhere for 2 seconds. It holds up to 36 points spaced by reads.
 5. **The plugin is not answering.** See [The panel says the plugin is not responding](#the-panel-says-the-plugin-is-not-responding).
 
@@ -228,7 +224,7 @@ Synthetic gesture traces replay in software tests; checks of physical Stream Dec
 3. **Check that it installed.** The installed plugin is the folder `~/Library/Application Support/com.elgato.StreamDeck/Plugins/com.lawrensen.mac.sdPlugin`.
 4. **The same version was already installed.** See the next section.
 
-Mac Sensors is not on the Elgato Marketplace yet. Install from the package as described in [Installation and requirements](installation.html).
+Install it again from the [Elgato Marketplace]({{ site.plugin_release.marketplace }}), or download `com.lawrensen.mac.streamDeckPlugin` from the [latest release](https://github.com/slawrensen/mac-sensors-streamdeck/releases/latest) and install it as described in [Installation and requirements](installation.html).
 
 ## Opening the same version again does nothing
 
@@ -240,9 +236,9 @@ To install the same version again, export a profile backup, remove Mac Sensors a
 
 The plugin runs one reader however many keys and dials are visible, and stops reading 2 seconds after none is (the log says `Stopped (no visible actions)`).
 
-1. **High CPU at 250 ms.** At **Read every** 250 ms the system counters and the SMC are read four times a second and every changed face is drawn again. An earlier 1.0.1 candidate, measured as a development copy in the Stream Deck app on the M5 Pro with 32 single-reading keys, used 2.478% of one core at 250 ms against 0.668% at 1 second (PERF.md). Choose 1 second or longer under **Advanced**, **Connection**.
+1. **High CPU at 250 ms.** At **Read every** 250 ms the system counters and the SMC are read four times a second and every changed face is drawn again. Choose 1 second or longer under **Advanced**, **Connection**. An earlier 1.0.1 candidate, measured as a development copy in the Stream Deck app on the M5 Pro with 32 single-reading keys, used 2.478% of one core at 250 ms against 0.668% at 1 second ([PERF.md](https://github.com/slawrensen/mac-sensors-streamdeck/blob/main/PERF.md)).
 2. **Memory.** Over 24 hours with 32 single-reading keys at 1 second on the M5 Pro, the published 1.0.1.0, run as a development copy, peaked at 92.55 MiB of resident memory with 12 threads and 49 to 50 file descriptors (PERF.md). The earlier candidate peaked at 95.9 MiB in shorter sessions at 250 ms. If you see steady growth, note how many keys and dials are visible and the **Read every** value, and attach the log.
-3. **A plugin process stays after the Stream Deck app quits.** The plugin checks for the app every 30 seconds. After two checks in a row find the app's process gone, it asks the app directly and exits if no answer comes within 15 seconds. The Stream Deck app starts its plugins when it launches; a real app restart with Mac Sensors has not been observed yet. If a Mac Sensors process keeps running well after that, keep the log and file an issue.
+3. **A plugin process stays after the Stream Deck app quits.** The plugin checks for the app every 30 seconds. After two checks in a row find the app's process gone, it asks the app directly and exits if no answer comes within 15 seconds. If a Mac Sensors process keeps running well after that, keep the log and file an issue. The Stream Deck app starts its plugins when it launches; a real app restart with Mac Sensors has not been observed yet.
 
 
 ---
@@ -273,7 +269,7 @@ Useful lines:
 - `Device connected: "…" (…, 8x4)` and `Device known: …`: one line per deck, with the name you gave it, its type and its key grid.
 - `Detail entry refused: …`: why a detail press showed the Stream Deck alert triangle.
 - `Parent probe failed […]`, `Parent watchdog disabled`, `watchdog standing down` and `Parent process gone, and the app did not answer: exiting.`: the check that ends the plugin when the Stream Deck app is gone. Report the exit line if the app is still running.
-- `Uncaught exception` or `Unhandled rejection`: an unexpected error; please report it with the lines around it.
+- `Uncaught exception` or `Unhandled rejection`: an unexpected error; report it with the lines around it.
 
 The `MacSensors` warnings are logged once each time the reader starts. In the 24-hour observation on the M5 Pro the log had no WARN or ERROR lines (PERF.md).
 
@@ -324,7 +320,7 @@ Check these first:
 - You picked the reading again if it is gone from this Mac for good.
 - Threshold values use the displayed temperature unit, or bytes and bytes per second for byte and rate readings, and **Alert when the value drops to or below these numbers** is ticked where low is bad.
 
-If it still fails, open a [public issue on the documentation repository](https://github.com/slawrensen/slawrensen.github.io/issues), name Mac Sensors in the title, and include:
+If it still fails, [open an issue on GitHub](https://github.com/slawrensen/mac-sensors-streamdeck/issues) and include:
 
 1. **What you see**: the exact status text, for example "Source busy / retrying", or a photo of the key or dial.
 2. **The installed plugin version**, from the support report's `plugin` field, and where you got the package.
@@ -334,7 +330,7 @@ If it still fails, open a [public issue on the documentation repository](https:/
 6. **The relevant log lines** from `com.lawrensen.mac.0.log`, especially any `MacSensors` warnings.
 7. **The support report**, pasted into the issue after you review it.
 
-Report security issues through the [private security-report form](https://github.com/slawrensen/slawrensen.github.io/security/advisories/new), naming Mac Sensors and the affected version. Do not post vulnerability details in a public issue.
+Report security issues through the [private security-report form](https://github.com/slawrensen/mac-sensors-streamdeck/security/advisories/new), naming the affected version. Do not post vulnerability details in a public issue.
 
 ## Where to go next
 

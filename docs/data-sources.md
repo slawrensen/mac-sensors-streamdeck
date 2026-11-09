@@ -155,7 +155,7 @@ When a key or dial shows readings from more than one source, the sources that an
 
 Waiting changes only when the face is drawn. It never changes a reading's acquisition time, and each read still adds one sparkline point and one dial observation.
 
-In a traced run of an earlier 1.0.1 candidate, measured as a development copy in the Stream Deck app on the M5 Pro at 1 second, the two sources of a read answered a median 11.5 ms apart and at most 40.2 ms apart (PERF.md). In a separate terminal benchmark of the native reader, two windows of 1,000 reads at 1 second, the SMC part of a read had a median of 11.52 ms and 11.10 ms; the slowest read, 66.39 ms, was in the first window (PERF.md, `scripts/bench-native.mjs`). How long SMC reads take on an Intel Mac is unknown; a source that answers more than 100 ms after the first can change the face twice in one read.
+In a traced run of an earlier 1.0.1 candidate, measured as a development copy in the Stream Deck app on the M5 Pro at 1 second, the two sources of a read answered a median 11.5 ms apart and at most 40.2 ms apart ([PERF.md](https://github.com/slawrensen/mac-sensors-streamdeck/blob/main/PERF.md)). In a separate terminal benchmark of the native reader, two windows of 1,000 reads at 1 second, the SMC part of a read had a median of 11.52 ms and 11.10 ms; the slowest read, 66.39 ms, was in the first window (PERF.md, `scripts/bench-native.mjs`). How long SMC reads take on an Intel Mac is unknown; a source that answers more than 100 ms after the first can change the face twice in one read.
 
 ### Counter rebaseline
 
@@ -174,7 +174,7 @@ Until the extra read, a key that shows only CPU usage or a rate shows **Sensor m
 
 **Read every** sets how often the plugin reads the system counters and the SMC; the health source is read at most every 1.5 seconds. It is under **Advanced**, **Connection**, marked **All keys and dials**, in both the Sensor Reading and Sensor Dial panels. It is one setting for the whole plugin, not one per key.
 
-**Connection** also says that the plugin reads available sensors on this Mac and does not change hardware settings, that available readings depend on this Mac and macOS version, and that a saved reading stays selected when it is unavailable. It holds **Sensor setup**, three first steps (see [Status screens](status-screens.html#in-the-settings-panel)).
+**Connection** also states that the plugin reads available sensors on this Mac and does not change hardware settings, that available readings depend on this Mac and macOS version, and that a saved reading stays selected when it is unavailable. It also holds **Sensor setup**, three first steps (see [Status screens](status-screens.html#in-the-settings-panel)).
 
 | Option | Notes |
 | --- | --- |
@@ -201,7 +201,7 @@ The plugin reads sensors while at least one Sensor Reading key (the Back tile of
 - **When the last one disappears**, the plugin makes no new regular reads but keeps the reading for 2 seconds. The Stream Deck app removes the old page's actions before it shows the new page's, so changing pages, opening sensor details and pressing Back leave a moment with nothing visible. If one appears again within the 2 seconds, the same reading continues. Key MIN, MAX and AVG, sparklines, the counter baseline, the count of fast reads and dial sessions are kept. Keys show readings at once instead of **Reading sensors**, CPU usage and the rates do not wait for a new pair, and the log shows no new `Started` line. The next read comes on the next **Read every** tick.
 - **Reading stops** 2 seconds after the last one disappeared, if none has appeared since. The plugin closes its reader, clears every sparkline, ends every reading's MIN, MAX and AVG, and logs `Stopped (no visible actions)`. The next appearance starts reading as above, and a dial that returns then shows `stats reset: data gap` once.
 
-The 2 seconds is fixed. This comes from the code and its software tests; how long a page change takes on a physical deck has not been measured.
+The 2 seconds is fixed. This behavior comes from the code and its software tests; how long a page change takes on a physical deck has not been measured.
 
 ## Freshness and local history
 
@@ -221,9 +221,9 @@ Dial minimum, maximum and average are local session statistics from new observat
 
 ## Sleep and wake
 
-This section describes the code and its software tests. Real sleep and wake on a Mac with a deck attached has not been checked yet; that check is pending.
+This section follows the code and its software tests; sleep and wake on a Mac with a deck attached have not been checked yet.
 
-- **After a sleep longer than 15 seconds**, every reading is past its limit, and the plugin removes them at its first read or expiry check after the wake. Every reading's MIN, MAX and AVG start over with its first read after the wake. Until then the deck can still show the face drawn before the sleep; how long that lasts on a physical deck is unknown. Until the first read after waking returns, keys and dials can then show **No sensor data**. A read that starts from a status screen always uses the 100 ms limit, so system readings return at most 100 ms after their read completes, even when the SMC read is slow. In software tests with a simulated 60-second sleep and a slow first SMC read, the status screen lasted at most 105 ms: a 5 ms system read plus the 100 ms limit. Whether that screen is visible on a physical deck is unknown.
+- **After a sleep longer than 15 seconds**, every reading is past its limit, and the plugin removes them at its first read or expiry check after the wake. Until they are removed, the deck can still show the face drawn before the sleep; how long that lasts on a physical deck is unknown. Once they are removed, keys and dials can show **No sensor data** until the first read after waking returns. Every reading's MIN, MAX and AVG start over with its first read after the wake. A read that starts from a status screen always uses the 100 ms limit, so system readings return at most 100 ms after their read completes, even when the SMC read is slow. In software tests with a simulated 60-second sleep and a slow first SMC read, the status screen lasted at most 105 ms: a 5 ms system read plus the 100 ms limit. Whether that screen is visible on a physical deck is unknown.
 - **After any sleep**, the first system counter read detects the sleep and leaves out CPU usage and the rates for that read, so they return one **Read every** interval later, with their MIN, MAX and AVG started over. No extra rebaseline read is made.
 - **After a sleep shorter than 15 seconds**, readings taken before the sleep stay current until their own 15 seconds run out or the next read replaces them. A reading other than CPU usage and the rates that is read again before its 15 seconds run out keeps its MIN, MAX and AVG.
 
