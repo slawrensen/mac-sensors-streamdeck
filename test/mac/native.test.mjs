@@ -122,6 +122,28 @@ test('a production read reports the facts its rows were chosen by, on whatever M
 	if(process.arch==='arm64'&&!packets[0].cpu.startsWith('Apple '))assert.deepEqual([smc.table,smc.tableMeasured],['',false]);
 	if(packets[0].appleSilicon!==1)assert.deepEqual([smc.table,smc.tableMeasured],['',false],'an Intel Mac never gets a chip family table');
 });
+test('a key the SMC does not have is asked again after 1, 2, 4 ... reads, then about every 64 to 95; a present key is read every time',()=>{
+	// The measured model against an SMC that has 3 of its 74 rows. Mirrors HWMAC_ABSENT_RECHECK_READS and its per-row offset in native/hwmac/collectors.h.
+	const RECHECK=64,OFFSETS=32,present={Tp00:float(44),TaTP:float(33),F0Ac:float(1500)},absent=74-3,READS=400;
+	const run=native.testSmc('Mac17,9','t6050',1,'Apple M5 Pro',scripted(present),READS),asked=run.transportCalls.map(calls=>calls-3);
+	// First read: key information for every row, then the value of the three that exist. Every absent key is then asked together while its wait doubles.
+	assert.equal(run.transportCalls[0],74+3);
+	const doubling=[2,5,10,19,36,69],STEADY_FROM=134;
+	assert.deepEqual(asked.slice(1,STEADY_FROM).map((calls,index)=>calls?index+1:0).filter(Boolean),doubling);
+	for(const read of doubling)assert.equal(asked[read],absent,`read ${read}`);
+	// From then on each key waits 64 reads plus its own offset: a read asks a few keys, never all, and no key waits longer than 64 + 31 reads.
+	const steady=asked.slice(STEADY_FROM);
+	assert.ok(Math.max(...steady)<absent/4,`largest recheck batch ${Math.max(...steady)}`);
+	for(let from=0;from+RECHECK+OFFSETS<=steady.length;from+=RECHECK+OFFSETS)assert.ok(steady.slice(from,from+RECHECK+OFFSETS).reduce((sum,calls)=>sum+calls,0)>=absent,`every absent key is asked within ${RECHECK+OFFSETS} reads from ${from}`);
+	assert.ok(asked.reduce((sum,calls)=>sum+calls,0)<absent*14,'400 reads ask each absent key about a dozen times, not 400');
+	// A repeated answer is the same row a fresh one gives, so the provider cannot tell them apart.
+	const first=native.testSmc('Mac17,9','t6050',1,'Apple M5 Pro',scripted(present)),shape=packet=>packet.rows.map(({key,valid,code,operation,firmwareCode})=>[key,valid,code,operation,firmwareCode]);
+	for(const reads of [2,4,50])assert.deepEqual(shape(native.testSmc('Mac17,9','t6050',1,'Apple M5 Pro',scripted(present),reads)),shape(first),`${reads} reads`);
+	assert.equal(first.rows.filter(row=>row.code==='HWMAC_FIRMWARE'&&row.firmwareCode===0x84&&row.operation==='smc.keyInfo').length,absent);
+	// A key that fails for another reason (here: a type that is not a number) is not treated as absent: its value is asked for on every read.
+	const odd=native.testSmc('Mac17,9','t6050',1,'Apple M5 Pro',scripted({...present,Tp04:{type:'ch8*',bytes:Buffer.from('abcd')}}),2);
+	assert.deepEqual(odd.transportCalls,[74+4,4]);
+});
 test('the same scripted read on the measured model and on a Mac without a table',()=>{
 	const fixture=scripted({Tp00:float(44),Tp04:float(9.5),Tp08:float(-50.5),Tg0U:float(0),TaTP:float(33),F0Mn:float(2317)});
 	const mine=native.testSmc('Mac17,9','t6050',1,'Apple M5 Pro',fixture);

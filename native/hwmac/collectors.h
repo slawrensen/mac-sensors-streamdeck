@@ -14,6 +14,10 @@
 #define HWMAC_FAMILY_MAXIMUM_C 120.0
 /* The SMC's firmware status for a key it does not have. */
 #define HWMAC_SMC_KEY_NOT_FOUND 0x84
+/* A key reported as not found is asked again after 1 read, then 2, 4 and so on up to this many reads plus a per-row offset of up to 31,
+ * about once a minute at the 1 s default. A key that was only missing for a moment returns within a few reads, while 20 to 60 rows a Mac
+ * never has cost no SMC call on an ordinary read, and their rechecks do not land on one read. */
+#define HWMAC_ABSENT_RECHECK_READS 64
 #define HWMAC_MAX_CPUS 256
 
 typedef struct {
@@ -53,6 +57,8 @@ typedef struct {
 typedef struct {
 	io_connect_t connection;
 	uint32_t types[HWMAC_MAX_CATALOG], sizes[HWMAC_MAX_CATALOG];
+	/* For a key the SMC reported as not found: reads left before it is asked again (0: asked on this read), and the wait that followed its last answer. */
+	uint8_t absent[HWMAC_MAX_CATALOG], absent_wait[HWMAC_MAX_CATALOG];
 	bool catalog_ready;
 } smc_context;
 #define HWMAC_LINK_NAME 16

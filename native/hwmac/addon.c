@@ -356,8 +356,9 @@ static napi_value test_catalog(napi_env env, napi_callback_info info) {
 typedef struct { uint32_t key, type, size; uint8_t bytes[32]; } scripted_key;
 typedef struct { scripted_key keys[HWMAC_TEST_KEYS]; size_t count; } scripted_smc;
 static _Thread_local const scripted_smc *scripted;
+static _Thread_local unsigned scripted_calls;
 static kern_return_t scripted_transport(io_connect_t connection, uint32_t selector, const void *request, size_t size, void *reply, size_t *length) {
-	(void)connection; (void)selector;
+	(void)connection; (void)selector; scripted_calls++;
 	if (size != 80 || *length != 80 || scripted == NULL) return KERN_FAILURE;
 	const uint8_t *bytes = request; uint8_t *answer = reply; uint32_t key; memcpy(&key, bytes, sizeof(key)); memset(answer, 0, 80);
 	for (size_t i = 0; i < scripted->count; i++) if (scripted->keys[i].key == key) {
@@ -368,11 +369,13 @@ static kern_return_t scripted_transport(io_connect_t connection, uint32_t select
 	}
 	answer[40] = HWMAC_SMC_KEY_NOT_FOUND; return KERN_SUCCESS;
 }
-/* Runs the production read loop for a Mac with the given facts against a scripted SMC and returns the packet as a read would. */
+/* Runs the production read loop for a Mac with the given facts against a scripted SMC, once or `reads` times on one connection
+ * context, and returns the last packet as a read would, with the transport calls each read made. */
 static napi_value test_smc(napi_env env, napi_callback_info info) {
-	size_t argc = 5; napi_value args[5]; CHECK(napi_get_cb_info(env, info, &argc, args, NULL, NULL));
-	bool array = false; uint32_t count = 0;
-	if (argc != 5 || napi_is_array(env, args[4], &array) != napi_ok || !array || napi_get_array_length(env, args[4], &count) != napi_ok || count > HWMAC_TEST_KEYS) return fail(env, "HWMAC_ARGUMENT", "testSmc", "Platform facts and up to 128 scripted keys required.");
+	size_t argc = 6; napi_value args[6]; CHECK(napi_get_cb_info(env, info, &argc, args, NULL, NULL));
+	bool array = false; uint32_t count = 0, reads = 1;
+	if (argc == 6 && (napi_get_value_uint32(env, args[5], &reads) != napi_ok || reads == 0 || reads > 512)) return fail(env, "HWMAC_ARGUMENT", "testSmc", "Reads must be 1 to 512.");
+	if (argc < 5 || napi_is_array(env, args[4], &array) != napi_ok || !array || napi_get_array_length(env, args[4], &count) != napi_ok || count > HWMAC_TEST_KEYS) return fail(env, "HWMAC_ARGUMENT", "testSmc", "Platform facts and up to 128 scripted keys required.");
 	scripted_smc *fixture = calloc(1, sizeof(*fixture)); read_job *job = calloc(1, sizeof(*job)); smc_context *context = calloc(1, sizeof(*context));
 	napi_value result = NULL;
 	if (fixture == NULL || job == NULL || context == NULL) { result = fail(env, "HWMAC_MEMORY", "testSmc", "Native allocation failed."); goto done; }
@@ -385,10 +388,15 @@ static napi_value test_smc(napi_env env, napi_callback_info info) {
 		target->key = smc_key(key); target->type = smc_key(type); target->size = (uint32_t)length; memcpy(target->bytes, data, length);
 	}
 	fixture->count = count; job->source = 1; scripted = fixture;
-	hwmac_read_smc_rows(context, &job->packet, scripted_transport);
+	napi_value calls; napi_create_array_with_length(env, reads, &calls);
+	for (uint32_t read = 0; read < reads; read++) {
+		job->packet.count = 0; memset(job->packet.rows, 0, sizeof(job->packet.rows)); scripted_calls = 0;
+		hwmac_read_smc_rows(context, &job->packet, scripted_transport);
+		napi_set_element(env, calls, read, number_value(env, scripted_calls));
+	}
 	scripted = NULL;
 	job->packet.continuous_ms = hwmac_continuous_ms(); job->packet.awake_ms = hwmac_awake_ms();
-	result = packet_value(env, job);
+	result = packet_value(env, job); napi_set_named_property(env, result, "transportCalls", calls);
 done:
 	free(fixture); free(job); free(context); return result;
 }

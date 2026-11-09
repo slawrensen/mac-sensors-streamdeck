@@ -154,13 +154,20 @@ void hwmac_read_smc_rows(smc_context *context, source_packet *packet, smc_transp
 		if (row == NULL) { packet->error = 12; break; }
 		uint8_t reply[80]; smc_result result = {0};
 		uint32_t key = smc_key(spec->key);
-		/* Metadata is bounded discovery, cached only for this connection. Missing keys retry. */
+		/* Metadata is bounded discovery, cached only for this connection. A key that failed any other way is asked again on the next read;
+		 * a key the SMC says it does not have repeats that answer without a call until its recheck comes up. */
 		if (context->sizes[i] == 0) {
 			row->operation = 9;
+			if (context->absent[i] > 0) { context->absent[i]--; row->error = 5; row->firmware_error = HWMAC_SMC_KEY_NOT_FOUND; continue; }
 			result = smc_read_request(context->connection, 9, key, 0, 0, reply, transport);
 			if (result.code == 0) {
 				context->types[i] = smc_u32(reply + 32); context->sizes[i] = smc_u32(reply + 28);
 				if (context->sizes[i] == 0 || context->sizes[i] > 32) { result.code = 2; context->sizes[i] = 0; }
+			} else if (result.code == 5 && result.firmware_code == HWMAC_SMC_KEY_NOT_FOUND) {
+				unsigned wait = context->absent_wait[i] == 0 ? 1 : context->absent_wait[i] * 2u;
+				if (wait > HWMAC_ABSENT_RECHECK_READS) wait = HWMAC_ABSENT_RECHECK_READS;
+				context->absent_wait[i] = (uint8_t)wait;
+				context->absent[i] = (uint8_t)(wait == HWMAC_ABSENT_RECHECK_READS ? wait + (i & 31) : wait);
 			}
 		}
 		double acquired = NAN, acquired_wall = NAN;
