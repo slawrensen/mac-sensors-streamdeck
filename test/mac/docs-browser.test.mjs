@@ -211,7 +211,8 @@ test("navigation, articles and full-image links work without JavaScript", option
 			images: [...document.querySelectorAll(".main-content img")].length
 		})`);
 		assert.notEqual(facts.nav, "none", "the navigation is visible without the menu script");
-		assert.equal(facts.links, 16);
+		// One link per navigation entry: every page except the not-found page (scripts/validate-docs.mjs requires each to be listed).
+		assert.equal(facts.links, PAGES.length);
 		assert.ok(facts.headings > 3);
 		assert.ok(facts.images > 0);
 		await open("", { width: 1280, height: 800, script: false });
