@@ -1,25 +1,25 @@
 {
-  "version": "1.0.1",
+  "version": "1.0.2",
   "scope": "Staged Mac panel in Chromium, simulated host; not the app webview",
   "sourceSha256": {
-    "ui/control.html": "c69b98d0f915b26694a406ac6e77793676225ddbf870aa3aeefb2ca10d1eefee",
-    "ui/detail-slot.html": "3c19a5e481b20a5da60db4f476facc34d83113ce0fbd07417ef5d68e0b4471b9",
+    "ui/control.html": "f7107ecc84f089d00be11498c9fe755a7cd106c7480d51360effe2b00a015d9f",
+    "ui/detail-slot.html": "6d5481b6245e3285cd6ccb186880287c3a4ab6ceda26a5bf43b75d8d11ba316e",
     "ui/pi-command.js": "a672b467fa4d6950bbae85ea59006c0a0185f6b2c9b366ad6e29340c19d6b62a",
-    "ui/pi-common.js": "8e895e5e7b4f837f3cce09b27aacee1dc77a60e9038285081d2c631763432af7",
+    "ui/pi-common.js": "1b8be3eac037179606e70f4178f38f87c3c09a8962a5d5ee65c12c235aebfb59",
     "ui/pi-control.js": "2a83b53d7c0f4cf6aca9216c5f0fc4001327f05b05e3c2b4282a0ad7083df18a",
     "ui/pi-model.js": "c9732cb2d91c9cfef8f6552eaecc0a72f4efff9fd6e25e2922b18f3decb39632",
     "ui/pi-shell.js": "6427c97286c2a39463a5138af22d188b180940dfb6c04fa096ab24200d1e77d3",
     "ui/pi-slot.js": "c07cd26a8d46a824c5440bb487d731bef0426f14d76ccea034b0669cab931337",
     "ui/pi.css": "51f44aeed25c6c0b56940a2079da5692547b48212f0d60efb820e885eb80d165",
     "ui/sdpi-components.js": "f6c0dfd2ed68e18084b9952842b86e3850cf837d674704700c2a0718e0a24f6b",
-    "ui/sensor-dial.html": "0e760dffbf254c5c3fb181fa1fd16d0801b9d031cf6bec2a3ba450e78c8c8bc6",
-    "ui/sensor-reading.html": "6a5474b8c27ef45cfbe17b8fdc0d38799fd7990df81a62f9acccd70296fd665d"
+    "ui/sensor-dial.html": "61d2727e071aee6fe4f002b6c2462fcfe167b52db63c43c980cb1c2570651177",
+    "ui/sensor-reading.html": "8c85f61a0bc42de8d8c2b2cad1d310346dcce5cfe825a0c55fe5c5c578016467"
   },
   "captures": [
     {
       "file": "settings-key.png",
       "kind": "settings-panel capture, simulated host, sample data",
-      "sha256": "eda4462e2b07e37fb85107939f8e9ed4df9d6e96243dccc75db725c4516828ff",
+      "sha256": "62aa7f1c18218b4e13aaddd36bc440deeda0fa3b899f9289fb20110282113eb3",
       "settings": {
         "readingKey": "mac:v1:smc:Mac17%2C9:54703030:temp.v1",
         "label": "CPU super 1",
@@ -28,7 +28,7 @@
         "warnValue": "75",
         "critValue": "90"
       },
-      "build": "1.0.1.0-mac7",
+      "build": "1.0.2.0-mac7",
       "width": 378,
       "dpr": 2,
       "overflow": 0
@@ -36,7 +36,7 @@
     {
       "file": "settings-dial.png",
       "kind": "settings-panel capture, simulated host, sample data",
-      "sha256": "c30d32186573e0bdb188f0f9044e07bd86ced97f7f38d70d5bb55343094e6fb5",
+      "sha256": "6014f4d5e090bc20736776c31a830ac6d39697b0666599ae9a2cf744ba603dbc",
       "settings": {
         "readingKey": "mac:v1:smc:Mac17%2C9:54703030:temp.v1",
         "label": "CPU super 1",
@@ -48,7 +48,7 @@
         "dialView": "overview",
         "theme": "void"
       },
-      "build": "1.0.1.0-mac7",
+      "build": "1.0.2.0-mac7",
       "width": 378,
       "dpr": 2,
       "overflow": 0
@@ -56,7 +56,7 @@
     {
       "file": "settings-reading-colors.png",
       "kind": "settings-panel capture, simulated host, sample data",
-      "sha256": "6a352a447d6305989e38dfd27fc088fb0d3b002a84a4f4f1afbd544352ebaf6a",
+      "sha256": "61de42a7dc0d738386be59faa79e508810217ce471fe94317b749fa5769428f2",
       "settings": {
         "readingKey": "mac:v1:smc:Mac17%2C9:54703030:temp.v1",
         "label": "CPU super 1",
@@ -73,7 +73,7 @@
           "mac:v1:smc:Mac17%2C9:46304163:rpm.v1": "#38CD89"
         }
       },
-      "build": "1.0.1.0-mac7",
+      "build": "1.0.2.0-mac7",
       "width": 378,
       "dpr": 2,
       "overflow": 0
@@ -81,7 +81,7 @@
     {
       "file": "settings-picker.png",
       "kind": "settings-panel capture, simulated host, sample data",
-      "sha256": "375abbd4144f6d65b3cfa1bd0198b3ae52d4573c365bf277c078340d7dac02b7",
+      "sha256": "438ac8359737b9fc1a7eba3169e5e86523dee7984b1f950d0aef21ad286e6cd2",
       "settings": {
         "readingKey": "mac:v1:smc:Mac17%2C9:54703030:temp.v1",
         "label": "CPU super 1",
@@ -91,7 +91,7 @@
         "critValue": "90"
       },
       "picker": "cpu",
-      "build": "1.0.1.0-mac7",
+      "build": "1.0.2.0-mac7",
       "width": 378,
       "dpr": 2,
       "overflow": 0
@@ -99,7 +99,7 @@
     {
       "file": "settings-dial-controls.png",
       "kind": "settings-panel capture, simulated host, sample data",
-      "sha256": "1c2d2366636b279841d900ca6e1a090ce35439ae2ee55139ff22a5cdb530395d",
+      "sha256": "82ce83188045194db104ed7c7843c294ecfa4f083c781ac2519ac0577ca568f4",
       "settings": {
         "readingKey": "mac:v1:smc:Mac17%2C9:54703030:temp.v1",
         "label": "CPU super 1",
@@ -116,7 +116,7 @@
         "sec-interaction"
       ],
       "clip": "#sec-interaction",
-      "build": "1.0.1.0-mac7",
+      "build": "1.0.2.0-mac7",
       "width": 378,
       "dpr": 2,
       "overflow": 0
@@ -124,10 +124,10 @@
     {
       "file": "settings-control.png",
       "kind": "settings-panel capture, simulated host, sample data",
-      "sha256": "3fe6218129e947f23e25b61bc9a593b837553d180289f4c57666d4daae1397b9",
+      "sha256": "2ab9838139ee40644a26744fae7bdba491abf615916eef66e7ba40243dd8f2ae",
       "settings": {},
       "clip": "body",
-      "build": "1.0.1.0-mac7",
+      "build": "1.0.2.0-mac7",
       "width": 378,
       "dpr": 2,
       "overflow": 0
@@ -135,7 +135,7 @@
     {
       "file": "settings-press-details.png",
       "kind": "settings-panel capture, simulated host, sample data",
-      "sha256": "17f100963cb4d595122cc821f8cacd5868e3025bdec999e7f468f61b88826acc",
+      "sha256": "ec60a9b4361e995411add927f8247ea596de5f9b14884df42c65f3b553e020cd",
       "settings": {
         "readingKey": "mac:v1:smc:Mac17%2C9:54703030:temp.v1",
         "label": "CPU super 1",
@@ -149,7 +149,7 @@
         "sec-interaction"
       ],
       "clip": "#sec-interaction",
-      "build": "1.0.1.0-mac7",
+      "build": "1.0.2.0-mac7",
       "width": 378,
       "dpr": 2,
       "overflow": 0

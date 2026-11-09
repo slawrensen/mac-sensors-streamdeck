@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.2.0 - 2026-11-10
+
+- Battery cycles, Battery health and the Internal SSD temperature are new readings on a Mac that reports them. They come from public macOS battery and drive interfaces, asked at most every 1.5 seconds.
+- On Mac17,9 with the M5 Pro, seven more temperatures can go on a key or dial: Airflow top, Charger proximity, Power supply proximity, Thunderbolt left and right, Trackpad and Trackpad actuator. Fan 1 and Fan 2 also offer their target, minimum and maximum speeds.
+- On the same Mac, CPU average, CPU hottest core and Fan average are computed from the SMC readings of one read. A read where any input is missing leaves the computed reading out.
+- Network receive and Network send keep their rate when an interface passes 4 GiB of traffic. Before, both showed Sensor missing for one read and their sparklines started over.
+- **Source busy**, **Bridge failed** and **Needs macOS** say in the settings panel what happened and what to do next.
+- The settings panel uses Mac wording: the alert direction box names fans and free space, the details filter samples are `*fan*` and `*cpu*core*`, fold and rotation hints name the Option key, and the Bar and Ring range help no longer mentions Yes/No readings.
+- Support reports count the readings of the health source (`sourceRows.health`) and the computed readings (`computedRows`).
+
 ## 1.0.1.0 - 2026-10-28
 
 - Pressing a Sensor Reading key now cycles MIN, MAX and AVG values that Mac Sensors keeps from the reads since reading started, instead of N/A. They start over after a gap in that reading, and **Value shown** and detail tiles show the same values.
