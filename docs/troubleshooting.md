@@ -13,7 +13,7 @@ Start with the exact text on your key, dial or settings panel header. Mac Sensor
 | Source busy | [Check the first read](#keys-show-source-busy) |
 | No sensor data | [Check every source](#keys-show-no-sensor-data) |
 | Tahoma needed | [Install Tahoma Bold](#keys-show-tahoma-needed) |
-| Bridge failed | [Reinstall the native reader](#keys-show-bridge-failed) |
+| Bridge failed | [Reopen Stream Deck, then reinstall](#keys-show-bridge-failed) |
 | Source error | [Collect the evidence](#keys-show-source-error) |
 | Needs macOS | [Check the runtime](#keys-show-needs-macos) |
 | Sensor missing / pick again, or Sensor missing / waiting on a dial | [Check the saved reading](#keys-show-sensor-missing) |
@@ -30,15 +30,15 @@ When a key cannot show a current reading, it shows a two-line status screen. Dia
 
 ![Seven key status screens: Reading sensors / please wait, Source busy / retrying, Sensor missing / pick again, No sensor data / copy report, Bridge failed / reinstall, Tahoma needed / Open Font Book, and Source error / copy report](assets/img/status.png)
 
-*Production-rendered status screens with sample scenarios. Status screens use fixed colors, so the theme does not change them.*
+*Production-rendered status screens with sample scenarios, drawn with 1.0.2. Status screens use fixed colors, so the theme does not change them. Since 1.1 the second line of **Source busy** reads check again, and of **Bridge failed** reads reopen Stream Deck.*
 
 | Key shows | Dial shows | Meaning |
 | --- | --- | --- |
 | **Reading sensors** / please wait | Reading sensors / please wait | The first read since reading started has not returned yet. |
-| **Source busy** / retrying | Source busy / retrying | The first read has not finished after 15 seconds. |
+| **Source busy** / check again | Source busy / check again | The first read has not finished after 15 seconds. |
 | **No sensor data** / copy report | No sensor data / copy report | Every source answered, but no reading is current. |
 | **Tahoma needed** / Open Font Book | Tahoma needed / Open Font Book | Tahoma Bold was not found. Fixed image. |
-| **Bridge failed** / reinstall | Bridge failed / reinstall | The native reader could not be used. |
+| **Bridge failed** / reopen Stream Deck | Bridge failed / reopen Stream Deck | The native reader could not be used. |
 | **Source error** / copy report | Source error / copy report | A read failed with no more specific cause. |
 | **Needs macOS** / check requirements | Needs macOS / check requirements | The Node runtime that started the plugin is not macOS on arm64 or x86_64. |
 | **Pick a sensor** / in settings | Mac Sensors / rotate to pick | No reading selected yet. |
@@ -324,7 +324,7 @@ Check these first:
 
 If it still fails, [open an issue on GitHub](https://github.com/slawrensen/mac-sensors-streamdeck/issues) and include:
 
-1. **What you see**: the exact status text, for example "Source busy / retrying", or a photo of the key or dial.
+1. **What you see**: the exact status text, for example "Source busy / check again", or a photo of the key or dial.
 2. **The installed plugin version**, from the support report's `plugin` field, and where you got the package.
 3. **The Mac model, chip and macOS version**, from the support report.
 4. **The Stream Deck app version and deck model**, for example Stream Deck +.

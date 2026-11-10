@@ -6,7 +6,16 @@ import {test} from 'node:test';
 import sharp from 'sharp';
 import {composeScenes,sampleReadings,sampleSnapshot,sampleGroups,PROVIDER_GROUPS,boardDefinitions,boardFooter} from '../../scripts/lib/mac-scenes';
 import {DETAIL_PROFILES} from '../../src/detail/managed-profiles';
+import {statusScreen} from '../../src/mac/state-screens';
+import {renderStatusKey} from '../../src/ui/key-renderer';
+import type {PollerStatus} from '../../src/poller';
 const hash=(bytes:Buffer|string)=>createHash('sha256').update(bytes).digest('hex');
+/**
+ * Status faces whose second line changed in 1.1 after the boards were drawn, with the line the status board shows. The boards cannot be
+ * redrawn until the private Qt adapter is measured again for the current app (the scene hashes pin what was drawn), and
+ * docs/status-screens.md says which lines the image shows. Empty again once the boards are redrawn.
+ */
+const DRAWN_SECOND_LINE:Record<string,string>={'status-busy':'retrying','status-bridge-failed':'reinstall'};
 const pngsIn=(dir:string)=>fs.readdirSync(dir).filter(file=>file.endsWith('.png')).sort();
 test('documentation boards recompose from production code and fixed public sample inputs',()=>{
 	const provenance=JSON.parse(fs.readFileSync('docs/assets/img/renderer-images.provenance.json','utf8')) as {version:string;readings:unknown;scenes:{id:string;svgSha256:string}[];assets:{file:string;sha256:string;sceneIds:string[]}[]};
@@ -14,7 +23,14 @@ test('documentation boards recompose from production code and fixed public sampl
 	// so a version bump alone needs no redraw; the measured Qt adapter is private and tied to one app build.
 	assert.match(provenance.version,/^\d+\.\d+\.\d+$/);assert.deepEqual(JSON.parse(JSON.stringify(sampleReadings)),provenance.readings);
 	const scenes=composeScenes();assert.equal(scenes.length,provenance.scenes.length);
-	for(const scene of scenes)assert.equal(hash(scene.svg),provenance.scenes.find(row=>row.id===scene.id)?.svgSha256,scene.id);
+	for(const scene of scenes){
+		const recorded=provenance.scenes.find(row=>row.id===scene.id)?.svgSha256,drawn=DRAWN_SECOND_LINE[scene.id];
+		if(drawn===undefined){assert.equal(hash(scene.svg),recorded,scene.id);continue;}
+		// A face whose second line changed after its board was drawn: today's face is the same face with only that line changed.
+		const face=statusScreen({state:'unavailable',reason:scene.id.replace('status-',''),message:''} as PollerStatus)!;
+		assert.equal(scene.svg,renderStatusKey(face),scene.id);assert.notEqual(face.lines[1],drawn,`${scene.id} matches its board again: drop it from DRAWN_SECOND_LINE`);
+		assert.equal(hash(renderStatusKey({...face,lines:[face.lines[0]!,drawn]})),recorded,scene.id);
+	}
 	for(const asset of provenance.assets){assert.equal(hash(fs.readFileSync(path.join('docs/assets/img',asset.file))),asset.sha256,asset.file);assert.deepEqual(asset.sceneIds,boardDefinitions.find(board=>board.id+'.png'===asset.file)?.scenes);assert.equal(hash(fs.readFileSync(path.join('.github/readme',asset.file))),asset.sha256);}
 	// Every board has a pinned image, and the README folder carries no image the provenance does not pin.
 	assert.deepEqual(provenance.assets.map(asset=>asset.file).sort(),boardDefinitions.map(board=>board.id+'.png').sort());

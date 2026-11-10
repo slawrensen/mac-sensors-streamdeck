@@ -274,17 +274,17 @@ A two-line status replaces the value when the key cannot show a reading. The sav
 
 ![Seven key status screens: Reading sensors / please wait, Source busy / retrying, Sensor missing / pick again, No sensor data / copy report, Bridge failed / reinstall, Tahoma needed / Open Font Book, and Source error / copy report](assets/img/status.png)
 
-*Production-rendered status screens with sample scenarios.*
+*Production-rendered status screens with sample scenarios, drawn with 1.0.2. Since 1.1 the second line of **Source busy** reads check again, and of **Bridge failed** reads reopen Stream Deck.*
 
 | Key shows | Meaning | What to do |
 | --- | --- | --- |
 | **Pick a sensor** / in settings | The key works, but no reading is selected yet. | Type in the **Reading** box and choose a reading. |
 | **Reading sensors** / please wait | No reading has arrived since reading started: the first read is still out. | Wait for the first read. |
 | **Sensor missing** / pick again | A reading is selected, but this Mac does not report it right now. | Choose **Reload sensor list** or **Pick another reading**; see [Reading](#reading). |
-| **Source busy** / retrying | 15 seconds after reading started, the first read has still not finished. | Choose **Check again**. |
+| **Source busy** / check again | 15 seconds after reading started, the first read has still not finished. | Choose **Check again**. |
 | **No sensor data** / copy report | Every source answered, but no reading is current. | Choose **Check again**. If it stays, choose **Copy support report** under **Advanced → Support**. |
 | **Tahoma needed** / Open Font Book | The plugin could not find the font Tahoma Bold. | Install Tahoma Bold in Font Book, then choose **Check again**. |
-| **Bridge failed** / reinstall | The native reader for the Node runtime's architecture could not be used. | Quit and reopen Stream Deck. If it persists, see [Keys show Bridge failed](troubleshooting.html#keys-show-bridge-failed). |
+| **Bridge failed** / reopen Stream Deck | The native reader for the Node runtime's architecture could not be used. | Quit and reopen Stream Deck. If it persists, see [Keys show Bridge failed](troubleshooting.html#keys-show-bridge-failed). |
 | **Source error** / copy report | A read failed in a way that has no more specific screen. | Choose **Check again**. If it stays, choose **Copy support report** under **Advanced → Support**. |
 | **Needs macOS** / check requirements | The plugin is not running on macOS with an arm64 or x86_64 Node runtime. | See [Installation and requirements](installation.html#system-requirements). |
 

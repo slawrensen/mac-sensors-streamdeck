@@ -241,10 +241,10 @@ When sensor data is not available, the touchscreen shows a short two-line messag
 | Touchscreen | Meaning and next step |
 | --- | --- |
 | **Reading sensors** / please wait | No reading has arrived since sensor reading started, or every reading lapsed or failed before a full read had completed. Readings appear after the next successful read. |
-| **Source busy** / retrying | The first read has not finished 15 seconds after reading started. Choose **Check again** in the settings panel. |
+| **Source busy** / check again | The first read has not finished 15 seconds after reading started. Choose **Check again** in the settings panel. |
 | **No sensor data** / copy report | Every source answered, but no reading is current. Choose **Check again**; if it stays, choose **Copy support report** under **Advanced**, **Support**. |
 | **Needs macOS** / check requirements | The Node runtime is not macOS on arm64 or x86_64. See [Installation and requirements](installation.html). |
-| **Bridge failed** / reinstall | The native reader could not load. Quit and reopen Stream Deck. If it persists, see [Keys show Bridge failed](troubleshooting.html#keys-show-bridge-failed). |
+| **Bridge failed** / reopen Stream Deck | The native reader could not load. Quit and reopen Stream Deck. If it persists, see [Keys show Bridge failed](troubleshooting.html#keys-show-bridge-failed). |
 | **Tahoma needed** / Open Font Book | A fixed image, drawn without Tahoma. Install Tahoma Bold in Font Book, then choose **Check again**. |
 | **Source error** / copy report | A read failed in a way no other screen covers. Choose **Check again**; if it stays, choose **Copy support report** under **Advanced**, **Support**. |
 

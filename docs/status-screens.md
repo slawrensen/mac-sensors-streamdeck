@@ -11,17 +11,17 @@ A status screen never changes saved settings. The selected reading, its label, c
 
 ![Seven key status screens: Reading sensors / please wait, Source busy / retrying, Sensor missing / pick again, No sensor data / copy report, Bridge failed / reinstall, Tahoma needed / Open Font Book, and Source error / copy report](assets/img/status.png)
 
-*Production-rendered status screens with sample scenarios. Status screens use fixed colors, so the theme does not change them.*
+*Production-rendered status screens with sample scenarios, drawn with 1.0.2. Status screens use fixed colors, so the theme does not change them. Since 1.1 the second line of **Source busy** reads check again, and of **Bridge failed** reads reopen Stream Deck.*
 
 ## Key screens
 
 | Key shows | Looks like | What it means | What to do |
 | --- | --- | --- | --- |
 | **Reading sensors** / please wait | Blue clock | No reading has arrived since reading started: the first read is still out. It also returns if every reading lapses or fails before the first SMC read of that session has answered. | Wait for the first read. If it has still not finished after 15 seconds, the key changes to **Source busy**. |
-| **Source busy** / retrying | Amber clock | 15 seconds after reading started, the first read has still not finished: no system counter read has succeeded and at least one source has not answered. | Choose **Check again**. If it stays, choose **Copy support report** under **Advanced**, **Support** first, then quit and reopen the Stream Deck app, which restarts the plugin. |
+| **Source busy** / check again | Amber clock | 15 seconds after reading started, the first read has still not finished: no system counter read has succeeded and at least one source has not answered. | Choose **Check again**. If it stays, choose **Copy support report** under **Advanced**, **Support** first, then quit and reopen the Stream Deck app, which restarts the plugin. |
 | **No sensor data** / copy report | Amber warning triangle | Every source answered, but no reading is current: every reading failed, was withheld or expired. It can appear briefly after the Mac wakes from a sleep longer than 15 seconds. | Choose **Check again**. If it stays, choose **Copy support report** under **Advanced**, **Support** and file an issue. |
 | **Tahoma needed** / Open Font Book | Fixed image: blue square outline above the two lines | macOS did not return Tahoma Bold. Readings are hidden until it is available. The screen is stored as pixels, so it draws without the font. | Install Tahoma Bold in Font Book, or turn it on. The screen clears on the next read; **Check again** only makes that read happen at once. See [Keys show Tahoma needed](troubleshooting.html#keys-show-tahoma-needed). |
-| **Bridge failed** / reinstall | Red warning triangle | The native reader for this processor could not be used. The result is kept until the plugin restarts. | Quit and reopen Stream Deck. If it persists, remove Mac Sensors and install it again. See [Removing](installation.html#removing) and [Keys show Bridge failed](troubleshooting.html#keys-show-bridge-failed). |
+| **Bridge failed** / reopen Stream Deck | Red warning triangle | The native reader for this processor could not be used. The result is kept until the plugin restarts. | Quit and reopen Stream Deck. If it persists, remove Mac Sensors and install it again. See [Removing](installation.html#removing) and [Keys show Bridge failed](troubleshooting.html#keys-show-bridge-failed). |
 | **Source error** / copy report | Red warning triangle | A read failed in a way no other screen covers. Known causes: the native reader's clock returned no usable time, or the other sources answered but the system counter read failed, so the font check that runs with it could not run. | Choose **Check again**. If it stays, copy a support report first, then quit and reopen the Stream Deck app, and file an issue. |
 | **Needs macOS** / check requirements | Red warning triangle | The Node runtime that started the plugin is not macOS on arm64 or x86_64. With the runtime the Stream Deck app supplies, this screen is not expected. | Check [Installation and requirements](installation.html), then copy a support report. |
 | **Pick a sensor** / in settings | Blue target | The key works, but no reading is selected yet. | Open the key's settings, type in the **Reading** box and choose a reading. |
@@ -55,10 +55,10 @@ Dials show the same states in the touchscreen's title and value lines:
 | Dial title | Dial value | Notes |
 | --- | --- | --- |
 | Reading sensors | please wait | |
-| Source busy | retrying | |
+| Source busy | check again | |
 | No sensor data | copy report | |
 | Tahoma needed | Open Font Book | Fixed image, like the key screen |
-| Bridge failed | reinstall | |
+| Bridge failed | reopen Stream Deck | |
 | Source error | copy report | |
 | Needs macOS | check requirements | |
 | Mac Sensors | rotate to pick | No reading selected yet; the bottom line says "or use the settings panel" |
