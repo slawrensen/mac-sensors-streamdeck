@@ -373,7 +373,7 @@ static void drive(source_packet *packet) {
 	}
 	IOObjectRelease(iterator);
 	if (drives == 0) return;
-	sensor_row *row = new_row(packet, "ssd-temperature", "Internal SSD", "Storage", "temperature", "°C");
+	sensor_row *row = new_row(packet, "ssd-temperature", "SSD SMART", "Storage", "temperature", "°C");
 	if (row == NULL) packet->error = 12;
 	/* One key cannot name two internal drives, so a Mac with more than one gets no value instead of an arbitrary one. */
 	else if (drives > 1) row->error = 13;

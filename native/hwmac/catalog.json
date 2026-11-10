@@ -191,7 +191,7 @@
     },
     {
       "key": "TW0P",
-      "label": "Airport",
+      "label": "Wi-Fi",
       "group": "System",
       "type": "temperature",
       "scope": "common",
@@ -199,8 +199,8 @@
     },
     {
       "key": "TH0x",
-      "label": "NAND",
-      "group": "System",
+      "label": "SSD",
+      "group": "Storage",
       "type": "temperature",
       "scope": "apple",
       "sourceLine": 569
@@ -552,7 +552,7 @@
     {
       "key": "Tm02",
       "label": "Memory 1",
-      "group": "System",
+      "group": "Memory",
       "type": "temperature",
       "scope": "m1",
       "sourceLine": 405
@@ -560,7 +560,7 @@
     {
       "key": "Tm06",
       "label": "Memory 2",
-      "group": "System",
+      "group": "Memory",
       "type": "temperature",
       "scope": "m1",
       "sourceLine": 406
@@ -568,7 +568,7 @@
     {
       "key": "Tm08",
       "label": "Memory 3",
-      "group": "System",
+      "group": "Memory",
       "type": "temperature",
       "scope": "m1",
       "sourceLine": 407
@@ -576,7 +576,7 @@
     {
       "key": "Tm09",
       "label": "Memory 4",
-      "group": "System",
+      "group": "Memory",
       "type": "temperature",
       "scope": "m1",
       "sourceLine": 408
@@ -1078,7 +1078,7 @@
     {
       "key": "Tm0p",
       "label": "Memory 1",
-      "group": "System",
+      "group": "Memory",
       "type": "temperature",
       "scope": "m4",
       "sourceLine": 483
@@ -1086,7 +1086,7 @@
     {
       "key": "Tm1p",
       "label": "Memory 2",
-      "group": "System",
+      "group": "Memory",
       "type": "temperature",
       "scope": "m4",
       "sourceLine": 484
@@ -1094,7 +1094,7 @@
     {
       "key": "Tm2p",
       "label": "Memory 3",
-      "group": "System",
+      "group": "Memory",
       "type": "temperature",
       "scope": "m4",
       "sourceLine": 485
@@ -1995,15 +1995,15 @@
     },
     {
       "key": "VM0R",
-      "label": "Memory",
-      "group": "System",
+      "label": "RAM voltage",
+      "group": "Memory",
       "type": "voltage",
       "scope": "common",
       "sourceLine": 582
     },
     {
       "key": "VD0R",
-      "label": "DC In",
+      "label": "DC in voltage",
       "group": "System",
       "type": "voltage",
       "scope": "common",
@@ -2011,23 +2011,23 @@
     },
     {
       "key": "IC0R",
-      "label": "CPU High side",
-      "group": "System",
+      "label": "CPU high side",
+      "group": "CPU",
       "type": "current",
       "scope": "common",
       "sourceLine": 595
     },
     {
       "key": "IG0R",
-      "label": "GPU High side",
-      "group": "System",
+      "label": "GPU high side",
+      "group": "GPU",
       "type": "current",
       "scope": "common",
       "sourceLine": 596
     },
     {
       "key": "ID0R",
-      "label": "DC In",
+      "label": "DC in current",
       "group": "System",
       "type": "current",
       "scope": "common",
@@ -2035,7 +2035,7 @@
     },
     {
       "key": "IBAC",
-      "label": "Battery",
+      "label": "Battery current",
       "group": "Battery",
       "type": "current",
       "scope": "common",
@@ -2043,7 +2043,7 @@
     },
     {
       "key": "PCPC",
-      "label": "CPU Package",
+      "label": "CPU package",
       "group": "CPU",
       "type": "power",
       "scope": "common",
@@ -2051,7 +2051,7 @@
     },
     {
       "key": "PCTR",
-      "label": "CPU Total",
+      "label": "CPU total",
       "group": "CPU",
       "type": "power",
       "scope": "common",
@@ -2075,7 +2075,7 @@
     },
     {
       "key": "PG0C",
-      "label": "GPU",
+      "label": "GPU power",
       "group": "GPU",
       "type": "power",
       "scope": "common",
@@ -2091,7 +2091,7 @@
     },
     {
       "key": "PPBR",
-      "label": "Battery",
+      "label": "Battery power",
       "group": "Battery",
       "type": "power",
       "scope": "common",
@@ -2099,7 +2099,7 @@
     },
     {
       "key": "PDTR",
-      "label": "DC In",
+      "label": "DC in power",
       "group": "System",
       "type": "power",
       "scope": "common",
@@ -2107,15 +2107,15 @@
     },
     {
       "key": "PMTR",
-      "label": "Memory Total",
-      "group": "System",
+      "label": "RAM power",
+      "group": "Memory",
       "type": "power",
       "scope": "common",
       "sourceLine": 628
     },
     {
       "key": "PSTR",
-      "label": "System Total",
+      "label": "System total",
       "group": "System",
       "type": "power",
       "scope": "common",

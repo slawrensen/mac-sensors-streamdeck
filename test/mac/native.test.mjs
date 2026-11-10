@@ -225,7 +225,7 @@ test('the production health source names only public battery and drive rows and 
 	assert.notEqual(process.getuid(),0,'run as the logged-in user, never root');
 	const session=production.open();let packet;try{packet=await session.read('health');}finally{session.close();}
 	assert.equal(packet.source,'health');assert.equal(packet.error,0);assert.equal(packet.operation,'health.read');
-	const allowed={'battery-cycles':['Battery cycles','Battery','count','cycles'],'battery-health':['Battery health','Battery','percent','%'],'ssd-temperature':['Internal SSD','Storage','temperature','°C']};
+	const allowed={'battery-cycles':['Battery cycles','Battery','count','cycles'],'battery-health':['Battery health','Battery','percent','%'],'ssd-temperature':['SSD SMART','Storage','temperature','°C']};
 	assert.equal(new Set(packet.rows.map(row=>row.key)).size,packet.rows.length);
 	for(const row of packet.rows){assert.deepEqual([row.label,row.group,row.kind,row.unit],allowed[row.key],row.key);if(row.valid)assert.ok(Number.isFinite(row.value)&&row.continuousMs<=packet.continuousMs,row.key);else assert.notEqual(row.error,0,row.key);}
 });

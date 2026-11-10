@@ -50,6 +50,20 @@ test('numbered names follow one pattern per kind',()=>{
 	const numbered=/^(?:(?:Super|Perf|Eff) core|Super zone|CPU sensor|GPU region|GPU|Memory|Fan) [1-9][0-9]?(?: (?:target|min|max))?$/;
 	for(const entry of catalog.filter(item=>/[0-9]/.test(item.label)&&item.key!=='TB2T'))assert.match(entry.label,numbered,`${entry.scope} ${entry.key}`);
 });
+test('no two names one Mac can show look alike once case is ignored',()=>{
+	// The measured Mac17,9, and a Mac on each chip family table: common and Apple silicon rows, its own rows, the system counters, health rows and computed readings.
+	const own:[string,(entry:CatalogRow)=>boolean][]=[['Mac17,9',entry=>entry.scope==='Mac17,9'||(entry.scope==='m5'&&(!entry.variants||entry.variants.includes('pro')))],...['m1','m2','m3','m4','m5','m6','a18pro'].map(name=>[name,(entry:CatalogRow)=>entry.scope===name] as [string,(entry:CatalogRow)=>boolean])];
+	const derived=everyName().filter(name=>name.from.startsWith('counter')||name.from.startsWith('computed')).map(name=>name.label);
+	for(const [name,mine] of own) {
+		// One variant at a time: M4 and M5 give some keys only to some variants, under the same name.
+		const variants=[...new Set(catalog.filter(entry=>entry.scope===name).flatMap(entry=>entry.variants??[]))];
+		for(const variant of variants.length?variants:[null]) {
+			const rows=catalog.filter(entry=>entry.scope==='common'||entry.scope==='apple'||(mine(entry)&&(variant===null||!entry.variants||entry.variants.includes(variant))));
+			const labels=[...rows.map(entry=>entry.label),...nativeNamed.map(entry=>entry.label),...new Set(derived)].map(label=>label.toLowerCase());
+			for(const label of new Set(labels))assert.equal(labels.filter(item=>item===label).length,1,`${name} ${variant??''}: "${label}"`);
+		}
+	}
+});
 /**
  * The 89 readings the measured Mac17,9 showed under 1.0.2 (test/mac/fixtures/mac17-9-readings-1.0.2.json, from npm run probe).
  * A saved key stores one of these identities, so each must still be produced, whatever its label or group now is.
@@ -72,6 +86,10 @@ test('every reading a 1.0.2 key could be saved on keeps its identity under the n
 	await answer('smc',smc);await answer('health',{...publicPacket(1000,0,0),source:'health',rows:health.map(item=>({...item,continuousMs:1000,wallSeconds:1.7e9+1}))});
 	const snapshot=provider.current();assert.ok(snapshot);
 	for(const reading of READINGS_1_0_2)assert.ok(snapshot.byKey.has(reading.identity),`${reading.label} (${reading.identity}) is no longer produced`);
+	// A group is not part of an identity either: the drive sensor moved from System to Storage and kept its key.
+	const groupNow=(identity:string)=>snapshot.sensors[snapshot.byKey.get(identity)!.sensorIndex]?.name;
+	const moved=READINGS_1_0_2.filter(reading=>groupNow(reading.identity)!==reading.group).map(reading=>`${reading.label}: ${reading.group} to ${groupNow(reading.identity)}`);
+	assert.deepEqual(moved,['NAND: System to Storage']);
 	assert.equal(snapshot.readings.length,READINGS_1_0_2.length,'no reading appeared or vanished, only names changed');
 	provider.close();
 });

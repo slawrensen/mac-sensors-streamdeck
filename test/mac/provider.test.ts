@@ -245,7 +245,7 @@ test('computed readings expire with their oldest input when SMC stops answering'
 const HEALTH_MIN_SPACING_MS=1500;
 const CYCLES='mac:v1:health:battery-cycles:count.v1',BATTERY_HEALTH='mac:v1:health:battery-health:percent.v1',SSD='mac:v1:health:ssd-temperature:temp.v1';
 type HealthRow=[key:string,label:string,group:string,kind:string,unit:string,value:number];
-const HEALTH_ROWS:HealthRow[]=[['battery-cycles','Battery cycles','Battery','count','cycles',82],['battery-health','Battery health','Battery','percent','%',92.1],['ssd-temperature','Internal SSD','Storage','temperature','°C',35.85]];
+const HEALTH_ROWS:HealthRow[]=[['battery-cycles','Battery cycles','Battery','count','cycles',82],['battery-health','Battery health','Battery','percent','%',92.1],['ssd-temperature','SSD SMART','Storage','temperature','°C',35.85]];
 function healthPacket(at:number,rows:HealthRow[]=HEALTH_ROWS):NativePacket {const next=packet('health',at);next.rows=rows.map(([key,label,group,kind,unit,value])=>({...smcRow(key,group,kind,unit,value,at),label}));return next;}
 async function readAll(r:ReturnType<typeof rig>,at:number,health:NativePacket|null=healthPacket(at)):Promise<SensorSnapshot>{r.clock.now=at;r.provider.read();await publish(r,'public',packet('public',at));await publish(r,'smc',packet('smc',at));if(health)await publish(r,'health',health);return r.provider.current()!;}
 // Chip family tables: Macs that read a family's rows without their own model having been measured.
@@ -310,7 +310,7 @@ test('a Mac with no chip family table gets no CPU readings but keeps the fan and
 	assert.deepEqual(names(computedRows(M2_MODEL,'t6021',inputs,false)),['computer-average','hottest-sensor'],'no table, no CPU readings');
 	assert.deepEqual(computedRows(M2_MODEL,'t6021',inputs,true).map(row=>[row.key,row.value]),[['cpu-average',50],['cpu-hottest',50],['computer-average',50],['hottest-sensor',50]]);
 	// A sensor that reads 0 or an impossible value stays out of the whole-Mac readings, one fan is no average, and a stopped fan still counts.
-	const mixed=new Map([labelled('T000','Airport','System',0,100),labelled('T001','NAND','System',130,100),labelled('T002','Battery','Battery',30,100),labelled('T003','Airflow left','System',40,100)].map(row=>[row.key,row] as const));
+	const mixed=new Map([labelled('T000','Wi-Fi','System',0,100),labelled('T001','SSD','Storage',130,100),labelled('T002','Battery','Battery',30,100),labelled('T003','Airflow left','System',40,100)].map(row=>[row.key,row] as const));
 	assert.deepEqual(computedRows(M2_MODEL,'t6021',mixed).map(row=>[row.key,row.value]),[['computer-average',35],['hottest-sensor',40]]);
 	assert.deepEqual(names(computedRows(M2_MODEL,'t6021',new Map([['F0Ac',smcRow('F0Ac','Fans','fan','RPM',1000,100)],['F0Tg',smcRow('F0Tg','Fans','fan','RPM',9000,100)]]))),[],'target speed is not a second fan');
 	assert.equal(computedRows(M2_MODEL,'t6021',new Map([['F0Ac',smcRow('F0Ac','Fans','fan','RPM',0,100)],['F1Ac',smcRow('F1Ac','Fans','fan','RPM',3000,100)]]))[0]?.value,1500);
@@ -328,7 +328,7 @@ test('health rows are keyed by a fixed name and meaning, the same on every Mac',
 });
 test('battery cycles, battery health and the internal SSD temperature are accepted as their own source',async()=>{
 	const r=rig();const snapshot=await readAll(r,100);
-	assert.deepEqual([CYCLES,BATTERY_HEALTH,SSD].map(key=>{const reading=snapshot.byKey.get(key);return [reading?.label,groupOf(snapshot,key),reading?.type,reading?.unit,reading?.value];}),[['Battery cycles','Battery',8,'cycles',82],['Battery health','Battery',8,'%',92.1],['Internal SSD','Storage',1,'°C',35.85]]);
+	assert.deepEqual([CYCLES,BATTERY_HEALTH,SSD].map(key=>{const reading=snapshot.byKey.get(key);return [reading?.label,groupOf(snapshot,key),reading?.type,reading?.unit,reading?.value];}),[['Battery cycles','Battery',8,'cycles',82],['Battery health','Battery',8,'%',92.1],['SSD SMART','Storage',1,'°C',35.85]]);
 	assert.deepEqual(r.provider.facts().sourceRows,{public:1,smc:1,health:3});
 	r.provider.close();
 	for(const [value,kept] of [[101,true],[200,true],[200.5,false],[-1,false]] as const){const next=rig();const health=await readAll(next,100,healthPacket(100,[['battery-health','Battery health','Battery','percent','%',value]]));assert.equal(health.byKey.has(BATTERY_HEALTH),kept,`battery health ${value}`);next.provider.close();}
