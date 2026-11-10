@@ -96,6 +96,30 @@ The list covers the rotation set (all groups), or the reading on the dial and th
 
 **Theme text** keeps chosen reading colors exact; **Dimmed** dims them. Leave both number-color controls at their defaults to keep normal text. See [Themes and colors](themes.html).
 
+## Background
+
+A dial on **Theme** covers the picture the Stream Deck app can show on the touch strip. **Background** (Display) lets that picture show behind the dial. To set a picture, right-click the touch strip in the Stream Deck app and choose **Set from File…** or **Open Background Library**.
+
+| Background | What the dial draws | Text over the picture |
+| --- | --- | --- |
+| **Theme** (default) | The theme's background, as in earlier versions. | The picture does not show. |
+| **Glass** | The theme's background as a panel at 80% opacity. | Labels and units draw lighter (darker on **Paper**). Built-in text keeps 4.5:1 contrast over any picture, by calculation. |
+| **Tint** | The theme's background as a panel at 50% opacity, and a 1 px outline on every word and mark. | Built-in text keeps 4.5:1 contrast against its outline, by calculation. |
+| **Outline** | No background, and a 1 px outline on every word, the range bar, the rail mark and the trend line: black on the dark themes, the theme's background on **Paper**. | Built-in text keeps 4.5:1 contrast against its outline, by calculation. |
+| **Clear** | No background and no outline. | No contrast floor. Use a dark, even picture with a dark theme, or a light one with **Paper**. |
+
+The plugin cannot read your picture, so the calculation uses the hardest case: the panel over pure white, or over pure black on **Paper**.
+
+**Words in the accent color** appears under **Background** on Glass, Tint and Outline. The title and the selected row's name take the dial's accent color, and units, statistics and other names move halfway to it, each kept at the same 4.5:1 floor. Values, alert colors and a **Custom color** for text do not change. It is off by default.
+
+On Glass, Tint, Outline and Clear:
+
+- In the two-row view only Glass draws the band behind the selected row. The others mark it with the accent rail and the brighter label.
+- A **Custom color** for text and chosen **Reading colors** stay as chosen and can fall below the floor over a bright picture.
+- The settings panel header cannot show your picture, so it previews a see-through dial over a checkerboard.
+
+Sensor Reading keys are not affected. These looks come from the shared rendering tests; I have not yet judged them on a physical Stream Deck + with Mac Sensors. See [Hardware compatibility](hardware.html).
+
 ## Gestures
 
 These are the **Legacy** preset's gestures, which every dial runs until you pick another preset. [Dial controls and presets](dial-controls.html) covers Elite and Custom, the pressed turn, touch zones, pause and pin, **A stats reset clears** and the Sensor Control key.
@@ -170,6 +194,8 @@ The theme strip, **Reading** and **Display** start open; the other sections star
 | Reading | **Title on the dial** | A custom title. Blank uses the reading's own name, or the name given with **Rename**. |
 | Reading | **Title when the dial moves on** | **Clears (default)**: a custom title clears whenever the dial moves on to another reading, by a turn, a press or touch set to step, a Sensor Control key or the auto cycle. Picking a reading in the settings panel keeps it. **Stays for this dial** keeps it as a fixed title. |
 | Display | **Text color** | **Default** (follows the shared Text color and names it, for example *Default (shared: Theme text)*), **Theme text**, **Dimmed** or **Custom color**. Custom adds **Custom text color** and **Dim labels, units and stats (the value keeps the exact color)**. |
+| Display | **Background** | **Theme** (default) fills the dial's part of the touch strip with the theme's background. **Glass**, **Tint**, **Outline** and **Clear** show the touch strip picture set in the Stream Deck app. See [Background](#background). |
+| Display | **Words in the accent color** | Glass, Tint and Outline only: the title and the selected row's name take the accent color, and units, statistics and other names move halfway to it. Off by default. See [Background](#background). |
 | Display | **View** | **One reading** (default), **Overview, two rows (big values and trend)** or **Overview, three rows**. See [Views](#views). |
 | Display | **Decimals** | **Auto** (default), or a fixed 0, 1, 2 or 3. Auto shows two decimals below 10, one below 100 and none from 100, and shortens values from 10,000 with k, M, G or T; byte and rate units follow the shared **Data units** setting instead. |
 | Display | **°F** (under **Temperature**) | Shows temperatures in °F instead of °C. |

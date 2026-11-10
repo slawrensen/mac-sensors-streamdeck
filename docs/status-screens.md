@@ -64,6 +64,8 @@ Dials show the same states in the touchscreen's title and value lines:
 | Mac Sensors | rotate to pick | No reading selected yet; the bottom line says "or use the settings panel" |
 | Sensor missing | waiting | The saved reading is not reported right now; the bottom line says "reselect in settings" |
 
+On a dial with **Background** set to **Tint**, **Outline** or **Clear**, these screens show their text without the empty range bar; **Glass** keeps it as a faint groove. See [Background](sensor-dial.html#background).
+
 While a dial shows a status screen or **Sensor missing** / **waiting**, turning it does not change its reading. A temporary dropout therefore cannot move the dial off the saved reading, and the dial recovers by itself when the reading returns. A small **pinned** or **cycle paused** label on a live dial is not a status screen; see [Dial controls and presets](dial-controls.html).
 
 Checks of these faces and of dial gestures on a physical Stream Deck + are pending; see [Hardware compatibility](hardware.html).

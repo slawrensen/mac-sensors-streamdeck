@@ -64,6 +64,10 @@ The custom-list editor shows the list as the tiles the page will draw:
 
 The note under the editor counts what the page lists, for example *7 readings across 3 tiles. Grouping is positional: readings flow through the tile sizes in list order, and readings past your groups follow Readings per tile.*
 
+When a confirmed link or a new **Reading** pick makes a listed key the opener's own reading, its cell stays in your tile layout, hidden. Its tile shows one reading fewer, and every other reading keeps its label, stored color and tile. Editing the list or a tile saves the layout you see.
+
+A tile layout last saved by 1.0.2 or earlier keeps its old rule until you next edit the list or a tile, so after such a link or pick its labels and colors can sit one reading off. To move it to the new rule, undo the link or the pick, make any edit while the labels sit right, then link or pick again.
+
 ## The detail page
 
 ![A 15-key Stream Deck detail page in five columns and three rows: a Back tile with CPU super 1 at 62.4 °C and a small return arrow at top left, a title tile reading Custom set over 1-7 / 7, dimmed Previous and Next chevrons down the left column, reading tiles without trend lines for GPU 1, Fan 1, System Total, CPU usage, Memory active, Network receive and Startup volume available, and four empty cells](assets/img/details.png)
