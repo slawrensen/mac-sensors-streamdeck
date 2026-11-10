@@ -28,7 +28,9 @@
 
 _Static_assert(sizeof(HWMAC_CATALOG) / sizeof(HWMAC_CATALOG[0]) <= HWMAC_MAX_CATALOG, "catalog rows");
 size_t hwmac_catalog_count(void) { return sizeof(HWMAC_CATALOG) / sizeof(HWMAC_CATALOG[0]); }
+#if defined(HWMAC_TEST_BUILD) && HWMAC_TEST_BUILD
 const sensor_spec *hwmac_catalog_row(size_t index) { return index < hwmac_catalog_count() ? &HWMAC_CATALOG[index] : NULL; }
+#endif
 /* Chip variant bits: the brand string is the family's brand alone, or the brand followed by one of these names. */
 static unsigned brand_variant(const char *cpu, const char *brand) {
 	size_t length = strlen(brand);
@@ -143,6 +145,12 @@ static void observed(sensor_row *row, double value) {
 	row->valid = isfinite(value) && isfinite(row->continuous_ms) && isfinite(row->wall_seconds);
 	row->value = row->valid ? value : NAN;
 }
+/* A row read by one API call is as old as the start of that call. */
+static void observed_at(sensor_row *row, double value, double acquired, double acquired_wall) {
+	observed(row, value);
+	if (row->valid) { row->continuous_ms = acquired; row->wall_seconds = acquired_wall; row->valid = isfinite(acquired) && isfinite(acquired_wall); }
+	if (!row->valid) row->value = NAN;
+}
 static void system_value(source_packet *packet, const char *key, const char *label, const char *group, double value) {
 	observed(new_row(packet, key, label, group, "other", "B"), value);
 }
@@ -165,7 +173,7 @@ void hwmac_collect_smc(smc_context *context, source_packet *packet) {
 }
 void hwmac_read_smc_rows(smc_context *context, source_packet *packet, smc_transport transport) {
 	bool broken = false;
-	for (size_t i = 0; i < sizeof(HWMAC_CATALOG) / sizeof(HWMAC_CATALOG[0]); i++) {
+	for (size_t i = 0; i < hwmac_catalog_count(); i++) {
 		const sensor_spec *spec = &HWMAC_CATALOG[i];
 		if (!hwmac_row_applies(spec, packet)) continue;
 		sensor_row *row = new_row(packet, spec->key, spec->label, spec->group, spec->kind, unit_for(spec->kind));
@@ -198,9 +206,8 @@ void hwmac_read_smc_rows(smc_context *context, source_packet *packet, smc_transp
 		double value, minimum = spec->minimum, maximum = spec->maximum;
 		if (spec->scope == 2 && !packet->model_measured) { minimum = HWMAC_FAMILY_MINIMUM_C; maximum = HWMAC_FAMILY_MAXIMUM_C; }
 		if (!smc_decode(context->types[i], context->sizes[i], reply + 48, &value) || value < minimum || value > maximum) { row->error = 13; continue; }
-		observed(row, value);
 		/* Age from the start of the actual read, never from a delayed return. */
-		row->continuous_ms = acquired; row->wall_seconds = acquired_wall;
+		observed_at(row, value, acquired, acquired_wall);
 	}
 	if (broken) hwmac_close_smc(context);
 }
@@ -318,12 +325,6 @@ void hwmac_collect_public(source_packet *packet) {
 }
 /* NVMe reports the composite temperature in whole kelvin; this is the SI offset, which the Linux NVMe hwmon driver also uses. */
 #define HWMAC_KELVIN_OFFSET 273.15
-/* A row read by one API call is as old as the start of that call. */
-static void observed_at(sensor_row *row, double value, double acquired, double acquired_wall) {
-	observed(row, value);
-	if (row->valid) { row->continuous_ms = acquired; row->wall_seconds = acquired_wall; row->valid = isfinite(acquired) && isfinite(acquired_wall); }
-	if (!row->valid) row->value = NAN;
-}
 /* 1 when IOPowerSources lists a present internal battery, 0 when it lists none (a desktop), -1 when it cannot answer. */
 static int internal_battery(void) {
 	CFTypeRef info = IOPSCopyPowerSourcesInfo(); if (info == NULL) return -1;

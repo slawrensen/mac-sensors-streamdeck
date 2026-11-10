@@ -135,7 +135,7 @@ export class MacPoller extends EventEmitter {
 	}
 	diagnostics(): Record<string, string | number | boolean | null> {
 		const status = this.getStatus();
-		return { state: status.state, ...(status.state === 'unavailable' ? { reason: status.reason } : { source: 'mac', readings: status.snapshot.readings.length }), intervalMs: this.intervalMs, polling: this.timer !== null, retained: this.refs, sampleAgeMs: this.provider?.age() ?? null };
+		return { state: status.state, ...(status.state === 'unavailable' ? { reason: status.reason, detail: status.message } : { source: 'mac', readings: status.snapshot.readings.length }), intervalMs: this.intervalMs, polling: this.timer !== null, retained: this.refs, sampleAgeMs: this.provider?.age() ?? null };
 	}
 	private accept(snapshot: SensorSnapshot): void {
 		if (!snapshot.readings.length) throw new HwinfoError('no-readable-sensors', 'No readable sensors were found.');

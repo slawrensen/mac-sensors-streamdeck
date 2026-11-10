@@ -231,7 +231,8 @@ export class MacProvider implements SnapshotProvider {
 	private accept(source:NativeSource,packet:NativePacket):void {
 		if(this.closed)return;
 		this.completed.add(source);
-		if(packet.error!==0)this.factsValue.sourceErrors[source]={code:packet.error===10?'HWMAC_NO_SERVICE':packet.error===11?'HWMAC_OPEN':'HWMAC_SOURCE',operation:packet.error===10?'smc.matchService':packet.error===11?'smc.open':`${source}.read`,systemCode:packet.systemCode};
+		// The addon names the error and the operation that failed (addon.c source_error_code), so the report carries its words.
+		if(packet.error!==0)this.factsValue.sourceErrors[source]={code:packet.code,operation:packet.operation,systemCode:packet.systemCode};
 		else delete this.factsValue.sourceErrors[source];
 		const now=this.native.now();
 		if(packet.source!==source||packet.error!==0||!Number.isFinite(now)||!Number.isFinite(packet.continuousMs)||packet.continuousMs>now||now-packet.continuousMs>=TTL_MS||packet.rows.length>128){this.removeSource(source);if(source==='public')this.previousPublic=null;if(source==='smc')this.factsValue.smcKeys={answered:'',absent:'',withheld:''};this.notice(`${source} readings unavailable; other sources continue.`);return;}
@@ -256,7 +257,6 @@ export class MacProvider implements SnapshotProvider {
 		}
 		for(const [key,item] of this.rows)if(item.source===source&&!accepted.has(key)){this.rows.delete(key);this.dirty=true;this.catalogDirty=true;}
 		for(const [key,item] of accepted)this.rows.set(key,item);
-		let direct=0;for(const item of accepted.values())if(!item.computed)direct++;
 		const evidence:SmcTableEvidence=packet.tableMeasured===true?'measured':packet.table?'source':'none';
 		let smcKeys=this.factsValue.smcKeys;
 		if(source==='smc') {
@@ -269,7 +269,7 @@ export class MacProvider implements SnapshotProvider {
 			}
 			smcKeys={answered:answered.join(' '),absent:absent.join(' '),withheld:withheld.join(' ')};
 		}
-		this.factsValue={model:packet.model||'unknown',chip:packet.chip||'unknown',cpu:packet.cpu||'unknown',cores:(packet.perfCores??[]).join(' '),smcTable:packet.table||'',smcTableEvidence:evidence,smcKeys,appleSilicon:packet.appleSilicon<0?null:packet.appleSilicon===1,translation:translationOf(packet.translated,packet.translationError),translationError:packet.translationError,sourceErrors:this.factsValue.sourceErrors,sourceRows:{...this.factsValue.sourceRows,[source]:direct},computedRows:this.factsValue.computedRows};
+		this.factsValue={model:packet.model||'unknown',chip:packet.chip||'unknown',cpu:packet.cpu||'unknown',cores:(packet.perfCores??[]).join(' '),smcTable:packet.table||'',smcTableEvidence:evidence,smcKeys,appleSilicon:packet.appleSilicon<0?null:packet.appleSilicon===1,translation:translationOf(packet.translated,packet.translationError),translationError:packet.translationError,sourceErrors:this.factsValue.sourceErrors,sourceRows:this.factsValue.sourceRows,computedRows:this.factsValue.computedRows};
 		if(packet.translated===1)this.notice('Node is running under translation; sensor interfaces follow the detected hardware.');
 		if(source==='smc'&&evidence==='source')this.notice(`This Mac reads the ${packet.table} chip family sensor table, which has not been measured on this Mac.`);
 		if(source==='smc'&&evidence==='none')this.notice('This model uses common typed sensors; its generation-specific catalog is not qualified.');
@@ -344,10 +344,10 @@ export class MacProvider implements SnapshotProvider {
 		if(!Number.isFinite(now)){this.rows.clear();this.dirty=true;this.catalogDirty=true;this.rebuild();throw new MacSensorError('source-error','The measurement clock is unavailable.');}
 		for(const [key,item] of this.rows)if(now-item.row.continuousMs>=TTL_MS||now<item.row.continuousMs){this.rows.delete(key);this.dirty=true;this.catalogDirty=true;}
 		if(this.dirty)this.rebuild();
-		if(this.fontKnown&&!this.fontAvailable)throw new MacSensorError('font-missing','Install Tahoma Bold in Font Book, then choose Check again.');
-		if(!this.fontKnown&&this.completed.size<NATIVE_SOURCES.length){if(now-this.startedAt>=TTL_MS)throw new MacSensorError('busy','The sensor source is still busy. Choose Check again.');return null;}
-		if(!this.fontKnown)throw new MacSensorError('source-error','The font prerequisite could not be checked. Choose Check again.');
-		if(this.rows.size===0&&this.completed.size===NATIVE_SOURCES.length)throw new MacSensorError('no-readable-sensors','No recent readable sensors were found. Choose Copy support report.');
+		if(this.fontKnown&&!this.fontAvailable)throw new MacSensorError('font-missing','macOS did not return Tahoma Bold.');
+		if(!this.fontKnown&&this.completed.size<NATIVE_SOURCES.length){if(now-this.startedAt>=TTL_MS)throw new MacSensorError('busy','The first read has not finished after 15 seconds.');return null;}
+		if(!this.fontKnown)throw new MacSensorError('source-error','No system counter read has succeeded, so the font check has not run.');
+		if(this.rows.size===0&&this.completed.size===NATIVE_SOURCES.length)throw new MacSensorError('no-readable-sensors','Every source answered, but no reading is current.');
 		return this.rows.size?this.snapshot:null;
 	}
 	/** Ms until the next row expires. No deadline while the clock is not finite: current() has already cleared the rows, and the interval tick rechecks, so a NaN clock cannot drive a 1 ms expiry loop. */

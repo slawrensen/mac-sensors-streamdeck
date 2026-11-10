@@ -7,7 +7,7 @@ import type { SensorSnapshot } from '../../src/hwinfo/types';
 import type { NativeBridge, NativePacket, NativeRow, NativeSource } from '../../src/mac/native-api';
 function packet(source:NativeSource,at=100):NativePacket {
 	const row:NativeRow={key:source==='smc'?'TB1T':'memory-total',label:source==='smc'?'Battery':'Memory total',group:source==='smc'?'Battery':'Memory',kind:source==='smc'?'temperature':'other',unit:source==='smc'?'°C':'B',value:source==='smc'?30:1024,valid:true,continuousMs:at,wallSeconds:1700000000+at/1000,error:0,systemCode:0};
-	return {source,rows:[row],continuousMs:at,awakeMs:at,wallSeconds:row.wallSeconds,durationMs:1,error:0,systemCode:0,operation:'fixture',model:'Mac17,9',chip:'t6050',cpu:'Apple M5 Pro',table:'m5',tableMeasured:true,appleSilicon:1,translated:0,translationError:0,fontAvailable:true,cpuValid:false,cpuTicks:[[10,10,20,0]],networkValid:false,networkIn:'1000',networkOut:'500',networkMembers:'1',storageValid:false,storageRead:'2000',storageWrite:'1000',storageMembers:'2'};
+	return {source,rows:[row],continuousMs:at,awakeMs:at,wallSeconds:row.wallSeconds,durationMs:1,error:0,code:'HWMAC_OK',systemCode:0,operation:`${source}.read`,model:'Mac17,9',chip:'t6050',cpu:'Apple M5 Pro',table:'m5',tableMeasured:true,appleSilicon:1,translated:0,translationError:0,fontAvailable:true,cpuValid:false,cpuTicks:[[10,10,20,0]],networkValid:false,networkIn:'1000',networkOut:'500',networkMembers:'1',storageValid:false,storageRead:'2000',storageWrite:'1000',storageMembers:'2'};
 }
 function rig():{provider:MacProvider;pending:Map<NativeSource,(packet:NativePacket)=>void>;clock:{now:number};events:()=>number;closed:()=>number} {
 	const pending=new Map<NativeSource,(packet:NativePacket)=>void>(),clock={now:100};let events=0,closed=0;
@@ -97,7 +97,7 @@ test('a non-finite clock at the first request still leaves the rebaseline its fu
 	mock.timers.enable({apis:['setTimeout','Date'],now:START_MS});
 	try {
 		const reads:number[]=[];let poisonNext=false;
-		const packet=(source:NativeSource,at:number):NativePacket=>({source,rows:[],continuousMs:at,awakeMs:at,wallSeconds:1.7e9,durationMs:1,error:source==='smc'?12:0,systemCode:0,operation:'fixture',model:'Mac17,9',chip:'t6050',cpu:'Apple M5 Pro',table:'m5',tableMeasured:true,appleSilicon:1,translated:0,translationError:0,fontAvailable:true,cpuValid:false,cpuTicks:[],networkValid:false,networkIn:'0',networkOut:'0',networkMembers:'1',storageValid:false,storageRead:'0',storageWrite:'0',storageMembers:'1'});
+		const packet=(source:NativeSource,at:number):NativePacket=>({source,rows:[],continuousMs:at,awakeMs:at,wallSeconds:1.7e9,durationMs:1,error:source==='smc'?12:0,code:source==='smc'?'HWMAC_BOUNDS':'HWMAC_OK',systemCode:0,operation:'fixture',model:'Mac17,9',chip:'t6050',cpu:'Apple M5 Pro',table:'m5',tableMeasured:true,appleSilicon:1,translated:0,translationError:0,fontAvailable:true,cpuValid:false,cpuTicks:[],networkValid:false,networkIn:'0',networkOut:'0',networkMembers:'1',storageValid:false,storageRead:'0',storageWrite:'0',storageMembers:'1'});
 		const bridge:NativeBridge={getBuildInfo:()=>({protocol:1,napi:8,version:'t',sourceId:'t',arch:process.arch,platform:'darwin',testHooks:true}),now:()=>{if(poisonNext){poisonNext=false;return NaN;}return Date.now();},open:()=>({read:(source)=>{const at=Date.now();if(source==='public'){reads.push(at-START_MS);poisonNext=reads.length===1;}return new Promise(resolve=>setTimeout(()=>resolve(packet(source,at)),READ_MS));},close:()=>{}})};
 		const provider=new MacProvider(bridge,()=>{});provider.read();
 		for(let i=0;i<400;i++){mock.timers.tick(1);await new Promise(resolve=>setImmediate(resolve));}
@@ -350,8 +350,9 @@ test('the health source is read at most every 1.5 s and its readings keep their 
 });
 test('a failed, missing or expired health read removes only health readings',async()=>{
 	const r=rig();await readAll(r,100);
-	const failed=healthPacket(1700);failed.error=12;let snapshot=await readAll(r,1700,failed);
-	assert.deepEqual([CYCLES,BATTERY_HEALTH,SSD].filter(key=>snapshot.byKey.has(key)),[]);assert.equal(snapshot.readings.length,2,'system and SMC readings stay');assert.equal(r.provider.facts().sourceErrors.health?.operation,'health.read');
+	const failed=healthPacket(1700);failed.error=12;failed.code='HWMAC_BOUNDS';failed.systemCode=7;let snapshot=await readAll(r,1700,failed);
+	assert.deepEqual([CYCLES,BATTERY_HEALTH,SSD].filter(key=>snapshot.byKey.has(key)),[]);assert.equal(snapshot.readings.length,2,'system and SMC readings stay');
+	assert.deepEqual(r.provider.facts().sourceErrors.health,{code:'HWMAC_BOUNDS',operation:'health.read',systemCode:7},'the report keeps the addon\'s own name for the error');
 	snapshot=await readAll(r,3300,healthPacket(3300,HEALTH_ROWS.slice(0,2)));assert.deepEqual([CYCLES,BATTERY_HEALTH,SSD].filter(key=>snapshot.byKey.has(key)),[CYCLES,BATTERY_HEALTH],'a drive row missing from the packet is a gap');
 	r.clock.now=3300+TTL_MS;assert.throws(()=>r.provider.current(),{reason:'no-readable-sensors'},'health rows expire on the same TTL as every other reading');
 	r.provider.close();

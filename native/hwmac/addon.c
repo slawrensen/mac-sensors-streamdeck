@@ -42,7 +42,10 @@ static const char HWMAC_METADATA[] =
 typedef struct module_state module_state;
 typedef struct session session;
 typedef struct read_job read_job;
+#if HWMAC_TEST_BUILD
+/* A test build's scripted answer for one source: delay, fault and value. The production addon has none of this state. */
 typedef struct { unsigned delay_ms; int fault; double value; } fake_source;
+#endif
 /* Read slots by index. A new name here is additive: the loader pairs JS and native by sourceId, so a peer never sees an unknown name. */
 #define HWMAC_SOURCES 3
 static const char *const SOURCE_NAMES[HWMAC_SOURCES] = { "public", "smc", "health" };
@@ -52,8 +55,10 @@ struct module_state {
 	unsigned references;
 	bool closing;
 	read_job *pending[HWMAC_SOURCES];
+#if HWMAC_TEST_BUILD
 	fake_source fake[HWMAC_SOURCES];
 	unsigned fake_revision;
+#endif
 };
 struct session {
 	module_state *state;
@@ -68,8 +73,10 @@ struct read_job {
 	napi_async_work work;
 	napi_deferred deferred;
 	napi_ref owner_ref;
+#if HWMAC_TEST_BUILD
 	fake_source fake;
 	unsigned revision;
+#endif
 	source_packet packet;
 };
 static const napi_type_tag SESSION_TAG = { UINT64_C(0x6dda082377f34b53), UINT64_C(0x8c42e1ce6437961a) };
@@ -237,8 +244,9 @@ static napi_value read_source(napi_env env, napi_callback_info info) {
 	if (atomic_load(&owner->closed) || state->closing) return fail(env, "HWMAC_CLOSED", "read", "The sensor session has closed.");
 	if (state->pending[index] != NULL) return fail(env, "HWMAC_BUSY", "read", "This source already has a pending read.");
 	read_job *job = calloc(1, sizeof(*job)); if (job == NULL) return fail(env, "HWMAC_MEMORY", "read", "Native allocation failed.");
-	job->state = state; job->owner = owner; job->source = index; job->fake = state->fake[index]; job->revision = ++state->fake_revision;
+	job->state = state; job->owner = owner; job->source = index;
 #if HWMAC_TEST_BUILD
+	job->fake = state->fake[index]; job->revision = ++state->fake_revision;
 	job->packet.continuous_ms = hwmac_continuous_ms(); job->packet.awake_ms = hwmac_awake_ms();
 	struct timespec acquisition; job->packet.wall_seconds = clock_gettime(CLOCK_REALTIME, &acquisition) == 0 ? (double)acquisition.tv_sec + (double)acquisition.tv_nsec / 1e9 : NAN;
 #endif
@@ -474,7 +482,10 @@ static napi_value test_network(napi_env env, napi_callback_info info) {
 #endif
 NAPI_MODULE_INIT() {
 	module_state *state = calloc(1, sizeof(*state)); if (state == NULL) return fail(env, "HWMAC_MEMORY", "initialize", "Native allocation failed.");
-	state->env = env; state->references = 2; state->fake[0].value = 68719476736.0; state->fake[1].value = 30.0; state->fake[2].value = 82.0;
+	state->env = env; state->references = 2;
+#if HWMAC_TEST_BUILD
+	state->fake[0].value = 68719476736.0; state->fake[1].value = 30.0; state->fake[2].value = 82.0;
+#endif
 	napi_status status = napi_set_instance_data(env, state, finalize_state, NULL);
 	if (status != napi_ok) { free(state); return fail(env, "HWMAC_API", "initialize", "Could not register native state."); }
 	status = napi_add_async_cleanup_hook(env, cleanup, state, &state->hook);

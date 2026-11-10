@@ -65,7 +65,6 @@ typedef struct {
 	uint32_t types[HWMAC_MAX_CATALOG], sizes[HWMAC_MAX_CATALOG];
 	/* For a key the SMC reported as not found: reads left before it is asked again (0: asked on this read), and the wait that followed its last answer. */
 	uint8_t absent[HWMAC_MAX_CATALOG], absent_wait[HWMAC_MAX_CATALOG];
-	bool catalog_ready;
 } smc_context;
 #define HWMAC_LINK_NAME 16
 /* The name and full 64-bit byte counters the system reports for one interface index. */
@@ -74,7 +73,10 @@ struct ifaddrs;
 /* Sets family, variant, model_table, model_measured and table from the packet's model, chip, core layout, cpu and apple_silicon. */
 void hwmac_resolve_platform(source_packet *packet);
 size_t hwmac_catalog_count(void);
+#if defined(HWMAC_TEST_BUILD) && HWMAC_TEST_BUILD
+/* The test build's view of one catalog row, for testCatalog. */
 const sensor_spec *hwmac_catalog_row(size_t index);
+#endif
 bool hwmac_row_applies(const sensor_spec *spec, const source_packet *packet);
 /* The read loop over an open connection. The transport is a parameter so the test build can answer as another Mac's SMC. */
 void hwmac_read_smc_rows(smc_context *context, source_packet *packet, smc_transport transport);

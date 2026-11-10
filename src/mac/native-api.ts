@@ -11,7 +11,8 @@ export interface NativePacket {
 	source: NativeSource; rows: NativeRow[];
 	/** Conservative start of this acquisition batch, not callback completion. */
 	continuousMs: number; awakeMs: number; wallSeconds: number; durationMs: number;
-	error: number; systemCode: number; operation: string;
+	/** error is the addon's number for what failed (0: nothing), code its name (addon.c source_error_code) and operation the call that failed. */
+	error: number; code: string; systemCode: number; operation: string;
 	model: string; chip: string; appleSilicon: number; translated: number; translationError: number;
 	/** CPU brand string, the chip family table this Mac reads (empty when none), and whether this model, chip and core layout were measured. */
 	cpu: string; table: string; tableMeasured: boolean;

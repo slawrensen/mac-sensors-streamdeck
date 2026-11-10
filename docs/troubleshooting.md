@@ -92,7 +92,7 @@ The plugin could not use its native reader: a check failed or macOS would not lo
 
 1. Quit and reopen Stream Deck. The new plugin process checks the reader again.
 2. If it persists, export a backup of your Stream Deck profiles, remove Mac Sensors as described in [Removing](installation.html#removing), then open the `.streamDeckPlugin` package again. Removing and reinstalling the same version has not been run on the measured Mac yet.
-3. If the screen returns, copy a support report and file an issue. Include the package's SHA-256 from `shasum -a 256` and the release you got it from.
+3. If the screen returns, copy a support report and file an issue. Include the package's SHA-256 from `shasum -a 256` and the release you got it from. The report's `dataSource` `detail` and the plugin log line `Native reader unavailable:` name the check that failed: the build information, the interface, a missing or unreadable file, the file's SHA-256, or macOS not loading the file.
 
 Do not copy files over the installed plugin folder while the plugin is running. See also [Opening the same version again does nothing](#opening-the-same-version-again-does-nothing).
 
@@ -290,8 +290,8 @@ The report is JSON with these parts:
 | `plugin`, `streamDeckApp`, `macOS` | Installed plugin version, Stream Deck app version and macOS version |
 | `devices` | Each deck by model, type, key grid, encoders and touch strip, with a hashed identifier |
 | `recentEvents` | The last 24 recorded dial and Sensor Control events, with hashed device and reading identities |
-| `mac` | Node version, process architecture, platform, kernel release, the Node path with your home folder shown as `~`, Mac model, chip, CPU name (`cpu`), the chip family table in use and whether it was measured on this model (`smcTable`, `smcTableEvidence`), the SMC key names that answered, are absent or were withheld (`smcKeys`, names only), Apple silicon, translation, and how many readings each source returned (`sourceRows`) and how many were computed (`computedRows`), with any source error (`sourceErrors`); `catalog: "not sampled"` before the first read |
-| `dataSource` | Current state and reason, reading count, effective **Read every**, whether reading is running, how many actions keep it running, and the age of the oldest current reading |
+| `mac` | Node version, process architecture, platform, kernel release, the Node path with your home folder shown as `~`, Mac model, chip, CPU name (`cpu`), the physical cores of each performance level (`cores`, for example `6 12`), the chip family table in use and whether it was measured on this model and core layout (`smcTable`, `smcTableEvidence`), the SMC key names that answered, are absent or were withheld (`smcKeys`, names only), Apple silicon, translation, and how many readings each source returned (`sourceRows`) and how many were computed (`computedRows`), with any source error (`sourceErrors`); `catalog: "not sampled"` before the first read |
+| `dataSource` | Current state and reason, with what failed (`detail`) when there is no reading, reading count, effective **Read every**, whether reading is running, how many actions keep it running, and the age of the oldest current reading |
 | `sensorDial`, `control`, `detailNav` | Dial presets, views and set sizes, visible Sensor Control keys, and detail view state, by hashed identifiers |
 
 How it reports the processor and translation:

@@ -1,3 +1,4 @@
+import streamDeck from '@elgato/streamdeck';
 import { registerDiagnostics } from '../diagnostics';
 import { runtimeFacts } from './runtime';
 import { getBridge } from './bridge';
@@ -13,7 +14,8 @@ export interface MacSnapshotProvider {
 let facts:ProviderFacts|null=null;
 /** The copied entry uses this binding name; its Mac target never loads the Windows reader. */
 export function initHwsm():void {
-	try {getBridge();}catch{/* The action status reports a typed load failure. */}
+	// The action status reports a typed load failure; the log keeps which check failed, a fixed sentence with no path.
+	try {getBridge();}catch(error){streamDeck.logger.createScope('MacSensors').error(`Native reader unavailable: ${(error as Error).message}`);}
 	registerDiagnostics('mac',()=>({...runtimeFacts(),...(facts??{catalog:'not sampled'})}));
 }
 export function openMacProvider(ready:()=>void):MacSnapshotProvider {return new MacProvider(getBridge(),ready,value=>{facts=value;});}
