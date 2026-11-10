@@ -77,5 +77,8 @@ for(const kind of ['production','test','wrong-protocol'])for(const architecture 
 	records.push({kind,architecture,file:path.relative(out,finalFile),unsignedSha256,sha256:createHash('sha256').update(fs.readFileSync(finalFile)).digest('hex'),bytes:fs.statSync(finalFile).size});
 }
 fs.writeFileSync(path.join(out,'build-record.json'),JSON.stringify({sourceId,sourceFiles,nodeHeaders:version,headerArchiveSha256:headerHash,compiler:execFileSync(compiler,['--version'],{encoding:'utf8'}).split('\n')[0],sdk:execFileSync('xcrun',['--sdk','macosx','--show-sdk-version'],{encoding:'utf8'}).trim(),deploymentTarget:'13.5',records},null,2)+'\n');
-fs.writeFileSync('src/mac/native-contract.ts',`// Generated from the native source inputs by scripts/build-native.mjs.\nexport const NATIVE_PROTOCOL = 1;\nexport const NATIVE_VERSION = '1.1.0';\nexport const NATIVE_SOURCE_ID = '${sourceId}';\n`);
+// The protocol and version the addon reports are the ones native/hwmac/version.h compiles in, so the contract reads them from there.
+const versionHeader=fs.readFileSync('native/hwmac/version.h','utf8'),protocol=/^#define HWMAC_PROTOCOL_VERSION ([0-9]+)$/m.exec(versionHeader)?.[1],nativeVersion=/^#define HWMAC_NATIVE_VERSION "([0-9]+\.[0-9]+\.[0-9]+)"$/m.exec(versionHeader)?.[1];
+if(!protocol||!nativeVersion)throw new Error('native/hwmac/version.h lacks HWMAC_PROTOCOL_VERSION or HWMAC_NATIVE_VERSION');
+fs.writeFileSync('src/mac/native-contract.ts',`// Generated from the native source inputs by scripts/build-native.mjs.\nexport const NATIVE_PROTOCOL = ${protocol};\nexport const NATIVE_VERSION = '${nativeVersion}';\nexport const NATIVE_SOURCE_ID = '${sourceId}';\n`);
 console.log(JSON.stringify({sourceId,artifacts:records.map(r=>({file:r.file,bytes:r.bytes,sha256:r.sha256}))}));
