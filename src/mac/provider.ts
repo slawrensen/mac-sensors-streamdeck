@@ -39,21 +39,28 @@ const HEALTH_KEYS=new Set(['battery-cycles','battery-health','ssd-temperature'])
 const SYSTEM_KEYS=new Set(['cpu-total','memory-total','memory-free','memory-active','memory-inactive','memory-wired','memory-compressed','swap-used','disk-root-total','disk-root-available','network-receive','network-send','storage-read','storage-write']);
 /** A reading this provider computes from other readings of one SMC packet. */
 interface ComputedSpec { name:string; label:string; group:string; kind:'temperature'|'fan'; unit:string; reduce:'mean'|'max'; inputs:readonly string[]; }
-/** Mac17,9 core keys, as named in native/hwmac/catalog.json (CPU super cores 1 to 6, then performance cores 1 to 12). */
-const M5_PRO_CORES=['Tp00','Tp04','Tp08','Tp0C','Tp0G','Tp0K','Tp0O','Tp0R','Tp0U','Tp0X','Tp0a','Tp0d','Tp0g','Tp0j','Tp0m','Tp0p','Tp0u','Tp0y'] as const;
+/**
+ * Mac17,9 core keys, as named in native/hwmac/catalog.json: super cores 1 to 6, then performance cores 1 to 12. Measured against TG Pro's
+ * own log through a load swing, and by loading each CPU cluster alone: every Tp key warms with the super cores, the Tm keys are the performance cores.
+ */
+const M5_PRO_CORES=['Tp04','Tp0G','Tp0R','Tp0a','Tp0j','Tp0u','Tm04','Tm0G','Tm0R','Tm0a','Tm0j','Tm0u','Tm1Q','Tm1c','Tm1o','Tm21','Tm2D','Tm2P'] as const;
+/** TG Pro's whole-Mac set on Mac17,9: the cores, its four GPU regions, battery, airflow, trackpad, power, ports, wireless and SSD. Its Battery, Battery Gas Gauge and Battery Management Unit all equal TB1T within rounding, so TB1T counts three times, as it does there. */
+const M5_PRO_WHOLE_MAC=[...M5_PRO_CORES,'Tg08','Tg12','Tg29','Tg3B','TB1T','TB1T','TB1T','TB2T','TaLP','TaRF','TaTP','Ts0P','Ts1P','TCHP','TPSP','TaLT','TaRT','TW0P','TH0x'] as const;
 /**
  * Computed readings exist only where their input set is qualified, as the native model tables are: a fixed
  * list of keys per model and chip, so a missing input can never quietly change what an average covers.
- * TG Pro's CPU Average is within 1 C of the 18 core mean in 99.98 % of its log rows on Mac17,9; its Fan Average
- * covers the two actual speeds. Fan target, minimum and maximum are never inputs.
+ * The mean of these 18 is within 1 °C of TG Pro's CPU Average in 94.7 % of 530 samples taken through CPU and GPU load swings, where it
+ * logs whole degrees 2 seconds apart. Its Fan Average covers the two actual speeds. Fan target, minimum and maximum are never inputs.
  */
 const COMPUTED_TABLES:ReadonlyArray<{model:string;chip:string;readings:readonly ComputedSpec[]}>=[{model:'Mac17,9',chip:'t6050',readings:[
 	{name:'cpu-average',label:'CPU average',group:'CPU',kind:'temperature',unit:'°C',reduce:'mean',inputs:M5_PRO_CORES},
 	{name:'cpu-hottest',label:'CPU hottest core',group:'CPU',kind:'temperature',unit:'°C',reduce:'max',inputs:M5_PRO_CORES},
-	{name:'fan-average',label:'Fan average',group:'Fans',kind:'fan',unit:'RPM',reduce:'mean',inputs:['F0Ac','F1Ac']}
+	{name:'fan-average',label:'Fan average',group:'Fans',kind:'fan',unit:'RPM',reduce:'mean',inputs:['F0Ac','F1Ac']},
+	{name:'computer-average',label:'Computer average',group:'System',kind:'temperature',unit:'°C',reduce:'mean',inputs:M5_PRO_WHOLE_MAC},
+	{name:'hottest-sensor',label:'Hottest sensor',group:'System',kind:'temperature',unit:'°C',reduce:'max',inputs:M5_PRO_WHOLE_MAC}
 ]}];
 /** How a chip family table names a per-core CPU temperature (native/hwmac/catalog.json; test/mac/provider.test.ts pins the match). */
-export const CORE_LABEL=/^CPU (?:super|performance|efficiency) core [1-9][0-9]?$/;
+export const CORE_LABEL=/^CPU (?:(?:super|performance|efficiency) core|sensor) [1-9][0-9]?$/;
 const FAN_SPEED_KEY=/^F[0-7]Ac$/;
 /** A temperature counts toward a whole-Mac reading only inside this window: Stats drops a sensor that reads 0 and one above 110 °C, and treats a CPU sensor outside 10 to 120 °C as broken (Modules/Sensors/readers.swift). */
 const WHOLE_MAC_TEMPERATURE_C=[10,120] as const;
@@ -93,18 +100,17 @@ function overAccepted(specs:readonly AcceptedSpec[],inputs:readonly NativeRow[])
  * On any other Mac that reads a chip family table (familyTable true) the table lists a fixed set of core rows, which
  * of them a chip has is not known ahead, and a core can fail a read on its own, so CPU average and CPU hottest core
  * cover the per-core temperatures accepted from that packet, and are left out when none was. Fan average and the
- * whole-Mac readings cover what was accepted on every Mac.
+ * whole-Mac readings likewise cover what was accepted on any Mac without a fixed list.
  */
 export function computedRows(model:string,chip:string,inputs:ReadonlyMap<string,NativeRow>,familyTable=false):NativeRow[] {
-	const accepted=[...inputs.values()],table=COMPUTED_TABLES.find(item=>item.model===model&&item.chip===chip),rows:NativeRow[]=[];
-	if(table) {
-		for(const spec of table.readings) {
-			const values=spec.inputs.map(key=>inputs.get(key));
-			if(values.some(row=>row===undefined||row.kind!==spec.kind||row.unit!==spec.unit))continue;
-			rows.push(reduced(spec,values as NativeRow[]));
-		}
-	}else rows.push(...overAccepted([...(familyTable?FAMILY_COMPUTED:[]),...FAN_COMPUTED],accepted));
-	rows.push(...overAccepted(WHOLE_MAC_COMPUTED,accepted));
+	const accepted=[...inputs.values()],table=COMPUTED_TABLES.find(item=>item.model===model&&item.chip===chip);
+	if(!table)return overAccepted([...(familyTable?FAMILY_COMPUTED:[]),...FAN_COMPUTED,...WHOLE_MAC_COMPUTED],accepted);
+	const rows:NativeRow[]=[];
+	for(const spec of table.readings) {
+		const values=spec.inputs.map(key=>inputs.get(key));
+		if(values.some(row=>row===undefined||row.kind!==spec.kind||row.unit!==spec.unit))continue;
+		rows.push(reduced(spec,values as NativeRow[]));
+	}
 	return rows;
 }
 /** The SMC firmware status for a key this Mac's SMC does not have; such a key answers it to every key information request. */

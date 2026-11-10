@@ -179,10 +179,12 @@ const CPU_AVERAGE='mac:v1:computed:Mac17%2C9:cpu-average:temp.v1',CPU_HOTTEST='m
 const COMPUTED=[CPU_AVERAGE,CPU_HOTTEST,FAN_AVERAGE];
 const COMPUTER_AVERAGE='mac:v1:computed:Mac17%2C9:computer-average:temp.v1',HOTTEST_SENSOR='mac:v1:computed:Mac17%2C9:hottest-sensor:temp.v1';
 function smcRow(key:string,group:string,kind:string,unit:string,value:number,at:number):NativeRow {return {key,label:key,group,kind,unit,value,valid:true,continuousMs:at,wallSeconds:1700000000+at/1000,error:0,systemCode:0};}
-/** One Mac17,9 SMC packet: cores read 40 to 57 C (mean 48.5, hottest 57), fans 2000 and 3000 RPM, and fan target, minimum and maximum rows that must never enter the fan average. */
+/** The other temperatures of the Mac17,9 whole-Mac set, besides its 18 cores. */
+const WHOLE_MAC_OTHERS=['Tg08','Tg12','Tg29','Tg3B','TB1T','TB2T','TaLP','TaRF','TaTP','Ts0P','Ts1P','TCHP','TPSP','TaLT','TaRT','TW0P','TH0x'];
+/** One Mac17,9 SMC packet: cores read 40 to 57 C (mean 48.5, hottest 57), the rest of the whole-Mac set 30 C, a side sensor that stays out of every average at 99 C, fans 2000 and 3000 RPM, and fan target, minimum and maximum rows that must never enter the fan average. */
 function m5Packet(at:number):NativePacket {
 	const next=packet('smc',at);
-	next.rows=[...CORE_KEYS.map((key,index)=>smcRow(key,'CPU','temperature','°C',40+index,at)),smcRow('F0Ac','Fans','fan','RPM',2000,at),smcRow('F1Ac','Fans','fan','RPM',3000,at),
+	next.rows=[...CORE_KEYS.map((key,index)=>smcRow(key,'CPU','temperature','°C',40+index,at)),...WHOLE_MAC_OTHERS.map(key=>smcRow(key,'System','temperature','°C',30,at)),smcRow('Tp00','CPU','temperature','°C',99,at),smcRow('F0Ac','Fans','fan','RPM',2000,at),smcRow('F1Ac','Fans','fan','RPM',3000,at),
 		smcRow('F0Tg','Fans','fan','RPM',9000,at),smcRow('F1Tg','Fans','fan','RPM',9000,at),smcRow('F0Mn','Fans','fan','RPM',2317,at),smcRow('F1Mn','Fans','fan','RPM',2317,at),smcRow('F0Mx','Fans','fan','RPM',7826,at),smcRow('F1Mx','Fans','fan','RPM',7826,at)];
 	return next;
 }
@@ -193,8 +195,8 @@ test('Mac17,9 gets a CPU average, hottest CPU core and fan average from the actu
 	const r=rig();const snapshot=await readM5(r,100);
 	assert.equal(snapshot.byKey.get(CPU_AVERAGE)?.value,48.5);assert.equal(snapshot.byKey.get(CPU_HOTTEST)?.value,57);assert.equal(snapshot.byKey.get(FAN_AVERAGE)?.value,2500,'target, minimum and maximum rows stay out of the fan average');
 	assert.deepEqual(COMPUTED.map(key=>[snapshot.byKey.get(key)?.label,groupOf(snapshot,key),snapshot.byKey.get(key)?.type,snapshot.byKey.get(key)?.unit]),[['CPU average','CPU',1,'°C'],['CPU hottest core','CPU',1,'°C'],['Fan average','Fans',3,'RPM']]);
-	assert.deepEqual(r.provider.facts().sourceRows,{public:1,smc:CORE_KEYS.length+8,health:0});assert.equal(r.provider.facts().computedRows,5,'computed readings are counted apart from the SMC rows they come from');
-	assert.deepEqual([COMPUTER_AVERAGE,HOTTEST_SENSOR].map(key=>[snapshot.byKey.get(key)?.label,snapshot.byKey.get(key)?.value,groupOf(snapshot,key),snapshot.byKey.get(key)?.unit]),[['Computer average',48.5,'System','°C'],['Hottest sensor',57,'System','°C']],'the whole-Mac readings cover temperatures only, never the fan rows');
+	assert.deepEqual(r.provider.facts().sourceRows,{public:1,smc:CORE_KEYS.length+WHOLE_MAC_OTHERS.length+1+8,health:0});assert.equal(r.provider.facts().computedRows,5,'computed readings are counted apart from the SMC rows they come from');
+	assert.deepEqual([COMPUTER_AVERAGE,HOTTEST_SENSOR].map(key=>[snapshot.byKey.get(key)?.label,snapshot.byKey.get(key)?.value,groupOf(snapshot,key),snapshot.byKey.get(key)?.unit]),[['Computer average',(873+19*30)/37,'System','°C'],['Hottest sensor',57,'System','°C']],'the fixed whole-Mac set: never the fan rows, never a sensor outside the set');
 	r.provider.close();
 });
 test('a computed reading is as old as its oldest input and keeps its own session',async()=>{
@@ -251,7 +253,7 @@ const wholeCatalog=JSON.parse(fs.readFileSync('native/hwmac/catalog.json','utf8'
 test('the per-core label pattern matches every chip family core row in the catalog and no other row',()=>{
 	const families=Object.keys(wholeCatalog.families);let cores=0;
 	for(const row of wholeCatalog.rows){const core=families.includes(row.scope)&&row.group==='CPU';if(core)cores++;assert.equal(CORE_LABEL.test(row.label),core,`${row.scope} ${row.key} ${row.label}`);}
-	assert.equal(cores,10+12+16+12+18+18+4,'M1, M2, M3, M4, M5, M6 and A18 Pro core rows');
+	assert.equal(cores,10+12+16+12+18+18+18+4,'M1, M2, M3, M4, M5 (Pro and Max, then the rest), M6 and A18 Pro core rows');
 });
 const M2_MODEL='Mac14,6',M2_AVERAGE='mac:v1:computed:Mac14%2C6:cpu-average:temp.v1',M2_HOTTEST='mac:v1:computed:Mac14%2C6:cpu-hottest:temp.v1';
 const labelled=(key:string,label:string,group:string,value:number,at:number):NativeRow=>({...smcRow(key,group,'temperature','°C',value,at),label});
@@ -304,7 +306,7 @@ test('a Mac with no chip family table gets no CPU readings but keeps the fan and
 	// Mac17,9 never falls back to "the cores that answered": seventeen of its eighteen cores give no CPU readings, with or without the family flag.
 	const inputs=new Map(CORE_KEYS.slice(1).map((key,index)=>[key,labelled(key,`CPU performance core ${index+1}`,'CPU',50,100)]));
 	const names=(rows:NativeRow[])=>rows.map(row=>row.key);
-	for(const family of [false,true])assert.deepEqual(names(computedRows('Mac17,9','t6050',inputs,family)),['computer-average','hottest-sensor'],String(family));
+	for(const family of [false,true])assert.deepEqual(names(computedRows('Mac17,9','t6050',inputs,family)),[],String(family));
 	assert.deepEqual(names(computedRows(M2_MODEL,'t6021',inputs,false)),['computer-average','hottest-sensor'],'no table, no CPU readings');
 	assert.deepEqual(computedRows(M2_MODEL,'t6021',inputs,true).map(row=>[row.key,row.value]),[['cpu-average',50],['cpu-hottest',50],['computer-average',50],['hottest-sensor',50]]);
 	// A sensor that reads 0 or an impossible value stays out of the whole-Mac readings, one fan is no average, and a stopped fan still counts.

@@ -1180,147 +1180,417 @@
     },
     {
       "key": "Tp00",
+      "label": "CPU sensor 1",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 488,
+      "variants": [
+        "base",
+        "ultra"
+      ]
+    },
+    {
+      "key": "Tp04",
+      "label": "CPU sensor 2",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 489,
+      "variants": [
+        "base",
+        "ultra"
+      ]
+    },
+    {
+      "key": "Tp08",
+      "label": "CPU sensor 3",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 490,
+      "variants": [
+        "base",
+        "ultra"
+      ]
+    },
+    {
+      "key": "Tp0C",
+      "label": "CPU sensor 4",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 491,
+      "variants": [
+        "base",
+        "ultra"
+      ]
+    },
+    {
+      "key": "Tp0G",
+      "label": "CPU sensor 5",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 492,
+      "variants": [
+        "base",
+        "ultra"
+      ]
+    },
+    {
+      "key": "Tp0K",
+      "label": "CPU sensor 6",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 493,
+      "variants": [
+        "base",
+        "ultra"
+      ]
+    },
+    {
+      "key": "Tp0O",
+      "label": "CPU sensor 7",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 495,
+      "variants": [
+        "base",
+        "ultra"
+      ]
+    },
+    {
+      "key": "Tp0R",
+      "label": "CPU sensor 8",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 496,
+      "variants": [
+        "base",
+        "ultra"
+      ]
+    },
+    {
+      "key": "Tp0U",
+      "label": "CPU sensor 9",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 497,
+      "variants": [
+        "base",
+        "ultra"
+      ]
+    },
+    {
+      "key": "Tp0X",
+      "label": "CPU sensor 10",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 498,
+      "variants": [
+        "base",
+        "ultra"
+      ]
+    },
+    {
+      "key": "Tp0a",
+      "label": "CPU sensor 11",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 499,
+      "variants": [
+        "base",
+        "ultra"
+      ]
+    },
+    {
+      "key": "Tp0d",
+      "label": "CPU sensor 12",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 500,
+      "variants": [
+        "base",
+        "ultra"
+      ]
+    },
+    {
+      "key": "Tp0g",
+      "label": "CPU sensor 13",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 501,
+      "variants": [
+        "base",
+        "ultra"
+      ]
+    },
+    {
+      "key": "Tp0j",
+      "label": "CPU sensor 14",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 502,
+      "variants": [
+        "base",
+        "ultra"
+      ]
+    },
+    {
+      "key": "Tp0m",
+      "label": "CPU sensor 15",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 503,
+      "variants": [
+        "base",
+        "ultra"
+      ]
+    },
+    {
+      "key": "Tp0p",
+      "label": "CPU sensor 16",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 504,
+      "variants": [
+        "base",
+        "ultra"
+      ]
+    },
+    {
+      "key": "Tp0u",
+      "label": "CPU sensor 17",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 505,
+      "variants": [
+        "base",
+        "ultra"
+      ]
+    },
+    {
+      "key": "Tp0y",
+      "label": "CPU sensor 18",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m5",
+      "sourceLine": 506,
+      "variants": [
+        "base",
+        "ultra"
+      ]
+    },
+    {
+      "key": "Tp04",
       "label": "CPU super core 1",
       "group": "CPU",
       "type": "temperature",
       "scope": "m5",
-      "sourceLine": 488
+      "variants": [
+        "pro",
+        "max"
+      ]
     },
     {
-      "key": "Tp04",
+      "key": "Tp0G",
       "label": "CPU super core 2",
       "group": "CPU",
       "type": "temperature",
       "scope": "m5",
-      "sourceLine": 489
+      "variants": [
+        "pro",
+        "max"
+      ]
     },
     {
-      "key": "Tp08",
+      "key": "Tp0R",
       "label": "CPU super core 3",
       "group": "CPU",
       "type": "temperature",
       "scope": "m5",
-      "sourceLine": 490
+      "variants": [
+        "pro",
+        "max"
+      ]
     },
     {
-      "key": "Tp0C",
+      "key": "Tp0a",
       "label": "CPU super core 4",
       "group": "CPU",
       "type": "temperature",
       "scope": "m5",
-      "sourceLine": 491
+      "variants": [
+        "pro",
+        "max"
+      ]
     },
     {
-      "key": "Tp0G",
+      "key": "Tp0j",
       "label": "CPU super core 5",
       "group": "CPU",
       "type": "temperature",
       "scope": "m5",
-      "sourceLine": 492
+      "variants": [
+        "pro",
+        "max"
+      ]
     },
     {
-      "key": "Tp0K",
+      "key": "Tp0u",
       "label": "CPU super core 6",
       "group": "CPU",
       "type": "temperature",
       "scope": "m5",
-      "sourceLine": 493
+      "variants": [
+        "pro",
+        "max"
+      ]
     },
     {
-      "key": "Tp0O",
+      "key": "Tm04",
       "label": "CPU performance core 1",
       "group": "CPU",
       "type": "temperature",
       "scope": "m5",
-      "sourceLine": 495
+      "variants": [
+        "pro",
+        "max"
+      ]
     },
     {
-      "key": "Tp0R",
+      "key": "Tm0G",
       "label": "CPU performance core 2",
       "group": "CPU",
       "type": "temperature",
       "scope": "m5",
-      "sourceLine": 496
+      "variants": [
+        "pro",
+        "max"
+      ]
     },
     {
-      "key": "Tp0U",
+      "key": "Tm0R",
       "label": "CPU performance core 3",
       "group": "CPU",
       "type": "temperature",
       "scope": "m5",
-      "sourceLine": 497
+      "variants": [
+        "pro",
+        "max"
+      ]
     },
     {
-      "key": "Tp0X",
+      "key": "Tm0a",
       "label": "CPU performance core 4",
       "group": "CPU",
       "type": "temperature",
       "scope": "m5",
-      "sourceLine": 498
+      "variants": [
+        "pro",
+        "max"
+      ]
     },
     {
-      "key": "Tp0a",
+      "key": "Tm0j",
       "label": "CPU performance core 5",
       "group": "CPU",
       "type": "temperature",
       "scope": "m5",
-      "sourceLine": 499
+      "variants": [
+        "pro",
+        "max"
+      ]
     },
     {
-      "key": "Tp0d",
+      "key": "Tm0u",
       "label": "CPU performance core 6",
       "group": "CPU",
       "type": "temperature",
       "scope": "m5",
-      "sourceLine": 500
+      "variants": [
+        "pro",
+        "max"
+      ]
     },
     {
-      "key": "Tp0g",
+      "key": "Tm1Q",
       "label": "CPU performance core 7",
       "group": "CPU",
       "type": "temperature",
       "scope": "m5",
-      "sourceLine": 501
+      "variants": [
+        "pro",
+        "max"
+      ]
     },
     {
-      "key": "Tp0j",
+      "key": "Tm1c",
       "label": "CPU performance core 8",
       "group": "CPU",
       "type": "temperature",
       "scope": "m5",
-      "sourceLine": 502
+      "variants": [
+        "pro",
+        "max"
+      ]
     },
     {
-      "key": "Tp0m",
+      "key": "Tm1o",
       "label": "CPU performance core 9",
       "group": "CPU",
       "type": "temperature",
       "scope": "m5",
-      "sourceLine": 503
+      "variants": [
+        "pro",
+        "max"
+      ]
     },
     {
-      "key": "Tp0p",
+      "key": "Tm21",
       "label": "CPU performance core 10",
       "group": "CPU",
       "type": "temperature",
       "scope": "m5",
-      "sourceLine": 504
+      "variants": [
+        "pro",
+        "max"
+      ]
     },
     {
-      "key": "Tp0u",
+      "key": "Tm2D",
       "label": "CPU performance core 11",
       "group": "CPU",
       "type": "temperature",
       "scope": "m5",
-      "sourceLine": 505
+      "variants": [
+        "pro",
+        "max"
+      ]
     },
     {
-      "key": "Tp0y",
+      "key": "Tm2P",
       "label": "CPU performance core 12",
       "group": "CPU",
       "type": "temperature",
       "scope": "m5",
-      "sourceLine": 506
+      "variants": [
+        "pro",
+        "max"
+      ]
     },
     {
       "key": "Tg0U",
@@ -1736,6 +2006,118 @@
       "key": "Ts1P",
       "label": "Trackpad actuator",
       "group": "System",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
+      "key": "Tp00",
+      "label": "CPU super cluster sensor 1",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
+      "key": "Tp08",
+      "label": "CPU super cluster sensor 2",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
+      "key": "Tp0C",
+      "label": "CPU super cluster sensor 3",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
+      "key": "Tp0K",
+      "label": "CPU super cluster sensor 4",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
+      "key": "Tp0O",
+      "label": "CPU super cluster sensor 5",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
+      "key": "Tp0U",
+      "label": "CPU super cluster sensor 6",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
+      "key": "Tp0X",
+      "label": "CPU super cluster sensor 7",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
+      "key": "Tp0d",
+      "label": "CPU super cluster sensor 8",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
+      "key": "Tp0g",
+      "label": "CPU super cluster sensor 9",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
+      "key": "Tp0m",
+      "label": "CPU super cluster sensor 10",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
+      "key": "Tp0p",
+      "label": "CPU super cluster sensor 11",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
+      "key": "Tp0y",
+      "label": "CPU super cluster sensor 12",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
+      "key": "Tg08",
+      "label": "GPU region 1",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
+      "key": "Tg12",
+      "label": "GPU region 2",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
+      "key": "Tg29",
+      "label": "GPU region 3",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
+      "key": "Tg3B",
+      "label": "GPU region 4",
+      "group": "GPU",
       "type": "temperature",
       "scope": "Mac17,9"
     }

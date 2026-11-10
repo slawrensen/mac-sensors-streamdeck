@@ -21,7 +21,7 @@
       "kind": "settings-panel capture, simulated host, sample data",
       "sha256": "62aa7f1c18218b4e13aaddd36bc440deeda0fa3b899f9289fb20110282113eb3",
       "settings": {
-        "readingKey": "mac:v1:smc:Mac17%2C9:54703030:temp.v1",
+        "readingKey": "mac:v1:smc:Mac17%2C9:54703034:temp.v1",
         "label": "CPU super 1",
         "displayMode": "sparkline",
         "theme": "void",
@@ -38,10 +38,10 @@
       "kind": "settings-panel capture, simulated host, sample data",
       "sha256": "6014f4d5e090bc20736776c31a830ac6d39697b0666599ae9a2cf744ba603dbc",
       "settings": {
-        "readingKey": "mac:v1:smc:Mac17%2C9:54703030:temp.v1",
+        "readingKey": "mac:v1:smc:Mac17%2C9:54703034:temp.v1",
         "label": "CPU super 1",
         "rotationKeys": [
-          "mac:v1:smc:Mac17%2C9:54703030:temp.v1",
+          "mac:v1:smc:Mac17%2C9:54703034:temp.v1",
           "mac:v1:smc:Mac17%2C9:54673055:temp.v1",
           "mac:v1:smc:Mac17%2C9:46304163:rpm.v1"
         ],
@@ -56,19 +56,19 @@
     {
       "file": "settings-reading-colors.png",
       "kind": "settings-panel capture, simulated host, sample data",
-      "sha256": "61de42a7dc0d738386be59faa79e508810217ce471fe94317b749fa5769428f2",
+      "sha256": "934a92a8e76aef27dc04fa792d06d21fe377e417e82e43f29b69159ca5775e6a",
       "settings": {
-        "readingKey": "mac:v1:smc:Mac17%2C9:54703030:temp.v1",
+        "readingKey": "mac:v1:smc:Mac17%2C9:54703034:temp.v1",
         "label": "CPU super 1",
         "rotationKeys": [
-          "mac:v1:smc:Mac17%2C9:54703030:temp.v1",
+          "mac:v1:smc:Mac17%2C9:54703034:temp.v1",
           "mac:v1:smc:Mac17%2C9:54673055:temp.v1",
           "mac:v1:smc:Mac17%2C9:46304163:rpm.v1"
         ],
         "dialView": "overview",
         "theme": "void",
         "readingColors": {
-          "mac:v1:smc:Mac17%2C9:54703030:temp.v1": "#4CC2FF",
+          "mac:v1:smc:Mac17%2C9:54703034:temp.v1": "#4CC2FF",
           "mac:v1:smc:Mac17%2C9:54673055:temp.v1": "#FF7E8E",
           "mac:v1:smc:Mac17%2C9:46304163:rpm.v1": "#38CD89"
         }
@@ -83,7 +83,7 @@
       "kind": "settings-panel capture, simulated host, sample data",
       "sha256": "438ac8359737b9fc1a7eba3169e5e86523dee7984b1f950d0aef21ad286e6cd2",
       "settings": {
-        "readingKey": "mac:v1:smc:Mac17%2C9:54703030:temp.v1",
+        "readingKey": "mac:v1:smc:Mac17%2C9:54703034:temp.v1",
         "label": "CPU super 1",
         "displayMode": "sparkline",
         "theme": "void",
@@ -101,10 +101,10 @@
       "kind": "settings-panel capture, simulated host, sample data",
       "sha256": "82ce83188045194db104ed7c7843c294ecfa4f083c781ac2519ac0577ca568f4",
       "settings": {
-        "readingKey": "mac:v1:smc:Mac17%2C9:54703030:temp.v1",
+        "readingKey": "mac:v1:smc:Mac17%2C9:54703034:temp.v1",
         "label": "CPU super 1",
         "rotationKeys": [
-          "mac:v1:smc:Mac17%2C9:54703030:temp.v1",
+          "mac:v1:smc:Mac17%2C9:54703034:temp.v1",
           "mac:v1:smc:Mac17%2C9:54673055:temp.v1",
           "mac:v1:smc:Mac17%2C9:46304163:rpm.v1"
         ],
@@ -137,7 +137,7 @@
       "kind": "settings-panel capture, simulated host, sample data",
       "sha256": "ec60a9b4361e995411add927f8247ea596de5f9b14884df42c65f3b553e020cd",
       "settings": {
-        "readingKey": "mac:v1:smc:Mac17%2C9:54703030:temp.v1",
+        "readingKey": "mac:v1:smc:Mac17%2C9:54703034:temp.v1",
         "label": "CPU super 1",
         "displayMode": "sparkline",
         "theme": "void",
