@@ -126,8 +126,14 @@ export type SmcTableEvidence='measured'|'source'|'none';
 export interface SmcKeyFacts { answered:string; absent:string; withheld:string; }
 /** Minimum, maximum and running mean of one reading's accepted values since its row last appeared: every gap deletes the row, so it starts over. */
 interface Session { min: number; max: number; mean: number; count: number; }
-/** source is the packet that produced the row, so a failed or expired read of it removes computed readings too. */
-interface Accepted { row: NativeRow; reading: Reading; source: NativeSource; session: Session; computed: boolean; }
+/**
+ * source is the packet that produced the row, so a failed or expired read of it removes computed readings too. order is the row's place
+ * in that packet, which is catalog order for SMC rows (the native reader walks native/hwmac/catalog.json in order), or in the computed list.
+ */
+interface Accepted { row: NativeRow; reading: Reading; source: NativeSource; session: Session; computed: boolean; order: number; }
+/** Inside a group the list reads system counters, then computed readings, then the SMC in catalog order, then battery and drive health. */
+const SOURCE_ORDER={public:0,computed:1,smc:2,health:3} as const;
+const listOrder=(item:Accepted):number=>SOURCE_ORDER[item.computed?'computed':item.source];
 export interface ProviderFacts { model:string;chip:string;cpu:string;smcTable:string;smcTableEvidence:SmcTableEvidence;smcKeys:SmcKeyFacts;appleSilicon:boolean|null;translation:'native'|'translated'|'unknown';translationError:number;sourceRows:Record<NativeSource,number>;computedRows:number; sourceErrors:Partial<Record<NativeSource,{code:string;operation:string;systemCode:number}>>; }
 export function encodeModel(model:string): string | null {
 	if(!model||model.length>128||[...model].some(character=>character.charCodeAt(0)<32||character.charCodeAt(0)===127)||Buffer.from(model,'utf8').toString('utf8')!==model)return null;
@@ -239,11 +245,11 @@ export class MacProvider implements SnapshotProvider {
 		const counts=new Map<string,number>();
 		for(const key of keys)if(key)counts.set(key,(counts.get(key)??0)+1);
 		const accepted=new Map<string,Accepted>();
-		for(let index=0;index<rows.length;index++){const key=keys[index];if(key&&counts.get(key)===1)this.admit(key,rows[index]!,source,now,false,accepted);}
+		for(let index=0;index<rows.length;index++){const key=keys[index];if(key&&counts.get(key)===1)this.admit(key,rows[index]!,source,now,false,index,accepted);}
 		// Computed readings see only what this packet just had accepted, never a row kept from an earlier read.
 		if(source==='smc'){
 			const inputs=new Map<string,NativeRow>();for(const item of accepted.values())inputs.set(item.row.key,item.row);
-			for(const row of computedRows(packet.model,packet.chip,inputs,Boolean(packet.table))){const key=computedKey(row,packet.model);if(key)this.admit(key,row,source,now,true,accepted);}
+			computedRows(packet.model,packet.chip,inputs,Boolean(packet.table)).forEach((row,index)=>{const key=computedKey(row,packet.model);if(key)this.admit(key,row,source,now,true,index,accepted);});
 		}
 		for(const [key,item] of this.rows)if(item.source===source&&!accepted.has(key)){this.rows.delete(key);this.dirty=true;this.catalogDirty=true;}
 		for(const [key,item] of accepted)this.rows.set(key,item);
@@ -267,7 +273,7 @@ export class MacProvider implements SnapshotProvider {
 		this.rebuild();
 	}
 	/** Accepts one keyed row of the current packet into `accepted` when it is valid, in range and inside the TTL; anything else is withheld. */
-	private admit(key:string,row:NativeRow,source:NativeSource,now:number,computed:boolean,accepted:Map<string,Accepted>):void {
+	private admit(key:string,row:NativeRow,source:NativeSource,now:number,computed:boolean,order:number,accepted:Map<string,Accepted>):void {
 		const kind=KIND[row.kind];
 		if(!kind||!row.valid||!Number.isFinite(row.value)||row.value<kind.minimum||row.value>kind.maximum||!Number.isFinite(row.continuousMs)||row.continuousMs<0||row.continuousMs>now||now-row.continuousMs>=TTL_MS||!Number.isFinite(row.wallSeconds))return;
 		const previous=this.rows.get(key);
@@ -276,11 +282,11 @@ export class MacProvider implements SnapshotProvider {
 		const count=(prior?.count??0)+1,session:Session={min:Math.min(prior?.min??row.value,row.value),max:Math.max(prior?.max??row.value,row.value),mean:prior?prior.mean+(row.value-prior.mean)/count:row.value,count};
 		const reading:Reading={key,type:kind.type,sensorIndex:0,id:0,label:row.label,unit:row.unit,value:row.value,valueMin:session.min,valueMax:session.max,valueAvg:session.mean,statistics:'producer',observationTime:row.continuousMs,observationRevision:++this.observation};
 		if(previous&&previous.reading.value!==reading.value)this.freshnessRevision++;
-		const changedCatalog=!previous||previous.reading.unit!==reading.unit||previous.reading.type!==reading.type||previous.reading.label!==reading.label||previous.row.group!==row.group;
+		const changedCatalog=!previous||previous.reading.unit!==reading.unit||previous.reading.type!==reading.type||previous.reading.label!==reading.label||previous.row.group!==row.group||previous.order!==order;
 		if(changedCatalog)this.catalogDirty=true;
 		// A repeated value cannot move the minimum or maximum, but it can move the mean, which an AVG face shows.
 		if(changedCatalog||previous?.reading.value!==reading.value||previous.reading.valueAvg!==reading.valueAvg)this.dirty=true;
-		accepted.set(key,{row,reading,source,session,computed});
+		accepted.set(key,{row,reading,source,session,computed,order});
 	}
 	/**
 	 * Once per generation: the first accepted public packet only sets the counter baseline, so read public again
@@ -320,9 +326,12 @@ export class MacProvider implements SnapshotProvider {
 		this.factsValue.sourceRows={public:0,smc:0,health:0};this.factsValue.computedRows=0;for(const item of this.rows.values())if(item.computed)this.factsValue.computedRows++;else this.factsValue.sourceRows[item.source]++;
 		this.report(this.facts());
 		if(this.dirty){this.valueRevision++;this.dirty=false;}
-		const groups=[...new Set([...this.rows.values()].map(item=>Object.hasOwn(GROUPS,item.row.group)?item.row.group:'System'))].sort((a,b)=>GROUPS[a]!-GROUPS[b]!);
+		const groupOf=(item:Accepted):string=>Object.hasOwn(GROUPS,item.row.group)?item.row.group:'System';
+		const groups=[...new Set([...this.rows.values()].map(groupOf))].sort((a,b)=>GROUPS[a]!-GROUPS[b]!);
 		const sensors:SensorSource[]=groups.map((name,index)=>({index,id:GROUPS[name]!,instance:0,name}));
-		const readings:Reading[]=[...this.rows.values()].map(item=>({...item.reading,sensorIndex:groups.indexOf(Object.hasOwn(GROUPS,item.row.group)?item.row.group:'System')})).sort((a,b)=>a.sensorIndex-b.sensorIndex||a.key.localeCompare(b.key));
+		// Group, then source, then the row's own order, so numbered rows read 1, 2, 3; the identity only breaks a tie it never has.
+		const ordered=[...this.rows.values()].map(item=>({item,sensorIndex:groups.indexOf(groupOf(item))})).sort((a,b)=>a.sensorIndex-b.sensorIndex||listOrder(a.item)-listOrder(b.item)||a.item.order-b.item.order||a.item.reading.key.localeCompare(b.item.reading.key));
+		const readings:Reading[]=ordered.map(({item,sensorIndex})=>({...item.reading,sensorIndex}));
 		let latest:Accepted|undefined;for(const item of this.rows.values())if(!latest||item.row.continuousMs>latest.row.continuousMs)latest=item;
 		this.snapshot={catalogRevision:this.catalogRevision,pollTime:latest?.row.wallSeconds??0,valueRevision:this.valueRevision,freshnessRevision:this.freshnessRevision,version:1,revision:1,sensors,readings,byKey:new Map(readings.map(reading=>[reading.key,reading]))};
 	}

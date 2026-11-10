@@ -39,10 +39,12 @@ const sampleRows:{key:string;label:string;unit:string;value:number;min:number;ma
 const sampleSensorNames=PROVIDER_GROUPS.filter(group=>sampleRows.some(row=>row.group===group));
 /** The scenes' authoring order; sampleSnapshot() publishes them in the provider's order. Reading ids are 0, as the provider sets them. */
 export const sampleReadings:Reading[]=sampleRows.map(({group,min,max,avg,...row},index)=>{sampleGroups[row.key]=group;return {...row,id:0,sensorIndex:sampleSensorNames.indexOf(group),valueMin:min,valueMax:max,valueAvg:avg,statistics:'producer' as const,observationTime:1000,observationRevision:index+1};});
-/** A snapshot shaped as MacProvider.rebuild() shapes one: sensors per present group, readings sorted by sensor then key. */
+/** Inside a group MacProvider lists system counters, then computed readings, then SMC rows in catalog order, then battery and drive health. */
+const sourceRank=(key:string)=>key.startsWith('mac:v1:system:')?0:key.startsWith('mac:v1:computed:')?1:key.startsWith('mac:v1:smc:')?2:3;
+/** A snapshot shaped as MacProvider.rebuild() shapes one: sensors per present group, readings by sensor, then source. No group holds two sample rows of one source. */
 export function sampleSnapshot():SensorSnapshot {
 	const sensors=sampleSensorNames.map((name,index)=>({index,id:PROVIDER_GROUPS.indexOf(name)+1,instance:0,name}));
-	const readings=sampleReadings.map(row=>({...row})).sort((a,b)=>a.sensorIndex-b.sensorIndex||a.key.localeCompare(b.key));
+	const readings=sampleReadings.map(row=>({...row})).sort((a,b)=>a.sensorIndex-b.sensorIndex||sourceRank(a.key)-sourceRank(b.key));
 	return {catalogRevision:1,pollTime:1,valueRevision:1,freshnessRevision:0,version:1,revision:1,sensors,readings,byKey:new Map(readings.map(row=>[row.key,row]))};
 }
 // Shared settings for every scene. Accents are off so faces compare across boards; the accents board alone turns on the shipped default.

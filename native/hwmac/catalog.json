@@ -117,12 +117,12 @@
       "sourceLine": 364
     },
     {
-      "key": "TW0P",
-      "label": "Airport",
-      "group": "System",
+      "key": "TB2T",
+      "label": "Battery 2",
+      "group": "Battery",
       "type": "temperature",
-      "scope": "common",
-      "sourceLine": 365
+      "scope": "apple",
+      "sourceLine": 571
     },
     {
       "key": "TaLP",
@@ -141,148 +141,69 @@
       "sourceLine": 567
     },
     {
+      "key": "TaTP",
+      "label": "Airflow top",
+      "group": "System",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
+      "key": "Ts0P",
+      "label": "Trackpad",
+      "group": "System",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
+      "key": "Ts1P",
+      "label": "Pad actuator",
+      "group": "System",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
+      "key": "TCHP",
+      "label": "Charger",
+      "group": "System",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
+      "key": "TPSP",
+      "label": "Power supply",
+      "group": "System",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
+      "key": "TaLT",
+      "label": "Ports left",
+      "group": "System",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
+      "key": "TaRT",
+      "label": "Ports right",
+      "group": "System",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
+      "key": "TW0P",
+      "label": "Airport",
+      "group": "System",
+      "type": "temperature",
+      "scope": "common",
+      "sourceLine": 365
+    },
+    {
       "key": "TH0x",
       "label": "NAND",
       "group": "System",
       "type": "temperature",
       "scope": "apple",
       "sourceLine": 569
-    },
-    {
-      "key": "TB2T",
-      "label": "Battery 2",
-      "group": "Battery",
-      "type": "temperature",
-      "scope": "apple",
-      "sourceLine": 571
-    },
-    {
-      "key": "VM0R",
-      "label": "Memory",
-      "group": "System",
-      "type": "voltage",
-      "scope": "common",
-      "sourceLine": 582
-    },
-    {
-      "key": "VD0R",
-      "label": "DC In",
-      "group": "System",
-      "type": "voltage",
-      "scope": "common",
-      "sourceLine": 585
-    },
-    {
-      "key": "IC0R",
-      "label": "CPU High side",
-      "group": "System",
-      "type": "current",
-      "scope": "common",
-      "sourceLine": 595
-    },
-    {
-      "key": "IG0R",
-      "label": "GPU High side",
-      "group": "System",
-      "type": "current",
-      "scope": "common",
-      "sourceLine": 596
-    },
-    {
-      "key": "ID0R",
-      "label": "DC In",
-      "group": "System",
-      "type": "current",
-      "scope": "common",
-      "sourceLine": 597
-    },
-    {
-      "key": "IBAC",
-      "label": "Battery",
-      "group": "Battery",
-      "type": "current",
-      "scope": "common",
-      "sourceLine": 598
-    },
-    {
-      "key": "PCPC",
-      "label": "CPU Package",
-      "group": "CPU",
-      "type": "power",
-      "scope": "common",
-      "sourceLine": 610
-    },
-    {
-      "key": "PCTR",
-      "label": "CPU Total",
-      "group": "CPU",
-      "type": "power",
-      "scope": "common",
-      "sourceLine": 611
-    },
-    {
-      "key": "PCPT",
-      "label": "Package total",
-      "group": "CPU",
-      "type": "power",
-      "scope": "common",
-      "sourceLine": 612
-    },
-    {
-      "key": "PCPR",
-      "label": "Package (SMC)",
-      "group": "CPU",
-      "type": "power",
-      "scope": "common",
-      "sourceLine": 613
-    },
-    {
-      "key": "PG0C",
-      "label": "GPU",
-      "group": "GPU",
-      "type": "power",
-      "scope": "common",
-      "sourceLine": 619
-    },
-    {
-      "key": "PCGC",
-      "label": "Intel GPU",
-      "group": "GPU",
-      "type": "power",
-      "scope": "common",
-      "sourceLine": 622
-    },
-    {
-      "key": "PPBR",
-      "label": "Battery",
-      "group": "Battery",
-      "type": "power",
-      "scope": "common",
-      "sourceLine": 626
-    },
-    {
-      "key": "PDTR",
-      "label": "DC In",
-      "group": "System",
-      "type": "power",
-      "scope": "common",
-      "sourceLine": 627
-    },
-    {
-      "key": "PMTR",
-      "label": "Memory Total",
-      "group": "System",
-      "type": "power",
-      "scope": "common",
-      "sourceLine": 628
-    },
-    {
-      "key": "PSTR",
-      "label": "System Total",
-      "group": "System",
-      "type": "power",
-      "scope": "common",
-      "sourceLine": 629
     },
     {
       "key": "F0Ac",
@@ -517,22 +438,6 @@
       "scope": "common"
     },
     {
-      "key": "Tp09",
-      "label": "Eff core 1",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "m1",
-      "sourceLine": 389
-    },
-    {
-      "key": "Tp0T",
-      "label": "Eff core 2",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "m1",
-      "sourceLine": 390
-    },
-    {
       "key": "Tp01",
       "label": "Perf core 1",
       "group": "CPU",
@@ -595,6 +500,22 @@
       "type": "temperature",
       "scope": "m1",
       "sourceLine": 398
+    },
+    {
+      "key": "Tp09",
+      "label": "Eff core 1",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m1",
+      "sourceLine": 389
+    },
+    {
+      "key": "Tp0T",
+      "label": "Eff core 2",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m1",
+      "sourceLine": 390
     },
     {
       "key": "Tg05",
@@ -661,38 +582,6 @@
       "sourceLine": 408
     },
     {
-      "key": "Tp1h",
-      "label": "Eff core 1",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "m2",
-      "sourceLine": 411
-    },
-    {
-      "key": "Tp1t",
-      "label": "Eff core 2",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "m2",
-      "sourceLine": 412
-    },
-    {
-      "key": "Tp1p",
-      "label": "Eff core 3",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "m2",
-      "sourceLine": 413
-    },
-    {
-      "key": "Tp1l",
-      "label": "Eff core 4",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "m2",
-      "sourceLine": 414
-    },
-    {
       "key": "Tp01",
       "label": "Perf core 1",
       "group": "CPU",
@@ -757,6 +646,38 @@
       "sourceLine": 423
     },
     {
+      "key": "Tp1h",
+      "label": "Eff core 1",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m2",
+      "sourceLine": 411
+    },
+    {
+      "key": "Tp1t",
+      "label": "Eff core 2",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m2",
+      "sourceLine": 412
+    },
+    {
+      "key": "Tp1p",
+      "label": "Eff core 3",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m2",
+      "sourceLine": 413
+    },
+    {
+      "key": "Tp1l",
+      "label": "Eff core 4",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m2",
+      "sourceLine": 414
+    },
+    {
       "key": "Tg0f",
       "label": "GPU 1",
       "group": "GPU",
@@ -771,38 +692,6 @@
       "type": "temperature",
       "scope": "m2",
       "sourceLine": 426
-    },
-    {
-      "key": "Te05",
-      "label": "Eff core 1",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "m3",
-      "sourceLine": 429
-    },
-    {
-      "key": "Te0L",
-      "label": "Eff core 2",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "m3",
-      "sourceLine": 430
-    },
-    {
-      "key": "Te0P",
-      "label": "Eff core 3",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "m3",
-      "sourceLine": 431
-    },
-    {
-      "key": "Te0S",
-      "label": "Eff core 4",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "m3",
-      "sourceLine": 432
     },
     {
       "key": "Tf04",
@@ -901,6 +790,38 @@
       "sourceLine": 445
     },
     {
+      "key": "Te05",
+      "label": "Eff core 1",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m3",
+      "sourceLine": 429
+    },
+    {
+      "key": "Te0L",
+      "label": "Eff core 2",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m3",
+      "sourceLine": 430
+    },
+    {
+      "key": "Te0P",
+      "label": "Eff core 3",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m3",
+      "sourceLine": 431
+    },
+    {
+      "key": "Te0S",
+      "label": "Eff core 4",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m3",
+      "sourceLine": 432
+    },
+    {
       "key": "Tf14",
       "label": "GPU 1",
       "group": "GPU",
@@ -965,38 +886,6 @@
       "sourceLine": 454
     },
     {
-      "key": "Te05",
-      "label": "Eff core 1",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "m4",
-      "sourceLine": 457
-    },
-    {
-      "key": "Te0S",
-      "label": "Eff core 2",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "m4",
-      "sourceLine": 458
-    },
-    {
-      "key": "Te09",
-      "label": "Eff core 3",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "m4",
-      "sourceLine": 459
-    },
-    {
-      "key": "Te0H",
-      "label": "Eff core 4",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "m4",
-      "sourceLine": 460
-    },
-    {
       "key": "Tp01",
       "label": "Perf core 1",
       "group": "CPU",
@@ -1059,6 +948,38 @@
       "type": "temperature",
       "scope": "m4",
       "sourceLine": 469
+    },
+    {
+      "key": "Te05",
+      "label": "Eff core 1",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m4",
+      "sourceLine": 457
+    },
+    {
+      "key": "Te0S",
+      "label": "Eff core 2",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m4",
+      "sourceLine": 458
+    },
+    {
+      "key": "Te09",
+      "label": "Eff core 3",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m4",
+      "sourceLine": 459
+    },
+    {
+      "key": "Te0H",
+      "label": "Eff core 4",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "m4",
+      "sourceLine": 460
     },
     {
       "key": "Tg0G",
@@ -1593,6 +1514,118 @@
       ]
     },
     {
+      "key": "Tp00",
+      "label": "Super zone 1",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
+      "key": "Tp08",
+      "label": "Super zone 2",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
+      "key": "Tp0C",
+      "label": "Super zone 3",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
+      "key": "Tp0K",
+      "label": "Super zone 4",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
+      "key": "Tp0O",
+      "label": "Super zone 5",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
+      "key": "Tp0U",
+      "label": "Super zone 6",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
+      "key": "Tp0X",
+      "label": "Super zone 7",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
+      "key": "Tp0d",
+      "label": "Super zone 8",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
+      "key": "Tp0g",
+      "label": "Super zone 9",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
+      "key": "Tp0m",
+      "label": "Super zone 10",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
+      "key": "Tp0p",
+      "label": "Super zone 11",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
+      "key": "Tp0y",
+      "label": "Super zone 12",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
+      "key": "Tg08",
+      "label": "GPU region 1",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
+      "key": "Tg12",
+      "label": "GPU region 2",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
+      "key": "Tg29",
+      "label": "GPU region 3",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
+      "key": "Tg3B",
+      "label": "GPU region 4",
+      "group": "GPU",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
       "key": "Tg0U",
       "label": "GPU 1",
       "group": "GPU",
@@ -1897,22 +1930,6 @@
       "sourceLine": 551
     },
     {
-      "key": "Te05",
-      "label": "Eff core 1",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "a18pro",
-      "sourceLine": 554
-    },
-    {
-      "key": "Te0S",
-      "label": "Eff core 2",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "a18pro",
-      "sourceLine": 555
-    },
-    {
       "key": "Tp05",
       "label": "Perf core 1",
       "group": "CPU",
@@ -1927,6 +1944,22 @@
       "type": "temperature",
       "scope": "a18pro",
       "sourceLine": 558
+    },
+    {
+      "key": "Te05",
+      "label": "Eff core 1",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "a18pro",
+      "sourceLine": 554
+    },
+    {
+      "key": "Te0S",
+      "label": "Eff core 2",
+      "group": "CPU",
+      "type": "temperature",
+      "scope": "a18pro",
+      "sourceLine": 555
     },
     {
       "key": "Tg05",
@@ -1961,165 +1994,132 @@
       "sourceLine": 563
     },
     {
-      "key": "TaTP",
-      "label": "Airflow top",
+      "key": "VM0R",
+      "label": "Memory",
       "group": "System",
-      "type": "temperature",
-      "scope": "Mac17,9"
+      "type": "voltage",
+      "scope": "common",
+      "sourceLine": 582
     },
     {
-      "key": "TCHP",
-      "label": "Charger",
+      "key": "VD0R",
+      "label": "DC In",
       "group": "System",
-      "type": "temperature",
-      "scope": "Mac17,9"
+      "type": "voltage",
+      "scope": "common",
+      "sourceLine": 585
     },
     {
-      "key": "TPSP",
-      "label": "Power supply",
+      "key": "IC0R",
+      "label": "CPU High side",
       "group": "System",
-      "type": "temperature",
-      "scope": "Mac17,9"
+      "type": "current",
+      "scope": "common",
+      "sourceLine": 595
     },
     {
-      "key": "TaLT",
-      "label": "Ports left",
+      "key": "IG0R",
+      "label": "GPU High side",
       "group": "System",
-      "type": "temperature",
-      "scope": "Mac17,9"
+      "type": "current",
+      "scope": "common",
+      "sourceLine": 596
     },
     {
-      "key": "TaRT",
-      "label": "Ports right",
+      "key": "ID0R",
+      "label": "DC In",
       "group": "System",
-      "type": "temperature",
-      "scope": "Mac17,9"
+      "type": "current",
+      "scope": "common",
+      "sourceLine": 597
     },
     {
-      "key": "Ts0P",
-      "label": "Trackpad",
-      "group": "System",
-      "type": "temperature",
-      "scope": "Mac17,9"
+      "key": "IBAC",
+      "label": "Battery",
+      "group": "Battery",
+      "type": "current",
+      "scope": "common",
+      "sourceLine": 598
     },
     {
-      "key": "Ts1P",
-      "label": "Pad actuator",
-      "group": "System",
-      "type": "temperature",
-      "scope": "Mac17,9"
-    },
-    {
-      "key": "Tp00",
-      "label": "Super zone 1",
+      "key": "PCPC",
+      "label": "CPU Package",
       "group": "CPU",
-      "type": "temperature",
-      "scope": "Mac17,9"
+      "type": "power",
+      "scope": "common",
+      "sourceLine": 610
     },
     {
-      "key": "Tp08",
-      "label": "Super zone 2",
+      "key": "PCTR",
+      "label": "CPU Total",
       "group": "CPU",
-      "type": "temperature",
-      "scope": "Mac17,9"
+      "type": "power",
+      "scope": "common",
+      "sourceLine": 611
     },
     {
-      "key": "Tp0C",
-      "label": "Super zone 3",
+      "key": "PCPT",
+      "label": "Package total",
       "group": "CPU",
-      "type": "temperature",
-      "scope": "Mac17,9"
+      "type": "power",
+      "scope": "common",
+      "sourceLine": 612
     },
     {
-      "key": "Tp0K",
-      "label": "Super zone 4",
+      "key": "PCPR",
+      "label": "Package (SMC)",
       "group": "CPU",
-      "type": "temperature",
-      "scope": "Mac17,9"
+      "type": "power",
+      "scope": "common",
+      "sourceLine": 613
     },
     {
-      "key": "Tp0O",
-      "label": "Super zone 5",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "Mac17,9"
-    },
-    {
-      "key": "Tp0U",
-      "label": "Super zone 6",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "Mac17,9"
-    },
-    {
-      "key": "Tp0X",
-      "label": "Super zone 7",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "Mac17,9"
-    },
-    {
-      "key": "Tp0d",
-      "label": "Super zone 8",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "Mac17,9"
-    },
-    {
-      "key": "Tp0g",
-      "label": "Super zone 9",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "Mac17,9"
-    },
-    {
-      "key": "Tp0m",
-      "label": "Super zone 10",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "Mac17,9"
-    },
-    {
-      "key": "Tp0p",
-      "label": "Super zone 11",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "Mac17,9"
-    },
-    {
-      "key": "Tp0y",
-      "label": "Super zone 12",
-      "group": "CPU",
-      "type": "temperature",
-      "scope": "Mac17,9"
-    },
-    {
-      "key": "Tg08",
-      "label": "GPU region 1",
+      "key": "PG0C",
+      "label": "GPU",
       "group": "GPU",
-      "type": "temperature",
-      "scope": "Mac17,9"
+      "type": "power",
+      "scope": "common",
+      "sourceLine": 619
     },
     {
-      "key": "Tg12",
-      "label": "GPU region 2",
+      "key": "PCGC",
+      "label": "Intel GPU",
       "group": "GPU",
-      "type": "temperature",
-      "scope": "Mac17,9"
+      "type": "power",
+      "scope": "common",
+      "sourceLine": 622
     },
     {
-      "key": "Tg29",
-      "label": "GPU region 3",
-      "group": "GPU",
-      "type": "temperature",
-      "scope": "Mac17,9"
+      "key": "PPBR",
+      "label": "Battery",
+      "group": "Battery",
+      "type": "power",
+      "scope": "common",
+      "sourceLine": 626
     },
     {
-      "key": "Tg3B",
-      "label": "GPU region 4",
-      "group": "GPU",
-      "type": "temperature",
-      "scope": "Mac17,9"
+      "key": "PDTR",
+      "label": "DC In",
+      "group": "System",
+      "type": "power",
+      "scope": "common",
+      "sourceLine": 627
+    },
+    {
+      "key": "PMTR",
+      "label": "Memory Total",
+      "group": "System",
+      "type": "power",
+      "scope": "common",
+      "sourceLine": 628
+    },
+    {
+      "key": "PSTR",
+      "label": "System Total",
+      "group": "System",
+      "type": "power",
+      "scope": "common",
+      "sourceLine": 629
     }
   ]
 }

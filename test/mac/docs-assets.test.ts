@@ -82,11 +82,12 @@ test('sample readings sit in the groups the shipped Mac provider reports, in its
   if(smc){const row=catalog.find(entry=>entry.key===Buffer.from(smc[1]!,'hex').toString('ascii')&&(entry.variants===undefined||entry.variants.includes('pro')));assert.equal(row?.label,label);assert.equal(row?.group,group,label);}
   else{const name=reading.key.replace('mac:v1:system:','');assert.ok(collectors.includes(`"${name}", "${label}", "${group}"`)||provider.includes(`'${name}','${label}','${group}'`),label+' in '+group);}
  }
- // MacProvider.rebuild(): one sensor per present group in GROUPS order, id from GROUPS, reading ids 0, readings by sensor then key.
+ // MacProvider.rebuild(): one sensor per present group in GROUPS order, id from GROUPS, reading ids 0, readings by sensor, then system
+ // counters before SMC rows inside a group (test/mac/provider.test.ts pins the provider's own order).
  const snapshot=sampleSnapshot(),present=PROVIDER_GROUPS.filter(name=>Object.values(sampleGroups).includes(name));
  assert.deepEqual(snapshot.sensors,present.map((name,index)=>({index,id:groups[name],instance:0,name})));
  for(const reading of snapshot.readings){assert.equal(reading.id,0);assert.equal(snapshot.sensors[reading.sensorIndex]?.name,sampleGroups[reading.key]);}
- assert.deepEqual(snapshot.readings.map(row=>row.key),[...snapshot.readings].sort((a,b)=>a.sensorIndex-b.sensorIndex||a.key.localeCompare(b.key)).map(row=>row.key));
+ assert.deepEqual(snapshot.readings.map(row=>row.key.replace(/^mac:v1:(?:system:|smc:Mac17%2C9:)/,'')),['cpu-total','54703034:temp.v1','54673055:temp.v1','memory-active','disk-root-available','network-receive','46304163:rpm.v1','50535452:power.v1']);
 });
 
 test('every 1920 by 960 listing image is fully opaque',async()=>{

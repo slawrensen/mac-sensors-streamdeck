@@ -352,3 +352,42 @@ test('a failed, missing or expired health read removes only health readings',asy
 	r.clock.now=3300+TTL_MS;assert.throws(()=>r.provider.current(),{reason:'no-readable-sensors'},'health rows expire on the same TTL as every other reading');
 	r.provider.close();
 });
+// Reading order: the picker, a dial with no rotation set and a detail page in source mode list readings in snapshot order.
+type OrderedRow={key:string;label:string;group:string;type:string;scope:string;variants?:string[]};
+const UNIT_OF:Record<string,string>={temperature:'°C',fan:'RPM',voltage:'V',current:'A',power:'W'};
+/** One SMC packet as the native reader returns it: every row the catalog gives this Mac, in catalog order. */
+function catalogPacket(at:number,model:string,chip:string,cpu:string,own:(row:OrderedRow)=>boolean):NativePacket {
+	const next=packet('smc',at);next.model=model;next.chip=chip;next.cpu=cpu;
+	next.rows=(wholeCatalog.rows as OrderedRow[]).filter(row=>row.scope==='common'||row.scope==='apple'||own(row)).map(row=>({...smcRow(row.key,row.group,row.type,UNIT_OF[row.type]!,row.type==='fan'?2000:45,at),label:row.label}));
+	return next;
+}
+const labelsIn=(snapshot:SensorSnapshot,group:string):string[]=>snapshot.readings.filter(reading=>snapshot.sensors[reading.sensorIndex]?.name===group).map(reading=>reading.label);
+const numbered=(labels:string[]):string[]=>labels.filter(label=>/ (core|zone) [0-9]+$/.test(label));
+test('readings are listed by group, then system counters, computed, SMC and health, then catalog order, never by identity',async()=>{
+	const r=rig();r.clock.now=100;r.provider.read();
+	const counters=packet('public',100);counters.cpuValid=counters.networkValid=counters.storageValid=true;counters.cpuTicks=[[10,0,10,0]];await publish(r,'public',counters);
+	r.clock.now=1100;r.provider.read();const next=packet('public',1100);next.cpuValid=next.networkValid=next.storageValid=true;next.cpuTicks=[[30,0,30,0]];next.networkIn=next.storageRead='9000';await publish(r,'public',next);
+	await publish(r,'smc',catalogPacket(1100,'Mac17,9','t6050','Apple M5 Pro',row=>row.scope==='Mac17,9'||(row.scope==='m5'&&(row.variants?.includes('pro')??true))));
+	await publish(r,'health',healthPacket(1100));
+	const m5=r.provider.current()!;
+	const cores=[...Array.from({length:6},(_,i)=>`Super core ${i+1}`),...Array.from({length:12},(_,i)=>`Perf core ${i+1}`),...Array.from({length:12},(_,i)=>`Super zone ${i+1}`)];
+	assert.deepEqual(labelsIn(m5,'CPU').slice(0,6),['CPU usage','CPU average','Hottest core','CPU diode','Virtual diode','CPU proximity'],'counters, computed, then the SMC in catalog order');
+	assert.deepEqual(numbered(labelsIn(m5,'CPU')),cores,'super cores 1 to 6, performance cores 1 to 12, then the other super cluster sensors');
+	assert.deepEqual(labelsIn(m5,'GPU').filter(label=>/ [0-9]+$/.test(label)),[...Array.from({length:4},(_,i)=>`GPU region ${i+1}`),...Array.from({length:8},(_,i)=>`GPU ${i+1}`)],'TG Pro\'s four GPU regions first');
+	assert.deepEqual(labelsIn(m5,'Fans').slice(0,4),['Fan average','Fan 1','Fan 2','Fan 3']);
+	assert.deepEqual(labelsIn(m5,'Battery'),['Battery','Battery 2',...labelsIn(m5,'Battery').slice(2,-2),'Battery cycles','Battery health'],'health readings follow the SMC ones');
+	assert.deepEqual(m5.sensors.map(sensor=>sensor.name),['CPU','GPU','Memory','Storage','Network','Battery','Fans','System']);
+	r.provider.close();
+	// An M2: efficiency cores 1 to 4 in order. Sorted by the hex of their identity they listed 1, 4, 3, 2.
+	const m2=rig();await readM2(m2,100,catalogPacket(100,M2_MODEL,'t6021','Apple M2',row=>row.scope==='m2'));
+	assert.deepEqual(numbered(labelsIn(m2.provider.current()!,'CPU')),[...Array.from({length:8},(_,i)=>`Perf core ${i+1}`),...Array.from({length:4},(_,i)=>`Eff core ${i+1}`)]);
+	m2.provider.close();
+});
+test('a reading that moves in the list starts a new catalog revision, so a cached list never keeps the old order',async()=>{
+	const r=rig();await readM2(r,100,catalogPacket(100,M2_MODEL,'t6021','Apple M2',row=>row.scope==='m2'));const before=r.provider.current()!;
+	const swapped=catalogPacket(1100,M2_MODEL,'t6021','Apple M2',row=>row.scope==='m2'),first=swapped.rows.findIndex(row=>row.label==='Eff core 1'),second=swapped.rows.findIndex(row=>row.label==='Eff core 2');
+	[swapped.rows[first],swapped.rows[second]]=[swapped.rows[second]!,swapped.rows[first]!];
+	const after=await readM2(r,1100,swapped);
+	assert.ok(after.catalogRevision!>before.catalogRevision!);assert.deepEqual(numbered(labelsIn(after,'CPU')).slice(-4),['Eff core 2','Eff core 1','Eff core 3','Eff core 4']);
+	r.provider.close();
+});
