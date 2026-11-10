@@ -217,7 +217,6 @@ test('a computed reading is withheld unless every input is fresh and valid in th
 		['core from the future',next=>{next.rows[4]!.continuousMs=next.continuousMs+1;},[FAN_AVERAGE]],
 		['fan invalid',next=>{next.rows.find(row=>row.key==='F1Ac')!.valid=false;},[CPU_AVERAGE,CPU_HOTTEST]],
 		['fan missing, target still read',next=>{next.rows=next.rows.filter(row=>row.key!=='F0Ac');},[CPU_AVERAGE,CPU_HOTTEST]],
-		['unqualified model',next=>{next.model='Mac16,1';},[]],
 		['unqualified chip: no fixed list, so the fan average covers what answered',next=>{next.chip='t6041';},[FAN_AVERAGE]],
 		['source error',next=>{next.error=12;},[]]
 	];
@@ -226,6 +225,13 @@ test('a computed reading is withheld unless every input is fresh and valid in th
 		assert.deepEqual(COMPUTED.filter(key=>snapshot.byKey.has(key)),expected,name);
 		r.provider.close();
 	}
+});
+test('an unqualified model gets only the every-Mac computed readings, under its own model',async()=>{
+	const r=rig();const snapshot=await readM5(r,100,next=>{next.model='Mac16,1';});
+	const computed=[...snapshot.byKey.keys()].filter(key=>key.startsWith('mac:v1:computed:')).sort();
+	assert.deepEqual(computed,['mac:v1:computed:Mac16%2C1:computer-average:temp.v1','mac:v1:computed:Mac16%2C1:fan-average:rpm.v1','mac:v1:computed:Mac16%2C1:hottest-sensor:temp.v1']);
+	assert.equal(snapshot.byKey.get('mac:v1:computed:Mac16%2C1:hottest-sensor:temp.v1')?.value,99,'the side sensor counts where no fixed list applies');
+	r.provider.close();
 });
 test('a stale input is never reused: a read missing one core removes the CPU readings instead of averaging the old value',async()=>{
 	const r=rig();await readM5(r,100);

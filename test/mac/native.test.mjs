@@ -75,7 +75,9 @@ test('every chip family and variant the catalog lists gets its own rows, each ke
 	assert.deepEqual([label('Apple M1','Tp09'),label('Apple M2','Tp09'),label('Apple M6','Tp09')],['CPU efficiency core 1','CPU performance core 3','CPU super core 3']);
 	// M5 Pro and Max read the layout measured on the M5 Pro; M5 and M5 Ultra keep the source's keys under names that claim no core type.
 	const cores=cpu=>native.testCatalog('Mac0,0','t0000',1,cpu).rows.filter(row=>row.group==='CPU'&&/ (core|sensor) [0-9]+$/.test(row.label)).map(row=>row.key+' '+row.label);
-	for(const cpu of ['Apple M5 Pro','Apple M5 Max'])assert.deepEqual(cores(cpu).slice(0,7),['Tp04 CPU super core 1','Tp0G CPU super core 2','Tp0R CPU super core 3','Tp0a CPU super core 4','Tp0j CPU super core 5','Tp0u CPU super core 6','Tm04 CPU performance core 1'],cpu);
+	for(const cpu of ['Apple M5 Pro','Apple M5 Max'])assert.deepEqual(cores(cpu),['Tp04 CPU super core 1','Tp0G CPU super core 2','Tp0R CPU super core 3','Tp0a CPU super core 4','Tp0j CPU super core 5','Tp0u CPU super core 6',
+		'Tm04 CPU performance core 1','Tm0G CPU performance core 2','Tm0R CPU performance core 3','Tm0a CPU performance core 4','Tm0j CPU performance core 5','Tm0u CPU performance core 6',
+		'Tm1Q CPU performance core 7','Tm1c CPU performance core 8','Tm1o CPU performance core 9','Tm21 CPU performance core 10','Tm2D CPU performance core 11','Tm2P CPU performance core 12'],cpu);
 	for(const cpu of ['Apple M5','Apple M5 Ultra'])assert.deepEqual([cores(cpu)[0],cores(cpu)[17],cores(cpu).length],['Tp00 CPU sensor 1','Tp0y CPU sensor 18',18],cpu);
 	// The two M4 GPU rows that differ between the base chip and Pro or Max.
 	const gpu=cpu=>native.testCatalog('Mac0,0','t0000',1,cpu).rows.filter(row=>/^GPU [12]$/.test(row.label)).map(row=>row.key);
@@ -132,7 +134,7 @@ test('a production read reports the facts its rows were chosen by, on whatever M
 	if(packets[0].appleSilicon!==1)assert.deepEqual([smc.table,smc.tableMeasured],['',false],'an Intel Mac never gets a chip family table');
 });
 test('a key the SMC does not have is asked again after 1, 2, 4 ... reads, then about every 64 to 95; a present key is read every time',()=>{
-	// The measured model against an SMC that has 3 of its 74 rows. Mirrors HWMAC_ABSENT_RECHECK_READS and its per-row offset in native/hwmac/collectors.h.
+	// The measured model against an SMC that has 3 of its 108 rows (MAC17_9_ROWS). Mirrors HWMAC_ABSENT_RECHECK_READS and its per-row offset in native/hwmac/collectors.h.
 	const RECHECK=64,OFFSETS=32,present={Tp04:float(44),TaTP:float(33),F0Ac:float(1500)},absent=MAC17_9_ROWS-3,READS=400;
 	const run=native.testSmc('Mac17,9','t6050',1,'Apple M5 Pro',scripted(present),READS),asked=run.transportCalls.map(calls=>calls-3);
 	// First read: key information for every row, then the value of the three that exist. Every absent key is then asked together while its wait doubles.
