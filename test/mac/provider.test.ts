@@ -181,6 +181,14 @@ const COMPUTER_AVERAGE='mac:v1:computed:Mac17%2C9:computer-average:temp.v1',HOTT
 function smcRow(key:string,group:string,kind:string,unit:string,value:number,at:number):NativeRow {return {key,label:key,group,kind,unit,value,valid:true,continuousMs:at,wallSeconds:1700000000+at/1000,error:0,systemCode:0};}
 /** The other temperatures of the Mac17,9 whole-Mac set, besides its 18 cores. */
 const WHOLE_MAC_OTHERS=['Tg08','Tg12','Tg29','Tg3B','TB1T','TB2T','TaLP','TaRF','TaTP','Ts0P','Ts1P','TCHP','TPSP','TaLT','TaRT','TW0P','TH0x'];
+/** Every whole-Mac test input is a temperature row the catalog gives Mac17,9, so the list cannot name a key that machine never reads. */
+test('the whole-Mac test inputs are temperature rows Mac17,9 reads',()=>{
+	const rows=catalogRows as {key:string;scope:string;type?:string;variants?:string[]}[];
+	const reads=(key:string)=>rows.find(row=>row.key===key&&(['common','apple','Mac17,9'].includes(row.scope)||(row.scope==='m5'&&(row.variants?.includes('pro')??true))));
+	assert.equal(new Set(WHOLE_MAC_OTHERS).size,17);
+	for(const key of [...CORE_KEYS,...WHOLE_MAC_OTHERS])assert.equal(reads(key)?.type,'temperature',key);
+	assert.ok(!WHOLE_MAC_OTHERS.some(key=>CORE_KEYS.includes(key)));
+});
 /** One Mac17,9 SMC packet: cores read 40 to 57 C (mean 48.5, hottest 57), the rest of the whole-Mac set 30 C, a side sensor that stays out of every average at 99 C, fans 2000 and 3000 RPM, and fan target, minimum and maximum rows that must never enter the fan average. */
 function m5Packet(at:number):NativePacket {
 	const next=packet('smc',at);

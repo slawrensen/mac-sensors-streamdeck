@@ -154,6 +154,24 @@ test('a production read reports the facts its rows were chosen by, on whatever M
 	if(smc.error===0)assert.deepEqual(smc.rows.map(row=>[row.key,row.label]),expected.rows.map(row=>[row.key,row.label]));
 	if(process.arch==='arm64'&&!packets[0].cpu.startsWith('Apple '))assert.deepEqual([smc.table,smc.tableMeasured],['',false]);
 	if(packets[0].appleSilicon!==1)assert.deepEqual([smc.table,smc.tableMeasured],['',false],'an Intel Mac never gets a chip family table');
+	// Pinned to the system's own answers, not to the native resolver: hw.model, the brand string and the core layout from sysctl, and
+	// the table catalog.json gives them. Only the chip comes from the packet (the device tree's arm-io device_type).
+	const sysctl=name=>{try{return execFileSync('/usr/sbin/sysctl',['-n',name],{encoding:'utf8'}).trim();}catch{return null;}};
+	const model=sysctl('hw.model'),brand=sysctl('machdep.cpu.brand_string'),levels=Number(sysctl('hw.nperflevels')??0);
+	const layout=levels>0?Array.from({length:levels},(_,level)=>Number(sysctl(`hw.perflevel${level}.physicalcpu`))):[];
+	assert.deepEqual([smc.model,smc.cpu,smc.perfCores],[model,brand,layout]);
+	const own=catalog.models[model],apple=sysctl('hw.optional.arm64')==='1',ownTable=apple&&own!==undefined&&own.chip===smc.chip;
+	const family=Object.entries(catalog.families).find(([,spec])=>spec.variants.some(variant=>spec.brand+VARIANT_SUFFIX[variant]===brand))?.[0];
+	assert.deepEqual([smc.table,smc.tableMeasured],[ownTable?own.family:apple?family??'':'',ownTable&&JSON.stringify(own.cores)===JSON.stringify(layout)]);
+	if(model==='Mac17,9'&&smc.chip==='t6050'&&JSON.stringify(layout)==='[6,12]')assert.deepEqual([smc.table,smc.tableMeasured,smc.error===0?smc.rows.length:MAC17_9_ROWS],['m5',true,MAC17_9_ROWS],'the measured Mac');
+});
+test('CPU names map to their chip family and variant as Apple spells them, from a table written by hand',()=>{
+	// Written out, not derived from catalog.json, so a misspelled brand there fails here. This Mac's sysctl says "Apple M5 Pro".
+	const BRANDS={'Apple M1':['m1','base'],'Apple M1 Pro':['m1','pro'],'Apple M1 Max':['m1','max'],'Apple M1 Ultra':['m1','ultra'],'Apple M2':['m2','base'],'Apple M2 Pro':['m2','pro'],'Apple M2 Max':['m2','max'],'Apple M2 Ultra':['m2','ultra'],
+		'Apple M3':['m3','base'],'Apple M3 Pro':['m3','pro'],'Apple M3 Max':['m3','max'],'Apple M3 Ultra':['m3','ultra'],'Apple M4':['m4','base'],'Apple M4 Pro':['m4','pro'],'Apple M4 Max':['m4','max'],
+		'Apple M5':['m5','base'],'Apple M5 Pro':['m5','pro'],'Apple M5 Max':['m5','max'],'Apple M5 Ultra':['m5','ultra'],'Apple M6':['m6','base'],'Apple M6 Pro':['m6','pro'],'Apple M6 Max':['m6','max'],'Apple A18 Pro':['a18pro','base']};
+	for(const [cpu,[table,variant]] of Object.entries(BRANDS)){const answer=native.testCatalog('Mac0,0','t0000',1,cpu);assert.deepEqual([answer.table,answer.variant,answer.measured],[table,VARIANT_BITS[variant],false],cpu);}
+	assert.equal(Object.keys(BRANDS).length,Object.values(catalog.families).reduce((count,family)=>count+family.variants.length,0),'every name the catalog answers to is in the table');
 });
 test('a key the SMC does not have is asked again after 1, 2, 4 ... reads, then about every 64 to 95; a present key is read every time',()=>{
 	// The measured model against an SMC that has 3 of its 74 rows. Mirrors HWMAC_ABSENT_RECHECK_READS and its per-row offset in native/hwmac/collectors.h.
@@ -252,6 +270,15 @@ test('the production health source names only public battery and drive rows and 
 	const allowed={'battery-cycles':['Battery cycles','Battery','count','cycles'],'battery-health':['Battery health','Battery','percent','%'],'ssd-temperature':['SSD SMART','Storage','temperature','°C']};
 	assert.equal(new Set(packet.rows.map(row=>row.key)).size,packet.rows.length);
 	for(const row of packet.rows){assert.deepEqual([row.label,row.group,row.kind,row.unit],allowed[row.key],row.key);if(row.valid)assert.ok(Number.isFinite(row.value)&&row.continuousMs<=packet.continuousMs,row.key);else assert.notEqual(row.error,0,row.key);}
+	// The measured Mac17,9 has an internal battery and one SMART drive, and all three rows answered in every sample of the 1.0.2
+	// 24-hour observation. Each value lies inside the range the provider accepts (src/mac/provider.ts KIND), the cycle count is a
+	// whole number, and the drive inside the 10 to 120 C window the provider trusts for a whole-Mac temperature.
+	if(packet.model!=='Mac17,9')return;
+	const value=key=>packet.rows.find(row=>row.key===key&&row.valid)?.value;
+	assert.deepEqual(packet.rows.map(row=>[row.key,row.valid]),[['battery-cycles',true],['battery-health',true],['ssd-temperature',true]]);
+	assert.ok(Number.isInteger(value('battery-cycles'))&&value('battery-cycles')>=0,String(value('battery-cycles')));
+	assert.ok(value('battery-health')>0&&value('battery-health')<=200,String(value('battery-health')));
+	assert.ok(value('ssd-temperature')>=10&&value('ssd-temperature')<=120,String(value('ssd-temperature')));
 });
 test('on the qualified Mac17,9 a health read stays a small part of the 25 ms acquisition budget',async()=>{
 	// The drive is found among block storage devices; matching the SMART property over the whole registry took 2 to 9 ms there.
