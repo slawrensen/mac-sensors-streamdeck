@@ -5,7 +5,7 @@ nav_order: 14.4
 description: "What 1.0.2.0 adds to keys and dials: CPU and GPU temperatures on M1 to M6 chips, battery and drive health, and network rates past 4 GiB."
 ---
 
-1.0.2.0 adds readings and changes none: saved keys, dials and their settings keep the readings they had. It ships new native readers for Apple silicon and Intel, and the 1.0.0.0 detail view files unchanged. The [changelog](changelog.html) lists every change.
+1.0.2.0 adds readings, and corrects the names of the core readings on the M5 Pro. Saved keys, dials and their settings keep reading the same sensors. It ships new native readers for Apple silicon and Intel, and the 1.0.0.0 detail view files unchanged. The [changelog](changelog.html) lists every change.
 
 | Change | What you see |
 | --- | --- |
@@ -20,7 +20,7 @@ description: "What 1.0.2.0 adds to keys and dials: CPU and GPU temperatures on M
 | Panel wording | The alert direction box reads **Alert when the value drops to or below these numbers (for fans and free space)**. The details filter samples are `*fan*` and `*cpu*core*`. Fold and rotation hints name the Option key, and the Bar and Ring range help no longer mentions Yes/No readings. |
 | Support reports | The `mac` section counts the health source's readings under `sourceRows` and the computed readings under `computedRows`. It names the CPU, the chip family table in use and whether that table was measured on this model, and lists which SMC keys answered, by name only. |
 
-After the update nothing needs action. The new readings are under **Reading** in a key's or dial's settings.
+After the update nothing needs action. The new readings are under **Reading** in a key's or dial's settings. On the M5 Pro, check any key you labeled by core type: its sensor is unchanged, and the reading's own name may have changed.
 
 On the measured Mac17,9 with an M5 Pro the list grew from 52 readings to 89. Unit tests, a scripted SMC for each chip family, a mock Stream Deck host and hosted runners for both architectures cover software behavior. They do not cover a physical Mac other than the M5 Pro, physical readability, dial gestures or Intel hardware behavior. [Hardware compatibility](hardware.html) lists what ran on which Mac and deck and what is still pending.
 
