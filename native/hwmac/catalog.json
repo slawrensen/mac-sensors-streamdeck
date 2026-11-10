@@ -555,7 +555,7 @@
     },
     {
       "key": "Tm02",
-      "label": "Memory 1",
+      "label": "RAM 1",
       "group": "Memory",
       "type": "temperature",
       "scope": "m1",
@@ -563,7 +563,7 @@
     },
     {
       "key": "Tm06",
-      "label": "Memory 2",
+      "label": "RAM 2",
       "group": "Memory",
       "type": "temperature",
       "scope": "m1",
@@ -571,7 +571,7 @@
     },
     {
       "key": "Tm08",
-      "label": "Memory 3",
+      "label": "RAM 3",
       "group": "Memory",
       "type": "temperature",
       "scope": "m1",
@@ -579,7 +579,7 @@
     },
     {
       "key": "Tm09",
-      "label": "Memory 4",
+      "label": "RAM 4",
       "group": "Memory",
       "type": "temperature",
       "scope": "m1",
@@ -1081,7 +1081,7 @@
     },
     {
       "key": "Tm0p",
-      "label": "Memory 1",
+      "label": "RAM 1",
       "group": "Memory",
       "type": "temperature",
       "scope": "m4",
@@ -1089,7 +1089,7 @@
     },
     {
       "key": "Tm1p",
-      "label": "Memory 2",
+      "label": "RAM 2",
       "group": "Memory",
       "type": "temperature",
       "scope": "m4",
@@ -1097,7 +1097,7 @@
     },
     {
       "key": "Tm2p",
-      "label": "Memory 3",
+      "label": "RAM 3",
       "group": "Memory",
       "type": "temperature",
       "scope": "m4",

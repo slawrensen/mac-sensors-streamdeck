@@ -194,7 +194,7 @@ static void execute_read(napi_env env, void *data) {
 	/* Fixture data was acquired when the job copied its configured values. */
 	if (job->fake.fault == 1) { packet->error = 10; return; }
 	static const char *const FAKE_ROWS[HWMAC_SOURCES][5] = {
-		{ "memory-total", "Memory total", "Memory", "other", "B" },
+		{ "memory-total", "RAM total", "Memory", "other", "B" },
 		{ "TB1T", "Battery", "Battery", "temperature", "°C" },
 		{ "battery-cycles", "Battery cycles", "Battery", "count", "cycles" }
 	};

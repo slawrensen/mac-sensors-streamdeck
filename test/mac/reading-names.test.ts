@@ -4,9 +4,10 @@ import {test} from 'node:test';
 import {inkEdges} from '../../src/ui/format';
 import {inKeyLens,KEY_TEXT_LADDERS,renderReadingKey} from '../../src/ui/key-renderer';
 import {renderDial} from '../../src/ui/dial-renderer';
-import {loadThemes,resolvePalette} from '../../src/ui/themes';
+import {classifyTypeAccent,loadThemes,resolvePalette} from '../../src/ui/themes';
 import {MacProvider,computedRows,counterRows} from '../../src/mac/provider';
 import type {NativeBridge,NativePacket,NativeRow,NativeSource} from '../../src/mac/native-api';
+import type {Reading} from '../../src/hwinfo/types';
 type CatalogRow={key:string;label:string;group:string;type:string;scope:string;variants?:string[]};
 const catalog=(JSON.parse(fs.readFileSync('native/hwmac/catalog.json','utf8')) as {rows:CatalogRow[]}).rows;
 /** The names collectors.c gives its system counter and health rows, read from its source as the build compiles it. */
@@ -47,7 +48,7 @@ test('every reading name fits the key lens whole at the smallest label size, so 
 	}
 });
 test('numbered names follow one pattern per kind',()=>{
-	const numbered=/^(?:(?:Super|Perf|Eff) core|(?:Super|Perf) zone|CPU sensor|GPU region|GPU|Memory|Fan) [1-9][0-9]?(?: (?:target|min|max))?$/;
+	const numbered=/^(?:(?:Super|Perf|Eff) core|(?:Super|Perf) zone|CPU sensor|GPU region|GPU|RAM|Fan) [1-9][0-9]?(?: (?:target|min|max))?$/;
 	for(const entry of catalog.filter(item=>/[0-9]/.test(item.label)&&item.key!=='TB2T'))assert.match(entry.label,numbered,`${entry.scope} ${entry.key}`);
 });
 test('no two names one Mac can show look alike once case is ignored',()=>{
@@ -91,5 +92,7 @@ test('every reading a 1.0.2 key could be saved on keeps its identity under the n
 	const moved=READINGS_1_0_2.filter(reading=>groupNow(reading.identity)!==reading.group).map(reading=>`${reading.label}: ${reading.group} to ${groupNow(reading.identity)}`);
 	assert.deepEqual(moved,['NAND: System to Storage']);
 	assert.equal(snapshot.readings.length,READINGS_1_0_2.length,'no reading appeared or vanished, only names changed');
+	// Type accents read the label for memory (src/ui/themes.ts classifyTypeAccent), so a rename must keep each reading's accent.
+	for(const reading of READINGS_1_0_2){const current:Reading=snapshot.byKey.get(reading.identity)!;assert.equal(classifyTypeAccent(current.type,current.unit,current.label),classifyTypeAccent(current.type,current.unit,reading.label),`${reading.label} to ${current.label}`);}
 	provider.close();
 });

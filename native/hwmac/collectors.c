@@ -301,14 +301,14 @@ void hwmac_collect_public(source_packet *packet) {
 		vm_deallocate(mach_task_self(), (vm_address_t)info, (vm_size_t)length * sizeof(integer_t));
 	}
 	uint64_t total = 0;
-	if (sys_number("hw.memsize", &total, sizeof(total))) system_value(packet, "memory-total", "Memory total", "Memory", (double)total);
+	if (sys_number("hw.memsize", &total, sizeof(total))) system_value(packet, "memory-total", "RAM total", "Memory", (double)total);
 	vm_size_t page_size = 0; vm_statistics64_data_t vm; mach_msg_type_number_t vm_count = HOST_VM_INFO64_COUNT;
 	if (host_page_size(host, &page_size) == KERN_SUCCESS && host_statistics64(host, HOST_VM_INFO64, (host_info64_t)&vm, &vm_count) == KERN_SUCCESS && vm_count == HOST_VM_INFO64_COUNT) {
-		system_value(packet, "memory-free", "Free", "Memory", (double)vm.free_count * page_size);
-		system_value(packet, "memory-active", "Active", "Memory", (double)vm.active_count * page_size);
-		system_value(packet, "memory-inactive", "Inactive", "Memory", (double)vm.inactive_count * page_size);
-		system_value(packet, "memory-wired", "Wired", "Memory", (double)vm.wire_count * page_size);
-		system_value(packet, "memory-compressed", "Compressed", "Memory", (double)vm.compressor_page_count * page_size);
+		system_value(packet, "memory-free", "RAM free", "Memory", (double)vm.free_count * page_size);
+		system_value(packet, "memory-active", "RAM active", "Memory", (double)vm.active_count * page_size);
+		system_value(packet, "memory-inactive", "RAM inactive", "Memory", (double)vm.inactive_count * page_size);
+		system_value(packet, "memory-wired", "RAM wired", "Memory", (double)vm.wire_count * page_size);
+		system_value(packet, "memory-compressed", "RAM compr.", "Memory", (double)vm.compressor_page_count * page_size);
 	}
 	mach_port_deallocate(mach_task_self(), host);
 	struct xsw_usage swap;

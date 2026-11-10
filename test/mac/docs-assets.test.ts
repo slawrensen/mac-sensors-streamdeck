@@ -91,7 +91,7 @@ test('sample readings sit in the groups the shipped Mac provider reports, in its
  const catalog=(JSON.parse(fs.readFileSync('native/hwmac/catalog.json','utf8')) as {rows:{key:string;label:string;group:string;variants?:string[]}[]}).rows,collectors=fs.readFileSync('native/hwmac/collectors.c','utf8');
  // The boards were drawn with the 1.0.1 names, and the pinned scene hashes above keep them as drawn until the private Qt adapter
  // is measured again for the current app. So a sample reading keeps the name its board shows, and this maps it to today's name.
- const NAMED_NOW:Record<string,string>={'CPU super core 1':'Super core 1','System Total':'System total','Memory active':'Active','Network receive':'Network in','Startup volume available':'Disk available'};
+ const NAMED_NOW:Record<string,string>={'CPU super core 1':'Super core 1','System Total':'System total','Memory active':'RAM active','Network receive':'Network in','Startup volume available':'Disk available'};
  for(const reading of sampleReadings){
   const group=sampleGroups[reading.key]!,smc=/^mac:v1:smc:[^:]+:([0-9a-f]{8}):/.exec(reading.key),label=NAMED_NOW[reading.label]??reading.label;
   // One key can carry another name on another chip; the sample readings are the measured M5 Pro's.
