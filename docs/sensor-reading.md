@@ -25,7 +25,7 @@ Show one to four Mac readings on a display key. Add a graph to the one-reading l
 
 The header shows the face the plugin last drew for this key, the reading's name and group, and a data state such as **Live · Mac sensors** or **Saved reading not found**. When the data or the saved selection needs attention, a message under the header names the next step and offers buttons such as **Check again**, **Sensor setup**, **Reload sensor list** or **Pick another reading**.
 
-The theme strip, **Reading** and **Display** start open. **Alerts**, **Press** and **Advanced** start folded, and each folded title carries a one-line summary of what is in force, for example *Warn ≥ 75 °C · critical ≥ 90 °C*. The two buttons at the top right open or fold every section, and Option-click on a section title (the panel calls it Alt-click) does the same. The plugin remembers which sections you left open for each kind of panel while it runs. Folds are not saved with any key, and a restart shows the defaults again.
+The theme strip, **Reading** and **Display** start open. **Alerts**, **Press** and **Advanced** start folded, and each folded title carries a one-line summary of what is in force, for example *Warn ≥ 75 °C · critical ≥ 90 °C*. The two buttons at the top right open or fold every section, and Option-click on a section title does the same. The plugin remembers which sections you left open for each kind of panel while it runs. Folds are not saved with any key, and a restart shows the defaults again.
 
 ![The Sensor Reading settings panel with the header, the theme strip, the Reading and Display sections open, and Alerts, Press and Advanced folded with their summaries](assets/img/settings-key.png)
 
@@ -54,7 +54,7 @@ The settings in panel order. Settings marked with a layout appear only for that 
 | Display | **Cell colors** | Signal (four hues) | Signal, Pairs, Uniform, or one color per cell; four readings |
 | Display | **Show a small label in each cell** | unticked | four readings |
 | Alerts | **Warn at**, **Critical at** | blank (Off) | any number |
-| Alerts | **Alert when the value drops to or below these numbers (for fans and clocks)** | unticked | ticked makes low values alert |
+| Alerts | **Alert when the value drops to or below these numbers (for fans and free space)** | unticked | ticked makes low values alert |
 | Press | **A press** | Cycles current, min, max, avg | Opens sensor details; Tap cycles; hold opens details |
 | Press | **Readings per tile**, **Title tile text**, **Also go back from this key's own position**, **Details list** | One; blank; ticked; Every reading from this reading's sensor | when a press opens details; see [Sensor details](sensor-details.html) |
 | Press | **Add readings**, **Filter** | none; blank | A custom list, or Readings matching a filter; see [Choosing the list](sensor-details.html#choosing-the-list) |
@@ -217,11 +217,9 @@ The **°F** box under **Temperature** converts °C readings to Fahrenheit for di
 
 Bar and Ring find their range automatically, and there are no bounds to type:
 
-- **Percentages** run 0 to 100. On Mac that is CPU usage.
+- **Percentages** run 0 to 100: CPU usage, and Battery health on a Mac that reports it.
 - Every other reading spans the values seen: the reading's MIN and MAX since the plugin last started reading sensors (see [Value shown](#value-shown-stat-mode)), the live value, and the recent samples the plugin holds for it, up to 36. The range therefore keeps its width when a **Read every** change clears the samples. While MIN and MAX are still equal, the range has no width, and the fill sits at the halfway point unless a threshold widens it.
 - **Warn at** and **Critical at** draw amber and red zones toward the alarmed end: the high end normally, the low end when the direction box is ticked. The range widens to keep a zone visible, with a small margin when a threshold sits at or past the edge.
-
-The panel's range sentence also mentions Yes/No readings, which run 0 to 1; the current Mac catalog has none.
 
 Zones draw as muted shades: the alert color blended 45 percent toward the key background. They mark positions; the fill on top shows the live value in the accent color. While the key alerts, the whole key takes the alert palette, and the fill and zones follow it.
 
@@ -246,7 +244,7 @@ See [Thresholds and alerts](thresholds.html) for the full behavior and worked ex
 
 ### Direction
 
-**Alert when the value drops to or below these numbers (for fans and clocks)** makes lower worse: the alert fires at or below each number. Use it for fan speed or free space on the startup volume. Unticked *(default)*, higher is worse, for temperatures, power and CPU usage.
+**Alert when the value drops to or below these numbers (for fans and free space)** makes lower worse: the alert fires at or below each number. Use it for fan speed or free space on the startup volume. Unticked *(default)*, higher is worse, for temperatures, power and CPU usage.
 
 ## Pressing the key
 
@@ -284,7 +282,7 @@ A two-line status replaces the value when the key cannot show a reading. The sav
 | **Reading sensors** / please wait | No reading has arrived since reading started: the first read is still out. | Wait for the first read. |
 | **Sensor missing** / pick again | A reading is selected, but this Mac does not report it right now. | Choose **Reload sensor list** or **Pick another reading**; see [Reading](#reading). |
 | **Source busy** / retrying | 15 seconds after reading started, the first read has still not finished. | Choose **Check again**. |
-| **No sensor data** / copy report | Both sources answered, but no reading is current. | Choose **Check again**. If it stays, choose **Copy support report** under **Advanced → Support**. |
+| **No sensor data** / copy report | Every source answered, but no reading is current. | Choose **Check again**. If it stays, choose **Copy support report** under **Advanced → Support**. |
 | **Tahoma needed** / Open Font Book | The plugin could not find the font Tahoma Bold. | Install Tahoma Bold in Font Book, then choose **Check again**. |
 | **Bridge failed** / reinstall | The native reader for the Node runtime's architecture could not be used. | Quit and reopen Stream Deck. If it persists, see [Keys show Bridge failed](troubleshooting.html#keys-show-bridge-failed). |
 | **Source error** / copy report | A read failed in a way that has no more specific screen. | Choose **Check again**. If it stays, choose **Copy support report** under **Advanced → Support**. |

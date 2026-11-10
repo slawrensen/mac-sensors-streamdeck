@@ -26,7 +26,7 @@ jobs:
           from pathlib import Path
           import re
           root = Path('build/docs-static')
-          pages = {'index','installation','getting-started','sensor-reading','sensor-details','sensor-dial','dial-controls','themes','thresholds','data-sources','status-screens','hardware','faq','troubleshooting','whats-new-1.0.1','changelog'}
+          pages = {'index','installation','getting-started','sensor-reading','sensor-details','sensor-dial','dial-controls','themes','thresholds','data-sources','status-screens','hardware','faq','troubleshooting','whats-new-1.0.1','whats-new-1.0.2','changelog'}
           files = [p for p in root.rglob('*') if p.is_file()]
           for p in root.rglob('*'):
               if p.is_symlink(): raise SystemExit('Symlink in static export')

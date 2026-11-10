@@ -57,11 +57,11 @@ test('Mac poller revalidates cached rows before redraw and closes generations on
 test('a source that stops completing expires at the 15 s TTL while reads continue at the clamped longest interval',async()=>{
 	mock.timers.enable({apis:['setInterval','setTimeout','Date'],now:0});
 	try {
-		const reads:Record<NativeSource,number[]>={public:[],smc:[]};
+		const reads:Record<NativeSource,number[]>={public:[],smc:[],health:[]};
 		const row=(source:NativeSource,at:number):NativeRow=>({key:source==='smc'?'TB1T':'memory-total',label:source,group:source==='smc'?'Battery':'Memory',kind:source==='smc'?'temperature':'other',unit:source==='smc'?'°C':'B',value:source==='smc'?30:1024,valid:true,continuousMs:at,wallSeconds:1.7e9+at/1000,error:0,systemCode:0});
-		const packet=(source:NativeSource,at:number):NativePacket=>({source,rows:[row(source,at)],continuousMs:at,awakeMs:at,wallSeconds:1.7e9+at/1000,durationMs:1,error:0,systemCode:0,operation:'fixture',model:'Mac17,9',chip:'t6050',appleSilicon:1,translated:0,translationError:0,fontAvailable:true,cpuValid:false,cpuTicks:[[0,0,0,0]],networkValid:false,networkIn:'0',networkOut:'0',networkMembers:'1',storageValid:false,storageRead:'0',storageWrite:'0',storageMembers:'1'});
-		// Public completes its first read and the provider's counter rebaseline read at 250 ms, then never again; SMC always completes.
-		const native:NativeBridge={getBuildInfo:()=>({protocol:1,napi:8,version:'t',sourceId:'t',arch:process.arch,platform:'darwin',testHooks:true}),now:()=>Date.now(),open:()=>({read:(source)=>{const at=Date.now();reads[source].push(at);return new Promise(resolve=>{if(source==='smc'||reads.public.length<=2)setTimeout(()=>resolve(packet(source,at)),5);});},close:()=>{}})};
+		const packet=(source:NativeSource,at:number):NativePacket=>({source,rows:[row(source,at)],continuousMs:at,awakeMs:at,wallSeconds:1.7e9+at/1000,durationMs:1,error:0,systemCode:0,operation:'fixture',model:'Mac17,9',chip:'t6050',cpu:'Apple M5 Pro',table:'m5',tableMeasured:true,appleSilicon:1,translated:0,translationError:0,fontAvailable:true,cpuValid:false,cpuTicks:[[0,0,0,0]],networkValid:false,networkIn:'0',networkOut:'0',networkMembers:'1',storageValid:false,storageRead:'0',storageWrite:'0',storageMembers:'1'});
+		// Public completes its first read and the provider's counter rebaseline read at 250 ms, then never again; SMC and health always complete.
+		const native:NativeBridge={getBuildInfo:()=>({protocol:1,napi:8,version:'t',sourceId:'t',arch:process.arch,platform:'darwin',testHooks:true}),now:()=>Date.now(),open:()=>({read:(source)=>{const at=Date.now();reads[source].push(at);return new Promise(resolve=>{if(source!=='public'||reads.public.length<=2)setTimeout(()=>resolve(packet(source,at)),5);});},close:()=>{}})};
 		const subject=poller0((ready)=>new MacProvider(native,ready));
 		subject.setIntervalMs(60000);assert.equal(subject.diagnostics().intervalMs,5000);
 		const memory='mac:v1:system:memory-total';const seen:{at:number;memory:boolean;state:string}[]=[];
@@ -73,7 +73,7 @@ test('a source that stops completing expires at the 15 s TTL while reads continu
 		const expiry=seen.find(item=>item.at>=15250&&!item.memory);
 		assert.equal(expiry?.at,15250,'the public reading leaves at its own 15 s deadline, not at the next read');assert.equal(expiry?.state,'ok');
 		await advance(5000);
-		assert.deepEqual(reads.smc,[0,5000,10000,15000,20000]);assert.deepEqual(reads.public,[0,250,5000]);
+		assert.deepEqual(reads.smc,[0,5000,10000,15000,20000]);assert.deepEqual(reads.health,reads.smc,'a 5 s interval is longer than the health spacing');assert.deepEqual(reads.public,[0,250,5000]);
 		subject.release();
 	}finally{mock.timers.reset();}
 });
@@ -96,22 +96,22 @@ test('a read checks the snapshot and arms expiry once, and a read that throws st
 	assert.deepEqual(reasons(poller0(()=>({read:()=>{throw denied;},current:()=>{throw denied;},untilExpiry:()=>null,age:()=>null,close:()=>{}}))),['access-denied']);
 	assert.deepEqual(reasons(poller0(()=>{throw new HwinfoError('bridge-failed','No bridge');})),['bridge-failed']);
 });
-test('readings that lapse before SMC ever completes are not kept live, whether public then fails, stalls or both sources had completed',async()=>{
+test('readings that lapse before SMC ever completes are not kept live, whether public then fails, stalls or every source had completed',async()=>{
 	const memory='mac:v1:system:memory-total';
 	const row=(source:NativeSource,at:number):NativeRow=>({key:source==='smc'?'TB1T':'memory-total',label:source,group:source==='smc'?'Battery':'Memory',kind:source==='smc'?'temperature':'other',unit:source==='smc'?'°C':'B',value:source==='smc'?30:1024,valid:true,continuousMs:at,wallSeconds:1.7e9+at/1000,error:0,systemCode:0});
-	const packet=(source:NativeSource,at:number):NativePacket=>({source,rows:[row(source,at)],continuousMs:at,awakeMs:at,wallSeconds:1.7e9+at/1000,durationMs:1,error:0,systemCode:0,operation:'fixture',model:'Mac17,9',chip:'t6050',appleSilicon:1,translated:0,translationError:0,fontAvailable:true,cpuValid:false,cpuTicks:[[0,0,0,0]],networkValid:false,networkIn:'0',networkOut:'0',networkMembers:'1',storageValid:false,storageRead:'0',storageWrite:'0',storageMembers:'1'});
+	const packet=(source:NativeSource,at:number):NativePacket=>({source,rows:[row(source,at)],continuousMs:at,awakeMs:at,wallSeconds:1.7e9+at/1000,durationMs:1,error:0,systemCode:0,operation:'fixture',model:'Mac17,9',chip:'t6050',cpu:'Apple M5 Pro',table:'m5',tableMeasured:true,appleSilicon:1,translated:0,translationError:0,fontAvailable:true,cpuValid:false,cpuTicks:[[0,0,0,0]],networkValid:false,networkIn:'0',networkOut:'0',networkMembers:'1',storageValid:false,storageRead:'0',storageWrite:'0',storageMembers:'1'});
 	const settle=():Promise<void>=>new Promise(resolve=>setImmediate(resolve));
-	for(const variant of ['public rejects','public stalls','smc had completed'] as const) {
+	for(const variant of ['public rejects','public stalls','every source had completed'] as const) {
 		const clock={now:100};const out=new Map<NativeSource,{resolve:(p:NativePacket)=>void;reject:(e:unknown)=>void}>();
 		const native:NativeBridge={getBuildInfo:()=>({protocol:1,napi:8,version:'t',sourceId:'t',arch:process.arch,platform:'darwin',testHooks:true}),now:()=>clock.now,open:()=>({read:(source)=>new Promise((resolve,reject)=>out.set(source,{resolve,reject})),close:()=>{}})};
 		const subject=poller0((ready)=>new MacProvider(native,ready));subject.subscribeSeries(memory);
 		const finish=async(source:NativeSource,how:'resolve'|'reject'):Promise<void>=>{const pending=out.get(source);assert.ok(pending,`${variant}: ${source} in flight`);out.delete(source);if(how==='resolve')pending.resolve(packet(source,clock.now));else pending.reject(Object.assign(new Error('fixture'),{code:'HWMAC_ASYNC'}));await settle();};
-		subject.retain();await finish('public','resolve');if(variant==='smc had completed')await finish('smc','resolve');
+		subject.retain();await finish('public','resolve');if(variant==='every source had completed'){await finish('smc','resolve');await finish('health','resolve');}
 		assert.equal(subject.getStatus().state,'ok',variant);assert.equal(subject.getSeries(memory)?.length,1,variant);
 		clock.now=1100;subject.checkAgain();if(variant==='public rejects')await finish('public','reject');
 		clock.now=40_000;const status=subject.getStatus();
 		assert.equal(status.state,'unavailable',variant);
-		assert.equal(status.state==='unavailable'&&status.reason,variant==='smc had completed'?'no-readable-sensors':'pending',variant);
+		assert.equal(status.state==='unavailable'&&status.reason,variant==='every source had completed'?'no-readable-sensors':'pending',variant);
 		assert.equal(subject.getSeries(memory)?.length,0,`${variant}: a lapsed reading leaves no sparkline behind`);
 		subject.release();
 	}

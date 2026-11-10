@@ -10,6 +10,7 @@ Check your Mac and deck and the evidence behind each row. A result from one Mac 
 - **Measured**: ran in the Stream Deck app on my Mac, with a recorded result.
 - **Hosted VM**: ran on hosted CI runners in a virtual machine. This is software evidence, not a physical-device result.
 - **Software tests**: exercised by unit tests or a mock Stream Deck host that simulates device registration and events. Not a physical-device result.
+- **Source table**: the plugin reads a sensor table taken from a named source for that hardware, and software tests cover the code. Nobody has confirmed it on that hardware for me.
 - **Pending**: not run yet.
 - **Not claimed**: no support is claimed.
 
@@ -19,9 +20,10 @@ Check your Mac and deck and the evidence behind each row. A result from one Mac 
 
 | Mac | Evidence | What ran |
 | --- | --- | --- |
-| Apple silicon: Mac17,9 with M5 Pro, macOS 27.0.1 | **Measured** | Stream Deck app 7.5.0 with its Node 24.13.1 on the 8 by 4 Virtual Stream Deck: the 1.0.0.0 package installed from Finder, and 14 system and 38 SMC readings. Stream Deck app 7.6.0 with its Node 24.22.1: a 24-hour observation of the published 1.0.1.0 build, run as a development copy with 32 keys at the 1 second default (24.017 hours, 1,442 samples, no warnings or errors, every plugin measure within its limit). Two faults of a macOS text service during that window were reviewed as unrelated ([PERF.md](https://github.com/slawrensen/mac-sensors-streamdeck/blob/main/PERF.md)). |
-| Other Apple silicon models | **Pending** | Not run. The table of generation-specific SMC readings is qualified only for Mac17,9 with the M5 Pro chip. On another Apple silicon model the plugin offers the 31 common and 4 Apple silicon SMC keys its SMC answers, and the system counters the Mac reports. |
-| Intel | **Hosted VM** | The x86_64 native reader in 1.0.1 is byte-identical to the one in 1.0.0. Hosted Intel CI runners (a virtual machine with an emulated SMC) loaded that exact file and read live system and SMC values for both 1.0.0 and the 1.0.1 release candidate. Physical Intel validation has not been done. |
+| Apple silicon: Mac17,9 with the 18-core M5 Pro, macOS 27.0.1 | **Measured** | Stream Deck app 7.5.0 with its Node 24.13.1 on the 8 by 4 Virtual Stream Deck: the 1.0.0.0 package installed from Finder, and 14 system and 38 SMC readings. Stream Deck app 7.6.0 with its Node 24.22.1: a 24-hour observation of the published 1.0.1.0 build, run as a development copy with 32 keys at the 1 second default (24.017 hours, 1,442 samples, no warnings or errors, every plugin measure within its limit). Two faults of a macOS text service during that window were reviewed as unrelated ([PERF.md](https://github.com/slawrensen/mac-sensors-streamdeck/blob/main/PERF.md)). A build of 1.0.2.0 read 89 readings on this Mac: 14 system, 67 SMC, 5 computed and 3 battery and drive health. The 15-core M5 Pro is also a Mac17,9 and has not been measured. |
+| Other Apple silicon models | **Source table** | Not run. A Mac whose CPU name is Apple M1 to M6 (with Pro, Max or Ultra where the family has them) or Apple A18 Pro reads that chip family's table: per-core CPU temperatures and GPU temperatures, with CPU average and CPU hottest core computed from the cores that answer. The keys and names come from the Stats table for the family, with two exceptions in the M5 family: the M5 Pro and M5 Max core rows follow the measured M5 Pro, and the M5 and M5 Ultra core rows are named CPU sensor 1 to 18 because I cannot say which core each belongs to. A scripted SMC in the native tests reads every family's rows, and no such Mac has confirmed them. It also gets the 55 common and 4 Apple silicon SMC rows its SMC answers, Fan average, Computer average and Hottest sensor, the system counters the Mac reports, and the battery and drive health readings its hardware has. The 23 rows measured on Mac17,9 stay with that model. [Data sources](data-sources.html#smc-readings) lists each family. |
+| Apple silicon in a virtual machine, or a chip the table does not list | **Pending** | Not run on a physical Mac. The plugin offers the common and Apple silicon SMC rows that answer, Fan average, Computer average and Hottest sensor, the system counters, and battery and drive health, and no CPU average or CPU hottest core. |
+| Intel | **Hosted VM** | 1.0.2.0 ships a new x86_64 native reader. Hosted Intel CI runners (a virtual machine with an emulated SMC) built it, ran the test suite, and loaded that exact file under Node 20, 22 and 24 to read live values. They did the same for the reader that 1.0.0 and 1.0.1 share. Physical Intel validation has not been done. |
 | Rosetta on the M5 Pro | **Pending** in the app | Outside the Stream Deck app, x86_64 Node 20, 22 and 24 running under Rosetta loaded the x86_64 reader and read live values on this Mac. Running the whole Stream Deck app under Rosetta has not been checked. The Node runtimes the Stream Deck app supplies on this Mac are arm64 files. |
 | macOS 26.6 | **Hosted VM** | Hosted Apple silicon runners on macOS 26.6.2 and Intel runners on macOS 26.6.1 ran the full test suite and loaded and read the exact shipped native readers. No physical Mac has run Mac Sensors on macOS 26. |
 | macOS 13.5 to 15 | **Pending** | 13.5 is the declared floor. Mac Sensors has not run on these versions. |
@@ -45,18 +47,18 @@ The package requires Stream Deck 7.1 or later, which plugins that use the Node 2
 
 ## Readings measured on the M5 Pro
 
-On Mac17,9 with the M5 Pro and macOS 27.0.1, the picker lists 52 readings: 14 from macOS system counters and 38 from the SMC. Another Mac can report a different set.
+On Mac17,9 with the M5 Pro and macOS 27.0.1, the picker lists 89 readings: 14 from macOS system counters, 67 from the SMC, 5 computed from SMC readings, and 3 battery and drive health readings. Another Mac can report a different set.
 
 | Group | Readings on the measured Mac | Source |
 | --- | --- | --- |
-| CPU | CPU usage; 6 super core and 12 performance core temperatures | System counters; SMC |
-| GPU | 7 GPU temperatures | SMC |
+| CPU | CPU usage; 6 super core and 12 performance core temperatures; 12 more super cluster sensors; CPU average and CPU hottest core | System counters; SMC; computed |
+| GPU | 7 GPU temperatures and 4 GPU regions | SMC |
 | Memory | Memory total, free, active, inactive, wired and compressed; swap used | System counters |
-| Storage | Startup volume total and available; storage read and write rates | System counters |
+| Storage | Startup volume total and available; storage read and write rates; Internal SSD temperature | System counters; health |
 | Network | Network receive and send rates | System counters |
-| Battery | Battery and Battery 2 temperatures; Battery power | SMC |
-| Fans | Fan 1 and Fan 2 speeds | SMC |
-| System | NAND, Airport, Airflow left and Airflow right temperatures; DC In and System Total power; DC In current; DC In voltage | SMC |
+| Battery | Battery and Battery 2 temperatures; Battery power; Battery cycles and Battery health | SMC; health |
+| Fans | Fan 1 and Fan 2 speeds; their target, minimum and maximum speeds; Fan average | SMC; computed |
+| System | Computer average and Hottest sensor; NAND, Airport, Airflow left, Airflow right and Airflow top temperatures; Charger proximity, Power supply proximity, Thunderbolt left, Thunderbolt right, Trackpad and Trackpad actuator temperatures; DC In and System Total power; DC In current; DC In voltage | SMC |
 
 CPU and GPU clock speeds, private GPU usage and the HID temperature channels are not offered. [Data sources](data-sources.html) explains what each reading family means.
 
@@ -80,6 +82,15 @@ The Stream Deck app removes the old page's actions before it shows the new page'
 
 This behavior comes from the code and its software tests. Swipes and page changes on a physical deck have not been checked.
 
+## Send a reading report from your Mac
+
+A chip family table becomes measured when a Mac of that family shows which keys it answers. The support report carries that, without any sensor value:
+
+1. Put one **Sensor Reading** key on a deck and pick any reading, so the plugin is reading sensors.
+2. Open the key's settings, then **Advanced**, **Support**, and choose **Copy support report**.
+3. In the report's `mac` section, `cpu` is the CPU name, `smcTable` the family table in use, and `smcTableEvidence` says `measured`, `source` or `none`. `smcKeys` lists the SMC keys of your table in three groups: `answered`, `absent` (your SMC does not have the key) and `withheld` (the key is there, but its type or value was not accepted).
+4. Open an issue in [GitHub Issues](https://github.com/slawrensen/mac-sensors-streamdeck/issues) titled `Reading report: Mac Sensors 1.0.2.0, [Mac model]` with the report. If a reading's name looks wrong for your Mac, for example more or fewer cores than the chip has, or a temperature that does not move with load, say which.
+
 ## Hardware test procedure
 
 You can check a deck yourself and report the result:
@@ -89,7 +100,7 @@ You can check a deck yourself and report the result:
 3. On keys: judge at arm's length whether each label and value is readable. Set **Warn at** just below the current value and leave **Critical at** blank to see the warning color, then set **Critical at** just below the current value to see the critical color. Set the key's **A press** to **Opens sensor details** and press it. The first time on each kind of deck, accept the app's prompt to install the detail view within 30 seconds. Then press **Back**. Switch to another page and back.
 4. On dials, in this order: **Turn** two slow turns each way and one fast spin; **Short push**; **Long push**; **Pressed turn**; **Touch tap**; **Long touch**; then a page swipe away and back. Note what the dial did for each step. [Dial controls](dial-controls.html) says what each gesture does in your preset.
 5. Open the dial's settings, then **Advanced**, **Support**, and choose **Copy support report**. The report keeps only the most recent 24 events, so copy one report after the turns and another after the pushes and touches.
-6. Open an issue in [GitHub Issues](https://github.com/slawrensen/mac-sensors-streamdeck/issues) titled `Hardware report: Mac Sensors 1.0.1.0, [Mac model], [deck]` with your notes and the reports.
+6. Open an issue in [GitHub Issues](https://github.com/slawrensen/mac-sensors-streamdeck/issues) titled `Hardware report: Mac Sensors 1.0.2.0, [Mac model], [deck]` with your notes and the reports.
 
 ## Event recorder
 

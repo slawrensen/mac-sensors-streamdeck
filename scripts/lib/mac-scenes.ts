@@ -26,7 +26,7 @@ const sampleHistory=(value:number,index:number)=>Array.from({length:36},(_,i)=>v
 // kind, such as a free-space minimum close to its current value.
 const cpuHistory=sampleHistory(62.4,0);
 const sampleRows:{key:string;label:string;unit:string;value:number;min:number;max:number;avg:number;type:SensorType;group:ProviderGroup}[]=[
-	{key:smc('Tp00','temp'),label:'CPU super core 1',unit:'°C',value:62.4,min:Math.min(...cpuHistory),max:Math.max(...cpuHistory),avg:cpuHistory.reduce((sum,value)=>sum+value,0)/cpuHistory.length,type:SensorType.Temperature,group:'CPU'},
+	{key:smc('Tp04','temp'),label:'CPU super core 1',unit:'°C',value:62.4,min:Math.min(...cpuHistory),max:Math.max(...cpuHistory),avg:cpuHistory.reduce((sum,value)=>sum+value,0)/cpuHistory.length,type:SensorType.Temperature,group:'CPU'},
 	{key:smc('Tg0U','temp'),label:'GPU 1',unit:'°C',value:54.8,min:36.2,max:57.3,avg:46.1,type:SensorType.Temperature,group:'GPU'},
 	{key:smc('F0Ac','rpm'),label:'Fan 1',unit:'RPM',value:1820,min:1190,max:2160,avg:1610,type:SensorType.Fan,group:'Fans'},
 	{key:smc('PSTR','power'),label:'System Total',unit:'W',value:38.6,min:9.8,max:64.2,avg:27.4,type:SensorType.Power,group:'System'},

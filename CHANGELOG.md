@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.2.0 - 2026-11-10
+
+- A Mac with an Apple M1 to M6 or A18 Pro chip gets per-core CPU temperatures and GPU temperatures from a table for its chip family, and CPU average and CPU hottest core computed from the cores that answer. Before, only the M5 Pro had per-core temperatures. The tables are adapted from the Stats project, except the M5 Pro and M5 Max core rows, which follow the measured M5 Pro. Only the M5 Pro has been measured.
+- Battery cycles, Battery health and the Internal SSD temperature are new readings on a Mac that reports them. They come from public macOS battery and drive interfaces, asked at most every 1.5 seconds.
+- On the M5 Pro the 18 readings named CPU super core 1 to 6 and CPU performance core 1 to 12 in 1.0.1.0 were all sensors on the super core cluster. A saved key keeps reading the same sensor under its new name, CPU super core 1 to 6 or CPU super cluster sensor 1 to 12. CPU performance core 1 to 12 are now the performance cores: pick one again under Reading to show a performance core. The new CPU average and CPU hottest core cover the 6 super cores and 12 performance cores.
+- On Mac17,9 with the M5 Pro, 11 more temperatures can go on a key or dial: Airflow top, Charger proximity, Power supply proximity, Thunderbolt left and right, Trackpad, Trackpad actuator and GPU region 1 to 4.
+- Every Mac gets each fan's target, minimum and maximum speed, Fan average with two or more fans, and Computer average and Hottest sensor. On Mac17,9 those two cover a fixed list of 37 temperatures, so a CPU super cluster sensor can read higher than Hottest sensor. On another Mac they cover the SMC temperatures between 10 and 120 °C in one read.
+- Network receive and Network send keep their rate when an interface passes 4 GiB of traffic. Before, both showed Sensor missing for one read and their sparklines started over.
+- **Source busy**, **Bridge failed** and **Needs macOS** say in the settings panel what happened and what to do next.
+- The settings panel uses Mac wording: the alert direction box names fans and free space, the details filter samples are `*fan*` and `*cpu*core*`, fold and rotation hints name the Option key, and the Bar and Ring range help no longer mentions Yes/No readings.
+- Support reports count the readings of the health source (`sourceRows.health`) and the computed readings (`computedRows`), name the CPU and the chip family table in use, and list which SMC keys answered, by name only.
+
 ## 1.0.1.0 - 2026-10-28
 
 - Pressing a Sensor Reading key now cycles MIN, MAX and AVG values that Mac Sensors keeps from the reads since reading started, instead of N/A. They start over after a gap in that reading, and **Value shown** and detail tiles show the same values.

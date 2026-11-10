@@ -26,7 +26,7 @@ Mac Sensors needs no administrator password, privileged helper, daemon or kernel
 
 ### Get the package
 
-Install from the [Elgato Marketplace]({{ site.plugin_release.marketplace }}), or download `com.lawrensen.mac.streamDeckPlugin` from the [latest GitHub release](https://github.com/slawrensen/mac-sensors-streamdeck/releases/latest). The current version is {{ site.plugin_release.package_version }} on both.
+Install from the [Elgato Marketplace]({{ site.plugin_release.marketplace }}), or download `com.lawrensen.mac.streamDeckPlugin` from the [latest GitHub release](https://github.com/slawrensen/mac-sensors-streamdeck/releases/latest). {% if site.plugin_release.marketplace_version == site.plugin_release.package_version %}The current version is {{ site.plugin_release.package_version }} on both.{% else %}The GitHub release is {{ site.plugin_release.package_version }}; the Marketplace listing offers {{ site.plugin_release.marketplace_version }}.{% endif %}
 
 ### Install from a .streamDeckPlugin file
 
@@ -56,7 +56,7 @@ Install from the [Marketplace listing]({{ site.plugin_release.marketplace }}). C
 
 - **Newer version:** open the newer package the same way. The Stream Deck app replaces the installed plugin. Your keys, dials and their settings stay, because the Stream Deck app stores them outside the plugin folder. On the measured Mac, 1.0.0.0 installed this way over an earlier build.
 - **Same version:** opening a package of the installed version changes nothing. The app writes `AlreadyInstalled` to its log in `~/Library/Logs/ElgatoStreamDeck`, the running plugin keeps going, and its files stay as they were. To install the same version again, remove it first.
-- **Detail view:** after an update that changes the bundled detail view, Stream Deck asks again to install it the first time details open on each kind of deck. 1.0.1.0 ships the 1.0.0.0 detail view files unchanged.
+- **Detail view:** after an update that changes the bundled detail view, Stream Deck asks again to install it the first time details open on each kind of deck. 1.0.1.0 and 1.0.2.0 ship the 1.0.0.0 detail view files unchanged.
 
 ### Removing
 
@@ -94,7 +94,7 @@ Do not remove a system font to test this screen. [Status screens](status-screens
 
 ## Verify it works
 
-Drag **Sensor Reading** onto a key and choose a **Reading**. The key shows a number and unit, and the settings header shows **Live · Mac sensors**. To see how many readings this Mac returned, open **Advanced**, then **Support**, choose **Copy support report**, and look at `sourceRows` in the `mac` section: `public` counts system readings and `smc` counts SMC readings. The measured M5 Pro reports `public` 14 and `smc` 38. Follow the [five-step guide](getting-started.html) or find the exact message in [Troubleshooting](troubleshooting.html).
+Drag **Sensor Reading** onto a key and choose a **Reading**. The key shows a number and unit, and the settings header shows **Live · Mac sensors**. To see how many readings this Mac returned, open **Advanced**, then **Support**, choose **Copy support report**, and look at `sourceRows` in the `mac` section: `public` counts system readings, `smc` counts SMC readings and `health` counts battery and drive health readings; `computedRows` counts the readings computed from SMC readings. The measured M5 Pro reports `public` 14, `smc` 67, `health` 3 and `computedRows` 5. Follow the [five-step guide](getting-started.html) or find the exact message in [Troubleshooting](troubleshooting.html).
 
 ## Next steps
 

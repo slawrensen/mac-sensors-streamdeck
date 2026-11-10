@@ -16,8 +16,10 @@ own; updates arrive through the Elgato Marketplace or the GitHub release page.
 ## What the plugin touches
 
 The plugin runs inside Elgato's Stream Deck app on macOS. It reads local
-macOS system interfaces and a bounded set of typed SMC keys, read-only, on the
-local machine only. It has no sensor-register setter and no fan control. It
+macOS system interfaces, a bounded set of typed SMC keys, and battery and
+internal drive health through public IOKit interfaces (IOPowerSources,
+AppleSmartBattery registry properties and the NVMe SMART read), read-only, on
+the local machine only. It has no sensor-register setter and no fan control. It
 installs no privileged helper, daemon or kernel extension and needs no
 administrator access for its reads. Settings are stored through the Stream Deck app and logs
 stay local. It makes no network requests and has no telemetry; its only

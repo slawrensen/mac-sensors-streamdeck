@@ -1,4 +1,4 @@
 // Generated from the native source inputs by scripts/build-native.mjs.
 export const NATIVE_PROTOCOL = 1;
-export const NATIVE_VERSION = '1.0.0';
-export const NATIVE_SOURCE_ID = '320b1ce96d748bc4be9dea79ee1f3cf561cb0d60c2e0450efafb4281cb2ed9db';
+export const NATIVE_VERSION = '1.1.0';
+export const NATIVE_SOURCE_ID = '648dc35dc7a7a9b4bb9a823712c12068b86a7d24c59133364bcbdcd7b477619e';

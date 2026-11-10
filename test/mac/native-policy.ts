@@ -2,7 +2,7 @@
 import fs from 'node:fs';
 import type {NativeBridge,NativePacket,NativeSource} from '../../src/mac/native-api';
 export const allowTestNative=true;
-interface Fixture {public?:{value?:number;fault?:number;delayMs?:number};smc?:{value?:number;fault?:number;delayMs?:number};hold?:NativeSource[];}
+interface Fixture {public?:{value?:number;fault?:number;delayMs?:number};smc?:{value?:number;fault?:number;delayMs?:number};health?:{value?:number;fault?:number;delayMs?:number};hold?:NativeSource[];}
 interface FakeBridge extends NativeBridge {configure(fixture:Fixture):void;}
 export function prepareNative(bridge:NativeBridge):NativeBridge {
 	(globalThis as {__MAC_SENSORS_TEST_BUILD__?:boolean}).__MAC_SENSORS_TEST_BUILD__=true;

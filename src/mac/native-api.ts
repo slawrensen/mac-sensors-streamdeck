@@ -1,5 +1,7 @@
 /** Internal read-only addon contract. No native resource identifier crosses it. */
-export type NativeSource = 'public' | 'smc';
+export type NativeSource = 'public' | 'smc' | 'health';
+/** Every source a read asks, in request order. */
+export const NATIVE_SOURCES: readonly NativeSource[] = ['public', 'smc', 'health'];
 export interface NativeRow {
 	key: string; label: string; group: string; kind: string; unit: string;
 	value: number; valid: boolean; continuousMs: number; wallSeconds: number;
@@ -11,6 +13,8 @@ export interface NativePacket {
 	continuousMs: number; awakeMs: number; wallSeconds: number; durationMs: number;
 	error: number; systemCode: number; operation: string;
 	model: string; chip: string; appleSilicon: number; translated: number; translationError: number;
+	/** CPU brand string, the chip family table this Mac reads (empty when none), and whether this model and chip were measured. */
+	cpu: string; table: string; tableMeasured: boolean;
 	fontAvailable: boolean;
 	cpuValid: boolean; cpuTicks: number[][];
 	networkValid: boolean; networkIn: string; networkOut: string; networkMembers: string;

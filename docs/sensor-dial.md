@@ -160,7 +160,7 @@ A dial and a Sensor Reading key both count one sample per acquisition and averag
 
 The panel groups settings under **Reading**, **Display**, **Alerts**, **Controls** and **Advanced**. Its header shows the current face, the reading's name and the data state, for example *Live · Mac sensors*. When something needs fixing, a status message under the header names the repair. The theme strip sits below the header.
 
-The theme strip, **Reading** and **Display** start open; the other sections start folded. A folded section summarizes its settings on its title line. **Open all sections** and **Fold all sections** in the header, or Option-click a section title (the panel's tooltip says Alt-click), change them together. The plugin remembers which sections you left open for every Sensor Dial panel until the plugin restarts.
+The theme strip, **Reading** and **Display** start open; the other sections start folded. A folded section summarizes its settings on its title line. **Open all sections** and **Fold all sections** in the header, or Option-click a section title, change them together. The plugin remembers which sections you left open for every Sensor Dial panel until the plugin restarts.
 
 | Section | Setting | What it does |
 | --- | --- | --- |
@@ -180,7 +180,7 @@ The theme strip, **Reading** and **Display** start open; the other sections star
 | Display | **Reading colors** | Overviews only: a preset or individual number colors, with **Auto** to reset a reading. See [Reading colors](#reading-colors). |
 | Display | **Bar from** / **Bar to** | One reading only: fixed ends of the range bar. Leave blank to follow the session low and high. A decimal comma such as `30,5` works. Anything else is kept as typed, and the field says *Not a number. The bar ignores this field until it is one.* See [Bar range](#bar-range-fixed-vs-session). |
 | Alerts | **Warn at** / **Critical at** | Values at which the bar fill, or an overview row's value, turns amber or red. Empty means off. Use the displayed temperature unit. |
-| Alerts | **Alert when the value drops to or below these numbers (for fans and clocks)** | Flips the comparison, for fan speeds and other readings where lower is worse. Mac Sensors offers no clock readings. |
+| Alerts | **Alert when the value drops to or below these numbers (for fans and free space)** | Flips the comparison, for fan speeds and other readings where lower is worse. |
 | Alerts | **Auto cycle jumps to a critical reading in the rotation and holds there while it stays critical** | Makes the auto cycle alert-aware. Off by default. |
 | Controls | **Gestures** | **Legacy (default)**, **Elite** or **Custom**. Under it the panel lists what each gesture does on this dial now. Custom adds one select per gesture: **Turn**, **Pressed turn**, **Short push**, **Long push**, **Touch tap**, **Long touch**. See [Dial controls and presets](dial-controls.html). |
 | Controls | **Touch zones** | Elite and Custom only: **Off (the whole strip is one tap)** (default), **Two: left and right switch readings**, or **Three: left and right switch, center taps**. |
@@ -216,7 +216,7 @@ When sensor data is not available, the touchscreen shows a short two-line messag
 | --- | --- |
 | **Reading sensors** / please wait | No reading has arrived since sensor reading started, or every reading lapsed or failed before a full read had completed. Readings appear after the next successful read. |
 | **Source busy** / retrying | The first read has not finished 15 seconds after reading started. Choose **Check again** in the settings panel. |
-| **No sensor data** / copy report | Both sources answered, but no reading is current. Choose **Check again**; if it stays, choose **Copy support report** under **Advanced**, **Support**. |
+| **No sensor data** / copy report | Every source answered, but no reading is current. Choose **Check again**; if it stays, choose **Copy support report** under **Advanced**, **Support**. |
 | **Needs macOS** / check requirements | The Node runtime is not macOS on arm64 or x86_64. See [Installation and requirements](installation.html). |
 | **Bridge failed** / reinstall | The native reader could not load. Quit and reopen Stream Deck. If it persists, see [Keys show Bridge failed](troubleshooting.html#keys-show-bridge-failed). |
 | **Tahoma needed** / Open Font Book | A fixed image, drawn without Tahoma. Install Tahoma Bold in Font Book, then choose **Check again**. |

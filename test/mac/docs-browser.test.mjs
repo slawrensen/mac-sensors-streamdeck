@@ -12,7 +12,7 @@ import { launch } from "../../scripts/lib/cdp.mjs";
 
 const base = process.env.DOCS_TEST_URL ? new URL(process.env.DOCS_TEST_URL.endsWith("/") ? process.env.DOCS_TEST_URL : `${process.env.DOCS_TEST_URL}/`) : null;
 const options = { skip: base ? false : "UNAVAILABLE: set DOCS_TEST_URL to a served Jekyll build or the published site", timeout: 60_000 };
-const PAGES = ["", "installation.html", "getting-started.html", "sensor-reading.html", "sensor-details.html", "sensor-dial.html", "dial-controls.html", "themes.html", "thresholds.html", "data-sources.html", "status-screens.html", "hardware.html", "faq.html", "troubleshooting.html", "whats-new-1.0.1.html", "changelog.html"];
+const PAGES = ["", "installation.html", "getting-started.html", "sensor-reading.html", "sensor-details.html", "sensor-dial.html", "dial-controls.html", "themes.html", "thresholds.html", "data-sources.html", "status-screens.html", "hardware.html", "faq.html", "troubleshooting.html", "whats-new-1.0.1.html", "whats-new-1.0.2.html", "changelog.html"];
 let browser;
 let exceptions = [];
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -211,7 +211,8 @@ test("navigation, articles and full-image links work without JavaScript", option
 			images: [...document.querySelectorAll(".main-content img")].length
 		})`);
 		assert.notEqual(facts.nav, "none", "the navigation is visible without the menu script");
-		assert.equal(facts.links, 16);
+		// One link per navigation entry: every page except the not-found page (scripts/validate-docs.mjs requires each to be listed).
+		assert.equal(facts.links, PAGES.length);
 		assert.ok(facts.headings > 3);
 		assert.ok(facts.images > 0);
 		await open("", { width: 1280, height: 800, script: false });

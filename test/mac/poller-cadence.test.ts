@@ -19,6 +19,7 @@ async function advance(ms: number): Promise<void> { for (let i = 0; i < ms; i++)
 const SMC = 'mac:v1:smc:Mac17%2C9:54423154:temp.v1';
 const MEM = 'mac:v1:system:memory-free';
 const CPU = 'mac:v1:system:cpu-total';
+const NET = 'mac:v1:system:network-receive';
 /** Mock clock origin; every recorded time is relative to it. */
 const START_MS = 1_000_000;
 /** The default Read every. */
@@ -38,23 +39,28 @@ type Emit = { at: number; signature: string; smc: boolean; mem: boolean; cpu: bo
 interface Rig { poller: MacPoller; emits: Emit[]; reads: Record<NativeSource, number[]> }
 /** Read duration in ms: fixed, or by the 1-based count of that source's reads (the first read of a session is the slow cold one). */
 type Delay = number | ((n: number) => number);
-/** Real MacPoller and MacProvider over a fake bridge whose reads settle after a delay per source. */
-function rig(delay: Record<NativeSource, Delay>, options: { smcError?: boolean; publicError?: (n: number) => boolean; cpu?: boolean; intervalMs?: number; clock?: false; asleepMs?: () => number; clockFails?: () => boolean } = {}): Rig {
-	const reads: Record<NativeSource, number[]> = { public: [], smc: [] };
+/** Mirrors HEALTH_MIN_SPACING_MS in src/mac/provider.ts: at the 1 s default the health source is asked every second read. */
+const HEALTH_MIN_SPACING_MS = 1500;
+/**
+ * Real MacPoller and MacProvider over a fake bridge whose reads settle after a delay per source. The health source answers
+ * with no rows after public's delay unless a test sets its own, so it never changes when a read's last source settles.
+ */
+function rig(delay: { public: Delay; smc: Delay; health?: Delay }, options: { smcError?: boolean; publicError?: (n: number) => boolean; cpu?: boolean; intervalMs?: number; clock?: false; asleepMs?: () => number; clockFails?: () => boolean; network?: (n: number) => bigint } = {}): Rig {
+	const reads: Record<NativeSource, number[]> = { public: [], smc: [], health: [] };
 	// asleepMs: time the Mac spent asleep so far. The native continuous clock counts it; the awake clock and Node timers do not.
 	// clockFails: the native clock reads NaN, as when mach_timebase_info fails.
 	const continuous = (): number => (options.clockFails?.() ? NaN : Date.now() + (options.asleepMs?.() ?? 0));
 	const row = (key: string, kind: string, unit: string, value: number, at: number): NativeRow => ({ key, label: key, group: kind === 'temperature' ? 'Battery' : 'Memory', kind, unit, value, valid: true, continuousMs: at, wallSeconds: 1.7e9 + at / 1000, error: 0, systemCode: 0 });
 	const packet = (source: NativeSource, n: number, at: number): NativePacket => ({
 		source, continuousMs: at, awakeMs: at - (options.asleepMs?.() ?? 0), wallSeconds: 1.7e9 + at / 1000, durationMs: 1, error: (source === 'smc' && options.smcError) || (source === 'public' && options.publicError?.(n)) ? 12 : 0, systemCode: 0, operation: 'fixture',
-		rows: source === 'public' ? [row('memory-free', 'other', 'B', 1e9 + n * 4096, at)] : options.smcError ? [] : [row('TB1T', 'temperature', '°C', 40 + (n % 9), at)],
-		model: 'Mac17,9', chip: 't6050', appleSilicon: 1, translated: 0, translationError: 0, fontAvailable: true, cpuValid: options.cpu === true, cpuTicks: [[Math.floor(at / CPU_TICK_MS) * 3, 0, Math.floor(at / CPU_TICK_MS) * 7, 0]],
-		networkValid: false, networkIn: '0', networkOut: '0', networkMembers: '1', storageValid: false, storageRead: '0', storageWrite: '0', storageMembers: '1'
+		rows: source === 'public' ? [row('memory-free', 'other', 'B', 1e9 + n * 4096, at)] : source === 'health' || options.smcError ? [] : [row('TB1T', 'temperature', '°C', 40 + (n % 9), at)],
+		model: 'Mac17,9', chip: 't6050', cpu: 'Apple M5 Pro', table: 'm5', tableMeasured: true, appleSilicon: 1, translated: 0, translationError: 0, fontAvailable: true, cpuValid: options.cpu === true, cpuTicks: [[Math.floor(at / CPU_TICK_MS) * 3, 0, Math.floor(at / CPU_TICK_MS) * 7, 0]],
+		networkValid: options.network !== undefined, networkIn: String(options.network?.(n) ?? 0n), networkOut: String(options.network?.(n) ?? 0n), networkMembers: '1', storageValid: false, storageRead: '0', storageWrite: '0', storageMembers: '1'
 	});
 	const bridge: NativeBridge = {
 		getBuildInfo: () => ({ protocol: 1, napi: 8, version: 'test', sourceId: 'test', arch: process.arch, platform: 'darwin', testHooks: true }),
 		now: continuous,
-		open: () => ({ read: (source) => { const at = continuous(); const n = reads[source].push(Date.now() - START_MS); return new Promise((resolve) => { const ms = delay[source]; setTimeout(() => resolve(packet(source, n, at)), typeof ms === 'number' ? ms : ms(n)); }); }, close: () => {} })
+		open: () => ({ read: (source) => { const at = continuous(); const n = reads[source].push(Date.now() - START_MS); return new Promise((resolve) => { const ms = delay[source] ?? delay.public; setTimeout(() => resolve(packet(source, n, at)), typeof ms === 'number' ? ms : ms(n)); }); }, close: () => {} })
 	};
 	const poller = poller0((ready) => {
 		const provider = new MacProvider(bridge, ready);
@@ -217,7 +223,9 @@ test('coalescing changes no measurement: own acquisition times, one sample and o
 	const starts = Array.from({ length: READS + 1 }, (_, k) => k * INTERVAL_MS);
 	// The provider's one counter rebaseline read (250 ms after the first public request) is a genuine extra public observation.
 	const publicStarts = [0, 250, ...starts.slice(1)];
-	assert.deepEqual(reads, { public: publicStarts, smc: starts });
+	// One interval after a health request is inside HEALTH_MIN_SPACING_MS and two are not, so health is read every second tick.
+	assert.ok(INTERVAL_MS < HEALTH_MIN_SPACING_MS && 2 * INTERVAL_MS >= HEALTH_MIN_SPACING_MS);
+	assert.deepEqual(reads, { public: publicStarts, smc: starts, health: starts.filter((_, k) => k % 2 === 0) });
 	assert.equal(poller.getSeries(MEM)?.length, publicStarts.length);
 	assert.equal(poller.getSeries(SMC)?.length, starts.length);
 	const stats = new SessionStatsStore();
@@ -248,7 +256,7 @@ test('the last release cancels a pending settle window and stops acquisition', a
 	const count = emits.length;
 	await advance(3 * INTERVAL_MS);
 	assert.equal(emits.length, count);
-	assert.deepEqual(reads, { public: [0], smc: [0] });
+	assert.deepEqual(reads, { public: [0], smc: [0], health: [0] });
 });
 
 test('counter readings appear about 250 ms after a key appears or returns, with no extra reads afterwards', async () => {
@@ -478,4 +486,36 @@ test('a clock that reads NaN publishes about once per read, not on a 1 ms expiry
 	const recovered = emits.find((emit) => emit.at >= FAILS_FROM_MS + FAILS_FOR_MS && emit.mem && emit.smc);
 	assert.ok(recovered && recovered.at <= FAILS_FROM_MS + FAILS_FOR_MS + INTERVAL_MS, `readings back at ${recovered?.at} ms`);
 	assert.equal(emits.at(-1)?.status.state, 'ok');
+});
+
+/** 2^32 bytes: where a 32-bit interface byte counter wraps. */
+const WRAP = 2n ** 32n;
+/** Bytes per public read on a steady link, so the third read lands exactly on 2^32 and later reads pass it. */
+const BYTES_PER_READ = 1_000_000n;
+const crossing = (n: number): bigint => WRAP - 3n * BYTES_PER_READ + BigInt(n) * BYTES_PER_READ;
+const networkCatalog = (emit: Emit): number | undefined => emit.status.state === 'ok' && emit.status.snapshot.byKey.has(NET) ? emit.status.snapshot.catalogRevision : undefined;
+
+test('network counters crossing 4 GiB keep the network rows, their sparkline and the catalog', async () => {
+	const { poller, emits, reads } = rig({ public: 5, smc: 40 }, { network: crossing });
+	poller.subscribeSeries(NET);
+	poller.retain();
+	await advance(8 * INTERVAL_MS + 100);
+	const samples = poller.getSeries(NET)?.length;
+	poller.release();
+	const first = emits.findIndex((emit) => networkCatalog(emit) !== undefined);
+	assert.ok(first >= 0 && reads.public.length >= 4, 'the reads pass 2^32 while the network key is shown');
+	assert.ok(emits.slice(first).every((emit) => networkCatalog(emit) !== undefined), 'no later read withholds the network rows');
+	assert.equal(new Set(emits.slice(first).map(networkCatalog)).size, 1, 'crossing 2^32 changes no catalog');
+	assert.equal(samples, reads.public.length - 1, 'one sample per read after the baseline; the ring is never cleared');
+});
+
+test('a network counter that decreases is a reset: that read withholds the network rows and the sparkline restarts', async () => {
+	// What 32-bit getifaddrs counters reported: the third read wraps to 0, below the second, so no rate exists for it.
+	const { poller, reads } = rig({ public: 5, smc: 40 }, { network: (n) => crossing(n) % WRAP });
+	poller.subscribeSeries(NET);
+	poller.retain();
+	await advance(8 * INTERVAL_MS + 100);
+	const samples = poller.getSeries(NET)?.length;
+	poller.release();
+	assert.equal(samples, reads.public.length - 3, 'the baseline, the sample before the decrease and the withheld read are gone');
 });

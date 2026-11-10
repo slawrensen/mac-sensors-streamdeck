@@ -13,7 +13,7 @@ description: Temperatures, fan speeds, power, CPU usage, memory, storage and net
     <a class="button button-secondary" href="{{ '/installation.html' | relative_url }}">Install <span aria-hidden="true">→</span></a>
   </div>
   <p class="home-requirements"><strong>macOS 13.5 or later</strong> · Stream Deck app 7.1 or later and its Node 24 runtime · Tahoma Bold, which ships with macOS. No separate sensor app. <a href="{{ '/installation.html' | relative_url }}">Requirements and installation</a></p>
-  <p class="home-release">Version {{ site.plugin_release.package_version }} is on the <a href="{{ site.plugin_release.marketplace }}">Elgato Marketplace</a> and <a href="https://github.com/slawrensen/mac-sensors-streamdeck/releases/latest">GitHub releases</a>.</p>
+  <p class="home-release">{% if site.plugin_release.marketplace_version == site.plugin_release.package_version %}Version {{ site.plugin_release.package_version }} is on the <a href="{{ site.plugin_release.marketplace }}">Elgato Marketplace</a> and <a href="https://github.com/slawrensen/mac-sensors-streamdeck/releases/latest">GitHub releases</a>.{% else %}Version {{ site.plugin_release.package_version }} is on <a href="https://github.com/slawrensen/mac-sensors-streamdeck/releases/latest">GitHub releases</a>. The <a href="{{ site.plugin_release.marketplace }}">Elgato Marketplace</a> listing offers {{ site.plugin_release.marketplace_version }}.{% endif %}</p>
 </header>
 
 <section class="hero-gallery" data-gallery aria-label="Production-rendered boards">
@@ -99,7 +99,7 @@ description: Temperatures, fan speeds, power, CPU usage, memory, storage and net
       <p class="deck-where"><strong>Where it goes:</strong> Any key, pedal or Multi Action step</p>
     </li>
   </ul>
-  <p>Which readings appear depends on the Mac and its macOS version. The measured M5 Pro reports 52: 14 from system counters and 38 from the SMC (<a href="{{ '/hardware.html#readings-measured-on-the-m5-pro' | relative_url }}">Readings measured on the M5 Pro</a>). CPU and GPU clock speeds and GPU usage are not offered.</p>
+  <p>Which readings appear depends on the Mac and its macOS version. The measured M5 Pro reports 89: 14 from system counters, 67 from the SMC, 5 computed from SMC readings (CPU average, CPU hottest core, Fan average, Computer average and Hottest sensor), and battery cycles, battery health and the internal SSD temperature (<a href="{{ '/hardware.html#readings-measured-on-the-m5-pro' | relative_url }}">Readings measured on the M5 Pro</a>). Other Apple silicon Mac computers read per-core CPU and GPU temperatures from a table for their chip family, M1 to M6, which I have not measured on that hardware. CPU and GPU clock speeds and GPU usage are not offered.</p>
 </section>
 
 ## What it does not do
@@ -115,5 +115,5 @@ Mac Sensors has no fan control and cannot write a sensor register. It installs n
     <li><a href="{{ site.bug_reports }}">Report a bug <span aria-hidden="true">↗</span></a><span>Name Mac Sensors and its version.</span></li>
   </ul>
   {%- comment -%} The release section moved to its own page; its old heading ids stay here so earlier deep links land on the sentence that points there. {%- endcomment %}
-  <p class="channel-note"><span id="mac-sensors-1010"></span><span id="what-changed-in-101"></span><span id="what-is-still-pending"></span>Version 1.0.1.0 keeps MIN, MAX and AVG on keys and keeps reading through page changes. <a href="{{ '/whats-new-1.0.1.html' | relative_url }}">What changed in 1.0.1</a> has the details.</p>
+  <p class="channel-note"><span id="mac-sensors-1010"></span><span id="what-changed-in-101"></span><span id="what-is-still-pending"></span>Version 1.0.2.0 adds CPU and GPU temperatures on Apple M1 to M6 chips, battery cycles and health, the internal SSD temperature, more M5 Pro readings and network rates that carry on past 4 GiB. <a href="{{ '/whats-new-1.0.2.html' | relative_url }}">What changed in 1.0.2</a> has the details.</p>
 </section>

@@ -2,15 +2,23 @@
 #include "smc.h"
 #include <CoreFoundation/CoreFoundation.h>
 #include <CoreText/CoreText.h>
+#include <IOKit/IOCFPlugIn.h>
+#include <IOKit/ps/IOPowerSources.h>
+#include <IOKit/ps/IOPSKeys.h>
+#include <IOKit/pwr_mgt/IOPM.h>
+#include <IOKit/storage/IOStorageProtocolCharacteristics.h>
+#include <IOKit/storage/nvme/NVMeSMARTLibExternal.h>
 #include <mach/mach.h>
 #include <mach/mach_time.h>
 #include <sys/sysctl.h>
 #include <sys/mount.h>
 #include <net/if.h>
 #include <net/if_dl.h>
+#include <net/if_mib.h>
 #include <net/if_types.h>
 #include <ifaddrs.h>
 #include <errno.h>
+#include <limits.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,14 +26,38 @@
 #include <time.h>
 #include "catalog.inc"
 
-bool hwmac_catalog_applies(unsigned scope, const char *model, const char *chip, int apple_silicon) {
-	if (scope == 0) return true;
-	if (apple_silicon != 1) return false;
-	if (scope == 1) return true;
+_Static_assert(sizeof(HWMAC_CATALOG) / sizeof(HWMAC_CATALOG[0]) <= HWMAC_MAX_CATALOG, "catalog rows");
+size_t hwmac_catalog_count(void) { return sizeof(HWMAC_CATALOG) / sizeof(HWMAC_CATALOG[0]); }
+const sensor_spec *hwmac_catalog_row(size_t index) { return index < hwmac_catalog_count() ? &HWMAC_CATALOG[index] : NULL; }
+/* Chip variant bits: the brand string is the family's brand alone, or the brand followed by one of these names. */
+static unsigned brand_variant(const char *cpu, const char *brand) {
+	size_t length = strlen(brand);
+	if (strncmp(cpu, brand, length) != 0) return 0;
+	const char *rest = cpu + length;
+	return rest[0] == 0 ? 1u : strcmp(rest, " Pro") == 0 ? 2u : strcmp(rest, " Max") == 0 ? 4u : strcmp(rest, " Ultra") == 0 ? 8u : 0;
+}
+void hwmac_resolve_platform(source_packet *packet) {
+	packet->family = 0; packet->model_table = 0; packet->variant = 0; packet->table[0] = 0;
+	if (packet->apple_silicon != 1) return;
+	/* A measured model names its own family, so it keeps its table when the brand string is not the chip's (a translated process reads another). */
 	for (size_t i = 0; i < sizeof(HWMAC_MODELS) / sizeof(HWMAC_MODELS[0]); i++) {
-		if (scope == HWMAC_MODELS[i].scope && strcmp(model, HWMAC_MODELS[i].model) == 0 && strcmp(chip, HWMAC_MODELS[i].chip) == 0) return true;
+		if (strcmp(packet->model, HWMAC_MODELS[i].model) == 0 && strcmp(packet->chip, HWMAC_MODELS[i].chip) == 0) { packet->model_table = (unsigned)i + 1; packet->family = HWMAC_MODELS[i].family + 1; packet->variant = HWMAC_MODELS[i].variant; break; }
 	}
-	return false;
+	/* Otherwise the whole string must be a listed brand and variant: "Apple M1 (Virtual)" or a later chip matches none. */
+	for (size_t i = 0; packet->family == 0 && i < sizeof(HWMAC_FAMILIES) / sizeof(HWMAC_FAMILIES[0]); i++) {
+		unsigned variant = brand_variant(packet->cpu, HWMAC_FAMILIES[i].brand);
+		if ((variant & HWMAC_FAMILIES[i].variants) != 0) { packet->family = (unsigned)i + 1; packet->variant = variant; }
+	}
+	if (packet->family != 0) snprintf(packet->table, sizeof(packet->table), "%s", HWMAC_FAMILIES[packet->family - 1].name);
+}
+bool hwmac_row_applies(const sensor_spec *spec, const source_packet *packet) {
+	switch (spec->scope) {
+		case 0: return true;
+		case 1: return packet->apple_silicon == 1;
+		case 2: return packet->family == spec->selector + 1 && (spec->variants == 0 || (spec->variants & packet->variant) != 0);
+		case 3: return packet->model_table == spec->selector + 1;
+		default: return false;
+	}
 }
 static double tick_ms(uint64_t ticks) {
 	mach_timebase_info_data_t base;
@@ -63,6 +95,10 @@ void hwmac_facts(source_packet *packet) {
 		if (property != NULL) CFRelease(property);
 		IOObjectRelease(entry);
 	}
+	length = sizeof(packet->cpu);
+	if (sysctlbyname("machdep.cpu.brand_string", packet->cpu, &length, NULL, 0) != 0 || length == 0 || length > sizeof(packet->cpu)) packet->cpu[0] = 0;
+	packet->cpu[sizeof(packet->cpu) - 1] = 0;
+	hwmac_resolve_platform(packet);
 }
 static const char *unit_for(const char *kind) {
 	if (strcmp(kind, "temperature") == 0) return "°C";
@@ -105,39 +141,50 @@ void hwmac_collect_smc(smc_context *context, source_packet *packet) {
 		IOObjectRelease(service);
 		if (status != KERN_SUCCESS) { packet->error = 11; packet->system_error = status; context->connection = 0; goto done; }
 	}
+	hwmac_read_smc_rows(context, packet, IOConnectCallStructMethod);
+ done:
+	packet->continuous_ms = hwmac_continuous_ms(); packet->awake_ms = hwmac_awake_ms(); packet->wall_seconds = wall_now(); packet->duration_ms = packet->continuous_ms - start;
+}
+void hwmac_read_smc_rows(smc_context *context, source_packet *packet, smc_transport transport) {
 	bool broken = false;
 	for (size_t i = 0; i < sizeof(HWMAC_CATALOG) / sizeof(HWMAC_CATALOG[0]); i++) {
 		const sensor_spec *spec = &HWMAC_CATALOG[i];
-		if (!hwmac_catalog_applies(spec->scope, packet->model, packet->chip, packet->apple_silicon)) continue;
+		if (!hwmac_row_applies(spec, packet)) continue;
 		sensor_row *row = new_row(packet, spec->key, spec->label, spec->group, spec->kind, unit_for(spec->kind));
 		if (row == NULL) { packet->error = 12; break; }
 		uint8_t reply[80]; smc_result result = {0};
 		uint32_t key = smc_key(spec->key);
-		/* Metadata is bounded discovery, cached only for this connection. Missing keys retry. */
+		/* Metadata is bounded discovery, cached only for this connection. A key that failed any other way is asked again on the next read;
+		 * a key the SMC says it does not have repeats that answer without a call until its recheck comes up. */
 		if (context->sizes[i] == 0) {
 			row->operation = 9;
-			result = smc_read_request(context->connection, 9, key, 0, 0, reply, IOConnectCallStructMethod);
+			if (context->absent[i] > 0) { context->absent[i]--; row->error = 5; row->firmware_error = HWMAC_SMC_KEY_NOT_FOUND; continue; }
+			result = smc_read_request(context->connection, 9, key, 0, 0, reply, transport);
 			if (result.code == 0) {
 				context->types[i] = smc_u32(reply + 32); context->sizes[i] = smc_u32(reply + 28);
 				if (context->sizes[i] == 0 || context->sizes[i] > 32) { result.code = 2; context->sizes[i] = 0; }
+			} else if (result.code == 5 && result.firmware_code == HWMAC_SMC_KEY_NOT_FOUND) {
+				unsigned wait = context->absent_wait[i] == 0 ? 1 : context->absent_wait[i] * 2u;
+				if (wait > HWMAC_ABSENT_RECHECK_READS) wait = HWMAC_ABSENT_RECHECK_READS;
+				context->absent_wait[i] = (uint8_t)wait;
+				context->absent[i] = (uint8_t)(wait == HWMAC_ABSENT_RECHECK_READS ? wait + (i & 31) : wait);
 			}
 		}
 		double acquired = NAN, acquired_wall = NAN;
-		if (result.code == 0) { row->operation = 5; acquired = hwmac_continuous_ms(); acquired_wall = wall_now(); result = smc_read_request(context->connection, 5, key, context->sizes[i], 0, reply, IOConnectCallStructMethod); }
+		if (result.code == 0) { row->operation = 5; acquired = hwmac_continuous_ms(); acquired_wall = wall_now(); result = smc_read_request(context->connection, 5, key, context->sizes[i], 0, reply, transport); }
 		if (result.code != 0) {
 			row->error = result.code; row->system_error = result.system_code; row->firmware_error = result.firmware_code;
 			if (result.code == 3) broken = true;
 			continue;
 		}
-		double value;
-		if (!smc_decode(context->types[i], context->sizes[i], reply + 48, &value) || value < spec->minimum || value > spec->maximum) { row->error = 13; continue; }
+		double value, minimum = spec->minimum, maximum = spec->maximum;
+		if (spec->scope == 2 && packet->model_table == 0) { minimum = HWMAC_FAMILY_MINIMUM_C; maximum = HWMAC_FAMILY_MAXIMUM_C; }
+		if (!smc_decode(context->types[i], context->sizes[i], reply + 48, &value) || value < minimum || value > maximum) { row->error = 13; continue; }
 		observed(row, value);
 		/* Age from the start of the actual read, never from a delayed return. */
 		row->continuous_ms = acquired; row->wall_seconds = acquired_wall;
 	}
 	if (broken) hwmac_close_smc(context);
- done:
-	packet->continuous_ms = hwmac_continuous_ms(); packet->awake_ms = hwmac_awake_ms(); packet->wall_seconds = wall_now(); packet->duration_ms = packet->continuous_ms - start;
 }
 static int compare_u64(const void *a, const void *b) {
 	uint64_t aa = *(const uint64_t *)a, bb = *(const uint64_t *)b;
@@ -149,11 +196,21 @@ static uint64_t membership(uint64_t *members, size_t count) {
 	for (size_t i = 0; i < count; i++) for (unsigned shift = 0; shift < 64; shift += 8) { hash ^= (members[i] >> shift) & 255; hash *= UINT64_C(1099511628211); }
 	return hash;
 }
-static void network(source_packet *packet) {
-	struct ifaddrs *list = NULL;
-	if (getifaddrs(&list) != 0) return;
+_Static_assert(sizeof(((struct ifmibdata *)0)->ifmd_name) == HWMAC_LINK_NAME, "interface name width");
+/* getifaddrs if_data byte counters are u_int32_t and wrap every 4 GiB. The IFMIB
+ * row for the same index carries if_data64, readable without an entitlement. */
+static bool ifmib_counters(unsigned index, char name[HWMAC_LINK_NAME], uint64_t *received, uint64_t *sent, void *context) {
+	(void)context;
+	if (index > (unsigned)INT_MAX) return false;
+	int mib[6] = { CTL_NET, PF_LINK, NETLINK_GENERIC, IFMIB_IFDATA, (int)index, IFDATA_GENERAL };
+	struct ifmibdata data; size_t length = sizeof(data);
+	if (sysctl(mib, 6, &data, &length, NULL, 0) != 0 || length != sizeof(data)) return false;
+	memcpy(name, data.ifmd_name, HWMAC_LINK_NAME); *received = data.ifmd_data.ifi_ibytes; *sent = data.ifmd_data.ifi_obytes;
+	return true;
+}
+void hwmac_network_from(source_packet *packet, const struct ifaddrs *list, hwmac_link_counters counters, void *context) {
 	uint64_t members[128]; size_t count = 0; bool valid = true;
-	for (struct ifaddrs *item = list; item != NULL; item = item->ifa_next) {
+	for (const struct ifaddrs *item = list; item != NULL; item = item->ifa_next) {
 		if (item->ifa_addr == NULL || item->ifa_addr->sa_family != AF_LINK || item->ifa_data == NULL || item->ifa_name == NULL) continue;
 		const struct if_data *data = (const struct if_data *)item->ifa_data;
 		if (data->ifi_type != IFT_ETHER || strncmp(item->ifa_name, "en", 2) != 0 || item->ifa_name[2] == 0) continue;
@@ -164,11 +221,20 @@ static void network(source_packet *packet) {
 		uint64_t member = (uint64_t)index; bool duplicate = false;
 		for (size_t i = 0; i < count; i++) if (members[i] == member) duplicate = true;
 		if (duplicate) continue;
-		if (count == 128 || UINT64_MAX - packet->network_in < data->ifi_ibytes || UINT64_MAX - packet->network_out < data->ifi_obytes) { valid = false; break; }
-		members[count++] = member; packet->network_in += data->ifi_ibytes; packet->network_out += data->ifi_obytes;
+		const struct sockaddr_dl *address = (const struct sockaddr_dl *)(const void *)item->ifa_addr;
+		unsigned link_index = item->ifa_addr->sa_len >= offsetof(struct sockaddr_dl, sdl_index) + sizeof(address->sdl_index) ? address->sdl_index : 0;
+		char name[HWMAC_LINK_NAME] = {0}; uint64_t received = 0, sent = 0;
+		/* Any unreadable eligible link withholds the aggregate. An index reused since getifaddrs reports another name. */
+		if (count == 128 || link_index == 0 || !counters(link_index, name, &received, &sent, context) || strncmp(name, item->ifa_name, sizeof(name)) != 0 || UINT64_MAX - packet->network_in < received || UINT64_MAX - packet->network_out < sent) { valid = false; break; }
+		members[count++] = member; packet->network_in += received; packet->network_out += sent;
 	}
-	freeifaddrs(list);
 	packet->network_valid = valid && count > 0; packet->network_members = membership(members, count);
+}
+static void network(source_packet *packet) {
+	struct ifaddrs *list = NULL;
+	if (getifaddrs(&list) != 0) return;
+	hwmac_network_from(packet, list, ifmib_counters, NULL);
+	freeifaddrs(list);
 }
 static bool dictionary_counter(CFDictionaryRef dictionary, CFStringRef key, uint64_t *value) {
 	CFTypeRef property = CFDictionaryGetValue(dictionary, key); int64_t number = -1;
@@ -231,4 +297,110 @@ void hwmac_collect_public(source_packet *packet) {
 	packet->duration_ms = hwmac_continuous_ms() - start;
 	packet->continuous_ms = start; packet->awake_ms = awake_start; packet->wall_seconds = wall_start;
 	for (unsigned i = 0; i < packet->count; i++) { packet->rows[i].continuous_ms = start; packet->rows[i].wall_seconds = wall_start; }
+}
+/* NVMe reports the composite temperature in whole kelvin; this is the SI offset, which the Linux NVMe hwmon driver also uses. */
+#define HWMAC_KELVIN_OFFSET 273.15
+/* A row read by one API call is as old as the start of that call. */
+static void observed_at(sensor_row *row, double value, double acquired, double acquired_wall) {
+	observed(row, value);
+	if (row->valid) { row->continuous_ms = acquired; row->wall_seconds = acquired_wall; row->valid = isfinite(acquired) && isfinite(acquired_wall); }
+	if (!row->valid) row->value = NAN;
+}
+/* 1 when IOPowerSources lists a present internal battery, 0 when it lists none (a desktop), -1 when it cannot answer. */
+static int internal_battery(void) {
+	CFTypeRef info = IOPSCopyPowerSourcesInfo(); if (info == NULL) return -1;
+	CFArrayRef list = IOPSCopyPowerSourcesList(info); int present = list == NULL ? -1 : 0;
+	for (CFIndex i = 0; list != NULL && i < CFArrayGetCount(list) && present == 0; i++) {
+		CFDictionaryRef description = IOPSGetPowerSourceDescription(info, CFArrayGetValueAtIndex(list, i));
+		if (description == NULL) continue;
+		CFTypeRef type = CFDictionaryGetValue(description, CFSTR(kIOPSTypeKey)), installed = CFDictionaryGetValue(description, CFSTR(kIOPSIsPresentKey));
+		if (type != NULL && CFGetTypeID(type) == CFStringGetTypeID() && CFEqual(type, CFSTR(kIOPSInternalBatteryType)) && installed != NULL && CFGetTypeID(installed) == CFBooleanGetTypeID() && CFBooleanGetValue(installed)) present = 1;
+	}
+	if (list != NULL) CFRelease(list);
+	CFRelease(info); return present;
+}
+/* A non-negative number from a registry property, or from the BatteryData dictionary where macOS 27 moved the capacities. */
+static bool battery_number(io_service_t battery, CFDictionaryRef data, CFStringRef key, uint64_t *value) {
+	if (data != NULL && dictionary_counter(data, key, value)) return true;
+	CFTypeRef property = IORegistryEntryCreateCFProperty(battery, key, kCFAllocatorDefault, 0); int64_t number = -1;
+	bool found = property != NULL && CFGetTypeID(property) == CFNumberGetTypeID() && CFNumberGetValue((CFNumberRef)property, kCFNumberSInt64Type, &number) && number >= 0;
+	if (property != NULL) CFRelease(property);
+	if (found) *value = (uint64_t)number;
+	return found;
+}
+static void battery(source_packet *packet) {
+	int present = internal_battery(); if (present == 0) return;
+	sensor_row *cycles = new_row(packet, "battery-cycles", "Battery cycles", "Battery", "count", "cycles");
+	sensor_row *health = new_row(packet, "battery-health", "Battery health", "Battery", "percent", "%");
+	if (cycles == NULL || health == NULL) { packet->error = 12; return; }
+	io_service_t service = present < 0 ? 0 : IOServiceGetMatchingService(kIOMainPortDefault, IOServiceMatching("AppleSmartBattery"));
+	if (service == 0) { cycles->error = health->error = 10; return; }
+	/* CycleCount is kIOPMPSCycleCountKey. The capacities are read before BatteryData is released. */
+	double acquired = hwmac_continuous_ms(), acquired_wall = wall_now(); uint64_t count = 0, nominal = 0, design = 0;
+	if (battery_number(service, NULL, CFSTR(kIOPMPSCycleCountKey), &count)) observed_at(cycles, (double)count, acquired, acquired_wall); else cycles->error = 13;
+	acquired = hwmac_continuous_ms(); acquired_wall = wall_now();
+	CFTypeRef data = IORegistryEntryCreateCFProperty(service, CFSTR("BatteryData"), kCFAllocatorDefault, 0);
+	CFDictionaryRef capacities = data != NULL && CFGetTypeID(data) == CFDictionaryGetTypeID() ? (CFDictionaryRef)data : NULL;
+	/* Health is the nominal full charge capacity as a percent of design capacity. System Settings' Maximum Capacity uses a method Apple does not publish. */
+	if (battery_number(service, capacities, CFSTR("NominalChargeCapacity"), &nominal) && battery_number(service, capacities, CFSTR(kIOPMPSDesignCapacityKey), &design) && nominal > 0 && design > 0) observed_at(health, 100.0 * (double)nominal / (double)design, acquired, acquired_wall);
+	else health->error = 13;
+	if (data != NULL) CFRelease(data);
+	IOObjectRelease(service);
+}
+static bool internal_drive(io_service_t service) {
+	CFTypeRef protocol = IORegistryEntrySearchCFProperty(service, kIOServicePlane, CFSTR(kIOPropertyProtocolCharacteristicsKey), kCFAllocatorDefault, kIORegistryIterateRecursively | kIORegistryIterateParents);
+	bool internal = false;
+	if (protocol != NULL && CFGetTypeID(protocol) == CFDictionaryGetTypeID()) {
+		CFTypeRef location = CFDictionaryGetValue((CFDictionaryRef)protocol, CFSTR(kIOPropertyPhysicalInterconnectLocationKey));
+		internal = location != NULL && CFGetTypeID(location) == CFStringGetTypeID() && CFEqual(location, CFSTR(kIOPropertyInternalKey));
+	}
+	if (protocol != NULL) CFRelease(protocol);
+	return internal;
+}
+/* The internal NVMe drive's SMART composite temperature through the public NVMeSMARTLib plug-in. The user client is opened and closed per read. */
+static void drive(source_packet *packet) {
+	/* Matching the property alone walks the whole registry (2 to 9 ms on Mac17,9); the NVMe namespace is a block storage device. */
+	CFMutableDictionaryRef match = IOServiceMatching("IOBlockStorageDevice");
+	CFMutableDictionaryRef property = CFDictionaryCreateMutable(kCFAllocatorDefault, 1, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+	if (match == NULL || property == NULL) { if (match != NULL) CFRelease(match); if (property != NULL) CFRelease(property); return; }
+	CFDictionarySetValue(property, CFSTR(kIOPropertyNVMeSMARTCapableKey), kCFBooleanTrue); CFDictionarySetValue(match, CFSTR(kIOPropertyMatchKey), property); CFRelease(property);
+	io_iterator_t iterator = 0; io_service_t service, internal = 0; unsigned drives = 0;
+	/* IOServiceGetMatchingServices consumes the matching dictionary. */
+	if (IOServiceGetMatchingServices(kIOMainPortDefault, match, &iterator) != KERN_SUCCESS) return;
+	while ((service = IOIteratorNext(iterator)) != 0) {
+		if (internal_drive(service) && drives++ == 0) { internal = service; continue; }
+		IOObjectRelease(service);
+	}
+	IOObjectRelease(iterator);
+	if (drives == 0) return;
+	sensor_row *row = new_row(packet, "ssd-temperature", "Internal SSD", "Storage", "temperature", "°C");
+	if (row == NULL) packet->error = 12;
+	/* One key cannot name two internal drives, so a Mac with more than one gets no value instead of an arbitrary one. */
+	else if (drives > 1) row->error = 13;
+	else {
+		IOCFPlugInInterface **plugin = NULL; IONVMeSMARTInterface **smart = NULL; SInt32 score = 0;
+		kern_return_t status = IOCreatePlugInInterfaceForService(internal, kIONVMeSMARTUserClientTypeID, kIOCFPlugInInterfaceID, &plugin, &score);
+		if (status != KERN_SUCCESS || plugin == NULL) { row->error = 11; row->system_error = status; }
+		else {
+			HRESULT result = (*plugin)->QueryInterface(plugin, CFUUIDGetUUIDBytes(kIONVMeSMARTInterfaceID), (LPVOID *)&smart);
+			if (result != S_OK || smart == NULL) { row->error = 11; row->system_error = result; }
+			else {
+				NVMeSMARTData data; memset(&data, 0, sizeof(data));
+				double acquired = hwmac_continuous_ms(), acquired_wall = wall_now();
+				IOReturn read = (*smart)->SMARTReadData(smart, &data); uint16_t kelvin = data.TEMPERATURE;
+				/* Zero kelvin means the drive reports no temperature. */
+				if (read != kIOReturnSuccess) { row->error = 3; row->system_error = read; }
+				else if (kelvin == 0) row->error = 13;
+				else observed_at(row, (double)kelvin - HWMAC_KELVIN_OFFSET, acquired, acquired_wall);
+				(*smart)->Release(smart);
+			}
+			IODestroyPlugInInterface(plugin);
+		}
+	}
+	IOObjectRelease(internal);
+}
+void hwmac_collect_health(source_packet *packet) {
+	double start = hwmac_continuous_ms(); hwmac_facts(packet);
+	battery(packet); drive(packet);
+	packet->continuous_ms = hwmac_continuous_ms(); packet->awake_ms = hwmac_awake_ms(); packet->wall_seconds = wall_now(); packet->duration_ms = packet->continuous_ms - start;
 }
