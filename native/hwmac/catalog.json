@@ -349,6 +349,174 @@
       "sourceLine": null
     },
     {
+      "key": "F0Tg",
+      "label": "Fan 1 target",
+      "group": "Fans",
+      "type": "fan",
+      "scope": "common"
+    },
+    {
+      "key": "F0Mn",
+      "label": "Fan 1 minimum",
+      "group": "Fans",
+      "type": "fan",
+      "scope": "common"
+    },
+    {
+      "key": "F0Mx",
+      "label": "Fan 1 maximum",
+      "group": "Fans",
+      "type": "fan",
+      "scope": "common"
+    },
+    {
+      "key": "F1Tg",
+      "label": "Fan 2 target",
+      "group": "Fans",
+      "type": "fan",
+      "scope": "common"
+    },
+    {
+      "key": "F1Mn",
+      "label": "Fan 2 minimum",
+      "group": "Fans",
+      "type": "fan",
+      "scope": "common"
+    },
+    {
+      "key": "F1Mx",
+      "label": "Fan 2 maximum",
+      "group": "Fans",
+      "type": "fan",
+      "scope": "common"
+    },
+    {
+      "key": "F2Tg",
+      "label": "Fan 3 target",
+      "group": "Fans",
+      "type": "fan",
+      "scope": "common"
+    },
+    {
+      "key": "F2Mn",
+      "label": "Fan 3 minimum",
+      "group": "Fans",
+      "type": "fan",
+      "scope": "common"
+    },
+    {
+      "key": "F2Mx",
+      "label": "Fan 3 maximum",
+      "group": "Fans",
+      "type": "fan",
+      "scope": "common"
+    },
+    {
+      "key": "F3Tg",
+      "label": "Fan 4 target",
+      "group": "Fans",
+      "type": "fan",
+      "scope": "common"
+    },
+    {
+      "key": "F3Mn",
+      "label": "Fan 4 minimum",
+      "group": "Fans",
+      "type": "fan",
+      "scope": "common"
+    },
+    {
+      "key": "F3Mx",
+      "label": "Fan 4 maximum",
+      "group": "Fans",
+      "type": "fan",
+      "scope": "common"
+    },
+    {
+      "key": "F4Tg",
+      "label": "Fan 5 target",
+      "group": "Fans",
+      "type": "fan",
+      "scope": "common"
+    },
+    {
+      "key": "F4Mn",
+      "label": "Fan 5 minimum",
+      "group": "Fans",
+      "type": "fan",
+      "scope": "common"
+    },
+    {
+      "key": "F4Mx",
+      "label": "Fan 5 maximum",
+      "group": "Fans",
+      "type": "fan",
+      "scope": "common"
+    },
+    {
+      "key": "F5Tg",
+      "label": "Fan 6 target",
+      "group": "Fans",
+      "type": "fan",
+      "scope": "common"
+    },
+    {
+      "key": "F5Mn",
+      "label": "Fan 6 minimum",
+      "group": "Fans",
+      "type": "fan",
+      "scope": "common"
+    },
+    {
+      "key": "F5Mx",
+      "label": "Fan 6 maximum",
+      "group": "Fans",
+      "type": "fan",
+      "scope": "common"
+    },
+    {
+      "key": "F6Tg",
+      "label": "Fan 7 target",
+      "group": "Fans",
+      "type": "fan",
+      "scope": "common"
+    },
+    {
+      "key": "F6Mn",
+      "label": "Fan 7 minimum",
+      "group": "Fans",
+      "type": "fan",
+      "scope": "common"
+    },
+    {
+      "key": "F6Mx",
+      "label": "Fan 7 maximum",
+      "group": "Fans",
+      "type": "fan",
+      "scope": "common"
+    },
+    {
+      "key": "F7Tg",
+      "label": "Fan 8 target",
+      "group": "Fans",
+      "type": "fan",
+      "scope": "common"
+    },
+    {
+      "key": "F7Mn",
+      "label": "Fan 8 minimum",
+      "group": "Fans",
+      "type": "fan",
+      "scope": "common"
+    },
+    {
+      "key": "F7Mx",
+      "label": "Fan 8 maximum",
+      "group": "Fans",
+      "type": "fan",
+      "scope": "common"
+    },
+    {
       "key": "Tp09",
       "label": "CPU efficiency core 1",
       "group": "CPU",
@@ -1569,48 +1737,6 @@
       "label": "Trackpad actuator",
       "group": "System",
       "type": "temperature",
-      "scope": "Mac17,9"
-    },
-    {
-      "key": "F0Tg",
-      "label": "Fan 1 target",
-      "group": "Fans",
-      "type": "fan",
-      "scope": "Mac17,9"
-    },
-    {
-      "key": "F1Tg",
-      "label": "Fan 2 target",
-      "group": "Fans",
-      "type": "fan",
-      "scope": "Mac17,9"
-    },
-    {
-      "key": "F0Mn",
-      "label": "Fan 1 minimum",
-      "group": "Fans",
-      "type": "fan",
-      "scope": "Mac17,9"
-    },
-    {
-      "key": "F1Mn",
-      "label": "Fan 2 minimum",
-      "group": "Fans",
-      "type": "fan",
-      "scope": "Mac17,9"
-    },
-    {
-      "key": "F0Mx",
-      "label": "Fan 1 maximum",
-      "group": "Fans",
-      "type": "fan",
-      "scope": "Mac17,9"
-    },
-    {
-      "key": "F1Mx",
-      "label": "Fan 2 maximum",
-      "group": "Fans",
-      "type": "fan",
       "scope": "Mac17,9"
     }
   ]

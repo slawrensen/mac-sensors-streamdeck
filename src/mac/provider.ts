@@ -54,15 +54,36 @@ const COMPUTED_TABLES:ReadonlyArray<{model:string;chip:string;readings:readonly 
 ]}];
 /** How a chip family table names a per-core CPU temperature (native/hwmac/catalog.json; test/mac/provider.test.ts pins the match). */
 export const CORE_LABEL=/^CPU (?:super|performance|efficiency) core [1-9][0-9]?$/;
-/** The two CPU readings a chip family table yields on a Mac whose own model was not measured. */
-const FAMILY_COMPUTED=[
-	{name:'cpu-average',label:'CPU average',reduce:'mean'},
-	{name:'cpu-hottest',label:'CPU hottest core',reduce:'max'}
-] as const;
-function reduced(spec:{name:string;label:string;reduce:'mean'|'max'},group:string,kind:string,unit:string,present:readonly NativeRow[]):NativeRow {
+const FAN_SPEED_KEY=/^F[0-7]Ac$/;
+/** A temperature counts toward a whole-Mac reading only inside this window: Stats drops a sensor that reads 0 and one above 110 °C, and treats a CPU sensor outside 10 to 120 °C as broken (Modules/Sensors/readers.swift). */
+const WHOLE_MAC_TEMPERATURE_C=[10,120] as const;
+/** A reading computed over whichever accepted rows of one SMC packet qualify; `least` is how many it needs to mean anything. */
+interface AcceptedSpec { name:string; label:string; group:string; kind:'temperature'|'fan'; unit:string; reduce:'mean'|'max'; least:number; takes:(row:NativeRow)=>boolean; }
+const isCore=(row:NativeRow):boolean=>row.kind==='temperature'&&row.unit==='°C'&&row.group==='CPU'&&CORE_LABEL.test(row.label);
+const isFanSpeed=(row:NativeRow):boolean=>row.kind==='fan'&&FAN_SPEED_KEY.test(row.key);
+const isMacTemperature=(row:NativeRow):boolean=>row.kind==='temperature'&&row.unit==='°C'&&row.value>=WHOLE_MAC_TEMPERATURE_C[0]&&row.value<=WHOLE_MAC_TEMPERATURE_C[1];
+/** On a Mac whose model has no fixed input list, the rows a chip family table gives are not known ahead, so these cover what answered. */
+const FAMILY_COMPUTED:readonly AcceptedSpec[]=[
+	{name:'cpu-average',label:'CPU average',group:'CPU',kind:'temperature',unit:'°C',reduce:'mean',least:1,takes:isCore},
+	{name:'cpu-hottest',label:'CPU hottest core',group:'CPU',kind:'temperature',unit:'°C',reduce:'max',least:1,takes:isCore}
+];
+/** Fan average needs two fans to say anything a Fan reading does not. Fan target, minimum and maximum are never inputs. */
+const FAN_COMPUTED:readonly AcceptedSpec[]=[{name:'fan-average',label:'Fan average',group:'Fans',kind:'fan',unit:'RPM',reduce:'mean',least:2,takes:isFanSpeed}];
+/** Every Mac. TG Pro's Computer Average rounds to the mean of its 38 SMC temperatures in 95.5 % of 1,563 log rows on Mac17,9, and its other whole-Mac reading is the highest sensor. */
+const WHOLE_MAC_COMPUTED:readonly AcceptedSpec[]=[
+	{name:'computer-average',label:'Computer average',group:'System',kind:'temperature',unit:'°C',reduce:'mean',least:2,takes:isMacTemperature},
+	{name:'hottest-sensor',label:'Hottest sensor',group:'System',kind:'temperature',unit:'°C',reduce:'max',least:2,takes:isMacTemperature}
+];
+type Reduced=Pick<ComputedSpec,'name'|'label'|'group'|'kind'|'unit'|'reduce'>;
+function reduced(spec:Reduced,present:readonly NativeRow[]):NativeRow {
 	const oldest=present.reduce((a,b)=>b.continuousMs<a.continuousMs?b:a);
 	const value=spec.reduce==='max'?Math.max(...present.map(row=>row.value)):present.reduce((sum,row)=>sum+row.value,0)/present.length;
-	return {key:spec.name,label:spec.label,group,kind,unit,value,valid:Number.isFinite(value),continuousMs:oldest.continuousMs,wallSeconds:oldest.wallSeconds,error:0,systemCode:0};
+	return {key:spec.name,label:spec.label,group:spec.group,kind:spec.kind,unit:spec.unit,value,valid:Number.isFinite(value),continuousMs:oldest.continuousMs,wallSeconds:oldest.wallSeconds,error:0,systemCode:0};
+}
+function overAccepted(specs:readonly AcceptedSpec[],inputs:readonly NativeRow[]):NativeRow[] {
+	const rows:NativeRow[]=[];
+	for(const spec of specs){const present=inputs.filter(spec.takes);if(present.length>=spec.least)rows.push(reduced(spec,present));}
+	return rows;
 }
 /**
  * Computed rows from the rows accepted out of one SMC packet, keyed by their SMC key. They are never computed from a
@@ -71,21 +92,19 @@ function reduced(spec:{name:string;label:string;reduce:'mean'|'max'},group:strin
  * On a model with a fixed input list a reading is produced only when every input was accepted from that packet.
  * On any other Mac that reads a chip family table (familyTable true) the table lists a fixed set of core rows, which
  * of them a chip has is not known ahead, and a core can fail a read on its own, so CPU average and CPU hottest core
- * cover the per-core temperatures accepted from that packet, and are left out when none was.
+ * cover the per-core temperatures accepted from that packet, and are left out when none was. Fan average and the
+ * whole-Mac readings cover what was accepted on every Mac.
  */
 export function computedRows(model:string,chip:string,inputs:ReadonlyMap<string,NativeRow>,familyTable=false):NativeRow[] {
-	const table=COMPUTED_TABLES.find(item=>item.model===model&&item.chip===chip);
-	if(!table) {
-		if(!familyTable)return [];
-		const cores=[...inputs.values()].filter(row=>row.kind==='temperature'&&row.unit==='°C'&&row.group==='CPU'&&CORE_LABEL.test(row.label));
-		return cores.length===0?[]:FAMILY_COMPUTED.map(spec=>reduced(spec,'CPU','temperature','°C',cores));
-	}
-	const rows:NativeRow[]=[];
-	for(const spec of table.readings) {
-		const values=spec.inputs.map(key=>inputs.get(key));
-		if(values.some(row=>row===undefined||row.kind!==spec.kind||row.unit!==spec.unit))continue;
-		rows.push(reduced(spec,spec.group,spec.kind,spec.unit,values as NativeRow[]));
-	}
+	const accepted=[...inputs.values()],table=COMPUTED_TABLES.find(item=>item.model===model&&item.chip===chip),rows:NativeRow[]=[];
+	if(table) {
+		for(const spec of table.readings) {
+			const values=spec.inputs.map(key=>inputs.get(key));
+			if(values.some(row=>row===undefined||row.kind!==spec.kind||row.unit!==spec.unit))continue;
+			rows.push(reduced(spec,values as NativeRow[]));
+		}
+	}else rows.push(...overAccepted([...(familyTable?FAMILY_COMPUTED:[]),...FAN_COMPUTED],accepted));
+	rows.push(...overAccepted(WHOLE_MAC_COMPUTED,accepted));
 	return rows;
 }
 /** The SMC firmware status for a key this Mac's SMC does not have; such a key answers it to every key information request. */
