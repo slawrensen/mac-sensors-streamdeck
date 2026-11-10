@@ -37,11 +37,13 @@ Detail tiles show the same screens. The Back tile keeps its return arrow on ever
 
 One screen is detail-only. After a plugin restart while a detail page is showing, its reading tiles show **No detail** / selected with a blue target, and the Back tile shows a plain Back with a left chevron. Press Back, then open details again ([Detail view problems](troubleshooting.html#detail-view-problems)).
 
-### Screens 1.0.1 does not report
+<span id="screens-101-does-not-report"></span>
 
-Two more screens are defined in the plugin's status set, but no read in version 1.0.1 reports either of them.
+### Screens defined but never reported
 
-| Screen | Looks like | Panel sentence | In 1.0.1 |
+Two more screens are defined in the plugin's status set, but no read reports either of them.
+
+| Screen | Looks like | Panel sentence | What happens instead |
 | --- | --- | --- | --- |
 | **Access denied** / copy report | Red lock | "macOS denied a read. Choose Copy support report under Advanced, Support." | When the SMC service cannot be opened, the SMC readings are left out, the system counters keep working, and the support report records the error under `sourceErrors`. |
 | **Not updating** / check again | Amber clock | "No recent measurement is available. Choose Check again." | A reading older than 15 seconds is removed instead of being held, so no source is ever reported as not updating. |

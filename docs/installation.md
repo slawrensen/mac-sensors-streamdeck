@@ -94,7 +94,7 @@ Do not remove a system font to test this screen. [Status screens](status-screens
 
 ## Verify it works
 
-Drag **Sensor Reading** onto a key and choose a **Reading**. The key shows a number and unit, and the settings header shows **Live · Mac sensors**. To see how many readings this Mac returned, open **Advanced**, then **Support**, choose **Copy support report**, and look at `sourceRows` in the `mac` section: `public` counts system readings, `smc` counts SMC readings and `health` counts battery and drive health readings; `computedRows` counts the readings computed from SMC readings. The measured M5 Pro reports `public` 14, `smc` 51, `health` 3 and `computedRows` 3. Follow the [five-step guide](getting-started.html) or find the exact message in [Troubleshooting](troubleshooting.html).
+Drag **Sensor Reading** onto a key and choose a **Reading**. The key shows a number and unit, and the settings header shows **Live · Mac sensors**. To see how many readings this Mac returned, open **Advanced**, then **Support**, choose **Copy support report**, and look at `sourceRows` in the `mac` section: `public` counts system readings, `smc` counts SMC readings and `health` counts battery and drive health readings; `computedRows` counts the readings computed from SMC readings. The measured M5 Pro reports `public` 14, `smc` 67, `health` 3 and `computedRows` 5. Follow the [five-step guide](getting-started.html) or find the exact message in [Troubleshooting](troubleshooting.html).
 
 ## Next steps
 
