@@ -60,10 +60,11 @@ const COMPUTED_TABLES:ReadonlyArray<{model:string;chip:string;readings:readonly 
 	{name:'hottest-sensor',label:'Hottest sensor',group:'System',kind:'temperature',unit:'°C',reduce:'max',inputs:M5_PRO_WHOLE_MAC}
 ]}];
 /**
- * How a chip family table names a per-core CPU temperature (native/hwmac/catalog.json; test/mac/provider.test.ts pins the match):
- * Super, Perf or Eff core N for a sensor named after one core, CPU sensor N where the core is not known.
+ * How a chip family or model table names a CPU core temperature (native/hwmac/catalog.json; test/mac/provider.test.ts pins the match):
+ * Super, Perf or Eff core N for a sensor named after one core, Super or Perf zone N for another sensor on that core cluster, and
+ * CPU sensor N where neither is known. On a chip family table CPU average and Hottest core cover all of them.
  */
-export const CORE_LABEL=/^(?:(?:Super|Perf|Eff) core|CPU sensor) [1-9][0-9]?$/;
+export const CORE_LABEL=/^(?:(?:Super|Perf|Eff) core|(?:Super|Perf) zone|CPU sensor) [1-9][0-9]?$/;
 const FAN_SPEED_KEY=/^F[0-7]Ac$/;
 /** A temperature counts toward a whole-Mac reading only inside this window: Stats drops a sensor that reads 0 and one above 110 °C, and treats a CPU sensor outside 10 to 120 °C as broken (Modules/Sensors/readers.swift). */
 const WHOLE_MAC_TEMPERATURE_C=[10,120] as const;

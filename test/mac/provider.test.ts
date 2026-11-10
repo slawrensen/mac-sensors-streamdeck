@@ -250,10 +250,14 @@ function healthPacket(at:number,rows:HealthRow[]=HEALTH_ROWS):NativePacket {cons
 async function readAll(r:ReturnType<typeof rig>,at:number,health:NativePacket|null=healthPacket(at)):Promise<SensorSnapshot>{r.clock.now=at;r.provider.read();await publish(r,'public',packet('public',at));await publish(r,'smc',packet('smc',at));if(health)await publish(r,'health',health);return r.provider.current()!;}
 // Chip family tables: Macs that read a family's rows without their own model having been measured.
 const wholeCatalog=JSON.parse(fs.readFileSync('native/hwmac/catalog.json','utf8')) as {families:Record<string,unknown>;rows:{key:string;label:string;group:string;scope:string}[]};
-test('the per-core label pattern matches every chip family core row in the catalog and no other row',()=>{
+test('the per-core label pattern matches every chip family and model core row in the catalog and no other row',()=>{
 	const families=Object.keys(wholeCatalog.families);let cores=0;
-	for(const row of wholeCatalog.rows){const core=families.includes(row.scope)&&row.group==='CPU';if(core)cores++;assert.equal(CORE_LABEL.test(row.label),core,`${row.scope} ${row.key} ${row.label}`);}
-	assert.equal(cores,10+12+16+12+18+18+18+4,'M1, M2, M3, M4, M5 (Pro and Max, then the rest), M6 and A18 Pro core rows');
+	for(const row of wholeCatalog.rows){const core=(families.includes(row.scope)||row.scope==='Mac17,9')&&row.group==='CPU';if(core)cores++;assert.equal(CORE_LABEL.test(row.label),core,`${row.scope} ${row.key} ${row.label}`);}
+	assert.equal(cores,10+12+16+12+18+18+18+4+12,'M1, M2, M3, M4, M5 (Pro and Max, then the rest), M6 and A18 Pro core rows, and the Mac17,9 super zones');
+	// On an M6, CPU average and Hottest core cover all 18 CPU rows of its table: the zones and CPU sensors are real cluster temperatures.
+	const m6=(wholeCatalog.rows as {key:string;label:string;group:string;scope:string}[]).filter(row=>row.scope==='m6'&&row.group==='CPU');
+	const inputs=new Map(m6.map((row,index)=>[row.key,labelled(row.key,row.label,'CPU',40+index,100)] as const));
+	assert.deepEqual(computedRows('Mac18,5','t0000',inputs,true).filter(row=>row.group==='CPU').map(row=>[row.label,row.value]),[['CPU average',40+17/2],['Hottest core',57]]);
 });
 const M2_MODEL='Mac14,6',M2_AVERAGE='mac:v1:computed:Mac14%2C6:cpu-average:temp.v1',M2_HOTTEST='mac:v1:computed:Mac14%2C6:cpu-hottest:temp.v1';
 const labelled=(key:string,label:string,group:string,value:number,at:number):NativeRow=>({...smcRow(key,group,'temperature','°C',value,at),label});

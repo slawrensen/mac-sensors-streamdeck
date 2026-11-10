@@ -70,9 +70,14 @@ test('every chip family and variant the catalog lists gets its own rows, each ke
 		assert.deepEqual([read.table,read.tableMeasured,read.cpu,read.rows.length],[name,false,family.brand+VARIANT_SUFFIX[variant],expected.length],`${name} ${variant}`);
 		assert.deepEqual(read.rows.filter(row=>row.valid).map(row=>[row.key,row.label,row.group,row.unit,row.value]),own.map(row=>[row.key,row.label,row.group,'°C',50]),`${name} ${variant}: read`);
 	}
+	// An M6 has 2 super, 4 performance and 6 efficiency cores (Apple's specifications). In the load test on one Mac18,5 behind its Stats
+	// table (issue 3668), four keys warmed with the two super cores and six with the performance cores, so the rows past those core
+	// counts are named as zones of their cluster. Tp0b and Tp05 warmed with both clusters, so they claim neither.
+	assert.deepEqual(native.testCatalog('Mac0,0','t0000',1,'Apple M6').rows.filter(row=>row.group==='CPU'&&/ [0-9]+$/.test(row.label)).map(row=>row.key+' '+row.label),
+		['Tp0j Super core 1','Tp0g Super core 2','Tp09 Super zone 1','Tp07 Super zone 2','Tp0m Perf core 1','Tp0L Perf core 2','Tp0I Perf core 3','Tp0d Perf core 4','Tp0E Perf zone 1','Tp0G Perf zone 2','Tp0b CPU sensor 1','Tp05 CPU sensor 2',...['Te07','Te08','Te09','Te0c','Te0h','Te0i'].map((key,index)=>`${key} Eff core ${index+1}`)]);
 	// One key means different cores on different families, so the label comes from the family, never from the key alone.
 	const label=(cpu,key)=>native.testCatalog('Mac0,0','t0000',1,cpu).rows.find(row=>row.key===key)?.label;
-	assert.deepEqual([label('Apple M1','Tp09'),label('Apple M2','Tp09'),label('Apple M6','Tp09')],['Eff core 1','Perf core 3','Super core 3']);
+	assert.deepEqual([label('Apple M1','Tp09'),label('Apple M2','Tp09'),label('Apple M6','Tp09')],['Eff core 1','Perf core 3','Super zone 1']);
 	// M5 Pro and Max read the layout measured on the M5 Pro; M5 and M5 Ultra keep the source's keys under names that claim no core type.
 	const cores=cpu=>native.testCatalog('Mac0,0','t0000',1,cpu).rows.filter(row=>row.group==='CPU'&&/ (core|sensor) [0-9]+$/.test(row.label)).map(row=>row.key+' '+row.label);
 	for(const cpu of ['Apple M5 Pro','Apple M5 Max'])assert.deepEqual(cores(cpu).slice(0,7),['Tp04 Super core 1','Tp0G Super core 2','Tp0R Super core 3','Tp0a Super core 4','Tp0j Super core 5','Tp0u Super core 6','Tm04 Perf core 1'],cpu);

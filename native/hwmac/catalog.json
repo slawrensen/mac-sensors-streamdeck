@@ -1707,7 +1707,7 @@
     },
     {
       "key": "Tp09",
-      "label": "Super core 3",
+      "label": "Super zone 1",
       "group": "CPU",
       "type": "temperature",
       "scope": "m6",
@@ -1715,7 +1715,7 @@
     },
     {
       "key": "Tp07",
-      "label": "Super core 4",
+      "label": "Super zone 2",
       "group": "CPU",
       "type": "temperature",
       "scope": "m6",
@@ -1755,7 +1755,7 @@
     },
     {
       "key": "Tp0E",
-      "label": "Perf core 5",
+      "label": "Perf zone 1",
       "group": "CPU",
       "type": "temperature",
       "scope": "m6",
@@ -1763,7 +1763,7 @@
     },
     {
       "key": "Tp0G",
-      "label": "Perf core 6",
+      "label": "Perf zone 2",
       "group": "CPU",
       "type": "temperature",
       "scope": "m6",
@@ -1771,7 +1771,7 @@
     },
     {
       "key": "Tp0b",
-      "label": "Perf core 7",
+      "label": "CPU sensor 1",
       "group": "CPU",
       "type": "temperature",
       "scope": "m6",
@@ -1779,7 +1779,7 @@
     },
     {
       "key": "Tp05",
-      "label": "Perf core 8",
+      "label": "CPU sensor 2",
       "group": "CPU",
       "type": "temperature",
       "scope": "m6",

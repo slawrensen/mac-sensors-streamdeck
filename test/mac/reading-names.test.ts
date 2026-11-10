@@ -47,7 +47,7 @@ test('every reading name fits the key lens whole at the smallest label size, so 
 	}
 });
 test('numbered names follow one pattern per kind',()=>{
-	const numbered=/^(?:(?:Super|Perf|Eff) core|Super zone|CPU sensor|GPU region|GPU|Memory|Fan) [1-9][0-9]?(?: (?:target|min|max))?$/;
+	const numbered=/^(?:(?:Super|Perf|Eff) core|(?:Super|Perf) zone|CPU sensor|GPU region|GPU|Memory|Fan) [1-9][0-9]?(?: (?:target|min|max))?$/;
 	for(const entry of catalog.filter(item=>/[0-9]/.test(item.label)&&item.key!=='TB2T'))assert.match(entry.label,numbered,`${entry.scope} ${entry.key}`);
 });
 test('no two names one Mac can show look alike once case is ignored',()=>{
