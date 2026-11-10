@@ -64,7 +64,11 @@
     "Mac17,9": {
       "chip": "t6050",
       "family": "m5",
-      "variant": "pro"
+      "variant": "pro",
+      "cores": [
+        6,
+        12
+      ]
     }
   },
   "rows": [

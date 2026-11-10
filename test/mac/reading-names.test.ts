@@ -27,7 +27,7 @@ function everyName():{label:string;from:string}[] {
 	// The fixed-list path on Mac17,9 and the accepted-rows path on a chip family table, each fed every row its table can give.
 	const measured=new Map(catalog.filter(entry=>['common','apple','Mac17,9'].includes(entry.scope)||(entry.scope==='m5'&&(!entry.variants||entry.variants.includes('pro')))).map(entry=>[entry.key,catalogRow(entry)]));
 	const family=new Map(catalog.filter(entry=>['common','apple','m2'].includes(entry.scope)).map(entry=>[entry.key,catalogRow(entry)]));
-	for(const computed of [...computedRows('Mac17,9','t6050',measured),...computedRows('Mac14,6','t6021',family,true)])names.push({label:computed.label,from:`computed ${computed.key}`});
+	for(const computed of [...computedRows('Mac17,9','t6050',measured,true,true),...computedRows('Mac14,6','t6021',family,true)])names.push({label:computed.label,from:`computed ${computed.key}`});
 	return names;
 }
 const KEY_LABEL_FLOOR=KEY_TEXT_LADDERS.singleLabel.at(-1)!;

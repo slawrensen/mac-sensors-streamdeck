@@ -34,7 +34,9 @@ for(const [name,family] of families)if(!/^[a-z0-9]{1,15}$/.test(name)||['common'
 // Every CPU name a family answers to must be its own: the native side takes the first family that matches.
 const brandNames=families.flatMap(([,family])=>family.variants.map(variant=>family.brand+(variant==='base'?'':' '+variant[0].toUpperCase()+variant.slice(1))));
 if(new Set(brandNames).size!==brandNames.length)throw new Error('Two chip families answer to one CPU name');
-for(const [model,facts] of modelTables)if(!Object.hasOwn(catalog.families,facts.family)||!catalog.families[facts.family].variants.includes(facts.variant)||!/^[\x21-\x7e]{1,63}$/.test(facts.chip)||!/^[\x21-\x7e]{1,127}$/.test(model)||Object.hasOwn(catalog.families,model)||['common','apple'].includes(model))throw new Error('Invalid model table');
+// A model table names the core layout it was measured on: physical cores per performance level, top level first (HWMAC_MAX_PERF_LEVELS).
+const MAX_PERF_LEVELS=4,validCores=cores=>Array.isArray(cores)&&cores.length>=1&&cores.length<=MAX_PERF_LEVELS&&cores.every(count=>Number.isInteger(count)&&count>=1&&count<=256);
+for(const [model,facts] of modelTables)if(!Object.hasOwn(catalog.families,facts.family)||!catalog.families[facts.family].variants.includes(facts.variant)||!/^[\x21-\x7e]{1,63}$/.test(facts.chip)||!/^[\x21-\x7e]{1,127}$/.test(model)||Object.hasOwn(catalog.families,model)||['common','apple'].includes(model)||!validCores(facts.cores))throw new Error('Invalid model table');
 const scopeOf=row=>{
 	if(row.scope==='common')return [0,0,0];
 	if(row.scope==='apple')return [1,0,0];
@@ -52,8 +54,8 @@ for(const [family,spec] of [[null,{variants:[null]}],...families])for(const vari
 	if(keys.length>MAX_PACKET_ROWS||new Set(keys).size!==keys.length)throw new Error(`Ambiguous or oversized SMC table for ${family??'common'} ${variant??''} ${model??''}`);
 }
 const familyRows=families.map(([name,family])=>`\t{${JSON.stringify(name)},${JSON.stringify(family.brand)},${variantMask(family.variants)}}`);
-const models=modelTables.map(([model,facts])=>`\t{${JSON.stringify(model)},${JSON.stringify(facts.chip)},${families.findIndex(([name])=>name===facts.family)},${variantMask([facts.variant])}}`);
-fs.writeFileSync(path.join(generated,'catalog.inc'),`static const struct { const char *name; const char *brand; unsigned variants; } HWMAC_FAMILIES[] = {\n${familyRows.join(',\n')}\n};\nstatic const struct { const char *model; const char *chip; unsigned family; unsigned variant; } HWMAC_MODELS[] = {\n${models.join(',\n')}\n};\nstatic const sensor_spec HWMAC_CATALOG[] = {\n${entries.join(',\n')}\n};\n`);
+const models=modelTables.map(([model,facts])=>`\t{${JSON.stringify(model)},${JSON.stringify(facts.chip)},${families.findIndex(([name])=>name===facts.family)},${variantMask([facts.variant])},${facts.cores.length},{${facts.cores.join(',')}}}`);
+fs.writeFileSync(path.join(generated,'catalog.inc'),`static const struct { const char *name; const char *brand; unsigned variants; } HWMAC_FAMILIES[] = {\n${familyRows.join(',\n')}\n};\nstatic const struct { const char *model; const char *chip; unsigned family; unsigned variant; unsigned levels; unsigned cores[HWMAC_MAX_PERF_LEVELS]; } HWMAC_MODELS[] = {\n${models.join(',\n')}\n};\nstatic const sensor_spec HWMAC_CATALOG[] = {\n${entries.join(',\n')}\n};\n`);
 const sdk=execFileSync('xcrun',['--sdk','macosx','--show-sdk-path'],{encoding:'utf8'}).trim();
 const compiler=execFileSync('xcrun',['--find','clang'],{encoding:'utf8'}).trim();
 const records=[];

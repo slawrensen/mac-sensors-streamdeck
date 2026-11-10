@@ -100,14 +100,16 @@ function overAccepted(specs:readonly AcceptedSpec[],inputs:readonly NativeRow[])
  * Computed rows from the rows accepted out of one SMC packet, keyed by their SMC key. They are never computed from a
  * stale or failed value, and each is as old as its oldest input, so it expires no later than that input.
  *
- * On a model with a fixed input list a reading is produced only when every input was accepted from that packet.
+ * On a model with a fixed input list, measured on this Mac's own core layout (measured: the packet's tableMeasured), a reading
+ * is produced only when every input was accepted from that packet. The same model and chip with another core layout takes the
+ * chip family path below, since its cores are not the ones the list names.
  * On any other Mac that reads a chip family table (familyTable true) the table lists a fixed set of core rows, which
  * of them a chip has is not known ahead, and a core can fail a read on its own, so CPU average and CPU hottest core
  * cover the per-core temperatures accepted from that packet, and are left out when none was. Fan average and the
  * whole-Mac readings likewise cover what was accepted on any Mac without a fixed list.
  */
-export function computedRows(model:string,chip:string,inputs:ReadonlyMap<string,NativeRow>,familyTable=false):NativeRow[] {
-	const accepted=[...inputs.values()],table=COMPUTED_TABLES.find(item=>item.model===model&&item.chip===chip);
+export function computedRows(model:string,chip:string,inputs:ReadonlyMap<string,NativeRow>,familyTable=false,measured=false):NativeRow[] {
+	const accepted=[...inputs.values()],table=measured?COMPUTED_TABLES.find(item=>item.model===model&&item.chip===chip):undefined;
 	if(!table)return overAccepted([...(familyTable?FAMILY_COMPUTED:[]),...FAN_COMPUTED,...WHOLE_MAC_COMPUTED],accepted);
 	const rows:NativeRow[]=[];
 	for(const spec of table.readings) {
@@ -121,7 +123,7 @@ export function computedRows(model:string,chip:string,inputs:ReadonlyMap<string,
 const SMC_KEY_NOT_FOUND=0x84;
 /** HWMAC_FIRMWARE in native/hwmac/addon.c: the SMC answered with a firmware status. */
 const NATIVE_FIRMWARE_ERROR=5;
-/** Where this Mac's SMC rows come from: its own measured model table, a chip family table not measured on this model, or the common keys only. */
+/** Where this Mac's SMC rows come from: a model table measured on this model, chip and core layout, a chip family table not measured on this Mac, or the common keys only. */
 export type SmcTableEvidence='measured'|'source'|'none';
 /** Catalog keys of one SMC read by outcome, space separated: accepted, not on this Mac's SMC, and present but failed or out of range. Key names only, never values. */
 export interface SmcKeyFacts { answered:string; absent:string; withheld:string; }
@@ -135,7 +137,7 @@ interface Accepted { row: NativeRow; reading: Reading; source: NativeSource; ses
 /** Inside a group the list reads system counters, then computed readings, then the SMC in catalog order, then battery and drive health. */
 const SOURCE_ORDER={public:0,computed:1,smc:2,health:3} as const;
 const listOrder=(item:Accepted):number=>SOURCE_ORDER[item.computed?'computed':item.source];
-export interface ProviderFacts { model:string;chip:string;cpu:string;smcTable:string;smcTableEvidence:SmcTableEvidence;smcKeys:SmcKeyFacts;appleSilicon:boolean|null;translation:'native'|'translated'|'unknown';translationError:number;sourceRows:Record<NativeSource,number>;computedRows:number; sourceErrors:Partial<Record<NativeSource,{code:string;operation:string;systemCode:number}>>; }
+export interface ProviderFacts { model:string;chip:string;cpu:string;cores:string;smcTable:string;smcTableEvidence:SmcTableEvidence;smcKeys:SmcKeyFacts;appleSilicon:boolean|null;translation:'native'|'translated'|'unknown';translationError:number;sourceRows:Record<NativeSource,number>;computedRows:number; sourceErrors:Partial<Record<NativeSource,{code:string;operation:string;systemCode:number}>>; }
 export function encodeModel(model:string): string | null {
 	if(!model||model.length>128||[...model].some(character=>character.charCodeAt(0)<32||character.charCodeAt(0)===127)||Buffer.from(model,'utf8').toString('utf8')!==model)return null;
 	return [...Buffer.from(model,'utf8')].map(byte=>/[A-Za-z0-9._~-]/.test(String.fromCharCode(byte))?String.fromCharCode(byte):'%'+byte.toString(16).toUpperCase().padStart(2,'0')).join('');
@@ -216,7 +218,7 @@ export class MacProvider implements SnapshotProvider {
 	private dirty=true;
 	private catalogDirty=true;
 	private catalogRevision=0;
-	private factsValue:ProviderFacts={model:'unknown',chip:'unknown',cpu:'unknown',smcTable:'',smcTableEvidence:'none',smcKeys:{answered:'',absent:'',withheld:''},appleSilicon:null,translation:'unknown',translationError:0,sourceRows:{public:0,smc:0,health:0},computedRows:0,sourceErrors:{}};
+	private factsValue:ProviderFacts={model:'unknown',chip:'unknown',cpu:'unknown',cores:'',smcTable:'',smcTableEvidence:'none',smcKeys:{answered:'',absent:'',withheld:''},appleSilicon:null,translation:'unknown',translationError:0,sourceRows:{public:0,smc:0,health:0},computedRows:0,sourceErrors:{}};
 	constructor(private readonly native:NativeBridge,private readonly ready:()=>void,private readonly report:(facts:ProviderFacts)=>void=()=>{}) {this.startedAt=native.now();this.session=native.open();}
 	facts():ProviderFacts{return structuredClone(this.factsValue);}
 	/** Reads requested and not yet settled; the poller publishes a read once none remain. */
@@ -250,7 +252,7 @@ export class MacProvider implements SnapshotProvider {
 		// Computed readings see only what this packet just had accepted, never a row kept from an earlier read.
 		if(source==='smc'){
 			const inputs=new Map<string,NativeRow>();for(const item of accepted.values())inputs.set(item.row.key,item.row);
-			computedRows(packet.model,packet.chip,inputs,Boolean(packet.table)).forEach((row,index)=>{const key=computedKey(row,packet.model);if(key)this.admit(key,row,source,now,true,index,accepted);});
+			computedRows(packet.model,packet.chip,inputs,Boolean(packet.table),packet.tableMeasured===true).forEach((row,index)=>{const key=computedKey(row,packet.model);if(key)this.admit(key,row,source,now,true,index,accepted);});
 		}
 		for(const [key,item] of this.rows)if(item.source===source&&!accepted.has(key)){this.rows.delete(key);this.dirty=true;this.catalogDirty=true;}
 		for(const [key,item] of accepted)this.rows.set(key,item);
@@ -267,9 +269,9 @@ export class MacProvider implements SnapshotProvider {
 			}
 			smcKeys={answered:answered.join(' '),absent:absent.join(' '),withheld:withheld.join(' ')};
 		}
-		this.factsValue={model:packet.model||'unknown',chip:packet.chip||'unknown',cpu:packet.cpu||'unknown',smcTable:packet.table||'',smcTableEvidence:evidence,smcKeys,appleSilicon:packet.appleSilicon<0?null:packet.appleSilicon===1,translation:translationOf(packet.translated,packet.translationError),translationError:packet.translationError,sourceErrors:this.factsValue.sourceErrors,sourceRows:{...this.factsValue.sourceRows,[source]:direct},computedRows:this.factsValue.computedRows};
+		this.factsValue={model:packet.model||'unknown',chip:packet.chip||'unknown',cpu:packet.cpu||'unknown',cores:(packet.perfCores??[]).join(' '),smcTable:packet.table||'',smcTableEvidence:evidence,smcKeys,appleSilicon:packet.appleSilicon<0?null:packet.appleSilicon===1,translation:translationOf(packet.translated,packet.translationError),translationError:packet.translationError,sourceErrors:this.factsValue.sourceErrors,sourceRows:{...this.factsValue.sourceRows,[source]:direct},computedRows:this.factsValue.computedRows};
 		if(packet.translated===1)this.notice('Node is running under translation; sensor interfaces follow the detected hardware.');
-		if(source==='smc'&&evidence==='source')this.notice(`This Mac reads the ${packet.table} chip family sensor table, which has not been measured on this model.`);
+		if(source==='smc'&&evidence==='source')this.notice(`This Mac reads the ${packet.table} chip family sensor table, which has not been measured on this Mac.`);
 		if(source==='smc'&&evidence==='none')this.notice('This model uses common typed sensors; its generation-specific catalog is not qualified.');
 		this.rebuild();
 	}

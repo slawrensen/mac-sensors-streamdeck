@@ -37,11 +37,18 @@ static unsigned brand_variant(const char *cpu, const char *brand) {
 	return rest[0] == 0 ? 1u : strcmp(rest, " Pro") == 0 ? 2u : strcmp(rest, " Max") == 0 ? 4u : strcmp(rest, " Ultra") == 0 ? 8u : 0;
 }
 void hwmac_resolve_platform(source_packet *packet) {
-	packet->family = 0; packet->model_table = 0; packet->variant = 0; packet->table[0] = 0;
+	packet->family = 0; packet->model_table = 0; packet->variant = 0; packet->table[0] = 0; packet->model_measured = false;
 	if (packet->apple_silicon != 1) return;
-	/* A measured model names its own family, so it keeps its table when the brand string is not the chip's (a translated process reads another). */
+	/* A model table names its own family, so it keeps its table when the brand string is not the chip's (a translated process reads another).
+	 * One model and chip can ship with fewer cores (Apple sells a 15-core M5 Pro in Mac17,9), so the table counts as measured only on the
+	 * core layout it was measured on; on another its rows still apply, so saved keys keep working, but nothing treats it as measured. */
 	for (size_t i = 0; i < sizeof(HWMAC_MODELS) / sizeof(HWMAC_MODELS[0]); i++) {
-		if (strcmp(packet->model, HWMAC_MODELS[i].model) == 0 && strcmp(packet->chip, HWMAC_MODELS[i].chip) == 0) { packet->model_table = (unsigned)i + 1; packet->family = HWMAC_MODELS[i].family + 1; packet->variant = HWMAC_MODELS[i].variant; break; }
+		if (strcmp(packet->model, HWMAC_MODELS[i].model) == 0 && strcmp(packet->chip, HWMAC_MODELS[i].chip) == 0) {
+			packet->model_table = (unsigned)i + 1; packet->family = HWMAC_MODELS[i].family + 1; packet->variant = HWMAC_MODELS[i].variant;
+			bool layout = packet->perf_levels == HWMAC_MODELS[i].levels;
+			for (unsigned level = 0; layout && level < packet->perf_levels; level++) layout = packet->perf_cores[level] == HWMAC_MODELS[i].cores[level];
+			packet->model_measured = layout; break;
+		}
 	}
 	/* Otherwise the whole string must be a listed brand and variant: "Apple M1 (Virtual)" or a later chip matches none. */
 	for (size_t i = 0; packet->family == 0 && i < sizeof(HWMAC_FAMILIES) / sizeof(HWMAC_FAMILIES[0]); i++) {
@@ -98,6 +105,17 @@ void hwmac_facts(source_packet *packet) {
 	length = sizeof(packet->cpu);
 	if (sysctlbyname("machdep.cpu.brand_string", packet->cpu, &length, NULL, 0) != 0 || length == 0 || length > sizeof(packet->cpu)) packet->cpu[0] = 0;
 	packet->cpu[sizeof(packet->cpu) - 1] = 0;
+	/* Every level or none: a layout with a level missing matches no measured model. */
+	int levels = 0; packet->perf_levels = 0;
+	if (sys_number("hw.nperflevels", &levels, sizeof(levels)) && levels > 0 && levels <= HWMAC_MAX_PERF_LEVELS) {
+		unsigned read = 0;
+		for (int level = 0; level < levels; level++) {
+			char name[40]; int cores = 0; snprintf(name, sizeof(name), "hw.perflevel%d.physicalcpu", level);
+			if (!sys_number(name, &cores, sizeof(cores)) || cores <= 0) break;
+			packet->perf_cores[level] = (unsigned)cores; read++;
+		}
+		if (read == (unsigned)levels) packet->perf_levels = read;
+	}
 	hwmac_resolve_platform(packet);
 }
 static const char *unit_for(const char *kind) {
@@ -178,7 +196,7 @@ void hwmac_read_smc_rows(smc_context *context, source_packet *packet, smc_transp
 			continue;
 		}
 		double value, minimum = spec->minimum, maximum = spec->maximum;
-		if (spec->scope == 2 && packet->model_table == 0) { minimum = HWMAC_FAMILY_MINIMUM_C; maximum = HWMAC_FAMILY_MAXIMUM_C; }
+		if (spec->scope == 2 && !packet->model_measured) { minimum = HWMAC_FAMILY_MINIMUM_C; maximum = HWMAC_FAMILY_MAXIMUM_C; }
 		if (!smc_decode(context->types[i], context->sizes[i], reply + 48, &value) || value < minimum || value > maximum) { row->error = 13; continue; }
 		observed(row, value);
 		/* Age from the start of the actual read, never from a delayed return. */

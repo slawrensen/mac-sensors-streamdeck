@@ -283,7 +283,7 @@ test('a Mac on a chip family table gets CPU average and CPU hottest core from th
 	const facts=r.provider.facts();
 	assert.deepEqual([facts.model,facts.cpu,facts.smcTable,facts.smcTableEvidence,facts.computedRows],[M2_MODEL,'Apple M2 Max','m2','source',5]);
 	assert.deepEqual(facts.smcKeys,{answered:'Tp1h Tp01 Tp05 Tg0f F0Ac F1Ac',absent:'Tp0D',withheld:''});
-	assert.deepEqual(r.provider.notices().filter(line=>/chip family/.test(line)),['This Mac reads the m2 chip family sensor table, which has not been measured on this model.']);
+	assert.deepEqual(r.provider.notices().filter(line=>/chip family/.test(line)),['This Mac reads the m2 chip family sensor table, which has not been measured on this Mac.']);
 	// A core that fails one read leaves that read's average; nothing is carried over from the read before.
 	snapshot=await readM2(r,1100,m2Packet(1100,{Tp1h:40,Tp01:50,Tp05:null}));
 	assert.deepEqual([snapshot.byKey.get(M2_AVERAGE)?.value,snapshot.byKey.get(M2_HOTTEST)?.value],[45,50]);
@@ -310,7 +310,7 @@ test('a Mac with no chip family table gets no CPU readings but keeps the fan and
 	// Mac17,9 never falls back to "the cores that answered": seventeen of its eighteen cores give no CPU readings, with or without the family flag.
 	const inputs=new Map(CORE_KEYS.slice(1).map((key,index)=>[key,labelled(key,`Perf core ${index+1}`,'CPU',50,100)]));
 	const names=(rows:NativeRow[])=>rows.map(row=>row.key);
-	for(const family of [false,true])assert.deepEqual(names(computedRows('Mac17,9','t6050',inputs,family)),[],String(family));
+	for(const family of [false,true])assert.deepEqual(names(computedRows('Mac17,9','t6050',inputs,family,true)),[],String(family));
 	assert.deepEqual(names(computedRows(M2_MODEL,'t6021',inputs,false)),['computer-average','hottest-sensor'],'no table, no CPU readings');
 	assert.deepEqual(computedRows(M2_MODEL,'t6021',inputs,true).map(row=>[row.key,row.value]),[['cpu-average',50],['cpu-hottest',50],['computer-average',50],['hottest-sensor',50]]);
 	// A sensor that reads 0 or an impossible value stays out of the whole-Mac readings, one fan is no average, and a stopped fan still counts.
@@ -394,4 +394,23 @@ test('a reading that moves in the list starts a new catalog revision, so a cache
 	const after=await readM2(r,1100,swapped);
 	assert.ok(after.catalogRevision!>before.catalogRevision!);assert.deepEqual(numbered(labelsIn(after,'CPU')).slice(-4),['Eff core 2','Eff core 1','Eff core 3','Eff core 4']);
 	r.provider.close();
+});
+test('a Mac17,9 with another core layout is not the measured Mac: it reports source, and its computed readings cover what answered',async()=>{
+	// Apple also sells Mac17,9 with a 15-core M5 Pro, 5 super and 10 performance cores. If its SMC lacks the keys of the cores it does
+	// not have (here the sixth super core and performance cores 11 and 12), the fixed 18-core list would leave the CPU readings out on every read.
+	const gone=new Set(['Tp0u','Tm2D','Tm2P']),own=(row:OrderedRow)=>row.scope==='Mac17,9'||(row.scope==='m5'&&(row.variants?.includes('pro')??true));
+	const fifteen=catalogPacket(100,'Mac17,9','t6050','Apple M5 Pro',own);fifteen.tableMeasured=false;fifteen.perfCores=[5,10];fifteen.rows=fifteen.rows.filter(row=>!gone.has(row.key));
+	const r=rig();r.clock.now=100;r.provider.read();await publish(r,'public',packet('public',100));await publish(r,'smc',fifteen);
+	const snapshot=r.provider.current()!,facts=r.provider.facts();
+	assert.deepEqual([facts.smcTable,facts.smcTableEvidence,facts.cores],['m5','source','5 10']);
+	assert.deepEqual(r.provider.notices().filter(line=>/chip family/.test(line)),['This Mac reads the m5 chip family sensor table, which has not been measured on this Mac.']);
+	// The chip family path: the 15 cores and the 12 super zones that answered.
+	assert.equal(fifteen.rows.filter(row=>CORE_LABEL.test(row.label)).length,15+12);
+	assert.deepEqual([CPU_AVERAGE,CPU_HOTTEST,COMPUTER_AVERAGE,HOTTEST_SENSOR,FAN_AVERAGE].map(key=>snapshot.byKey.get(key)?.value),[45,45,45,45,2000]);
+	r.provider.close();
+	// The measured layout keeps the fixed lists, so the same three missing cores leave the CPU and whole-Mac readings out.
+	const measured=rig(),same={...fifteen,tableMeasured:true,perfCores:[6,12]};measured.clock.now=100;measured.provider.read();await publish(measured,'public',packet('public',100));await publish(measured,'smc',same);
+	assert.deepEqual([CPU_AVERAGE,CPU_HOTTEST,COMPUTER_AVERAGE,HOTTEST_SENSOR,FAN_AVERAGE].filter(key=>measured.provider.current()!.byKey.has(key)),[FAN_AVERAGE]);
+	assert.deepEqual([measured.provider.facts().smcTableEvidence,measured.provider.facts().cores],['measured','6 12']);
+	measured.provider.close();
 });

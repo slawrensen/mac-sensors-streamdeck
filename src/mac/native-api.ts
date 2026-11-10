@@ -13,8 +13,10 @@ export interface NativePacket {
 	continuousMs: number; awakeMs: number; wallSeconds: number; durationMs: number;
 	error: number; systemCode: number; operation: string;
 	model: string; chip: string; appleSilicon: number; translated: number; translationError: number;
-	/** CPU brand string, the chip family table this Mac reads (empty when none), and whether this model and chip were measured. */
+	/** CPU brand string, the chip family table this Mac reads (empty when none), and whether this model, chip and core layout were measured. */
 	cpu: string; table: string; tableMeasured: boolean;
+	/** Physical cores of each performance level, top level first (hw.perflevelN.physicalcpu); empty when macOS did not report every level. */
+	perfCores?: number[];
 	fontAvailable: boolean;
 	cpuValid: boolean; cpuTicks: number[][];
 	networkValid: boolean; networkIn: string; networkOut: string; networkMembers: string;

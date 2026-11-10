@@ -19,6 +19,8 @@
  * never has cost no SMC call on an ordinary read, and their rechecks do not land on one read. */
 #define HWMAC_ABSENT_RECHECK_READS 64
 #define HWMAC_MAX_CPUS 256
+/* Performance levels a packet records (hw.nperflevels): Apple silicon has two or three. */
+#define HWMAC_MAX_PERF_LEVELS 4
 
 typedef struct {
 	const char *key, *label, *group, *kind;
@@ -39,10 +41,14 @@ typedef struct {
 	sensor_row rows[HWMAC_MAX_ROWS];
 	unsigned count;
 	char model[128], chip[64];
-	/* The CPU brand string and the chip family table it or the measured model selects (empty when none). family and
-	 * model_table are catalog indexes plus one, so a zeroed packet has no family and is no measured model. */
+	/* The CPU brand string and the chip family table it or the model table selects (empty when none). family and
+	 * model_table are catalog indexes plus one, so a zeroed packet has no family and no model rows. */
 	char cpu[64], table[16];
 	unsigned family, model_table, variant;
+	/* Physical cores of each performance level, top level first (hw.perflevelN.physicalcpu), and how many levels were read. */
+	unsigned perf_levels, perf_cores[HWMAC_MAX_PERF_LEVELS];
+	/* The model table was measured on this exact core layout; otherwise its rows still apply, and its family rows take the family window. */
+	bool model_measured;
 	int apple_silicon, translated, translation_error;
 	bool font_available;
 	double continuous_ms, awake_ms, wall_seconds, duration_ms;
@@ -65,7 +71,7 @@ typedef struct {
 /* The name and full 64-bit byte counters the system reports for one interface index. */
 typedef bool (*hwmac_link_counters)(unsigned index, char name[HWMAC_LINK_NAME], uint64_t *received, uint64_t *sent, void *context);
 struct ifaddrs;
-/* Sets family, variant, model_table and table from the packet's model, chip, cpu and apple_silicon. */
+/* Sets family, variant, model_table, model_measured and table from the packet's model, chip, core layout, cpu and apple_silicon. */
 void hwmac_resolve_platform(source_packet *packet);
 size_t hwmac_catalog_count(void);
 const sensor_spec *hwmac_catalog_row(size_t index);
