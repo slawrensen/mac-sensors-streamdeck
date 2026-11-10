@@ -3,6 +3,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import vm from 'node:vm';
+// The cache-busting token the copied panels carry at the pinned core version.
+const BASELINE_PANEL_TOKEN='1.7.1.0-1';
 export function stagePanels(destination, token) {
 	if(!/^\d+\.\d+\.\d+\.\d+-mac\d+$/.test(token))throw new Error('Invalid panel token');
 	const root='com.lawrensen.mac.sdPlugin/ui',rules=JSON.parse(fs.readFileSync('core-patches/panel-stage.json','utf8')).files;
@@ -13,8 +15,8 @@ export function stagePanels(destination, token) {
 			const count=output.split(rule.before).length-1;if(count!==rule.count)throw new Error(`${name}: staged anchor changed (${count}/${rule.count})`);
 			output=output.split(rule.before).join(rule.after);
 		}
-		const tokens=output.match(/1\.7\.0\.0-d28/g)?.length??0;
-		if(name.endsWith('.html')||name==='pi-common.js'){if(!tokens)throw new Error(`${name}: missing baseline token`);output=output.replaceAll('1.7.0.0-d28',token);}
+		const tokens=output.split(BASELINE_PANEL_TOKEN).length-1;
+		if(name.endsWith('.html')||name==='pi-common.js'){if(!tokens)throw new Error(`${name}: missing baseline token`);output=output.replaceAll(BASELINE_PANEL_TOKEN,token);}
 		if(name.endsWith('.js'))new vm.Script(output,{filename:name});
 		if(/HWiNFO|REALiX|hwinfo-streamdeck|HWINFO_/.test(output))throw new Error(`${name}: platform name remains`);
 		outputs.push([name,output]);

@@ -1,11 +1,11 @@
-Source: slawrensen/hwinfo-streamdeck/src/actions/sensor-dial.ts@11b9645b78395f157493648d873a3066673ba493
+Source: slawrensen/hwinfo-streamdeck/src/actions/sensor-dial.ts@bb4aedecbce499e199df8af63793a1490c0fb6ed
 Seam: S1/S2/S5
 Reason: Select Mac poller/status copy, empty-dial title and fixed setup pixels.
-Before: 58d73bb0b8485f0e787ccd8e39ba67aa1254439759a5e8275a16f2f54e292d49
-After: adcaa6b1e48c8af43f386d499526984cec0017f72575bbb3666992eeb393ebe6
+Before: 0bab3d4f8e1ec4325099523749f36c8cbefeee1f78d9b9cd649e42d58bef9eb4
+After: ce03c09cfce5355b302dcb718a8a4f9961b57307dd453a0dcb7441896d2bccf8
 
 diff --git a/src/actions/sensor-dial.ts b/src/actions/sensor-dial.ts
-index c02a480..2e284eb 100644
+index 4233201..97de927 100644
 --- a/src/actions/sensor-dial.ts
 +++ b/src/actions/sensor-dial.ts
 @@ -1,3 +1,4 @@
@@ -22,7 +22,7 @@ index c02a480..2e284eb 100644
  import { describeGestureState, hashId, trace, traceEnabled } from "../recorder";
  import { activeGroupIndex, autoCycleTarget, groupDisplayName, overviewWindow, rotationGroupsOf, rotationReadings, stepGroup, stepReading, stepSensorSource } from "../rotation";
  import { SessionStatsStore, sessionResetMessage, type SessionStats } from "../stats";
-@@ -41,7 +42,7 @@ import { dialViewOf, overviewRowColors, rotationKeysOf, stepListOf } from "../ui
+@@ -42,7 +43,7 @@ import { dialViewOf, overviewRowColors, rotationKeysOf, stepListOf } from "../ui
  import { alertLevel, convertUnit, dedupeSharedLabelPrefix, nextStatMode, parseThreshold, STAT_BADGE, thresholdsApplyTo, type DecimalsSetting, type StatMode } from "../ui/format";
  import { computeGauge, drawnZones } from "../ui/gauge";
  import { formatMeasurement, formatStat, isDataUnit } from "../ui/measure";
@@ -31,19 +31,19 @@ index c02a480..2e284eb 100644
  import { resolveTextColors, type TextColors } from "../ui/text-colors";
  import { decideLegacyDefault, effectiveTextFor, effectiveThemeFor, measureOptionsFrom, onThemeChange, typeAccentsEnabled } from "../ui/theme-store";
  import { classifyTypeAccent, loadThemes, resolvePalette, type ThemesConfig } from "../ui/themes";
-@@ -1049,13 +1050,14 @@ export function composeDialSvg(state: DialRenderState, status: PollerStatus, his
+@@ -1071,13 +1072,14 @@ export function composeDialSvg(state: DialRenderState, status: PollerStatus, his
  
  	const problem = statusDialText(status);
  	if (problem !== null) {
 +		if (problem.rasterSVG) return problem.rasterSVG;
  		const palette = resolvePalette(config, themeId, null, "normal");
- 		return renderDial({ title: problem.title, valueText: problem.value, unitText: "", statsText: "", fraction: NaN, palette, barColor: palette.accent, text: textOf(palette) });
+ 		return renderDial({ title: problem.title, valueText: problem.value, unitText: "", statsText: "", fraction: NaN, palette, barColor: palette.accent, text: textOf(palette), background });
  	}
  	const { snapshot } = status as Extract<PollerStatus, { state: "ok" }>;
  	if (settings.readingKey === undefined || settings.readingKey === "") {
  		const palette = resolvePalette(config, themeId, null, "normal");
--		return renderDial({ title: "HWiNFO", valueText: "rotate to pick", unitText: "", statsText: "or use the settings panel", fraction: NaN, palette, barColor: palette.accent, text: textOf(palette) });
-+		return renderDial({ title: runtime.displayName, valueText: "rotate to pick", unitText: "", statsText: "or use the settings panel", fraction: NaN, palette, barColor: palette.accent, text: textOf(palette) });
+-		return renderDial({ title: "HWiNFO", valueText: "rotate to pick", unitText: "", statsText: "or use the settings panel", fraction: NaN, palette, barColor: palette.accent, text: textOf(palette), background });
++		return renderDial({ title: runtime.displayName, valueText: "rotate to pick", unitText: "", statsText: "or use the settings panel", fraction: NaN, palette, barColor: palette.accent, text: textOf(palette), background });
  	}
  	const reading = snapshot.byKey.get(settings.readingKey);
  	if (reading === undefined) {

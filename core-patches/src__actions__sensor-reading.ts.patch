@@ -1,11 +1,11 @@
-Source: slawrensen/hwinfo-streamdeck/src/actions/sensor-reading.ts@11b9645b78395f157493648d873a3066673ba493
+Source: slawrensen/hwinfo-streamdeck/src/actions/sensor-reading.ts@bb4aedecbce499e199df8af63793a1490c0fb6ed
 Seam: S1/S2
 Reason: Resolve the poller and platform status copy through checked aliases.
-Before: a9030ca8874f62c853eaabb6bb3ff934e15bcc64ba1f22c3e22720957da48f46
-After: a6104b235d6917383ad642d40264776b612316a77cd33f4adf3dee8773a42e54
+Before: 50a18af85048c9c22811b4f361f867c5050a0e0b43b35778cd73e6650fa0bd08
+After: cebf0710857337404e663e139e8ea9511b4757d155b623f1275c0ddc590962d5
 
 diff --git a/src/actions/sensor-reading.ts b/src/actions/sensor-reading.ts
-index 3b11a89..2db4324 100644
+index b7abace..7392052 100644
 --- a/src/actions/sensor-reading.ts
 +++ b/src/actions/sensor-reading.ts
 @@ -13,7 +13,7 @@ import { tickSignature } from "../detail/tick-signature";
