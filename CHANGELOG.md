@@ -4,8 +4,8 @@
 
 - A Mac with an Apple M1 to M6 or A18 Pro chip gets per-core CPU temperatures and GPU temperatures from a table for its chip family, and CPU average and CPU hottest core computed from the cores that answer. Before, only the M5 Pro had them. The tables are adapted from the Stats project and are measured only on the M5 Pro.
 - Battery cycles, Battery health and the Internal SSD temperature are new readings on a Mac that reports them. They come from public macOS battery and drive interfaces, asked at most every 1.5 seconds.
-- On Mac17,9 with the M5 Pro, seven more temperatures can go on a key or dial: Airflow top, Charger proximity, Power supply proximity, Thunderbolt left and right, Trackpad and Trackpad actuator. Fan 1 and Fan 2 also offer their target, minimum and maximum speeds.
-- On the same Mac, CPU average, CPU hottest core and Fan average are computed from the SMC readings of one read. A read where any input is missing leaves the computed reading out.
+- On Mac17,9 with the M5 Pro, seven more temperatures can go on a key or dial: Airflow top, Charger proximity, Power supply proximity, Thunderbolt left and right, Trackpad and Trackpad actuator. On the same Mac, CPU average and CPU hottest core cover its 18 cores and are left out of a read where any is missing.
+- Every Mac gets each fan's target, minimum and maximum speed, Fan average with two or more fans, and Computer average and Hottest sensor over the SMC temperatures of one read.
 - Network receive and Network send keep their rate when an interface passes 4 GiB of traffic. Before, both showed Sensor missing for one read and their sparklines started over.
 - **Source busy**, **Bridge failed** and **Needs macOS** say in the settings panel what happened and what to do next.
 - The settings panel uses Mac wording: the alert direction box names fans and free space, the details filter samples are `*fan*` and `*cpu*core*`, fold and rotation hints name the Option key, and the Bar and Ring range help no longer mentions Yes/No readings.
