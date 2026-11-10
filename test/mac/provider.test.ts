@@ -174,7 +174,7 @@ test('a failed source read is a gap for every reading of that source',async()=>{
 // Computed readings (TG Pro parity tier B): CPU average, hottest CPU core and fan average on the qualified Mac17,9 table.
 const catalogRows=(JSON.parse(fs.readFileSync('native/hwmac/catalog.json','utf8')) as {rows:{key:string;label:string;scope:string}[]}).rows;
 /** The 18 Mac17,9 core keys, taken from the native catalog so the provider's input set cannot drift from it. */
-const CORE_KEYS=catalogRows.filter(row=>row.scope==='m5'&&/^CPU (super|performance) core [0-9]+$/.test(row.label)).map(row=>row.key);
+const CORE_KEYS=catalogRows.filter(row=>row.scope==='m5'&&/^(Super|Perf) core [0-9]+$/.test(row.label)).map(row=>row.key);
 const CPU_AVERAGE='mac:v1:computed:Mac17%2C9:cpu-average:temp.v1',CPU_HOTTEST='mac:v1:computed:Mac17%2C9:cpu-hottest:temp.v1',FAN_AVERAGE='mac:v1:computed:Mac17%2C9:fan-average:rpm.v1';
 const COMPUTED=[CPU_AVERAGE,CPU_HOTTEST,FAN_AVERAGE];
 const COMPUTER_AVERAGE='mac:v1:computed:Mac17%2C9:computer-average:temp.v1',HOTTEST_SENSOR='mac:v1:computed:Mac17%2C9:hottest-sensor:temp.v1';
@@ -194,9 +194,9 @@ test('Mac17,9 gets a CPU average, hottest CPU core and fan average from the actu
 	assert.equal(CORE_KEYS.length,18);
 	const r=rig();const snapshot=await readM5(r,100);
 	assert.equal(snapshot.byKey.get(CPU_AVERAGE)?.value,48.5);assert.equal(snapshot.byKey.get(CPU_HOTTEST)?.value,57);assert.equal(snapshot.byKey.get(FAN_AVERAGE)?.value,2500,'target, minimum and maximum rows stay out of the fan average');
-	assert.deepEqual(COMPUTED.map(key=>[snapshot.byKey.get(key)?.label,groupOf(snapshot,key),snapshot.byKey.get(key)?.type,snapshot.byKey.get(key)?.unit]),[['CPU average','CPU',1,'°C'],['CPU hottest core','CPU',1,'°C'],['Fan average','Fans',3,'RPM']]);
+	assert.deepEqual(COMPUTED.map(key=>[snapshot.byKey.get(key)?.label,groupOf(snapshot,key),snapshot.byKey.get(key)?.type,snapshot.byKey.get(key)?.unit]),[['CPU average','CPU',1,'°C'],['Hottest core','CPU',1,'°C'],['Fan average','Fans',3,'RPM']]);
 	assert.deepEqual(r.provider.facts().sourceRows,{public:1,smc:CORE_KEYS.length+WHOLE_MAC_OTHERS.length+1+8,health:0});assert.equal(r.provider.facts().computedRows,5,'computed readings are counted apart from the SMC rows they come from');
-	assert.deepEqual([COMPUTER_AVERAGE,HOTTEST_SENSOR].map(key=>[snapshot.byKey.get(key)?.label,snapshot.byKey.get(key)?.value,groupOf(snapshot,key),snapshot.byKey.get(key)?.unit]),[['Computer average',(873+19*30)/37,'System','°C'],['Hottest sensor',57,'System','°C']],'the fixed whole-Mac set: never the fan rows, never a sensor outside the set');
+	assert.deepEqual([COMPUTER_AVERAGE,HOTTEST_SENSOR].map(key=>[snapshot.byKey.get(key)?.label,snapshot.byKey.get(key)?.value,groupOf(snapshot,key),snapshot.byKey.get(key)?.unit]),[['Mac average',(873+19*30)/37,'System','°C'],['Hottest sensor',57,'System','°C']],'the fixed whole-Mac set: never the fan rows, never a sensor outside the set');
 	r.provider.close();
 });
 test('a computed reading is as old as its oldest input and keeps its own session',async()=>{
@@ -262,9 +262,9 @@ const notFound=(key:string,label:string,at:number):NativeRow=>({...labelled(key,
 const outOfRange=(key:string,label:string,at:number):NativeRow=>({...labelled(key,label,'CPU',NaN,at),valid:false,error:13,firmwareCode:0,operation:'smc.read'});
 /** An M2 Max packet: efficiency core 1 and performance cores 1 and 2 answer unless a test changes them; performance core 4 is not on this SMC. */
 function m2Packet(at:number,cores:Record<string,number|null>={Tp1h:40,Tp01:50,Tp05:60}):NativePacket {
-	const next=packet('smc',at),names:Record<string,string>={Tp1h:'CPU efficiency core 1',Tp01:'CPU performance core 1',Tp05:'CPU performance core 2'};
+	const next=packet('smc',at),names:Record<string,string>={Tp1h:'Eff core 1',Tp01:'Perf core 1',Tp05:'Perf core 2'};
 	next.model=M2_MODEL;next.chip='t6021';next.cpu='Apple M2 Max';next.table='m2';next.tableMeasured=false;
-	next.rows=[...Object.entries(cores).map(([key,value])=>value===null?outOfRange(key,names[key]!,at):labelled(key,names[key]!,'CPU',value,at)),notFound('Tp0D','CPU performance core 4',at),
+	next.rows=[...Object.entries(cores).map(([key,value])=>value===null?outOfRange(key,names[key]!,at):labelled(key,names[key]!,'CPU',value,at)),notFound('Tp0D','Perf core 4',at),
 		labelled('Tg0f','GPU 1','GPU',45,at),smcRow('F0Ac','Fans','fan','RPM',1000,at),smcRow('F1Ac','Fans','fan','RPM',2000,at)];
 	return next;
 }
@@ -272,10 +272,10 @@ async function readM2(r:ReturnType<typeof rig>,at:number,next=m2Packet(at)):Prom
 test('a Mac on a chip family table gets CPU average and CPU hottest core from the cores that answered in that read',async()=>{
 	const r=rig();let snapshot=await readM2(r,100);
 	assert.deepEqual([snapshot.byKey.get(M2_AVERAGE)?.value,snapshot.byKey.get(M2_HOTTEST)?.value],[50,60]);
-	assert.deepEqual([M2_AVERAGE,M2_HOTTEST].map(key=>[snapshot.byKey.get(key)?.label,groupOf(snapshot,key),snapshot.byKey.get(key)?.unit]),[['CPU average','CPU','°C'],['CPU hottest core','CPU','°C']]);
+	assert.deepEqual([M2_AVERAGE,M2_HOTTEST].map(key=>[snapshot.byKey.get(key)?.label,groupOf(snapshot,key),snapshot.byKey.get(key)?.unit]),[['CPU average','CPU','°C'],['Hottest core','CPU','°C']]);
 	assert.equal(snapshot.byKey.get('mac:v1:computed:Mac14%2C6:fan-average:rpm.v1')?.value,1500,'both fans that answered');
 	assert.deepEqual([snapshot.byKey.get('mac:v1:computed:Mac14%2C6:computer-average:temp.v1')?.value,snapshot.byKey.get('mac:v1:computed:Mac14%2C6:hottest-sensor:temp.v1')?.value],[48.75,60],'every temperature that answered, cores and GPU alike');
-	assert.equal(snapshot.byKey.get('mac:v1:smc:Mac14%2C6:54703168:temp.v1')?.label,'CPU efficiency core 1','the core rows themselves are readings too');
+	assert.equal(snapshot.byKey.get('mac:v1:smc:Mac14%2C6:54703168:temp.v1')?.label,'Eff core 1','the core rows themselves are readings too');
 	const facts=r.provider.facts();
 	assert.deepEqual([facts.model,facts.cpu,facts.smcTable,facts.smcTableEvidence,facts.computedRows],[M2_MODEL,'Apple M2 Max','m2','source',5]);
 	assert.deepEqual(facts.smcKeys,{answered:'Tp1h Tp01 Tp05 Tg0f F0Ac F1Ac',absent:'Tp0D',withheld:''});
@@ -304,7 +304,7 @@ test('a Mac with no chip family table gets no CPU readings but keeps the fan and
 	assert.deepEqual(r.provider.notices().filter(line=>/common typed/.test(line)),['This model uses common typed sensors; its generation-specific catalog is not qualified.']);
 	r.provider.close();
 	// Mac17,9 never falls back to "the cores that answered": seventeen of its eighteen cores give no CPU readings, with or without the family flag.
-	const inputs=new Map(CORE_KEYS.slice(1).map((key,index)=>[key,labelled(key,`CPU performance core ${index+1}`,'CPU',50,100)]));
+	const inputs=new Map(CORE_KEYS.slice(1).map((key,index)=>[key,labelled(key,`Perf core ${index+1}`,'CPU',50,100)]));
 	const names=(rows:NativeRow[])=>rows.map(row=>row.key);
 	for(const family of [false,true])assert.deepEqual(names(computedRows('Mac17,9','t6050',inputs,family)),[],String(family));
 	assert.deepEqual(names(computedRows(M2_MODEL,'t6021',inputs,false)),['computer-average','hottest-sensor'],'no table, no CPU readings');

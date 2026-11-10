@@ -1,0 +1,450 @@
+{
+  "source": "npm run probe on Mac17,9 (Apple M5 Pro, t6050, macOS 27.0.1), 2026-11-10, with the 1.0.2 names (catalog and provider at 85da2ae)",
+  "readings": [
+    {
+      "identity": "mac:v1:computed:Mac17%2C9:computer-average:temp.v1",
+      "label": "Computer average",
+      "group": "System"
+    },
+    {
+      "identity": "mac:v1:computed:Mac17%2C9:cpu-average:temp.v1",
+      "label": "CPU average",
+      "group": "CPU"
+    },
+    {
+      "identity": "mac:v1:computed:Mac17%2C9:cpu-hottest:temp.v1",
+      "label": "CPU hottest core",
+      "group": "CPU"
+    },
+    {
+      "identity": "mac:v1:computed:Mac17%2C9:fan-average:rpm.v1",
+      "label": "Fan average",
+      "group": "Fans"
+    },
+    {
+      "identity": "mac:v1:computed:Mac17%2C9:hottest-sensor:temp.v1",
+      "label": "Hottest sensor",
+      "group": "System"
+    },
+    {
+      "identity": "mac:v1:health:battery-cycles:count.v1",
+      "label": "Battery cycles",
+      "group": "Battery"
+    },
+    {
+      "identity": "mac:v1:health:battery-health:percent.v1",
+      "label": "Battery health",
+      "group": "Battery"
+    },
+    {
+      "identity": "mac:v1:health:ssd-temperature:temp.v1",
+      "label": "Internal SSD",
+      "group": "Storage"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:46304163:rpm.v1",
+      "label": "Fan 1",
+      "group": "Fans"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:46304d6e:rpm.v1",
+      "label": "Fan 1 minimum",
+      "group": "Fans"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:46304d78:rpm.v1",
+      "label": "Fan 1 maximum",
+      "group": "Fans"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:46305467:rpm.v1",
+      "label": "Fan 1 target",
+      "group": "Fans"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:46314163:rpm.v1",
+      "label": "Fan 2",
+      "group": "Fans"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:46314d6e:rpm.v1",
+      "label": "Fan 2 minimum",
+      "group": "Fans"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:46314d78:rpm.v1",
+      "label": "Fan 2 maximum",
+      "group": "Fans"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:46315467:rpm.v1",
+      "label": "Fan 2 target",
+      "group": "Fans"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:49443052:current.v1",
+      "label": "DC In",
+      "group": "System"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:50445452:power.v1",
+      "label": "DC In",
+      "group": "System"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:50504252:power.v1",
+      "label": "Battery",
+      "group": "Battery"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:50535452:power.v1",
+      "label": "System Total",
+      "group": "System"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:54423154:temp.v1",
+      "label": "Battery",
+      "group": "Battery"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:54423254:temp.v1",
+      "label": "Battery 2",
+      "group": "Battery"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:54434850:temp.v1",
+      "label": "Charger proximity",
+      "group": "System"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:54483078:temp.v1",
+      "label": "NAND",
+      "group": "System"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:54505350:temp.v1",
+      "label": "Power supply proximity",
+      "group": "System"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:54573050:temp.v1",
+      "label": "Airport",
+      "group": "System"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:54614c50:temp.v1",
+      "label": "Airflow left",
+      "group": "System"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:54614c54:temp.v1",
+      "label": "Thunderbolt left",
+      "group": "System"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:54615246:temp.v1",
+      "label": "Airflow right",
+      "group": "System"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:54615254:temp.v1",
+      "label": "Thunderbolt right",
+      "group": "System"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:54615450:temp.v1",
+      "label": "Airflow top",
+      "group": "System"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:54673038:temp.v1",
+      "label": "GPU region 1",
+      "group": "GPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:54673055:temp.v1",
+      "label": "GPU 1",
+      "group": "GPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:54673058:temp.v1",
+      "label": "GPU 2",
+      "group": "GPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:54673064:temp.v1",
+      "label": "GPU 3",
+      "group": "GPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:54673067:temp.v1",
+      "label": "GPU 4",
+      "group": "GPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:5467306a:temp.v1",
+      "label": "GPU 5",
+      "group": "GPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:54673132:temp.v1",
+      "label": "GPU region 2",
+      "group": "GPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:54673159:temp.v1",
+      "label": "GPU 6",
+      "group": "GPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:54673163:temp.v1",
+      "label": "GPU 7",
+      "group": "GPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:54673239:temp.v1",
+      "label": "GPU region 3",
+      "group": "GPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:54673342:temp.v1",
+      "label": "GPU region 4",
+      "group": "GPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:546d3034:temp.v1",
+      "label": "CPU performance core 1",
+      "group": "CPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:546d3047:temp.v1",
+      "label": "CPU performance core 2",
+      "group": "CPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:546d3052:temp.v1",
+      "label": "CPU performance core 3",
+      "group": "CPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:546d3061:temp.v1",
+      "label": "CPU performance core 4",
+      "group": "CPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:546d306a:temp.v1",
+      "label": "CPU performance core 5",
+      "group": "CPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:546d3075:temp.v1",
+      "label": "CPU performance core 6",
+      "group": "CPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:546d3151:temp.v1",
+      "label": "CPU performance core 7",
+      "group": "CPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:546d3163:temp.v1",
+      "label": "CPU performance core 8",
+      "group": "CPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:546d316f:temp.v1",
+      "label": "CPU performance core 9",
+      "group": "CPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:546d3231:temp.v1",
+      "label": "CPU performance core 10",
+      "group": "CPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:546d3244:temp.v1",
+      "label": "CPU performance core 11",
+      "group": "CPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:546d3250:temp.v1",
+      "label": "CPU performance core 12",
+      "group": "CPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:54703030:temp.v1",
+      "label": "CPU super cluster sensor 1",
+      "group": "CPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:54703034:temp.v1",
+      "label": "CPU super core 1",
+      "group": "CPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:54703038:temp.v1",
+      "label": "CPU super cluster sensor 2",
+      "group": "CPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:54703043:temp.v1",
+      "label": "CPU super cluster sensor 3",
+      "group": "CPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:54703047:temp.v1",
+      "label": "CPU super core 2",
+      "group": "CPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:5470304b:temp.v1",
+      "label": "CPU super cluster sensor 4",
+      "group": "CPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:5470304f:temp.v1",
+      "label": "CPU super cluster sensor 5",
+      "group": "CPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:54703052:temp.v1",
+      "label": "CPU super core 3",
+      "group": "CPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:54703055:temp.v1",
+      "label": "CPU super cluster sensor 6",
+      "group": "CPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:54703058:temp.v1",
+      "label": "CPU super cluster sensor 7",
+      "group": "CPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:54703061:temp.v1",
+      "label": "CPU super core 4",
+      "group": "CPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:54703064:temp.v1",
+      "label": "CPU super cluster sensor 8",
+      "group": "CPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:54703067:temp.v1",
+      "label": "CPU super cluster sensor 9",
+      "group": "CPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:5470306a:temp.v1",
+      "label": "CPU super core 5",
+      "group": "CPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:5470306d:temp.v1",
+      "label": "CPU super cluster sensor 10",
+      "group": "CPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:54703070:temp.v1",
+      "label": "CPU super cluster sensor 11",
+      "group": "CPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:54703075:temp.v1",
+      "label": "CPU super core 6",
+      "group": "CPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:54703079:temp.v1",
+      "label": "CPU super cluster sensor 12",
+      "group": "CPU"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:54733050:temp.v1",
+      "label": "Trackpad",
+      "group": "System"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:54733150:temp.v1",
+      "label": "Trackpad actuator",
+      "group": "System"
+    },
+    {
+      "identity": "mac:v1:smc:Mac17%2C9:56443052:voltage.v1",
+      "label": "DC In",
+      "group": "System"
+    },
+    {
+      "identity": "mac:v1:system:cpu-total",
+      "label": "CPU usage",
+      "group": "CPU"
+    },
+    {
+      "identity": "mac:v1:system:disk-root-available",
+      "label": "Startup volume available",
+      "group": "Storage"
+    },
+    {
+      "identity": "mac:v1:system:disk-root-total",
+      "label": "Startup volume total",
+      "group": "Storage"
+    },
+    {
+      "identity": "mac:v1:system:memory-active",
+      "label": "Memory active",
+      "group": "Memory"
+    },
+    {
+      "identity": "mac:v1:system:memory-compressed",
+      "label": "Memory compressed",
+      "group": "Memory"
+    },
+    {
+      "identity": "mac:v1:system:memory-free",
+      "label": "Memory free",
+      "group": "Memory"
+    },
+    {
+      "identity": "mac:v1:system:memory-inactive",
+      "label": "Memory inactive",
+      "group": "Memory"
+    },
+    {
+      "identity": "mac:v1:system:memory-total",
+      "label": "Memory total",
+      "group": "Memory"
+    },
+    {
+      "identity": "mac:v1:system:memory-wired",
+      "label": "Memory wired",
+      "group": "Memory"
+    },
+    {
+      "identity": "mac:v1:system:network-receive",
+      "label": "Network receive",
+      "group": "Network"
+    },
+    {
+      "identity": "mac:v1:system:network-send",
+      "label": "Network send",
+      "group": "Network"
+    },
+    {
+      "identity": "mac:v1:system:storage-read",
+      "label": "Storage read",
+      "group": "Storage"
+    },
+    {
+      "identity": "mac:v1:system:storage-write",
+      "label": "Storage write",
+      "group": "Storage"
+    },
+    {
+      "identity": "mac:v1:system:swap-used",
+      "label": "Swap used",
+      "group": "Memory"
+    }
+  ]
+}

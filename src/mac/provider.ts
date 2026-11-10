@@ -40,7 +40,7 @@ const SYSTEM_KEYS=new Set(['cpu-total','memory-total','memory-free','memory-acti
 /** A reading this provider computes from other readings of one SMC packet. */
 interface ComputedSpec { name:string; label:string; group:string; kind:'temperature'|'fan'; unit:string; reduce:'mean'|'max'; inputs:readonly string[]; }
 /**
- * Mac17,9 core keys, as named in native/hwmac/catalog.json: super cores 1 to 6, then performance cores 1 to 12. Measured against TG Pro's
+ * Mac17,9 core keys, as named in native/hwmac/catalog.json: Super core 1 to 6, then Perf core 1 to 12. Measured against TG Pro's
  * own log through a load swing, and by loading each CPU cluster alone: every Tp key warms with the super cores, the Tm keys are the performance cores.
  */
 const M5_PRO_CORES=['Tp04','Tp0G','Tp0R','Tp0a','Tp0j','Tp0u','Tm04','Tm0G','Tm0R','Tm0a','Tm0j','Tm0u','Tm1Q','Tm1c','Tm1o','Tm21','Tm2D','Tm2P'] as const;
@@ -54,13 +54,16 @@ const M5_PRO_WHOLE_MAC=[...M5_PRO_CORES,'Tg08','Tg12','Tg29','Tg3B','TB1T','TB1T
  */
 const COMPUTED_TABLES:ReadonlyArray<{model:string;chip:string;readings:readonly ComputedSpec[]}>=[{model:'Mac17,9',chip:'t6050',readings:[
 	{name:'cpu-average',label:'CPU average',group:'CPU',kind:'temperature',unit:'°C',reduce:'mean',inputs:M5_PRO_CORES},
-	{name:'cpu-hottest',label:'CPU hottest core',group:'CPU',kind:'temperature',unit:'°C',reduce:'max',inputs:M5_PRO_CORES},
+	{name:'cpu-hottest',label:'Hottest core',group:'CPU',kind:'temperature',unit:'°C',reduce:'max',inputs:M5_PRO_CORES},
 	{name:'fan-average',label:'Fan average',group:'Fans',kind:'fan',unit:'RPM',reduce:'mean',inputs:['F0Ac','F1Ac']},
-	{name:'computer-average',label:'Computer average',group:'System',kind:'temperature',unit:'°C',reduce:'mean',inputs:M5_PRO_WHOLE_MAC},
+	{name:'computer-average',label:'Mac average',group:'System',kind:'temperature',unit:'°C',reduce:'mean',inputs:M5_PRO_WHOLE_MAC},
 	{name:'hottest-sensor',label:'Hottest sensor',group:'System',kind:'temperature',unit:'°C',reduce:'max',inputs:M5_PRO_WHOLE_MAC}
 ]}];
-/** How a chip family table names a per-core CPU temperature (native/hwmac/catalog.json; test/mac/provider.test.ts pins the match). */
-export const CORE_LABEL=/^CPU (?:(?:super|performance|efficiency) core|sensor) [1-9][0-9]?$/;
+/**
+ * How a chip family table names a per-core CPU temperature (native/hwmac/catalog.json; test/mac/provider.test.ts pins the match):
+ * Super, Perf or Eff core N for a sensor named after one core, CPU sensor N where the core is not known.
+ */
+export const CORE_LABEL=/^(?:(?:Super|Perf|Eff) core|CPU sensor) [1-9][0-9]?$/;
 const FAN_SPEED_KEY=/^F[0-7]Ac$/;
 /** A temperature counts toward a whole-Mac reading only inside this window: Stats drops a sensor that reads 0 and one above 110 °C, and treats a CPU sensor outside 10 to 120 °C as broken (Modules/Sensors/readers.swift). */
 const WHOLE_MAC_TEMPERATURE_C=[10,120] as const;
@@ -72,13 +75,13 @@ const isMacTemperature=(row:NativeRow):boolean=>row.kind==='temperature'&&row.un
 /** On a Mac whose model has no fixed input list, the rows a chip family table gives are not known ahead, so these cover what answered. */
 const FAMILY_COMPUTED:readonly AcceptedSpec[]=[
 	{name:'cpu-average',label:'CPU average',group:'CPU',kind:'temperature',unit:'°C',reduce:'mean',least:1,takes:isCore},
-	{name:'cpu-hottest',label:'CPU hottest core',group:'CPU',kind:'temperature',unit:'°C',reduce:'max',least:1,takes:isCore}
+	{name:'cpu-hottest',label:'Hottest core',group:'CPU',kind:'temperature',unit:'°C',reduce:'max',least:1,takes:isCore}
 ];
 /** Fan average needs two fans to say anything a Fan reading does not. Fan target, minimum and maximum are never inputs. */
 const FAN_COMPUTED:readonly AcceptedSpec[]=[{name:'fan-average',label:'Fan average',group:'Fans',kind:'fan',unit:'RPM',reduce:'mean',least:2,takes:isFanSpeed}];
 /** Every Mac. TG Pro's Computer Average rounds to the mean of its 38 SMC temperatures in 95.5 % of 1,563 log rows on Mac17,9, and its other whole-Mac reading is the highest sensor. */
 const WHOLE_MAC_COMPUTED:readonly AcceptedSpec[]=[
-	{name:'computer-average',label:'Computer average',group:'System',kind:'temperature',unit:'°C',reduce:'mean',least:2,takes:isMacTemperature},
+	{name:'computer-average',label:'Mac average',group:'System',kind:'temperature',unit:'°C',reduce:'mean',least:2,takes:isMacTemperature},
 	{name:'hottest-sensor',label:'Hottest sensor',group:'System',kind:'temperature',unit:'°C',reduce:'max',least:2,takes:isMacTemperature}
 ];
 type Reduced=Pick<ComputedSpec,'name'|'label'|'group'|'kind'|'unit'|'reduce'>;
@@ -165,7 +168,7 @@ export function counterRows(previous:NativePacket|null,packet:NativePacket):Nati
 		if(valid&&total>0)rows.push(derived(packet,'cpu-total','CPU usage','CPU','usage','%',100*(total-idle)/total));
 	}
 	for(const [valid,oldValid,membership,oldMembership,fields] of [
-		[packet.networkValid,previous.networkValid,packet.networkMembers,previous.networkMembers,[['network-receive','Network receive','Network',packet.networkIn,previous.networkIn],['network-send','Network send','Network',packet.networkOut,previous.networkOut]]],
+		[packet.networkValid,previous.networkValid,packet.networkMembers,previous.networkMembers,[['network-receive','Network in','Network',packet.networkIn,previous.networkIn],['network-send','Network out','Network',packet.networkOut,previous.networkOut]]],
 		[packet.storageValid,previous.storageValid,packet.storageMembers,previous.storageMembers,[['storage-read','Storage read','Storage',packet.storageRead,previous.storageRead],['storage-write','Storage write','Storage',packet.storageWrite,previous.storageWrite]]]
 	] as const) {
 		if(!valid||!oldValid||membership!==oldMembership||counter(membership)===null)continue;
