@@ -178,7 +178,7 @@
       "file": "crops/settings-reading-colors-display.png",
       "source": {
         "file": "docs/assets/img/settings-reading-colors.png",
-        "sha256": "934a92a8e76aef27dc04fa792d06d21fe377e417e82e43f29b69159ca5775e6a"
+        "sha256": "7669e7e6afd282c1679b9b21cdef0c2136f4f209568e5d8015a73ab410bd5ec0"
       },
       "regions": [
         {
@@ -190,14 +190,14 @@
       ],
       "width": 756,
       "height": 1184,
-      "bytes": 74238,
-      "sha256": "3f2aa6db6c9e32aa3fe7e53695005e13c5c3879fed918a6f5322878be3134024"
+      "bytes": 82273,
+      "sha256": "87a347abbe87dce35800e0698b035d1757b14228f343e74bb7be2824b81ae687"
     },
     {
       "file": "crops/settings-dial-display.png",
       "source": {
         "file": "docs/assets/img/settings-dial.png",
-        "sha256": "6014f4d5e090bc20736776c31a830ac6d39697b0666599ae9a2cf744ba603dbc"
+        "sha256": "ee5c5a854625ec1fa010e9f1ee0f4a14e974db2df3ea3e99e6aeaf39874e332c"
       },
       "regions": [
         {
@@ -215,8 +215,8 @@
       ],
       "width": 756,
       "height": 1462,
-      "bytes": 97712,
-      "sha256": "2432cfa57b08173543f2f19dc2632e76269e05e04c200604ed4e08ffc9a0a179"
+      "bytes": 105966,
+      "sha256": "c9f53dcb20c56d9736e33db31bf39a9e6f667d196fd4f3bb8c811ef8b639684d"
     },
     {
       "file": "brand/mac-sensors-icon-16.png",
