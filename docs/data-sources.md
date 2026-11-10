@@ -18,7 +18,7 @@ For requirements and the Tahoma Bold prerequisite, see [Installation and require
 | What they are | Processor time, memory, swap, startup volume space, and network and storage byte counters that macOS keeps | Temperatures, fan speeds, voltages, currents and power from the System Management Controller (SMC) | Battery cycle count and battery health, and the internal SSD temperature |
 | How they are read | Public macOS calls: `host_processor_info`, `host_statistics64`, `sysctl`, `statfs`, `getifaddrs` and the IOKit storage driver statistics | The `AppleSMC` IOKit service, with read-only commands, for a fixed table of keys | Public IOKit calls: `IOPSCopyPowerSourcesInfo`, `AppleSmartBattery` registry properties and the NVMe SMART plug-in from the macOS SDK |
 | Picker groups | CPU, Memory, Storage, Network | CPU, GPU, Battery, Fans, System | Battery, Storage |
-| On the measured M5 Pro | 14 readings: 9 read directly, 5 worked out from two reads | 51 readings, plus 5 computed from them | 3 readings |
+| On the measured M5 Pro | 14 readings: 9 read directly, 5 worked out from two reads | 67 readings, plus 5 computed from them | 3 readings |
 | On another Mac | The same collectors run; a counter macOS does not return is left out | Depends on the model and chip (see [SMC readings](#smc-readings)) | No battery readings without an internal battery; no drive reading without exactly one internal NVMe drive that reports SMART |
 | Minimum, maximum, average | Not provided; Mac Sensors keeps its own from its reads | Not provided; Mac Sensors keeps its own from its reads | Not provided; Mac Sensors keeps its own from its reads |
 | Access needed | No administrator access | No administrator access, privileged helper or driver | No administrator access, privileged helper or driver |
@@ -61,14 +61,14 @@ When a worked-out reading is left out, a key showing only that reading shows **S
 
 The native reader opens the `AppleSMC` service and, for each key in its table, asks for the key's type and size once per connection, then reads its value on every read. A key the SMC reports as not found is not asked for on every read: the reader asks again after 1 read, then 2, 4 and so on, and from then on about once a minute at the 1 second default. Its transport accepts three read-only SMC commands and rejects any other command before it reaches the SMC. It checks the reply's length and firmware status, decodes the types `flt`, `sp78`, `fpe2`, `ui8`, `ui16` and `ui32`, and withholds anything else.
 
-The table lists 211 rows. A Mac is asked only for the rows that apply to it, 92 at most, and a key that its SMC does not have is left out.
+The table lists 245 rows. A Mac is asked only for the rows that apply to it, 108 at most, and a key that its SMC does not have is left out.
 
 | Applies to | Rows | Readings |
 | --- | --- | --- |
 | Every Mac | 55 | CPU and GPU diode and proximity, battery and Airport temperatures; memory and DC In voltage; CPU and GPU high side, DC In and battery current; CPU package, GPU, battery, DC In, memory and system power; Fan 1 to Fan 8, each with its target, minimum and maximum speed |
 | Mac computers with Apple silicon | 4 more | Airflow left, Airflow right, NAND and Battery 2 temperatures |
 | One chip family (next table) | 8 to 30 more | Per-core CPU temperatures and GPU temperatures; memory temperatures on M1 and M4 |
-| Mac17,9 with the t6050 chip only | 7 more | Airflow top, Charger proximity, Power supply proximity, Thunderbolt left and right, Trackpad and Trackpad actuator temperatures |
+| Mac17,9 with the t6050 chip only | 23 more | Airflow top, Charger proximity, Power supply proximity, Thunderbolt left and right, Trackpad and Trackpad actuator temperatures; GPU region 1 to 4; 12 more sensors in the super core cluster |
 
 The chip family is taken from the CPU name macOS reports (`machdep.cpu.brand_string`), for example `Apple M2 Max`. A family table applies only when the whole name is one it lists:
 
@@ -78,11 +78,11 @@ The chip family is taken from the CPU name macOS reports (`machdep.cpu.brand_str
 | M2 | Apple M2, M2 Pro, M2 Max, M2 Ultra | 14 | CPU efficiency core 1 to 4, CPU performance core 1 to 8, GPU 1 and 2 |
 | M3 | Apple M3, M3 Pro, M3 Max, M3 Ultra | 24 | CPU efficiency core 1 to 4, CPU performance core 1 to 12, GPU 1 to 8 |
 | M4 | Apple M4, M4 Pro, M4 Max | 23 | CPU efficiency core 1 to 4, CPU performance core 1 to 8, GPU 1 to 8, Memory proximity 1 to 3. GPU 1 and 2 use other keys on M4 Pro and M4 Max than on M4 |
-| M5 | Apple M5, M5 Pro, M5 Max, M5 Ultra | 26 | CPU super core 1 to 6, CPU performance core 1 to 12, GPU 1 to 8 |
+| M5 | Apple M5, M5 Pro, M5 Max, M5 Ultra | 26 | M5 Pro and M5 Max: CPU super core 1 to 6, CPU performance core 1 to 12. M5 and M5 Ultra: CPU sensor 1 to 18. All four: GPU 1 to 8 |
 | M6 | Apple M6, M6 Pro, M6 Max | 30 | CPU super core 1 to 4, CPU performance core 1 to 8, CPU efficiency core 1 to 6, GPU 1 to 12 |
 | A18 Pro | Apple A18 Pro | 8 | CPU efficiency core 1 and 2, CPU performance core 1 and 2, GPU 1 to 4 |
 
-The keys and names of the common, Apple silicon and chip family rows are adapted from the sensor table of [Stats](https://github.com/exelban/stats) by Serhiy Mytrovtsiy. I have measured one Mac: on Mac17,9 with an M5 Pro, 51 of its 92 rows answer, 25 of them from the M5 family table. On every other chip the family rows are that table's word, not my measurement. A table lists a fixed set of core rows: a chip with fewer cores answers for fewer, on a chip with more cores the readings cover only the listed ones, and a name can be wrong for a chip I have not seen. When the Mac itself was not measured, the plugin log records `This Mac reads the m2 chip family sensor table, which has not been measured on this model.` with its own family name. [Hardware compatibility](hardware.html#send-a-reading-report-from-your-mac) says how to send me which keys your Mac answers.
+The keys and names of the common, Apple silicon and chip family rows are adapted from the sensor table of [Stats](https://github.com/exelban/stats) by Serhiy Mytrovtsiy. I have measured one Mac: on Mac17,9 with an M5 Pro, 67 of its 108 rows answer. On every other chip the family rows are that table's word, not my measurement. A table lists a fixed set of core rows: a chip with fewer cores answers for fewer, on a chip with more cores the readings cover only the listed ones, and a name can be wrong for a chip I have not seen. The M5 Pro and M5 Max core rows are not Stats': on the measured M5 Pro, a load on the six super cores alone warmed 18 `Tp` keys by 17 to 19 °C within 10 seconds, all alike, while Stats names 12 of those keys performance cores. The core rows of those two chips use the keys that follow TG Pro's Super Core and Performance Core columns through CPU and GPU load swings. On M5 and M5 Ultra the 18 `Tp` keys are named CPU sensor 1 to 18, because I cannot say which core each belongs to. When the Mac itself was not measured, the plugin log records `This Mac reads the m2 chip family sensor table, which has not been measured on this model.` with its own family name. [Hardware compatibility](hardware.html#send-a-reading-report-from-your-mac) says how to send me which keys your Mac answers.
 
 A virtual machine, an Intel Mac and a chip the table does not list get the first one or two rows of the first table only, and the plugin log records `This model uses common typed sensors; its generation-specific catalog is not qualified.` A Mac without fans need not report fan readings. For the state of Intel validation, see [Hardware compatibility](hardware.html).
 
@@ -111,19 +111,18 @@ The plugin computes these readings from the SMC readings of one read:
 
 | Reading | Group | Unit | On the measured Mac17,9 | On any other Mac |
 | --- | --- | --- | --- | --- |
-| CPU average | CPU | °C | Mean of its 18 CPU core temperatures (super cores 1 to 6 and performance cores 1 to 12) | With a chip family table: mean of the per-core CPU temperatures accepted in that read. Without one: not offered |
+| CPU average | CPU | °C | Mean of its 18 core temperatures (super cores 1 to 6 and performance cores 1 to 12) | With a chip family table: mean of the per-core CPU temperatures accepted in that read. Without one: not offered |
 | CPU hottest core | CPU | °C | Highest of the same 18 | With a chip family table: highest of the same cores. Without one: not offered |
 | Fan average | Fans | RPM | Mean of Fan 1 and Fan 2 actual speed | Mean of the fan speeds accepted in that read, when there are at least two |
-| Computer average | System | °C | Mean of every SMC temperature accepted in that read that lies between 10 and 120 °C | The same, when there are at least two |
-| Hottest sensor | System | °C | Highest of the same temperatures | The same, when there are at least two |
+| Computer average | System | °C | Mean of a fixed list of 37 temperatures: the 18 cores, the 4 GPU regions and 13 others, with Battery counted three times | Mean of every SMC temperature accepted in that read that lies between 10 and 120 °C, when there are at least two |
+| Hottest sensor | System | °C | Highest of the same temperatures | Highest of the same temperatures, when there are at least two |
 
-Fan target, minimum and maximum speeds are never inputs. On the measured M5 Pro, TG Pro's own CPU Average was within 1 °C of the mean of the 18 cores in 99.98 % of 32,932 log rows, and its Computer Average was within 1 °C of the mean of its 38 SMC temperatures in every one of 1,563 log rows.
+Fan target, minimum and maximum speeds are never inputs. On the measured M5 Pro I compared these with TG Pro's log, which holds whole degrees every 2 seconds, over 530 samples through CPU and GPU load swings: CPU average was within 1 °C of TG Pro's CPU Average in 94.7 % of them, and Computer average within 1 °C of its Computer Average in 89.4 % and within 2 °C in 99.8 %. TG Pro's Computer Average covers one drive reading this list does not, the SMART temperature, which comes from another source.
 
 A computed reading follows its inputs:
 
-- CPU average, CPU hottest core and Fan average on Mac17,9 are computed only when every input of their fixed list was accepted from the same SMC read: valid, a finite number, inside its range, not duplicated and less than 15 seconds old. If any input is missing or withheld, the computed reading is left out of that read.
-- On another Mac the plugin cannot know ahead which of the table's core rows the chip has, and a core can fail a read on its own. Those readings cover the rows accepted in that read, so a read in which one core was withheld averages one core fewer. A read in which too few were accepted leaves them out.
-- Computer average and Hottest sensor always cover what was accepted in that read. A temperature outside 10 to 120 °C counts as a broken or idle sensor for them, even where the reading itself is accepted.
+- On Mac17,9 each one is computed only when every input of its fixed list was accepted from the same SMC read: valid, a finite number, inside its range, not duplicated and less than 15 seconds old. If any input is missing or withheld, the computed reading is left out of that read.
+- On another Mac the plugin cannot know ahead which of the table's rows the chip has, and a row can fail a read on its own. These readings cover the rows accepted in that read, so a read in which one was withheld averages one fewer. A read in which too few were accepted leaves them out. A temperature outside 10 to 120 °C counts as a broken or idle sensor for Computer average and Hottest sensor, even where the reading itself is accepted.
 - A computed reading is never computed from a value kept from an earlier read.
 - Its acquisition time is that of its oldest input, so it expires no later than that input.
 - A failed or expired SMC read removes it with the SMC readings.

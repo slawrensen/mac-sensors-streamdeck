@@ -155,7 +155,7 @@ The **Reading** list shows the readings of the latest read, grouped by CPU, GPU,
 
 Available readings depend on the Mac model and macOS version:
 
-- The SMC table lists 211 rows. Every Mac is asked for 55 common rows, Mac computers with Apple silicon for 4 more, a Mac with an Apple M1 to M6 or A18 Pro chip for its chip family's 8 to 30 rows, and the Mac17,9 with the t6050 chip for 7 more. Keys that the SMC on this Mac does not have are left out. On the measured M5 Pro, 51 of 92 answer.
+- The SMC table lists 245 rows. Every Mac is asked for 55 common rows, Mac computers with Apple silicon for 4 more, a Mac with an Apple M1 to M6 or A18 Pro chip for its chip family's 8 to 30 rows, and the Mac17,9 with the t6050 chip for 23 more. Keys that the SMC on this Mac does not have are left out. On the measured M5 Pro, 67 of 108 answer.
 - A chip family table lists a fixed set of core rows. A chip with fewer cores shows fewer core readings, and on a chip with more cores the readings cover only the listed ones. On a Mac other than the measured one, a core, GPU or memory temperature below 10 °C or above 120 °C is withheld for that read.
 - On a Mac other than the measured one, the plugin log records which table it reads: `This Mac reads the … chip family sensor table, which has not been measured on this model.` or `This model uses common typed sensors; its generation-specific catalog is not qualified.`
 - A Mac without fans need not report fan readings.
