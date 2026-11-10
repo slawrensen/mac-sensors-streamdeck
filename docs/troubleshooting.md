@@ -126,7 +126,7 @@ The settings panel tells this apart from a source problem. Its header says **Sav
 
 ## Keys show Access denied or Not updating
 
-These two screens are defined, but no read in version 1.0.1 reports them. When the SMC service cannot be opened, the SMC readings are left out and the system counters keep working; a reading older than 15 seconds is removed rather than held. If you see either screen, copy a support report, keep the plugin log and file an issue.
+These two screens are defined, but no read reports them. When the SMC service cannot be opened, the SMC readings are left out and the system counters keep working; a reading older than 15 seconds is removed rather than held. If you see either screen, copy a support report, keep the plugin log and file an issue.
 
 ## The panel says the plugin is not responding
 
@@ -267,7 +267,7 @@ Useful lines:
 - `MacSensors: smc read failed; retrying.` or `smc could not start; retrying.` (or `public`): a read did not complete or could not be queued.
 - `MacSensors: Node is running under translation; sensor interfaces follow the detected hardware.`: macOS reports the Node process as translated.
 - `MacSensors: Native reader unavailable: …`: keys show **Bridge failed**, and the sentence names the check that failed. See [Keys show Bridge failed](#keys-show-bridge-failed).
-- `MacSensors: This Mac reads the … chip family sensor table, which has not been measured on this Mac.`: this Mac gets the per-core CPU and GPU rows of its chip family, taken from the Stats table and not measured on this model. A Mac17,9 with the 15-core M5 Pro logs this too: it keeps the Mac17,9 rows, but they were measured on the 18-core part.
+- `MacSensors: This Mac reads the … chip family sensor table, which has not been measured on this Mac.`: this Mac gets the per-core CPU and GPU rows of its chip family, taken from the Stats table (the M5 Pro and M5 Max core rows follow the measured M5 Pro) and not measured on this model. A Mac17,9 with the 15-core M5 Pro logs this too: it keeps the Mac17,9 rows, but they were measured on the 18-core part.
 - `MacSensors: This model uses common typed sensors; its generation-specific catalog is not qualified.`: this Mac's CPU name matches no chip family table, so it gets the common SMC rows only.
 - `Device connected: "…" (…, 8x4)` and `Device known: …`: one line per deck, with the name you gave it, its type and its key grid.
 - `Detail entry refused: …`: why a detail press showed the Stream Deck alert triangle.
