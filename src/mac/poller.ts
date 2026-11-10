@@ -24,8 +24,8 @@ export function parseSourceMode(_raw: unknown): 'auto' { void _raw; return 'auto
 type Factory = (ready: () => void) => MacSnapshotProvider;
 const pending = (): PollerStatus => ({ state: 'unavailable', reason: 'pending', message: PENDING_MESSAGE });
 /**
- * Longest a settled source's readings wait for the other source of the same read, so a
- * context that shows both gets one publication per read. Below the 250 ms minimum interval.
+ * Longest a settled source's readings wait for the read's other sources, so a context that
+ * shows readings of several sources gets one publication per read. Below the 250 ms minimum interval.
  * Evidence (PERF.md, 2026-10-12 CI native benchmark on the M5 Pro, SMC read time at 1 s): p50
  * 11.10 ms in the second window, slowest of 1,000 reads 66.39 ms in the first. Intel SMC
  * duration is unknown; a timed read slower than this window publishes twice (bounded).

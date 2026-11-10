@@ -15,8 +15,9 @@
 /* The SMC's firmware status for a key it does not have. */
 #define HWMAC_SMC_KEY_NOT_FOUND 0x84
 /* A key reported as not found is asked again after 1 read, then 2, 4 and so on up to this many reads plus a per-row offset of up to 31,
- * about once a minute at the 1 s default. A key that was only missing for a moment returns within a few reads, while 20 to 60 rows a Mac
- * never has cost no SMC call on an ordinary read, and their rechecks do not land on one read. */
+ * so a key that stays absent is asked every 65 to 96 reads, 65 to 96 seconds at the 1 s default. A key that was only missing for a
+ * moment returns within a few reads, while 20 to 60 rows a Mac never has cost no SMC call on an ordinary read, and their rechecks do
+ * not land on one read. */
 #define HWMAC_ABSENT_RECHECK_READS 64
 #define HWMAC_MAX_CPUS 256
 /* Performance levels a packet records (hw.nperflevels): Apple silicon has two or three. */

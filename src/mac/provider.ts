@@ -44,7 +44,14 @@ interface ComputedSpec { name:string; label:string; group:string; kind:'temperat
  * own log through a load swing, and by loading each CPU cluster alone: every Tp key warms with the super cores, the Tm keys are the performance cores.
  */
 const M5_PRO_CORES=['Tp04','Tp0G','Tp0R','Tp0a','Tp0j','Tp0u','Tm04','Tm0G','Tm0R','Tm0a','Tm0j','Tm0u','Tm1Q','Tm1c','Tm1o','Tm21','Tm2D','Tm2P'] as const;
-/** TG Pro's whole-Mac set on Mac17,9: the cores, its four GPU regions, battery, airflow, trackpad, power, ports, wireless and SSD. Its Battery, Battery Gas Gauge and Battery Management Unit all equal TB1T within rounding, so TB1T counts three times, as it does there. */
+/**
+ * TG Pro's whole-Mac set on Mac17,9: the cores, its four GPU regions, battery, airflow, trackpad, power, ports, wireless and SSD.
+ * TG Pro averages three battery columns, Battery, Battery Gas Gauge and Battery Management Unit, and TB1T stands for all three, so it
+ * counts three times. They are not one value: in TG Pro's logs Gas Gauge differs from Battery in 41,107 of 43,207 rows on 2026-09-03
+ * and 365 of 25,137 on 2026-11-10, and Battery equals the higher of BMU and Battery Proximity in every row of both days. Which SMC
+ * keys they read is not known yet. Its 38th column, SSD (NAND I/O), equals its SMART drive column in 99.7 % of 24,882 rows on
+ * 2026-11-10: Mac Sensors reads that value from the health source, and a computed reading uses one SMC read only.
+ */
 const M5_PRO_WHOLE_MAC=[...M5_PRO_CORES,'Tg08','Tg12','Tg29','Tg3B','TB1T','TB1T','TB1T','TB2T','TaLP','TaRF','TaTP','Ts0P','Ts1P','TCHP','TPSP','TaLT','TaRT','TW0P','TH0x'] as const;
 /**
  * Computed readings exist only where their input set is qualified, as the native model tables are: a fixed
@@ -66,7 +73,7 @@ const COMPUTED_TABLES:ReadonlyArray<{model:string;chip:string;readings:readonly 
  */
 export const CORE_LABEL=/^(?:(?:Super|Perf|Eff) core|(?:Super|Perf) zone|CPU sensor) [1-9][0-9]?$/;
 const FAN_SPEED_KEY=/^F[0-7]Ac$/;
-/** A temperature counts toward a whole-Mac reading only inside this window: Stats drops a sensor that reads 0 and one above 110 °C, and treats a CPU sensor outside 10 to 120 °C as broken (Modules/Sensors/readers.swift). */
+/** On a Mac without a fixed list, a temperature counts toward a whole-Mac reading only inside this window: Stats drops a sensor that reads 0 and one above 110 °C, and treats a CPU sensor outside 10 to 120 °C as broken (Modules/Sensors/readers.swift). */
 const WHOLE_MAC_TEMPERATURE_C=[10,120] as const;
 /** A reading computed over whichever accepted rows of one SMC packet qualify; `least` is how many it needs to mean anything. */
 interface AcceptedSpec { name:string; label:string; group:string; kind:'temperature'|'fan'; unit:string; reduce:'mean'|'max'; least:number; takes:(row:NativeRow)=>boolean; }
@@ -80,7 +87,7 @@ const FAMILY_COMPUTED:readonly AcceptedSpec[]=[
 ];
 /** Fan average needs two fans to say anything a Fan reading does not. Fan target, minimum and maximum are never inputs. */
 const FAN_COMPUTED:readonly AcceptedSpec[]=[{name:'fan-average',label:'Fan average',group:'Fans',kind:'fan',unit:'RPM',reduce:'mean',least:2,takes:isFanSpeed}];
-/** Every Mac. TG Pro's Computer Average rounds to the mean of its 38 SMC temperatures in 95.5 % of 1,563 log rows on Mac17,9, and its other whole-Mac reading is the highest sensor. */
+/** Every Mac without a fixed list. TG Pro's Computer Average rounds to the mean of its 38 temperature columns, 37 from the SMC and the SSD's SMART value, in 96.0 % of 24,882 log rows on Mac17,9 on 2026-11-10, and its other whole-Mac reading is the highest sensor. */
 const WHOLE_MAC_COMPUTED:readonly AcceptedSpec[]=[
 	{name:'computer-average',label:'Mac average',group:'System',kind:'temperature',unit:'°C',reduce:'mean',least:2,takes:isMacTemperature},
 	{name:'hottest-sensor',label:'Hottest sensor',group:'System',kind:'temperature',unit:'°C',reduce:'max',least:2,takes:isMacTemperature}
@@ -104,7 +111,7 @@ function overAccepted(specs:readonly AcceptedSpec[],inputs:readonly NativeRow[])
  * is produced only when every input was accepted from that packet. The same model and chip with another core layout takes the
  * chip family path below, since its cores are not the ones the list names.
  * On any other Mac that reads a chip family table (familyTable true) the table lists a fixed set of core rows, which
- * of them a chip has is not known ahead, and a core can fail a read on its own, so CPU average and CPU hottest core
+ * of them a chip has is not known ahead, and a core can fail a read on its own, so CPU average and Hottest core
  * cover the per-core temperatures accepted from that packet, and are left out when none was. Fan average and the
  * whole-Mac readings likewise cover what was accepted on any Mac without a fixed list.
  */
