@@ -39,6 +39,17 @@ const sampleRows:{key:string;label:string;unit:string;value:number;min:number;ma
 const sampleSensorNames=PROVIDER_GROUPS.filter(group=>sampleRows.some(row=>row.group===group));
 /** The scenes' authoring order; sampleSnapshot() publishes them in the provider's order. Reading ids are 0, as the provider sets them. */
 export const sampleReadings:Reading[]=sampleRows.map(({group,min,max,avg,...row},index)=>{sampleGroups[row.key]=group;return {...row,id:0,sensorIndex:sampleSensorNames.indexOf(group),valueMin:min,valueMax:max,valueAvg:avg,statistics:'producer' as const,observationTime:1000,observationRevision:index+1};});
+/**
+ * The renderer boards were drawn with the 1.0.1 names, and their pinned scene hashes keep them as drawn until the private Qt adapter
+ * is measured again for the current app. Each sample reading keeps the name its board shows; this maps it to the name the provider
+ * gives that reading today, which the settings-panel captures show.
+ */
+export const NAMED_NOW:Readonly<Record<string,string>>={'CPU super core 1':'Super core 1','System Total':'System total','Memory active':'RAM active','Network receive':'Network in','Startup volume available':'Disk available'};
+/** The sample snapshot under today's names, for the settings-panel captures. Keys, values and order are the same. */
+export function currentSnapshot():SensorSnapshot {
+	const snapshot=sampleSnapshot(),readings=snapshot.readings.map(row=>({...row,label:NAMED_NOW[row.label]??row.label}));
+	return {...snapshot,readings,byKey:new Map(readings.map(row=>[row.key,row]))};
+}
 /** Inside a group MacProvider lists system counters, then computed readings, then SMC rows in catalog order, then battery and drive health. */
 const sourceRank=(key:string)=>key.startsWith('mac:v1:system:')?0:key.startsWith('mac:v1:computed:')?1:key.startsWith('mac:v1:smc:')?2:3;
 /** A snapshot shaped as MacProvider.rebuild() shapes one: sensors per present group, readings by sensor, then source. No group holds two sample rows of one source. */

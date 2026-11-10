@@ -13,7 +13,7 @@ Both fields are optional and independent. A key with neither set shows its theme
 
 Alerts change only what the plugin shows: colors, and with **Auto cycle jumps to a critical reading** ticked, which reading a dial shows. They never write to the Mac. The SMC transport accepts read and key-information requests only, so an alert cannot change a fan speed or a power limit.
 
-![Four key faces labeled CPU super 1 and CPU usage: CPU super core 1 at 62.4 °C on the normal theme with a sparkline, the same reading on an amber warning face with a bar, the same reading on a red critical face with a bar, and a CPU usage bar with amber and red zones](assets/img/alerts.png)
+![Four key faces labeled CPU super 1 and CPU usage: Super core 1 at 62.4 °C on the normal theme with a sparkline, the same reading on an amber warning face with a bar, the same reading on a red critical face with a bar, and a CPU usage bar with amber and red zones](assets/img/alerts.png)
 
 *Production-rendered sample data: Mac catalog readings with the custom label CPU super 1 on the first three faces, and illustrative values. Warn at 60 and Critical at 80 for the amber face, Warn at 40 and Critical at 60 for the red face, both with a bar, and Warn at 65 and Critical at 85 for the CPU usage bar. Rendered with **Accent colors** set to **Theme accent everywhere**, so the normal faces use the Void accent instead of the default type accents.*
 
@@ -35,18 +35,18 @@ Thresholds also mark the range on any face that draws one. A key whose **Graph u
 
 The value compared is the live reading in the unit the key shows, after the °C to °F conversion. Tick **°F** and a **Warn at** of `80` fires at 80 °F, which is about 26.7 °C; every temperature in a live read on the measured M5 Pro was above that. Enter Fahrenheit numbers instead: 176 for 80 °C. Leave °F off and the same reading compares in °C.
 
-One exception: **Data units** rescales bytes and transfer rates for display only. Thresholds compare against the number in the reading's own unit, bytes or bytes per second. A Startup volume available reading of 292596883456 B shows 293 GB under Decimal and compares as 292596883456. Switching Decimal and Binary never changes an alert. See [Data units](sensor-reading.html#data-units).
+One exception: **Data units** rescales bytes and transfer rates for display only. Thresholds compare against the number in the reading's own unit, bytes or bytes per second. A Disk available reading of 292596883456 B shows 293 GB under Decimal and compares as 292596883456. Switching Decimal and Binary never changes an alert. See [Data units](sensor-reading.html#data-units).
 
 | Mac readings | Unit a threshold compares in |
 | --- | --- |
-| Temperatures (CPU and GPU cores, Battery, NAND, Airport, Airflow) | °C, or °F with **°F** ticked |
+| Temperatures (CPU cores and zones, GPU, Battery, SSD, Wi-Fi, Airflow) | °C, or °F with **°F** ticked |
 | Fans | RPM |
-| Power (System Total, DC In, Battery) | W |
+| Power (System total, DC in power, Battery power) | W |
 | Voltage | V |
 | Current | A |
 | CPU usage | % |
-| Memory total, free, active, inactive, wired and compressed; Swap used; Startup volume total and available | B (bytes) |
-| Network receive and send; Storage read and write | B/s (bytes per second), also when the key shows Mbps |
+| RAM total, free, active, inactive, wired and compr.; Swap used; Disk total and Disk available | B (bytes) |
+| Network in and Network out; Storage read and write | B/s (bytes per second), also when the key shows Mbps |
 
 ### The trigger is at or past the limit
 
@@ -70,7 +70,7 @@ The fields also accept exponent notation, which helps with byte thresholds: `50e
 By default higher is worse: the right setting for temperatures, power, CPU usage and transfer rates. Tick **Alert when the value drops to or below these numbers (for fans and free space)** for readings where low is the problem:
 
 - **Fan speed**, on a fan that should keep spinning.
-- **Startup volume available**, to know when free space drops under a floor.
+- **Disk available**, to know when free space drops under a floor.
 
 With the box ticked, **Warn at** and **Critical at** become floors: the alert fires when the reading falls to or below them.
 
@@ -88,7 +88,7 @@ The readings below come from a live read on the measured M5 Pro at 15.7 percent 
 
 ### CPU temperature: warn 80, critical 90
 
-In that read, **CPU super core 1** was 49.6 °C.
+In that read, **Super core 1** was 49.6 °C.
 
 - **Warn at** `80`
 - **Critical at** `90`
@@ -110,7 +110,7 @@ In the same read, **Fan 1** and **Fan 2** both read 0 RPM. A floor on those fans
 
 ### Free space on the startup volume
 
-**Startup volume available** reports bytes. In the same read it was 292596883456 B, which the key shows as 293 GB under Decimal or 273 GiB under Binary. Enter the limits in bytes:
+**Disk available** reports bytes. In the same read it was 292596883456 B, which the key shows as 293 GB under Decimal or 273 GiB under Binary. Enter the limits in bytes:
 
 - **Warn at** `50000000000` or `50e9` (50 GB)
 - **Critical at** `20000000000` or `20e9` (20 GB)
@@ -120,7 +120,7 @@ When free space drops to 50 GB the key turns amber, and at 20 GB red. The folded
 
 ### Network rate in bits
 
-**Network receive** reports bytes per second, and Decimal shows bits per second. To warn at 100 Mbps, enter `12500000`: 100 million bits per second divided by 8. In the same read, Network send was 2909517.6 B/s, shown as 23.3 Mbps.
+**Network in** reports bytes per second, and Decimal shows bits per second. To warn at 100 Mbps, enter `12500000`: 100 million bits per second divided by 8. In the same read, Network out was 2909517.6 B/s, shown as 23.3 Mbps.
 
 > **Tip:** With the below direction, set **Critical at** lower than **Warn at**: critical is the deeper floor. Because critical is checked first, an inverted pair (Warn at 300, Critical at 500, box ticked) turns red at 500 and never shows amber. The same holds in the normal direction: a **Critical at** below **Warn at** turns red first.
 

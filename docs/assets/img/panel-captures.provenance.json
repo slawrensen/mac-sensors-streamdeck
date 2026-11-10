@@ -36,7 +36,7 @@
     {
       "file": "settings-dial.png",
       "kind": "settings-panel capture, simulated host, sample data",
-      "sha256": "ee5c5a854625ec1fa010e9f1ee0f4a14e974db2df3ea3e99e6aeaf39874e332c",
+      "sha256": "ec9f2ef6e99c5c87976b7222313dd0b445792350fbcf8115888b353a0f767593",
       "settings": {
         "readingKey": "mac:v1:smc:Mac17%2C9:54703034:temp.v1",
         "label": "CPU super 1",
@@ -56,7 +56,7 @@
     {
       "file": "settings-reading-colors.png",
       "kind": "settings-panel capture, simulated host, sample data",
-      "sha256": "7669e7e6afd282c1679b9b21cdef0c2136f4f209568e5d8015a73ab410bd5ec0",
+      "sha256": "73f12b265c61f6a6e85c117da84ff07023a72e8f46281595043ef025c7f2a5f5",
       "settings": {
         "readingKey": "mac:v1:smc:Mac17%2C9:54703034:temp.v1",
         "label": "CPU super 1",
@@ -81,7 +81,7 @@
     {
       "file": "settings-picker.png",
       "kind": "settings-panel capture, simulated host, sample data",
-      "sha256": "438ac8359737b9fc1a7eba3169e5e86523dee7984b1f950d0aef21ad286e6cd2",
+      "sha256": "d52a4b0107b18b7ec893183c64cea41f8d75999f840e6b736c02fe28f2c8438b",
       "settings": {
         "readingKey": "mac:v1:smc:Mac17%2C9:54703034:temp.v1",
         "label": "CPU super 1",

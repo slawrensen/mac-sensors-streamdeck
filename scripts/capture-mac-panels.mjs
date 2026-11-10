@@ -5,7 +5,7 @@ import path from 'node:path';
 import {createHash} from 'node:crypto';
 import {startPiSim} from './lib/pi-sim.mjs';
 import {launch} from './lib/cdp.mjs';
-import {sampleSnapshot,sampleReadings} from './lib/mac-scenes.ts';
+import {currentSnapshot,sampleReadings} from './lib/mac-scenes.ts';
 const out=process.argv[2]??'docs/assets/img',root='build/plugin',base=Number(process.env.PI_CAPTURE_PORT_BASE??29990);fs.mkdirSync(out,{recursive:true});
 const sim=await startPiSim({httpPort:base+1,wsPort:base}),browser=await launch({width:378,height:800,scale:2}),captures=[],errors=[];
 browser.on('Runtime.exceptionThrown',row=>errors.push(row.exceptionDetails?.text));
@@ -28,7 +28,7 @@ try{
   {fixture:'control-default',file:'settings-control.png',settings:{},clip:'body'},
   {fixture:'key-configured',file:'settings-press-details.png',settings:{...keySettings,pressBehavior:'open-details'},open:['sec-interaction'],clip:'#sec-interaction'}
  ]){
-  sim.setFixture(fixture,{snapshot:sampleSnapshot(),settings,globals:{theme:'void',textMode:'theme',typeAccents:'off',pollIntervalMs:'1000'}});await browser.goto(sim.url(fixture));
+  sim.setFixture(fixture,{snapshot:currentSnapshot(),settings,globals:{theme:'void',textMode:'theme',typeAccents:'off',pollIntervalMs:'1000'}});await browser.goto(sim.url(fixture));
   // The control panel has no reading, so it never asks for the sensor tree; it is ready once the plugin side has answered.
   for(let i=0;i<100;i++){if(await browser.evaluate('!!(window.__hwPanel?.kind==="control"?window.__hwPanel.heardFromPlugin:window.__hwPanel?.tree) && !document.documentElement.hasAttribute("data-folds-pending")'))break;await new Promise(resolve=>setTimeout(resolve,30));}
   await browser.evaluate('document.fonts.ready');await settle();

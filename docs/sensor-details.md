@@ -98,11 +98,11 @@ The other cells (title, pagers and reading tiles) are **Sensor Detail Slot** act
 
 ## Filter patterns
 
-The filter is a glob, not a regular expression: `*` spans anything, `?` matches exactly one character, everything else is literal, and case never matters. Every reading is tested against one text: the sensor group name, a single space, then the reading label. For the first fan that text is `Fans Fan 1`; for a memory reading it is `Memory Memory free`. That is why one pattern can select a whole group or a kind of reading across groups, and why an anchored pattern must allow for the group name at the front. Three rules cover it:
+The filter is a glob, not a regular expression: `*` spans anything, `?` matches exactly one character, everything else is literal, and case never matters. Every reading is tested against one text: the sensor group name, a single space, then the reading label. For the first fan that text is `Fans Fan 1`; for a memory reading it is `Memory RAM free`. That is why one pattern can select a whole group or a kind of reading across groups, and why an anchored pattern must allow for the group name at the front. Three rules cover it:
 
 1. **Plain text matches anywhere.** A pattern with no wildcard behaves as if wrapped in `*...*`, so `fan` and `*fan*` are the same filter.
 2. **One wildcard anchors the whole pattern.** As soon as a pattern contains `*` or `?`, the automatic wrapping is off and the pattern must cover the entire text. `core*` matches nothing, because the text starts with the group name, not with "core"; `*core*` is the form you want.
-3. **Spaces are literal.** Multi-word plain text works only when the words sit next to each other: `fan 1` finds `Fans Fan 1`, but `cpu core` finds nothing because the core readings are named like `CPU super core 1`. Span the gap with a star: `*cpu*core*`.
+3. **Spaces are literal.** Multi-word plain text works only when the words sit next to each other: `fan 1` finds `Fans Fan 1`, but `cpu core` finds nothing because a core reading is tested as `CPU Super core 1`. Span the gap with a star: `*cpu*core*`.
 
 Examples, by these rules:
 
@@ -111,8 +111,8 @@ Examples, by these rules:
 | `fans` | every reading in the Fans group |
 | `memory` | every reading in the Memory group, plus any reading whose label contains Memory |
 | `storage*` | every reading in the Storage group (the text starts with Storage) |
-| `network` | the Network readings, such as Network receive and Network send |
-| `*total*` | every reading whose group or label contains total, such as Memory total |
+| `network` | the Network readings, such as Network in and Network out |
+| `*total*` | every reading whose group or label contains total, such as RAM total and System total |
 | `*core*` | per-core CPU temperatures, on a Mac whose catalog lists them |
 | `?PU*` | readings in groups whose name is one character plus PU: CPU and GPU (anchored start) |
 | `*` | every reading, paged |

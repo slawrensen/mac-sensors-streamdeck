@@ -11,7 +11,7 @@ Pick a theme in the strip under a key's or dial's settings header. Choose **Defa
 
 ![The same CPU super 1 key at 62.4 °C with a sparkline in each of the seven themes: Void, Graphite, Ultraviolet, Midnight, Forest, Ember and Paper](assets/img/themes.png)
 
-*Production-rendered sample data: the CPU super core 1 reading with the custom label CPU super 1 and an illustrative value. Rendered with **Accent colors** set to **Theme accent everywhere**, so each sparkline shows its theme's own accent instead of the default temperature accent.*
+*Production-rendered sample data: the Super core 1 reading with the custom label CPU super 1 and an illustrative value. Rendered with **Accent colors** set to **Theme accent everywhere**, so each sparkline shows its theme's own accent instead of the default temperature accent.*
 
 | Theme | Background | Value text | Accent | Notes |
 | --- | --- | --- | --- | --- |
@@ -98,15 +98,15 @@ Tahoma Bold ships with macOS. The plugin asks macOS for the font named Tahoma-Bo
 
 | Category | Accent | Mac readings in the measured M5 Pro catalog |
 | --- | --- | --- |
-| Temperature | Rose (`#FF7E8E`) | Every °C reading: CPU and GPU cores, Battery, NAND, Airport, Airflow left and right |
+| Temperature | Rose (`#FF7E8E`) | Every °C reading whose label has no Memory or RAM: CPU cores and zones, GPU, Battery, SSD, Wi-Fi, Airflow left and right |
 | Fan | Cyan (`#3FBEDD`) | Fan 1 and Fan 2 |
-| Power | Gold (`#D4AB33`) | Watt readings: System Total, DC In and Battery |
+| Power | Gold (`#D4AB33`) | Watt readings: System total, DC in power and Battery power |
 | Load | Violet (`#B195FF`) | CPU usage |
-| Network | Blue (`#6FA7FF`) | Every byte-rate reading: Network receive and send, and Storage read and write |
-| Memory | Magenta (`#CE8BE0`) | Any reading whose label contains the word Memory: Memory total, free, active, inactive, wired and compressed |
+| Network | Blue (`#6FA7FF`) | Every byte-rate reading: Network in and Network out, and Storage read and write |
+| Memory | Magenta (`#CE8BE0`) | Any reading whose label contains the word Memory or RAM: RAM total, free, active, inactive, wired and compr., RAM voltage and power, and the RAM temperatures on M1 and M4 |
 | Clock | Green (`#38CD89`) | No Mac reading in this release |
 
-Swap used, Startup volume total and available, and the DC In voltage and current keep the theme accent. Storage rates take the Network accent because the category comes from the unit. On a multi-reading key the accent follows the first reading.
+Swap used, Disk total and Disk available, and DC in voltage and DC in current keep the theme accent. Storage rates take the Network accent because the category comes from the unit. On a multi-reading key the accent follows the first reading.
 
 **Paper always keeps its dark accent** (`#3B382E`), whatever **Accent colors** says.
 

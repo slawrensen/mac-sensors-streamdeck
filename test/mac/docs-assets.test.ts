@@ -4,7 +4,7 @@ import path from 'node:path';
 import {createHash} from 'node:crypto';
 import {test} from 'node:test';
 import sharp from 'sharp';
-import {composeScenes,sampleReadings,sampleSnapshot,sampleGroups,PROVIDER_GROUPS,boardDefinitions,boardFooter} from '../../scripts/lib/mac-scenes';
+import {composeScenes,currentSnapshot,NAMED_NOW,sampleReadings,sampleSnapshot,sampleGroups,PROVIDER_GROUPS,boardDefinitions,boardFooter} from '../../scripts/lib/mac-scenes';
 import {DETAIL_PROFILES} from '../../src/detail/managed-profiles';
 import {statusScreen} from '../../src/mac/state-screens';
 import {renderStatusKey} from '../../src/ui/key-renderer';
@@ -89,9 +89,7 @@ test('sample readings sit in the groups the shipped Mac provider reports, in its
  const groups=Object.fromEntries((literal??'').split(',').map(entry=>entry.split(':')).map(([name,id])=>[name!,Number(id)]));
  assert.deepEqual(Object.keys(groups).sort((a,b)=>groups[a]!-groups[b]!),[...PROVIDER_GROUPS]);
  const catalog=(JSON.parse(fs.readFileSync('native/hwmac/catalog.json','utf8')) as {rows:{key:string;label:string;group:string;variants?:string[]}[]}).rows,collectors=fs.readFileSync('native/hwmac/collectors.c','utf8');
- // The boards were drawn with the 1.0.1 names, and the pinned scene hashes above keep them as drawn until the private Qt adapter
- // is measured again for the current app. So a sample reading keeps the name its board shows, and this maps it to today's name.
- const NAMED_NOW:Record<string,string>={'CPU super core 1':'Super core 1','System Total':'System total','Memory active':'RAM active','Network receive':'Network in','Startup volume available':'Disk available'};
+ // A sample reading keeps the name its board shows (NAMED_NOW in scripts/lib/mac-scenes.ts maps it to today's name).
  for(const reading of sampleReadings){
   const group=sampleGroups[reading.key]!,smc=/^mac:v1:smc:[^:]+:([0-9a-f]{8}):/.exec(reading.key),label=NAMED_NOW[reading.label]??reading.label;
   // One key can carry another name on another chip; the sample readings are the measured M5 Pro's.
@@ -104,6 +102,9 @@ test('sample readings sit in the groups the shipped Mac provider reports, in its
  assert.deepEqual(snapshot.sensors,present.map((name,index)=>({index,id:groups[name],instance:0,name})));
  for(const reading of snapshot.readings){assert.equal(reading.id,0);assert.equal(snapshot.sensors[reading.sensorIndex]?.name,sampleGroups[reading.key]);}
  assert.deepEqual(snapshot.readings.map(row=>row.key.replace(/^mac:v1:(?:system:|smc:Mac17%2C9:)/,'')),['cpu-total','54703034:temp.v1','54673055:temp.v1','memory-active','disk-root-available','network-receive','46304163:rpm.v1','50535452:power.v1']);
+ // The panel captures show the same snapshot under today's names: only labels differ, and each one is a name the provider gives.
+ const current=currentSnapshot();assert.deepEqual(current.readings.map(row=>[row.key,row.value,row.sensorIndex]),snapshot.readings.map(row=>[row.key,row.value,row.sensorIndex]));
+ for(const row of current.readings)assert.equal(row.label,NAMED_NOW[snapshot.byKey.get(row.key)!.label]??snapshot.byKey.get(row.key)!.label);
 });
 
 test('every 1920 by 960 listing image is fully opaque',async()=>{

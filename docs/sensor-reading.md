@@ -29,7 +29,7 @@ The theme strip, **Reading** and **Display** start open. **Alerts**, **Press** a
 
 ![The Sensor Reading settings panel with the header, the theme strip, the Reading and Display sections open, and Alerts, Press and Advanced folded with their summaries](assets/img/settings-key.png)
 
-*Settings-panel capture of the shipped 1.0.1.0 panel in a simulated host with sample data and **Accent colors** set to **Theme accent everywhere**: Void set on this key, CPU super core 1 labeled CPU super 1, a sparkline, and sample thresholds of 75 and 90.*
+*Settings-panel capture of the shipped 1.0.1.0 panel in a simulated host with sample data and **Accent colors** set to **Theme accent everywhere**: Void set on this key, the reading then named CPU super core 1 (now Super core 1) labeled CPU super 1, a sparkline, and sample thresholds of 75 and 90.*
 
 ### Settings at a glance
 
@@ -73,7 +73,7 @@ The settings in panel order. Settings marked with a layout appear only for that 
 
 Type part of a reading or group name in **Reading**. Every word you type must appear in the group name or the reading's label, so `airflow` lists Airflow left and Airflow right, and `gpu 3` finds GPU 3. Results are grouped under CPU, GPU, Memory, Storage, Network, Battery, Fans and System. Each row shows its value when the list loaded and, where it has one, its type, such as Temp, Fan or Power. **Reload the sensor list**, the button beside the box, fetches the list again.
 
-![The Sensor Reading settings panel with cpu typed in the Reading search and the results open under the CPU group: CPU super core 1, 62.4 °C, highlighted, and CPU usage, 37.5 %](assets/img/settings-picker.png)
+![The Sensor Reading settings panel with cpu typed in the Reading search and the results open under the CPU group: CPU usage, 37.5 %, and Super core 1, 62.4 °C, highlighted](assets/img/settings-picker.png)
 
 *Settings-panel capture of the shipped 1.0.1.0 panel on a simulated host with sample readings and **Accent colors** set to **Theme accent everywhere**. It is not the Stream Deck app's own window.*
 
@@ -160,7 +160,7 @@ Choose **Readings on this key → Two readings, stacked**, then pick **Reading 2
 - **The same stat as row 1** *(default)*: a press cycles both rows together, with one badge in the divider.
 - **Always the current value**, **Always the minimum**, **Always the maximum** or **Always the average**: row 2 stays put while a press cycles row 1. Each row that shows a statistic gets its own badge on its label line; matching statistics share the divider badge.
 
-Each row shows its own reading's statistics. For a minimum and maximum pair, set **Value shown** to **Minimum** and **Row 2 shows** to **Always the maximum**. Useful pairs are CPU super core 1 above GPU 1, or Network receive above Network send.
+Each row shows its own reading's statistics. For a minimum and maximum pair, set **Value shown** to **Minimum** and **Row 2 shows** to **Always the maximum**. Useful pairs are Super core 1 above GPU 1, or Network in above Network out.
 
 **Rules for every multi-reading layout:**
 
@@ -189,7 +189,7 @@ Choose **Readings on this key → Four readings, quad grid**. The first reading 
 
 **Show a small label in each cell (values then use the text color)** puts a short label in the cell color above each value, and values take the key's **Text color**. With **Custom color**, the labels take the custom color's secondary shade instead of the cell color. Unticked *(default)*, values take the cell colors.
 
-With small labels on, cell labels come from **Label on the key** and **Label 2**, **Label 3** and **Label 4**, or else from the first word of the reading's name. They are upper-cased and cut at four characters, and the label fields say *4 chars max* in this layout. Startup volume available becomes STAR, so give it a label such as FREE. Values compact to four characters at most: decimals drop first, then large numbers shorten, such as 48700 to 49k.
+With small labels on, cell labels come from **Label on the key** and **Label 2**, **Label 3** and **Label 4**, or else from the first word of the reading's name. They are upper-cased and cut at four characters, and the label fields say *4 chars max* in this layout. Super core 1 becomes SUPE and every Perf core reading becomes PERF, so give such a cell a label such as P1. Values compact to four characters at most: decimals drop first, then large numbers shorten, such as 48700 to 49k.
 
 A press cycles every cell through the same statistic, with one badge at the center. The [multi-reading rules](#layout-two-readings-on-one-key) apply.
 
@@ -318,9 +318,9 @@ Every Mac rate is a byte rate, including Storage read and Storage write, so unde
 
 | Reading in a live read on the measured M5 Pro | Source value | Decimal | Binary |
 | --- | --- | --- | --- |
-| Startup volume available | 292596883456 B | 293 GB | 273 GiB |
-| Memory total | 68719476736 B | 68.7 GB | 64.0 GiB |
-| Network send | 2909517.6 B/s | 23.3 Mbps | 2.77 MiB/s |
+| Disk available | 292596883456 B | 293 GB | 273 GiB |
+| RAM total | 68719476736 B | 68.7 GB | 64.0 GiB |
+| Network out | 2909517.6 B/s | 23.3 Mbps | 2.77 MiB/s |
 
 This is display only. **Warn at**, **Critical at** and a dial's bar range compare against the source value in bytes or bytes per second, so switching Decimal and Binary never changes an alert.
 
