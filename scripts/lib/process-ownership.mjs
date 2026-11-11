@@ -5,8 +5,11 @@ import { execFileSync } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
 export const processIdentity = row => `${row.pid}:${row.createdAt}:${row.commandLine}`;
-export function processSnapshot() {
-	const output=execFileSync('/bin/ps',['-axo','pid=,ppid=,lstart=,command='],{encoding:'utf8',env:{...process.env,LC_ALL:'C'}});
+// Node's default 1 MiB output cap stopped a 24-hour observation when the process table grew past it; an ordinary table on the bench Mac is about 0.7 MiB.
+export const PROCESS_TABLE_MAX_BYTES=64*1024*1024;
+// Reads every process with its start time so ownership survives PID reuse; the ps path is a parameter only so a test can feed an oversized table.
+export function processSnapshot(ps='/bin/ps') {
+	const output=execFileSync(ps,['-axo','pid=,ppid=,lstart=,command='],{encoding:'utf8',maxBuffer:PROCESS_TABLE_MAX_BYTES,env:{...process.env,LC_ALL:'C'}});
 	return output.trim().split('\n').map(line=>{
 		const match=line.match(/^\s*(\d+)\s+(\d+)\s+(\w{3}\s+\w{3}\s+\d+\s+\d\d:\d\d:\d\d\s+\d{4})\s+(.+)$/);
 		if(!match)throw new Error('Unparseable process identity');
