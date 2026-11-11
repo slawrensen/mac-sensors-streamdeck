@@ -47,7 +47,7 @@ The package requires Stream Deck 7.1 or later, which plugins that use the Node 2
 
 ## Readings measured on the M5 Pro
 
-On Mac17,9 with the M5 Pro and macOS 27.0.1, the picker lists 89 readings: 14 from macOS system counters, 67 from the SMC, 5 computed from SMC readings, and 3 battery and drive health readings. Another Mac can report a different set.
+On Mac17,9 with the M5 Pro and macOS 27.0.1, the picker lists 91 readings: 14 from macOS system counters, 68 from the SMC, 6 computed from SMC readings, and 3 battery and drive health readings. Another Mac can report a different set.
 
 | Group | Readings on the measured Mac | Source |
 | --- | --- | --- |
@@ -56,7 +56,7 @@ On Mac17,9 with the M5 Pro and macOS 27.0.1, the picker lists 89 readings: 14 fr
 | Memory | RAM total, RAM free, RAM active, RAM inactive, RAM wired and RAM compr. (compressed); Swap used | System counters |
 | Storage | Disk total and Disk available; Storage read and write rates; SSD and SSD SMART temperatures | System counters; SMC; health |
 | Network | Network in and Network out rates | System counters |
-| Battery | Battery and Battery 2 temperatures; Battery power; Battery cycles and Battery health | SMC; health |
+| Battery | Battery hottest; Battery, Battery 2 and Battery gauge temperatures; Battery power; Battery cycles and Battery health | computed; SMC; health |
 | Fans | Fan average; Fan 1 and Fan 2 speeds; their target, min and max speeds | computed; SMC |
 | System | Mac average and Hottest sensor; Airflow left, Airflow right, Airflow top, Trackpad, Pad actuator, Charger, Power supply, Ports left, Ports right and Wi-Fi temperatures; DC in voltage, DC in current, DC in power and System total | computed; SMC |
 
