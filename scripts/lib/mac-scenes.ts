@@ -136,6 +136,34 @@ export function composeScenes():Scene[] {
 	}
 	return scenes;
 }
+/** The Background looks in the order the settings panel lists them (src/ui/dial-background.ts). */
+export const STRIP_LOOKS=['theme','glass','tint','outline','clear'] as const;
+export type StripLook=typeof STRIP_LOOKS[number];
+export type StripView='single'|'tworow'|'overview';
+/**
+ * One Sensor Dial face for a touch strip example, with its Background look. Unlike a board face it is drawn to be laid over a
+ * picture: every look but Theme leaves part of its 200 by 100 segment see-through. Same sample readings and history as the boards.
+ */
+export function composeLookScene(theme:string,look:StripLook,view:StripView,accentWords:boolean):string {
+	applyGlobalThemeSettings(docsGlobals);
+	const status={state:'ok',snapshot:sampleSnapshot(),source:'mac'} as const,stats=new SessionStatsStore(),histories=new Map<string,number[]>();
+	for(const [index,row] of sampleReadings.entries()){const history=sampleHistory(row.value,index);histories.set(row.key,history);for(const value of history)stats.sample(row.key,value);}
+	const settings:DialSettings={readingKey:sampleReadings[0]!.key,label:'CPU super 1',rotationKeys:sampleReadings.slice(0,3).map(row=>row.key),dialView:view,overviewLabels:'full',theme,dialBackground:look,...(accentWords?{dialAccentWords:true}:{}),...(view==='single'?{warnValue:'75',critValue:'90'}:{})};
+	return composeDialSvg({settings,stats,statMode:'current',overlay:null,pinned:false,cyclePaused:false},status,key=>histories.get(key)??[]);
+}
+/**
+ * The touch strip examples on the Sensor Dial page. Each strip is six dial segments over one picture: the five looks on the
+ * one-reading view, then Tint on the three-row overview. Paper sits on a light picture, as its Clear look needs.
+ */
+export const stripDefinitions=[
+	{id:'void',theme:'void',accentWords:false,picture:'cosmic-cliffs'},
+	{id:'ultraviolet-accent-words',theme:'ultraviolet',accentWords:true,picture:'cosmic-cliffs'},
+	{id:'paper',theme:'paper',accentWords:false,picture:'light'}
+] as const;
+export type StripScene={id:string;strip:string;theme:string;look:StripLook;view:StripView;accentWords:boolean;svg:string};
+export function composeStripScenes():StripScene[] {
+	return stripDefinitions.flatMap(strip=>[...STRIP_LOOKS.map(look=>({look,view:'single' as StripView})),{look:'tint' as StripLook,view:'overview' as StripView}].map(({look,view})=>({id:`strip-${strip.id}-${look}-${view}`,strip:strip.id,theme:strip.theme,look,view,accentWords:strip.accentWords,svg:composeLookScene(strip.theme,look,view,strip.accentWords)})));
+}
 /** The footer under a board: it says custom labels are shown when any face on the board draws one. */
 export function boardFooter(board:{scenes:string[]},scenes:Scene[]):string {
 	const custom=board.scenes.some(id=>scenes.find(scene=>scene.id===id)?.customLabel);

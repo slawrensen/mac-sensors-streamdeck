@@ -4,7 +4,8 @@ import path from 'node:path';
 import {createHash} from 'node:crypto';
 import {test} from 'node:test';
 import sharp from 'sharp';
-import {composeScenes,currentSnapshot,NAMED_NOW,sampleReadings,sampleSnapshot,sampleGroups,PROVIDER_GROUPS,boardDefinitions,boardFooter} from '../../scripts/lib/mac-scenes';
+import {composeScenes,composeStripScenes,stripDefinitions,STRIP_LOOKS,currentSnapshot,NAMED_NOW,sampleReadings,sampleSnapshot,sampleGroups,PROVIDER_GROUPS,boardDefinitions,boardFooter} from '../../scripts/lib/mac-scenes';
+import {GLASS_OPACITY,TINT_OPACITY} from '../../src/ui/glass';
 import {DETAIL_PROFILES} from '../../src/detail/managed-profiles';
 import {statusScreen} from '../../src/mac/state-screens';
 import {renderStatusKey} from '../../src/ui/key-renderer';
@@ -16,6 +17,36 @@ const hash=(bytes:Buffer|string)=>createHash('sha256').update(bytes).digest('hex
  * docs/status-screens.md says which lines the image shows. Empty again once the boards are redrawn.
  */
 const DRAWN_SECOND_LINE:Record<string,string>={'status-busy':'retrying','status-bridge-failed':'reinstall'};
+type StripProvenance={renderer:{version:string};picture:{file:string;sha256:string;credit:string;license:string};alphaMeasuredAt:number[];scenes:{id:string;look:string;view:string;svgSha256:string;alpha:{clear:number;solid:number;panelAlpha:number|null;panelShare:number}}[];assets:{file:string;sha256:string;sceneIds:string[]}[]};
+const ALPHA_OPAQUE=255;
+test('the touch strip examples are today\'s faces, and each Background look is as see-through in the app\'s renderer as its name says',()=>{
+	const provenance=JSON.parse(fs.readFileSync('docs/assets/img/strip-images.provenance.json','utf8')) as StripProvenance,scenes=composeStripScenes();
+	// Six segments a strip: the five looks in panel order, then Tint on the three-row overview.
+	assert.equal(scenes.length,stripDefinitions.length*(STRIP_LOOKS.length+1));
+	assert.deepEqual(scenes.filter(scene=>scene.strip===stripDefinitions[0].id).map(scene=>[scene.look,scene.view]),[...STRIP_LOOKS.map(look=>[look,'single']),['tint','overview']]);
+	assert.deepEqual(provenance.scenes.map(scene=>[scene.id,scene.svgSha256]),scenes.map(scene=>[scene.id,hash(scene.svg)]),'redraw with npm run docs:assets -- docs/assets/img strips');
+	assert.deepEqual(provenance.alphaMeasuredAt,[200,100],'measured at the size of one dial segment');
+	for(const {id,look,alpha} of provenance.scenes) {
+		// Measured through QtSvg, so these are what the app composites over the strip picture, not what the SVG asks for.
+		if(look==='theme')assert.deepEqual(alpha,{clear:0,solid:1,panelAlpha:null,panelShare:0},id+': Theme hides the picture everywhere');
+		else if(look==='glass'||look==='tint'){
+			assert.equal(alpha.panelAlpha,Math.round((look==='glass'?GLASS_OPACITY:TINT_OPACITY)*ALPHA_OPAQUE),id+': the panel has the opacity the source names');
+			assert.equal(alpha.clear,0,id+': a panel covers the whole segment');assert.ok(alpha.panelShare>.5&&alpha.solid<.5,id+': most of the segment is panel, not ink');
+		}else{assert.equal(alpha.panelAlpha,null,id+': no panel');assert.ok(alpha.clear>.6,id+': most of the segment shows the picture untouched');}
+	}
+	// Outline adds an edge to what Clear draws, so it covers more.
+	const clearShare=(look:string)=>provenance.scenes.find(scene=>scene.look===look&&scene.view==='single')!.alpha.clear;
+	assert.ok(clearShare('outline')<clearShare('clear'));
+	const [asset]=provenance.assets;assert.equal(provenance.assets.length,1);
+	assert.equal(hash(fs.readFileSync(path.join('docs/assets/img',asset!.file))),asset!.sha256);assert.deepEqual(asset!.sceneIds,scenes.map(scene=>scene.id));
+	assert.equal(hash(fs.readFileSync(path.join('docs/assets/img',provenance.picture.file))),provenance.picture.sha256);
+	// The picture is someone else's work under CC BY 4.0: the page that shows it must carry the credit the provenance records.
+	const page=fs.readFileSync('docs/sensor-dial.md','utf8');
+	assert.ok(page.includes('assets/img/'+asset!.file)&&page.includes(provenance.picture.credit)&&page.includes(provenance.picture.license),'credit and licence beside the image');
+	// The page quotes the measured shares: they must be the recorded ones.
+	const percent=(look:string)=>(clearShare(look)*100).toFixed(1)+'%';
+	assert.ok(page.includes(`Outline leaves ${percent('outline')} of the segment fully clear, and Clear ${percent('clear')}.`));
+});
 const pngsIn=(dir:string)=>fs.readdirSync(dir).filter(file=>file.endsWith('.png')).sort();
 test('documentation boards recompose from production code and fixed public sample inputs',()=>{
 	const provenance=JSON.parse(fs.readFileSync('docs/assets/img/renderer-images.provenance.json','utf8')) as {version:string;readings:unknown;scenes:{id:string;svgSha256:string}[];assets:{file:string;sha256:string;sceneIds:string[]}[]};

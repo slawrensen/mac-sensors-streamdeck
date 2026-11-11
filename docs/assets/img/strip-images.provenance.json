@@ -1,0 +1,325 @@
+{
+  "schema": 1,
+  "version": "1.0.2",
+  "command": "npm run docs:assets -- docs/assets/img strips",
+  "renderer": {
+    "name": "Installed app QtSvg through a measured local adapter",
+    "version": "6.11.1",
+    "deviceEquivalence": "INFERRED until physical photograph calibration"
+  },
+  "font": "fc1863ab504b9c160abaa12b92296363db72f5b759311982510a85fe2aa9ff4f",
+  "sampleData": true,
+  "picture": {
+    "file": "sources/cosmic-cliffs-strip.jpg",
+    "sha256": "02addce3479b1a8e2003f47cb2b99b984aa34093f65022da220a646cfeb7767e",
+    "credit": "NASA, ESA, CSA, and STScI",
+    "source": "https://esawebb.org/images/weic2205a/",
+    "license": "CC BY 4.0",
+    "change": "Cropped and scaled to a 12 to 1 strip"
+  },
+  "alphaMeasuredAt": [
+    200,
+    100
+  ],
+  "scenes": [
+    {
+      "id": "strip-void-theme-single",
+      "strip": "void",
+      "theme": "void",
+      "look": "theme",
+      "view": "single",
+      "accentWords": false,
+      "svgSha256": "dddc8f8263904b5044e8690cb3e498393755a0738f52bdf3498dc9076493cc6f",
+      "alpha": {
+        "clear": 0,
+        "solid": 1,
+        "panelAlpha": null,
+        "panelShare": 0
+      }
+    },
+    {
+      "id": "strip-void-glass-single",
+      "strip": "void",
+      "theme": "void",
+      "look": "glass",
+      "view": "single",
+      "accentWords": false,
+      "svgSha256": "37c6210f59982e2d4f47c32f9c48004f6198402f8cbaab9ec090040a8212cb9b",
+      "alpha": {
+        "clear": 0,
+        "solid": 0.1246,
+        "panelAlpha": 204,
+        "panelShare": 0.7879
+      }
+    },
+    {
+      "id": "strip-void-tint-single",
+      "strip": "void",
+      "theme": "void",
+      "look": "tint",
+      "view": "single",
+      "accentWords": false,
+      "svgSha256": "154b91223abd0630488bd9f4a09efab5cab302f31a59aa399da6cfbdda083bed",
+      "alpha": {
+        "clear": 0,
+        "solid": 0.2637,
+        "panelAlpha": 128,
+        "panelShare": 0.698
+      }
+    },
+    {
+      "id": "strip-void-outline-single",
+      "strip": "void",
+      "theme": "void",
+      "look": "outline",
+      "view": "single",
+      "accentWords": false,
+      "svgSha256": "6d30d87e1585da557285ff73d8bd51490e9134d5ed931ee05a1ba613e2ab1d81",
+      "alpha": {
+        "clear": 0.698,
+        "solid": 0.2605,
+        "panelAlpha": null,
+        "panelShare": 0
+      }
+    },
+    {
+      "id": "strip-void-clear-single",
+      "strip": "void",
+      "theme": "void",
+      "look": "clear",
+      "view": "single",
+      "accentWords": false,
+      "svgSha256": "84b9c406431947a0e2f2e3c111c4800dd553d597b353b0b9b0520a85ae12a91c",
+      "alpha": {
+        "clear": 0.7678,
+        "solid": 0.1537,
+        "panelAlpha": null,
+        "panelShare": 0
+      }
+    },
+    {
+      "id": "strip-void-tint-overview",
+      "strip": "void",
+      "theme": "void",
+      "look": "tint",
+      "view": "overview",
+      "accentWords": false,
+      "svgSha256": "15a87feb93f388814c5f5acb2043b081cb1c6ad0744fbfb3e10a2d4c11b7f51b",
+      "alpha": {
+        "clear": 0,
+        "solid": 0.2922,
+        "panelAlpha": 128,
+        "panelShare": 0.6533
+      }
+    },
+    {
+      "id": "strip-ultraviolet-accent-words-theme-single",
+      "strip": "ultraviolet-accent-words",
+      "theme": "ultraviolet",
+      "look": "theme",
+      "view": "single",
+      "accentWords": true,
+      "svgSha256": "b0f75cc6c6eab819336d57892a4eeec0666cf562ab263477e6ec955e43a5e03a",
+      "alpha": {
+        "clear": 0,
+        "solid": 1,
+        "panelAlpha": null,
+        "panelShare": 0
+      }
+    },
+    {
+      "id": "strip-ultraviolet-accent-words-glass-single",
+      "strip": "ultraviolet-accent-words",
+      "theme": "ultraviolet",
+      "look": "glass",
+      "view": "single",
+      "accentWords": true,
+      "svgSha256": "8ac624b40840026bf77aed8e1577b428992176fb5e6f611d36ae7b6a391d26a7",
+      "alpha": {
+        "clear": 0,
+        "solid": 0.1246,
+        "panelAlpha": 204,
+        "panelShare": 0.7879
+      }
+    },
+    {
+      "id": "strip-ultraviolet-accent-words-tint-single",
+      "strip": "ultraviolet-accent-words",
+      "theme": "ultraviolet",
+      "look": "tint",
+      "view": "single",
+      "accentWords": true,
+      "svgSha256": "2bec8cbeaf7c7c4949a944e98d063838bfeef3d3f68e51a184d8d964604498b5",
+      "alpha": {
+        "clear": 0,
+        "solid": 0.2637,
+        "panelAlpha": 128,
+        "panelShare": 0.698
+      }
+    },
+    {
+      "id": "strip-ultraviolet-accent-words-outline-single",
+      "strip": "ultraviolet-accent-words",
+      "theme": "ultraviolet",
+      "look": "outline",
+      "view": "single",
+      "accentWords": true,
+      "svgSha256": "b118ae7493ce7b9c1c49f4621b4accf1851ee6d0f90c630c70dc875e2a3373f5",
+      "alpha": {
+        "clear": 0.698,
+        "solid": 0.2605,
+        "panelAlpha": null,
+        "panelShare": 0
+      }
+    },
+    {
+      "id": "strip-ultraviolet-accent-words-clear-single",
+      "strip": "ultraviolet-accent-words",
+      "theme": "ultraviolet",
+      "look": "clear",
+      "view": "single",
+      "accentWords": true,
+      "svgSha256": "4fd0dff91b2a5f9a8845391f216ecce050be30c321198d15dfb4d9e41e55a27e",
+      "alpha": {
+        "clear": 0.7678,
+        "solid": 0.1537,
+        "panelAlpha": null,
+        "panelShare": 0
+      }
+    },
+    {
+      "id": "strip-ultraviolet-accent-words-tint-overview",
+      "strip": "ultraviolet-accent-words",
+      "theme": "ultraviolet",
+      "look": "tint",
+      "view": "overview",
+      "accentWords": true,
+      "svgSha256": "987bd71caff38dbdc7e84ccbc29ff927a583d824f8d994b4ba0ffc4e60c4dc55",
+      "alpha": {
+        "clear": 0,
+        "solid": 0.2922,
+        "panelAlpha": 128,
+        "panelShare": 0.6533
+      }
+    },
+    {
+      "id": "strip-paper-theme-single",
+      "strip": "paper",
+      "theme": "paper",
+      "look": "theme",
+      "view": "single",
+      "accentWords": false,
+      "svgSha256": "68d516a4a0420cdc2ddf81bd436c612124633dc5af78b7dfae4b18412720419c",
+      "alpha": {
+        "clear": 0,
+        "solid": 1,
+        "panelAlpha": null,
+        "panelShare": 0
+      }
+    },
+    {
+      "id": "strip-paper-glass-single",
+      "strip": "paper",
+      "theme": "paper",
+      "look": "glass",
+      "view": "single",
+      "accentWords": false,
+      "svgSha256": "aa2a5ea155bc131c3c93f4a2ce8ba93fda79304e6f42a5c4d7256c9c23d6e2e5",
+      "alpha": {
+        "clear": 0,
+        "solid": 0.1246,
+        "panelAlpha": 204,
+        "panelShare": 0.7879
+      }
+    },
+    {
+      "id": "strip-paper-tint-single",
+      "strip": "paper",
+      "theme": "paper",
+      "look": "tint",
+      "view": "single",
+      "accentWords": false,
+      "svgSha256": "31b990f0ec0499d850e1d664dcd1c38c95ed798cc36dc10535f08048245fa5fe",
+      "alpha": {
+        "clear": 0,
+        "solid": 0.2637,
+        "panelAlpha": 128,
+        "panelShare": 0.698
+      }
+    },
+    {
+      "id": "strip-paper-outline-single",
+      "strip": "paper",
+      "theme": "paper",
+      "look": "outline",
+      "view": "single",
+      "accentWords": false,
+      "svgSha256": "8ca29476158c208deeb76992c07e8fbb1ba8823f8bd9ec41d35a4088fbd1f199",
+      "alpha": {
+        "clear": 0.698,
+        "solid": 0.2605,
+        "panelAlpha": null,
+        "panelShare": 0
+      }
+    },
+    {
+      "id": "strip-paper-clear-single",
+      "strip": "paper",
+      "theme": "paper",
+      "look": "clear",
+      "view": "single",
+      "accentWords": false,
+      "svgSha256": "837bbf02e497ae1f5f0b20ea58b4ff50988f6633b4725d627a0b60124721779c",
+      "alpha": {
+        "clear": 0.7678,
+        "solid": 0.1537,
+        "panelAlpha": null,
+        "panelShare": 0
+      }
+    },
+    {
+      "id": "strip-paper-tint-overview",
+      "strip": "paper",
+      "theme": "paper",
+      "look": "tint",
+      "view": "overview",
+      "accentWords": false,
+      "svgSha256": "9bdc349348ef36cdf136310470bad0e863892e382b185f5332ba7a3529b46294",
+      "alpha": {
+        "clear": 0,
+        "solid": 0.2922,
+        "panelAlpha": 128,
+        "panelShare": 0.6533
+      }
+    }
+  ],
+  "assets": [
+    {
+      "file": "dial-backgrounds-looks.jpg",
+      "width": 2560,
+      "height": 856,
+      "sha256": "3f254c4fb8f70dfc11bfd7330a52db4f38f10ad861c75cef1aaec9816094d528",
+      "sceneIds": [
+        "strip-void-theme-single",
+        "strip-void-glass-single",
+        "strip-void-tint-single",
+        "strip-void-outline-single",
+        "strip-void-clear-single",
+        "strip-void-tint-overview",
+        "strip-ultraviolet-accent-words-theme-single",
+        "strip-ultraviolet-accent-words-glass-single",
+        "strip-ultraviolet-accent-words-tint-single",
+        "strip-ultraviolet-accent-words-outline-single",
+        "strip-ultraviolet-accent-words-clear-single",
+        "strip-ultraviolet-accent-words-tint-overview",
+        "strip-paper-theme-single",
+        "strip-paper-glass-single",
+        "strip-paper-tint-single",
+        "strip-paper-outline-single",
+        "strip-paper-clear-single",
+        "strip-paper-tint-overview"
+      ],
+      "kind": "production-rendered sample data over a picture"
+    }
+  ]
+}

@@ -108,6 +108,12 @@ A dial on **Theme** covers the picture the Stream Deck app can show on the touch
 | **Outline** | No background, and a 1 px outline on every word, the range bar, the rail mark and the trend line: black on the dark themes, the theme's background on **Paper**. | Built-in text keeps 4.5:1 contrast against its outline, by calculation. |
 | **Clear** | No background and no outline. | No contrast floor. Use a dark, even picture with a dark theme, or a light one with **Paper**. |
 
+![Three touch strips of six dial segments each, every segment showing CPU super 1 at 62.4 °C. The first two strips lie over a picture of orange dust cliffs under a blue field of stars: Theme hides the picture, Glass dims it strongly, Tint shows it at half strength with outlined words, Outline and Clear show it fully, and the sixth segment is the three-row view on Tint. The second strip uses Ultraviolet with the title in its purple accent. The third strip is Paper over a pale gradient.](assets/img/dial-backgrounds-looks.jpg)
+
+*Production-rendered sample data over a picture, not a capture from a device. From left: Theme, Glass, Tint, Outline, Clear, then Tint in the three-row view. Top: Void. Middle: Ultraviolet with Words in the accent color. Bottom: Paper over a gradient I made. Picture: the Cosmic Cliffs ([NASA, ESA, CSA, and STScI](https://esawebb.org/images/weic2205a/), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), cropped for the strip).*
+
+I drew each face through the Stream Deck app's own SVG engine (QtSvg 6.11.1 from app 7.6.1) at the strip's 200 by 100 pixels and counted what it leaves see-through on the one-reading view. Theme covers every pixel. Glass leaves no pixel fully clear and its panel sits at 80% opacity. Tint's panel sits at 50%. Outline leaves 69.8% of the segment fully clear, and Clear 76.8%.
+
 The plugin cannot read your picture, so the calculation uses the hardest case: the panel over pure white, or over pure black on **Paper**.
 
 **Words in the accent color** appears under **Background** on Glass, Tint and Outline. The title and the selected row's name take the dial's accent color, and units, statistics and other names move halfway to it, each kept at the same 4.5:1 floor. Values, alert colors and a **Custom color** for text do not change. It is off by default.
@@ -118,7 +124,7 @@ On Glass, Tint, Outline and Clear:
 - A **Custom color** for text and chosen **Reading colors** stay as chosen and can fall below the floor over a bright picture.
 - The settings panel header cannot show your picture, so it previews a see-through dial over a checkerboard.
 
-Sensor Reading keys are not affected. These looks come from the shared rendering tests; I have not yet judged them on a physical Stream Deck + with Mac Sensors. See [Hardware compatibility](hardware.html).
+Sensor Reading keys are not affected. I have not yet judged these looks on a physical Stream Deck + with Mac Sensors, so how the device shows the picture behind them is not measured here. See [Hardware compatibility](hardware.html).
 
 ## Gestures
 
