@@ -11,7 +11,7 @@
   "sampleData": true,
   "picture": {
     "file": "sources/cosmic-cliffs-strip.jpg",
-    "sha256": "02addce3479b1a8e2003f47cb2b99b984aa34093f65022da220a646cfeb7767e",
+    "sha256": "a219107b9c966bda1fe03074650fee052a8c22d83f6b5b914ad0cf8ea19c6f07",
     "credit": "NASA, ESA, CSA, and STScI",
     "source": "https://esawebb.org/images/weic2205a/",
     "license": "CC BY 4.0",
@@ -23,13 +23,13 @@
   ],
   "scenes": [
     {
-      "id": "strip-void-theme-single",
-      "strip": "void",
-      "theme": "void",
+      "id": "strip-midnight-theme-single",
+      "strip": "midnight",
+      "theme": "midnight",
       "look": "theme",
       "view": "single",
       "accentWords": false,
-      "svgSha256": "dddc8f8263904b5044e8690cb3e498393755a0738f52bdf3498dc9076493cc6f",
+      "svgSha256": "5a1d99adf2a56151be157a6689e86cec85b7bab8a7da007e9e0d5c16e5e1271c",
       "alpha": {
         "clear": 0,
         "solid": 1,
@@ -38,13 +38,13 @@
       }
     },
     {
-      "id": "strip-void-glass-single",
-      "strip": "void",
-      "theme": "void",
+      "id": "strip-midnight-glass-single",
+      "strip": "midnight",
+      "theme": "midnight",
       "look": "glass",
       "view": "single",
       "accentWords": false,
-      "svgSha256": "37c6210f59982e2d4f47c32f9c48004f6198402f8cbaab9ec090040a8212cb9b",
+      "svgSha256": "198419de622dbb5ae6f05b8e0da9911b558f865cce0f4b886d38222175eb4e55",
       "alpha": {
         "clear": 0,
         "solid": 0.1246,
@@ -53,13 +53,13 @@
       }
     },
     {
-      "id": "strip-void-tint-single",
-      "strip": "void",
-      "theme": "void",
+      "id": "strip-midnight-tint-single",
+      "strip": "midnight",
+      "theme": "midnight",
       "look": "tint",
       "view": "single",
       "accentWords": false,
-      "svgSha256": "154b91223abd0630488bd9f4a09efab5cab302f31a59aa399da6cfbdda083bed",
+      "svgSha256": "b774eb3cb9cfb7fb1877199bba6bdefe5923d4fc4717f2672bacf1c721258f6a",
       "alpha": {
         "clear": 0,
         "solid": 0.2637,
@@ -68,13 +68,13 @@
       }
     },
     {
-      "id": "strip-void-outline-single",
-      "strip": "void",
-      "theme": "void",
+      "id": "strip-midnight-outline-single",
+      "strip": "midnight",
+      "theme": "midnight",
       "look": "outline",
       "view": "single",
       "accentWords": false,
-      "svgSha256": "6d30d87e1585da557285ff73d8bd51490e9134d5ed931ee05a1ba613e2ab1d81",
+      "svgSha256": "3d7dd6c2e87cfbf91f0ea9d9dc78b5d25616d648a79e382cfefc17bf66577488",
       "alpha": {
         "clear": 0.698,
         "solid": 0.2605,
@@ -83,13 +83,13 @@
       }
     },
     {
-      "id": "strip-void-clear-single",
-      "strip": "void",
-      "theme": "void",
+      "id": "strip-midnight-clear-single",
+      "strip": "midnight",
+      "theme": "midnight",
       "look": "clear",
       "view": "single",
       "accentWords": false,
-      "svgSha256": "84b9c406431947a0e2f2e3c111c4800dd553d597b353b0b9b0520a85ae12a91c",
+      "svgSha256": "77459c5524d90df1f3c2be782c9fa6b08dc7bed7ea722fd0d1a02203b042dd71",
       "alpha": {
         "clear": 0.7678,
         "solid": 0.1537,
@@ -98,13 +98,13 @@
       }
     },
     {
-      "id": "strip-void-tint-overview",
-      "strip": "void",
-      "theme": "void",
+      "id": "strip-midnight-tint-overview",
+      "strip": "midnight",
+      "theme": "midnight",
       "look": "tint",
       "view": "overview",
       "accentWords": false,
-      "svgSha256": "15a87feb93f388814c5f5acb2043b081cb1c6ad0744fbfb3e10a2d4c11b7f51b",
+      "svgSha256": "5cd19b860111eb4bc3f85e8d931c6a2bdb277127b4b8e16ef4eda8dee4fd1a9e",
       "alpha": {
         "clear": 0,
         "solid": 0.2922,
@@ -298,14 +298,14 @@
       "file": "dial-backgrounds-looks.jpg",
       "width": 2560,
       "height": 856,
-      "sha256": "3f254c4fb8f70dfc11bfd7330a52db4f38f10ad861c75cef1aaec9816094d528",
+      "sha256": "76d5f61d97a460da21e6e7d9bebd3bf2869ee279324afca9606c43610dfb1b10",
       "sceneIds": [
-        "strip-void-theme-single",
-        "strip-void-glass-single",
-        "strip-void-tint-single",
-        "strip-void-outline-single",
-        "strip-void-clear-single",
-        "strip-void-tint-overview",
+        "strip-midnight-theme-single",
+        "strip-midnight-glass-single",
+        "strip-midnight-tint-single",
+        "strip-midnight-outline-single",
+        "strip-midnight-clear-single",
+        "strip-midnight-tint-overview",
         "strip-ultraviolet-accent-words-theme-single",
         "strip-ultraviolet-accent-words-glass-single",
         "strip-ultraviolet-accent-words-tint-single",

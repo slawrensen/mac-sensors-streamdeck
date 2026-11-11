@@ -156,7 +156,7 @@ export function composeLookScene(theme:string,look:StripLook,view:StripView,acce
  * one-reading view, then Tint on the three-row overview. Paper sits on a light picture, as its Clear look needs.
  */
 export const stripDefinitions=[
-	{id:'void',theme:'void',accentWords:false,picture:'cosmic-cliffs'},
+	{id:'midnight',theme:'midnight',accentWords:false,picture:'cosmic-cliffs'},
 	{id:'ultraviolet-accent-words',theme:'ultraviolet',accentWords:true,picture:'cosmic-cliffs'},
 	{id:'paper',theme:'paper',accentWords:false,picture:'light'}
 ] as const;
