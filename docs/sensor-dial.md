@@ -114,6 +114,8 @@ A dial on **Theme** covers the picture the Stream Deck app can show on the touch
 
 I drew each face through the Stream Deck app's own SVG engine (QtSvg 6.11.1 from app 7.6.1) at the strip's 200 by 100 pixels and counted what it leaves see-through on the one-reading view. Theme covers every pixel. Glass leaves no pixel fully clear and its panel sits at 80% opacity. Tint's panel sits at 50%. Outline leaves 69.8% of the segment fully clear, and Clear 76.8%.
 
+I also laid every look, in all seven themes, over each dial segment of the 101 touch strip pictures in the Stream Deck app's Background Library (app 7.6.1, Stream Deck + and + XL) and of the Cosmic Cliffs file. On Glass the lowest contrast between a word and the panel beside it was 4.55:1. On Tint and Outline the lowest contrast between a word and its outline was 6.11:1. Clear promises nothing: on the dark themes it kept words at 4.5:1 or better on 31 of those 102 pictures.
+
 The plugin cannot read your picture, so the calculation uses the hardest case: the panel over pure white, or over pure black on **Paper**.
 
 **Words in the accent color** appears under **Background** on Glass, Tint and Outline. The title and the selected row's name take the dial's accent color, and units, statistics and other names move halfway to it, each kept at the same 4.5:1 floor. Values, alert colors and a **Custom color** for text do not change. It is off by default.
