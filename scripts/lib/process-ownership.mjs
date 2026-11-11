@@ -5,7 +5,7 @@ import { execFileSync } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
 export const processIdentity = row => `${row.pid}:${row.createdAt}:${row.commandLine}`;
-// Node's default 1 MiB output cap stopped a 24-hour observation when the process table grew past it; an ordinary table here is about 0.75 MiB.
+// Node's default 1 MiB output cap stopped a 24-hour observation when the process table grew past it; an ordinary table on the bench Mac is about 0.7 MiB.
 export const PROCESS_TABLE_MAX_BYTES=64*1024*1024;
 // Reads every process with its start time so ownership survives PID reuse; the ps path is a parameter only so a test can feed an oversized table.
 export function processSnapshot(ps='/bin/ps') {
