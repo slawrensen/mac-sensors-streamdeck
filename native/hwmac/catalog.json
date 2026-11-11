@@ -129,6 +129,13 @@
       "sourceLine": 571
     },
     {
+      "key": "TG0B",
+      "label": "Battery gauge",
+      "group": "Battery",
+      "type": "temperature",
+      "scope": "Mac17,9"
+    },
+    {
       "key": "TaLP",
       "label": "Airflow left",
       "group": "System",

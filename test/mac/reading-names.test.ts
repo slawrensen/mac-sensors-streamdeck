@@ -34,7 +34,7 @@ function everyName():{label:string;from:string}[] {
 const KEY_LABEL_FLOOR=KEY_TEXT_LADDERS.singleLabel.at(-1)!;
 test('every reading name fits the key lens whole at the smallest label size, so its number stays on the face',()=>{
 	const names=everyName(),computed=names.filter(name=>name.from.startsWith('computed')).map(name=>name.label);
-	assert.deepEqual([...new Set(computed)].sort(),['CPU average','Fan average','Hottest core','Hottest sensor','Mac average']);
+	assert.deepEqual([...new Set(computed)].sort(),['Battery hottest','CPU average','Fan average','Hottest core','Hottest sensor','Mac average']);
 	assert.ok(names.length>catalog.length+nativeNamed.length,'counters and computed readings are walked too');
 	for(const {label,from} of names) {
 		// The production fit: the single key tries its ladder and cuts with an ellipsis at the floor only when nothing fits.
@@ -91,7 +91,9 @@ test('every reading a 1.0.2 key could be saved on keeps its identity under the n
 	const groupNow=(identity:string)=>snapshot.sensors[snapshot.byKey.get(identity)!.sensorIndex]?.name;
 	const moved=READINGS_1_0_2.filter(reading=>groupNow(reading.identity)!==reading.group).map(reading=>`${reading.label}: ${reading.group} to ${groupNow(reading.identity)}`);
 	assert.deepEqual(moved,['NAND: System to Storage']);
-	assert.equal(snapshot.readings.length,READINGS_1_0_2.length,'no reading appeared or vanished, only names changed');
+	// One reading is new over those same rows: Battery hottest, worked out from the two battery sensors 1.0.2 already read.
+	const known=new Set(READINGS_1_0_2.map(reading=>reading.identity));
+	assert.deepEqual([...snapshot.byKey.keys()].filter(identity=>!known.has(identity)),['mac:v1:computed:Mac17%2C9:battery-hottest:temp.v1'],'nothing else appeared, and nothing vanished');
 	// Type accents read the label for memory (src/ui/themes.ts classifyTypeAccent), so a rename must keep each reading's accent.
 	for(const reading of READINGS_1_0_2){const current:Reading=snapshot.byKey.get(reading.identity)!;assert.equal(classifyTypeAccent(current.type,current.unit,current.label),classifyTypeAccent(current.type,current.unit,reading.label),`${reading.label} to ${current.label}`);}
 	provider.close();

@@ -48,11 +48,18 @@ const M5_PRO_CORES=['Tp04','Tp0G','Tp0R','Tp0a','Tp0j','Tp0u','Tm04','Tm0G','Tm0
  * TG Pro's whole-Mac set on Mac17,9: the cores, its four GPU regions, battery, airflow, trackpad, power, ports, wireless and SSD.
  * TG Pro averages three battery columns, Battery, Battery Gas Gauge and Battery Management Unit, and TB1T stands for all three, so it
  * counts three times. They are not one value: in TG Pro's logs Gas Gauge differs from Battery in 41,107 of 43,207 rows on 2026-09-03
- * and 365 of 25,137 on 2026-11-10, and Battery equals the higher of BMU and Battery Proximity in every row of both days. Which SMC
- * keys they read is not known yet. Its 38th column, SSD (NAND I/O), equals its SMART drive column in 99.7 % of 24,882 rows on
+ * and 365 of 25,137 on 2026-11-10, and Battery equals the higher of BMU and Battery Proximity in every row of both days. TB1T rounds
+ * to all three in at least 98.6 % of 21,600 paired samples on 2026-11-10 and 11. Its 38th column, SSD (NAND I/O), equals its SMART drive column in 99.7 % of 24,882 rows on
  * 2026-11-10: Mac Sensors reads that value from the health source, and a computed reading uses one SMC read only.
  */
 const M5_PRO_WHOLE_MAC=[...M5_PRO_CORES,'Tg08','Tg12','Tg29','Tg3B','TB1T','TB1T','TB1T','TB2T','TaLP','TaRF','TaTP','Ts0P','Ts1P','TCHP','TPSP','TaLT','TaRT','TW0P','TH0x'] as const;
+/**
+ * The two battery temperature sensors on Mac17,9. TG Pro's Battery column is the higher of its Battery Management Unit and Battery
+ * Proximity columns in 4,932,673 of 4,932,674 rows of its logs from 2026-07-14 to 2026-11-10, and the higher of these two keys rounds
+ * to that column in 21,600 of 21,600 paired samples on 2026-11-10 and 11. TG Pro reads the same sensors by two paths and changed
+ * path once without a restart, so in the 1,200 samples before that the match was 98.9 %.
+ */
+const M5_PRO_BATTERY=['TB1T','TB2T'] as const;
 /**
  * Computed readings exist only where their input set is qualified, as the native model tables are: a fixed
  * list of keys per model and chip, so a missing input can never quietly change what an average covers.
@@ -63,6 +70,7 @@ const COMPUTED_TABLES:ReadonlyArray<{model:string;chip:string;readings:readonly 
 	{name:'cpu-average',label:'CPU average',group:'CPU',kind:'temperature',unit:'°C',reduce:'mean',inputs:M5_PRO_CORES},
 	{name:'cpu-hottest',label:'Hottest core',group:'CPU',kind:'temperature',unit:'°C',reduce:'max',inputs:M5_PRO_CORES},
 	{name:'fan-average',label:'Fan average',group:'Fans',kind:'fan',unit:'RPM',reduce:'mean',inputs:['F0Ac','F1Ac']},
+	{name:'battery-hottest',label:'Battery hottest',group:'Battery',kind:'temperature',unit:'°C',reduce:'max',inputs:M5_PRO_BATTERY},
 	{name:'computer-average',label:'Mac average',group:'System',kind:'temperature',unit:'°C',reduce:'mean',inputs:M5_PRO_WHOLE_MAC},
 	{name:'hottest-sensor',label:'Hottest sensor',group:'System',kind:'temperature',unit:'°C',reduce:'max',inputs:M5_PRO_WHOLE_MAC}
 ]}];

@@ -203,8 +203,19 @@ test('Mac17,9 gets a CPU average, hottest CPU core and fan average from the actu
 	const r=rig();const snapshot=await readM5(r,100);
 	assert.equal(snapshot.byKey.get(CPU_AVERAGE)?.value,48.5);assert.equal(snapshot.byKey.get(CPU_HOTTEST)?.value,57);assert.equal(snapshot.byKey.get(FAN_AVERAGE)?.value,2500,'target, minimum and maximum rows stay out of the fan average');
 	assert.deepEqual(COMPUTED.map(key=>[snapshot.byKey.get(key)?.label,groupOf(snapshot,key),snapshot.byKey.get(key)?.type,snapshot.byKey.get(key)?.unit]),[['CPU average','CPU',1,'°C'],['Hottest core','CPU',1,'°C'],['Fan average','Fans',3,'RPM']]);
-	assert.deepEqual(r.provider.facts().sourceRows,{public:1,smc:CORE_KEYS.length+WHOLE_MAC_OTHERS.length+1+8,health:0});assert.equal(r.provider.facts().computedRows,5,'computed readings are counted apart from the SMC rows they come from');
+	assert.deepEqual(r.provider.facts().sourceRows,{public:1,smc:CORE_KEYS.length+WHOLE_MAC_OTHERS.length+1+8,health:0});assert.equal(r.provider.facts().computedRows,6,'computed readings are counted apart from the SMC rows they come from');
 	assert.deepEqual([COMPUTER_AVERAGE,HOTTEST_SENSOR].map(key=>[snapshot.byKey.get(key)?.label,snapshot.byKey.get(key)?.value,groupOf(snapshot,key),snapshot.byKey.get(key)?.unit]),[['Mac average',(873+19*30)/37,'System','°C'],['Hottest sensor',57,'System','°C']],'the fixed whole-Mac set: never the fan rows, never a sensor outside the set');
+	r.provider.close();
+});
+test('Mac17,9 gets Battery hottest, the higher of its two battery sensors, only when both answered in that read',async()=>{
+	const BATTERY_HOTTEST='mac:v1:computed:Mac17%2C9:battery-hottest:temp.v1';
+	const set=(next:NativePacket,key:string,value:number):void=>{next.rows.find(row=>row.key===key)!.value=value;};
+	const r=rig();const first=await readM5(r,100,next=>{set(next,'TB1T',31.5);set(next,'TB2T',33.25);});
+	assert.deepEqual([first.byKey.get(BATTERY_HOTTEST)?.label,first.byKey.get(BATTERY_HOTTEST)?.value,groupOf(first,BATTERY_HOTTEST),first.byKey.get(BATTERY_HOTTEST)?.unit],['Battery hottest',33.25,'Battery','°C']);
+	const second=await readM5(r,1100,next=>{set(next,'TB1T',34);set(next,'TB2T',33.25);});
+	assert.equal(second.byKey.get(BATTERY_HOTTEST)?.value,34,'whichever sensor is higher in this read');
+	const third=await readM5(r,2100,next=>{next.rows=next.rows.filter(row=>row.key!=='TB2T');});
+	assert.equal(third.byKey.has(BATTERY_HOTTEST),false,'one sensor alone is the Battery reading, not a comparison');
 	r.provider.close();
 });
 test('a computed reading is as old as its oldest input and keeps its own session',async()=>{
@@ -394,7 +405,7 @@ test('readings are listed by group, then system counters, computed, SMC and heal
 	assert.deepEqual(numbered(labelsIn(m5,'CPU')),cores,'super cores 1 to 6, performance cores 1 to 12, then the other super cluster sensors');
 	assert.deepEqual(labelsIn(m5,'GPU').filter(label=>/ [0-9]+$/.test(label)),[...Array.from({length:4},(_,i)=>`GPU region ${i+1}`),...Array.from({length:8},(_,i)=>`GPU ${i+1}`)],'TG Pro\'s four GPU regions first');
 	assert.deepEqual(labelsIn(m5,'Fans').slice(0,4),['Fan average','Fan 1','Fan 2','Fan 3']);
-	assert.deepEqual(labelsIn(m5,'Battery'),['Battery','Battery 2',...labelsIn(m5,'Battery').slice(2,-2),'Battery cycles','Battery health'],'health readings follow the SMC ones');
+	assert.deepEqual(labelsIn(m5,'Battery'),['Battery hottest','Battery','Battery 2','Battery gauge','Battery current','Battery power','Battery cycles','Battery health'],'computed, then the SMC in catalog order, then health');
 	assert.deepEqual(m5.sensors.map(sensor=>sensor.name),['CPU','GPU','Memory','Storage','Network','Battery','Fans','System']);
 	r.provider.close();
 	// An M2: efficiency cores 1 to 4 in order. Sorted by the hex of their identity they listed 1, 4, 3, 2.

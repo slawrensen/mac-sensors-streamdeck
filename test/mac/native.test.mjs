@@ -30,7 +30,11 @@ test('typed decoders preserve zero, signed and fractional values, and refuse bad
 	assert.equal(native.testDecode('sp78',Buffer.from([0xf6,0x80])),-9.5);assert.equal(native.testDecode('fpe2',Buffer.from([0x0b,0xba])),750.5);
 	for(const value of [0,-12.25,53.5,NaN,Infinity,-Infinity]){const bytes=Buffer.alloc(4);bytes.writeFloatLE(value);assert.equal(native.testDecode('flt ',bytes),Number.isFinite(value)?value:null);}
 	assert.equal(native.testDecode('ui8 ',Buffer.from([0])),0);assert.equal(native.testDecode('ui16',Buffer.from([1,0])),256);assert.equal(native.testDecode('ui32',Buffer.from([0,1,0,0])),65536);
-	for(const type of ['flt ','sp78','fpe2','ui8 ','ui16','ui32','xxxx'])assert.equal(native.testDecode(type,Buffer.alloc(7)),null);
+	// ioft is unsigned 48.16 fixed point, little endian: the first bytes are TG0B as read on Mac17,9 beside an HID value of 36.2.
+	assert.equal(native.testDecode('ioft',Buffer.from([0x33,0x33,0x24,0,0,0,0,0])),0x243333/65536);assert.equal(native.testDecode('ioft',Buffer.from([0,0x80,0x23,0,0,0,0,0])),35.5);assert.equal(native.testDecode('ioft',Buffer.alloc(8)),0);
+	assert.equal(native.testDecode('ioft',Buffer.from([0,0,0,0,0,0,0,1])),2**40,'the top byte is the most significant');
+	for(const type of ['flt ','sp78','fpe2','ui8 ','ui16','ui32','ioft','xxxx'])assert.equal(native.testDecode(type,Buffer.alloc(7)),null);
+	assert.equal(native.testDecode('ioft',Buffer.alloc(4)),null);
 });
 const catalog=JSON.parse(fs.readFileSync('native/hwmac/catalog.json','utf8'));
 const VARIANT_BITS={base:1,pro:2,max:4,ultra:8},VARIANT_SUFFIX={base:'',pro:' Pro',max:' Max',ultra:' Ultra'};

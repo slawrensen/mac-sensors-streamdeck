@@ -45,6 +45,11 @@ bool smc_decode(uint32_t type, uint32_t size, const uint8_t *bytes, double *valu
 		uint32_t integer = 0;
 		for (uint32_t i = 0; i < size; i++) integer = (integer << 8) | bytes[i];
 		result = integer;
+	} else if (type == smc_key("ioft") && size == 8) {
+		/* Unsigned 48.16 fixed point, little endian: on Mac17,9 TG0B read 33 33 24 00 00 00 00 00 while its HID service read 36.2. */
+		uint64_t bits = 0;
+		for (uint32_t i = size; i > 0; i--) bits = (bits << 8) | bytes[i - 1];
+		result = (double)bits / HWMAC_IOFT_ONE;
 	} else return false;
 	if (!isfinite(result)) return false;
 	*value = result;
