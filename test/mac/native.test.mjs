@@ -38,8 +38,8 @@ test('typed decoders preserve zero, signed and fractional values, and refuse bad
 });
 const catalog=JSON.parse(fs.readFileSync('native/hwmac/catalog.json','utf8'));
 const VARIANT_BITS={base:1,pro:2,max:4,ultra:8},VARIANT_SUFFIX={base:'',pro:' Pro',max:' Max',ultra:' Ultra'};
-/** 55 common, 4 Apple silicon, 26 M5 Pro family (18 CPU and 8 GPU) and 23 measured-model rows. */
-const MAC17_9_ROWS=108;
+/** 55 common, 4 Apple silicon, 26 M5 Pro family (18 CPU and 8 GPU) and 24 measured-model rows. */
+const MAC17_9_ROWS=109;
 /** The core layout Mac17,9 was measured on: 6 super and 12 performance cores (hw.perflevel0 and hw.perflevel1 physicalcpu). */
 const MEASURED_CORES=[6,12];
 /** The rows catalog.json gives one Mac, by the same rule the native side applies. */
@@ -52,7 +52,7 @@ test('the measured Mac17,9 keeps its rows, also when a translated process reads 
 	}
 	// TG Pro parity on Mac17,9: each key was matched to a TG Pro reading within rounding. They name places on this model, so they stay rows of that measured model only.
 	const SIDE_SENSORS=['Tp00','Tp08','Tp0C','Tp0K','Tp0O','Tp0U','Tp0X','Tp0d','Tp0g','Tp0m','Tp0p','Tp0y'];
-	const parity={...Object.fromEntries(SIDE_SENSORS.map((key,index)=>[key,[`Super zone ${index+1}`,'CPU','temperature']])),Tg08:['GPU region 1','GPU','temperature'],Tg12:['GPU region 2','GPU','temperature'],Tg29:['GPU region 3','GPU','temperature'],Tg3B:['GPU region 4','GPU','temperature'],TaTP:['Airflow top','System','temperature'],TCHP:['Charger','System','temperature'],TPSP:['Power supply','System','temperature'],TaLT:['Ports left','System','temperature'],TaRT:['Ports right','System','temperature'],Ts0P:['Trackpad','System','temperature'],Ts1P:['Pad actuator','System','temperature']};
+	const parity={...Object.fromEntries(SIDE_SENSORS.map((key,index)=>[key,[`Super zone ${index+1}`,'CPU','temperature']])),Tg08:['GPU region 1','GPU','temperature'],Tg12:['GPU region 2','GPU','temperature'],Tg29:['GPU region 3','GPU','temperature'],Tg3B:['GPU region 4','GPU','temperature'],TaTP:['Airflow top','System','temperature'],TCHP:['Charger','System','temperature'],TPSP:['Power supply','System','temperature'],TaLT:['Ports left','System','temperature'],TaRT:['Ports right','System','temperature'],Ts0P:['Trackpad','System','temperature'],Ts1P:['Pad actuator','System','temperature'],TG0B:['Battery gauge','Battery','temperature']};
 	assert.deepEqual(catalog.rows.filter(row=>row.scope==='Mac17,9').map(row=>row.key).sort(),Object.keys(parity).sort());
 	for(const [key,[label,group,type]] of Object.entries(parity))assert.deepEqual((({label,group,type})=>({label,group,type}))(catalog.rows.find(r=>r.key===key&&r.scope==='Mac17,9')??{}),{label,group,type},key);
 	// Target, minimum and maximum speed mean the same on every Mac with fans, so each of the eight fans has them everywhere and they are only ever read.
@@ -63,7 +63,7 @@ test('the measured Mac17,9 keeps its rows, also when a translated process reads 
 });
 test('every chip family and variant the catalog lists gets its own rows, each key once, from the exact CPU name',()=>{
 	assert.deepEqual(Object.fromEntries(Object.keys(catalog.families).map(name=>[name,catalog.rows.filter(row=>row.scope===name).length])),{m1:18,m2:14,m3:24,m4:25,m5:44,m6:30,a18pro:8});
-	assert.equal(catalog.rows.length,245);
+	assert.equal(catalog.rows.length,246);
 	for(const [name,family] of Object.entries(catalog.families))for(const variant of family.variants) {
 		const answer=native.testCatalog('Mac0,0','t0000',1,family.brand+VARIANT_SUFFIX[variant]),expected=rowsFor(name,variant,null);
 		assert.deepEqual([answer.table,answer.variant,answer.measured],[name,VARIANT_BITS[variant],false],`${name} ${variant}`);
@@ -180,7 +180,7 @@ test('CPU names map to their chip family and variant as Apple spells them, from 
 	assert.equal(Object.keys(BRANDS).length,Object.values(catalog.families).reduce((count,family)=>count+family.variants.length,0),'every name the catalog answers to is in the table');
 });
 test('a key the SMC does not have is asked again after 1, 2, 4 ... reads, then about every 64 to 95; a present key is read every time',()=>{
-	// The measured model against an SMC that has 3 of its 108 rows (MAC17_9_ROWS). Mirrors HWMAC_ABSENT_RECHECK_READS and its per-row offset in native/hwmac/collectors.h.
+	// The measured model against an SMC that has 3 of its 109 rows (MAC17_9_ROWS). Mirrors HWMAC_ABSENT_RECHECK_READS and its per-row offset in native/hwmac/collectors.h.
 	const RECHECK=64,OFFSETS=32,present={Tp04:float(44),TaTP:float(33),F0Ac:float(1500)},absent=MAC17_9_ROWS-3,READS=400;
 	const run=native.testSmc('Mac17,9','t6050',1,'Apple M5 Pro',scripted(present),READS,MEASURED_CORES),asked=run.transportCalls.map(calls=>calls-3);
 	// First read: key information for every row, then the value of the three that exist. Every absent key is then asked together while its wait doubles.
