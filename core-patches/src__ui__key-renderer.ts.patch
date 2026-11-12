@@ -1,11 +1,11 @@
-Source: slawrensen/hwinfo-streamdeck/src/ui/key-renderer.ts@11b9645b78395f157493648d873a3066673ba493
+Source: slawrensen/hwinfo-streamdeck/src/ui/key-renderer.ts@bb4aedecbce499e199df8af63793a1490c0fb6ed
 Seam: S5
 Reason: Use measured Mac ink bounds for labels and quad values, with clearance above quad micro-labels
-Before: bc102770946a97cc0dddadfae89dc2126100f8af31bcaaf8e31c5c4c70cec855
-After: e4d0421dbd3c68f907cb6491f04bcdf155815121d079119b991834358a952da6
+Before: 9ad86386532217598c9eda6178484a9cc825c39395498d6fb6ba18c46f3f2726
+After: 6ebb6d40eb97f01360d8c28a1f6e3f900b32326ce44e6bf862f986b92db07e85
 
 diff --git a/src/ui/key-renderer.ts b/src/ui/key-renderer.ts
-index ae80dcc..720c760 100644
+index 24b7db9..22971ac 100644
 --- a/src/ui/key-renderer.ts
 +++ b/src/ui/key-renderer.ts
 @@ -119,6 +119,7 @@ export function inKeyLens(runs: readonly TextRun[]): boolean {
@@ -25,7 +25,7 @@ index ae80dcc..720c760 100644
  }
  /** The single key's value: the 1.6.0 char-count size (kept while it draws
   * as 1.6.0 did), stepping down 2 px only while Tahoma's ink would leave the
-@@ -874,9 +875,14 @@ export function quadIdentityOf(chosen: string | null | undefined, slot: number):
+@@ -875,9 +876,14 @@ export function quadIdentityOf(chosen: string | null | undefined, slot: number):
   * shares the cell); anything longer steps down 4 px per extra glyph rather
   * than overflow a 72 px cell, never below the 12 px legibility floor.
   */
@@ -41,7 +41,7 @@ index ae80dcc..720c760 100644
  	if (count <= 4) {
  		return base;
  	}
-@@ -952,10 +958,10 @@ export function renderQuadKey(opts: QuadKeyOptions): string {
+@@ -953,10 +959,10 @@ export function renderQuadKey(opts: QuadKeyOptions): string {
  				const fit = isTahoma()
  					? fitLadderBy(micro, QUAD_LABEL_SIZES, (line, size) => inksWithin([{ text: line, fontSize: size, fontWeight: 700 }], "middle", cx, Math.max(LENS.first, cx - 26), Math.min(LENS.last, cx + 26)))
  					: fitTextLadder(micro, QUAD_LABEL_BUDGET, QUAD_LABEL_SIZES, { fontWeight: 700 });
@@ -54,7 +54,7 @@ index ae80dcc..720c760 100644
  		if (cell.unitText !== "") {
  			// 14 px matches the dual layout's unit step (single 16, dual 14,
  			// quad 14): the empty band under the value has the room, and the
-@@ -1005,6 +1011,8 @@ const ICONS: Record<StatusIcon, (accent: string) => string> = {
+@@ -1006,6 +1012,8 @@ const ICONS: Record<StatusIcon, (accent: string) => string> = {
  };
  
  export interface StatusKeyOptions {
@@ -63,7 +63,7 @@ index ae80dcc..720c760 100644
  	icon: StatusIcon;
  	accent: string;
  	/** 1–3 short lines below the icon. */
-@@ -1019,6 +1027,7 @@ export interface StatusKeyOptions {
+@@ -1020,6 +1028,7 @@ export interface StatusKeyOptions {
  const STATUS_HOOK_CLEAR = 37;
  
  export function renderStatusKey(opts: StatusKeyOptions): string {

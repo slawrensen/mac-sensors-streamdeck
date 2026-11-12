@@ -46,13 +46,13 @@ A short message takes the whole stats line for about 1.6 seconds, then the line 
 - **Overview, two rows (big values and trend)**: two rows with large right-aligned values. The selected row sits on a band with an accent bar at its left edge. A long label wraps onto a second line; a row whose label fits on one line draws a trend line of its last 36 samples there when it has room. The footer shows the selected reading's session low and high.
 - **Overview, three rows**: one line per reading. A thumb on the left rail marks the reading on the dial and where the visible window sits in the list. The context line carries the shared name, the state tags and the session `▼low ▲high`; names shorten before statistics. Put it above or below the rows with **Context line**, and show or hide the lines between rows with **Separators**. A temporary message replaces the context line for its moment.
 
-<a class="image-link" data-image-viewer href="{{ '/assets/img/settings-dial.png' | relative_url }}" aria-label="Enlarge image: The Sensor Dial settings panel with the dial face in its header showing three rows, the theme strip on Void, the Reading section with CPU super core 1 on the dial and a rotation of three readings, and the Display section on Overview, three rows with Row labels, Context line, Separators, Color numbers by sensor type and Reading colors." data-image-caption="Settings-panel capture of the shipped 1.0.1.0 panel in a simulated host with sample data. Shared Accent colors set to Theme accent everywhere."><img src="{{ '/assets/img/crops/settings-dial-display.png' | relative_url }}" width="756" height="1462" loading="lazy" decoding="async" alt="The Sensor Dial settings panel header with the dial face showing three rows, above the Display section on Overview, three rows with Row labels, Context line, Separators, Color numbers by sensor type and Reading colors."></a>
+<a class="image-link" data-image-viewer href="{{ '/assets/img/settings-dial.png' | relative_url }}" aria-label="Enlarge image: The Sensor Dial settings panel with the dial face in its header showing three rows, the theme strip on Void, the Reading section with Super core 1 on the dial and a rotation of three readings, and the Display section on Overview, three rows with Row labels, Context line, Separators, Color numbers by sensor type and Reading colors." data-image-caption="Settings-panel capture of the shipped 1.0.1.0 panel in a simulated host with sample data. Shared Accent colors set to Theme accent everywhere."><img src="{{ '/assets/img/crops/settings-dial-display.png' | relative_url }}" width="756" height="1462" loading="lazy" decoding="async" alt="The Sensor Dial settings panel header with the dial face showing three rows, above the Display section on Overview, three rows with Row labels, Context line, Separators, Color numbers by sensor type and Reading colors."></a>
 
 *Settings-panel capture of the shipped 1.0.1.0 panel in a simulated host with sample data, showing the header and the **Display** section; the full capture opens from the image. Shared **Accent colors** set to **Theme accent everywhere**.*
 
 Three things keep short labels readable:
 
-- **Shared words move to the context line.** When the visible rows' labels start with the same words, such as `Memory free`, `Memory active` and `Memory wired`, the shared part is shown once and the rows read `free`, `active` and `wired`. The three-row face puts `Memory` on the context line; the two-row face puts it at the end of its footer. Names you type yourself are never shortened, and a reading whose whole label is the shared words keeps it. To keep every label whole, set **Row labels** to **Always full labels**.
+- **Shared words move to the context line.** When the visible rows' labels start with the same words, such as `Fan 1 target`, `Fan 1 min` and `Fan 1 max`, the shared part is shown once and the rows read `target`, `min` and `max`. The three-row face puts `Fan 1` on the context line; the two-row face puts it at the end of its footer. Names you type yourself are never shortened, and a reading whose whole label is the shared words keeps it. To keep every label whole, set **Row labels** to **Always full labels**.
 - **Values share one right-aligned column.** Units sit in their own column beside it. The three-row face steps the value size down from 20 to 12 px until the widest visible value fits, and each row's label runs up to its own value before it shortens. A wide rate unit in view moves the value and unit columns left together, so the unit is not cut at the screen edge. The two-row face places its columns by the widest visible value.
 - **You can rename any reading in the rotation.** Select it in the list under **Readings to rotate through** and press **Rename** in the toolbar under the list (or double-click it, or press F2 in the list). Type the new name in the **Name on the dial for ...** field; Return or clicking away saves it, and an empty field goes back to the reading's own name. The name shows on that reading's row and as the dial's title whenever that reading is on the dial, in every view. Removing the reading from the rotation keeps its name for later.
 
@@ -88,13 +88,45 @@ The list covers the rotation set (all groups), or the reading on the dial and th
 
 *Production-rendered sample data, drawn with **Accent colors** set to **Theme accent everywhere**. Only the number colors differ between the two faces; geometry and words are the same.*
 
-<a class="image-link" data-image-viewer href="{{ '/assets/img/settings-reading-colors.png' | relative_url }}" aria-label="Enlarge image: The full Sensor Dial settings panel with View on Overview, three rows, Reading colors on Signal (four hues) with a color well and an Auto button for CPU super core 1, GPU 1 and Fan 1, then the Alerts, Controls and Advanced sections open." data-image-caption="Settings-panel capture of the shipped 1.0.1.0 panel in a simulated host with sample data, showing individual reading colors. Shared Accent colors set to Theme accent everywhere."><img src="{{ '/assets/img/crops/settings-reading-colors-display.png' | relative_url }}" width="756" height="1184" loading="lazy" decoding="async" alt="The Display section of the Sensor Dial settings with View on Overview, three rows, and Reading colors on Signal (four hues) with a color well and an Auto button for CPU super core 1, GPU 1 and Fan 1"></a>
+<a class="image-link" data-image-viewer href="{{ '/assets/img/settings-reading-colors.png' | relative_url }}" aria-label="Enlarge image: The full Sensor Dial settings panel with View on Overview, three rows, Reading colors on Signal (four hues) with a color well and an Auto button for Super core 1, GPU 1 and Fan 1, then the Alerts, Controls and Advanced sections open." data-image-caption="Settings-panel capture of the shipped 1.0.1.0 panel in a simulated host with sample data, showing individual reading colors. Shared Accent colors set to Theme accent everywhere."><img src="{{ '/assets/img/crops/settings-reading-colors-display.png' | relative_url }}" width="756" height="1184" loading="lazy" decoding="async" alt="The Display section of the Sensor Dial settings with View on Overview, three rows, and Reading colors on Signal (four hues) with a color well and an Auto button for Super core 1, GPU 1 and Fan 1"></a>
 
 *Settings-panel capture of the shipped 1.0.1.0 panel in a simulated host with sample data, showing the **Display** section with individual reading colors; the full panel opens from the image. Shared **Accent colors** set to **Theme accent everywhere**.*
 
 **Color numbers by sensor type** is off by default. It needs **Text color** on **Theme text** or **Dimmed**, and **Accent colors** on **By sensor type** under **Advanced**, **Shared defaults**. Numbers then take their sensor type's accent color. On the Paper theme, and for readings whose type has no accent, numbers keep normal text.
 
 **Theme text** keeps chosen reading colors exact; **Dimmed** dims them. Leave both number-color controls at their defaults to keep normal text. See [Themes and colors](themes.html).
+
+## Background
+
+A dial on **Theme** covers the picture the Stream Deck app can show on the touch strip. **Background** (Display) lets that picture show behind the dial. To set a picture, right-click the touch strip in the Stream Deck app and choose **Set from File…** or **Open Background Library**.
+
+| Background | What the dial draws | Text over the picture |
+| --- | --- | --- |
+| **Theme** (default) | The theme's background, as in earlier versions. | The picture does not show. |
+| **Glass** | The theme's background as a panel at 80% opacity. | Labels and units draw lighter (darker on **Paper**). Built-in text keeps 4.5:1 contrast over any picture, by calculation. |
+| **Tint** | The theme's background as a panel at 50% opacity, and a 1 px outline on every word and mark. | Built-in text keeps 4.5:1 contrast against its outline, by calculation. |
+| **Outline** | No background, and a 1 px outline on every word, the range bar, the rail mark and the trend line: black on the dark themes, the theme's background on **Paper**. | Built-in text keeps 4.5:1 contrast against its outline, by calculation. |
+| **Clear** | No background and no outline. | No contrast floor. Use a dark, even picture with a dark theme, or a light one with **Paper**. |
+
+![Three touch strips of six dial segments each, every segment showing CPU super 1 at 62.4 °C. The first two strips lie over a picture of orange dust cliffs under a blue field of stars: Theme hides the picture, Glass dims it strongly, Tint shows it at half strength with outlined words, Outline and Clear show it fully, and the sixth segment is the three-row view on Tint. The second strip uses Ultraviolet with the title in its purple accent. The third strip is Paper over a pale gradient.](assets/img/dial-backgrounds-looks.jpg)
+
+*Production-rendered sample data over a picture, not a capture from a device. From left: Theme, Glass, Tint, Outline, Clear, then Tint in the three-row view. Top: Midnight. Middle: Ultraviolet with Words in the accent color. Bottom: Paper over a gradient I made. Picture: the Cosmic Cliffs ([NASA, ESA, CSA, and STScI](https://esawebb.org/images/weic2205a/), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), cropped for the strip).*
+
+I drew each face through the Stream Deck app's own SVG engine (QtSvg 6.11.1 from app 7.6.1) at the strip's 200 by 100 pixels and counted what it leaves see-through on the one-reading view. Theme covers every pixel. Glass leaves no pixel fully clear and its panel sits at 80% opacity. Tint's panel sits at 50%. Outline leaves 69.8% of the segment fully clear, and Clear 76.8%.
+
+I also laid every look, in all seven themes, over each dial segment of the 101 touch strip pictures in the Stream Deck app's Background Library (app 7.6.1, Stream Deck + and + XL) and of the Cosmic Cliffs file. On Glass the lowest contrast between a word and the panel beside it was 4.55:1. On Tint and Outline the lowest contrast between a word and its outline was 6.11:1. Clear promises nothing: on the dark themes it kept words at 4.5:1 or better on 31 of those 102 pictures.
+
+The plugin cannot read your picture, so the calculation uses the hardest case: the panel over pure white, or over pure black on **Paper**.
+
+**Words in the accent color** appears under **Background** on Glass, Tint and Outline. The title and the selected row's name take the dial's accent color, and units, statistics and other names move halfway to it, each kept at the same 4.5:1 floor. Values, alert colors and a **Custom color** for text do not change. It is off by default.
+
+On Glass, Tint, Outline and Clear:
+
+- In the two-row view only Glass draws the band behind the selected row. The others mark it with the accent rail and the brighter label.
+- A **Custom color** for text and chosen **Reading colors** stay as chosen and can fall below the floor over a bright picture.
+- The settings panel header cannot show your picture, so it previews a see-through dial over a checkerboard.
+
+Sensor Reading keys are not affected. I have not yet judged these looks on a physical Stream Deck + with Mac Sensors, so how the device shows the picture behind them is not measured here. See [Hardware compatibility](hardware.html).
 
 ## Gestures
 
@@ -170,6 +202,8 @@ The theme strip, **Reading** and **Display** start open; the other sections star
 | Reading | **Title on the dial** | A custom title. Blank uses the reading's own name, or the name given with **Rename**. |
 | Reading | **Title when the dial moves on** | **Clears (default)**: a custom title clears whenever the dial moves on to another reading, by a turn, a press or touch set to step, a Sensor Control key or the auto cycle. Picking a reading in the settings panel keeps it. **Stays for this dial** keeps it as a fixed title. |
 | Display | **Text color** | **Default** (follows the shared Text color and names it, for example *Default (shared: Theme text)*), **Theme text**, **Dimmed** or **Custom color**. Custom adds **Custom text color** and **Dim labels, units and stats (the value keeps the exact color)**. |
+| Display | **Background** | **Theme** (default) fills the dial's part of the touch strip with the theme's background. **Glass**, **Tint**, **Outline** and **Clear** show the touch strip picture set in the Stream Deck app. See [Background](#background). |
+| Display | **Words in the accent color** | Glass, Tint and Outline only: the title and the selected row's name take the accent color, and units, statistics and other names move halfway to it. Off by default. See [Background](#background). |
 | Display | **View** | **One reading** (default), **Overview, two rows (big values and trend)** or **Overview, three rows**. See [Views](#views). |
 | Display | **Decimals** | **Auto** (default), or a fixed 0, 1, 2 or 3. Auto shows two decimals below 10, one below 100 and none from 100, and shortens values from 10,000 with k, M, G or T; byte and rate units follow the shared **Data units** setting instead. |
 | Display | **°F** (under **Temperature**) | Shows temperatures in °F instead of °C. |
@@ -215,10 +249,10 @@ When sensor data is not available, the touchscreen shows a short two-line messag
 | Touchscreen | Meaning and next step |
 | --- | --- |
 | **Reading sensors** / please wait | No reading has arrived since sensor reading started, or every reading lapsed or failed before a full read had completed. Readings appear after the next successful read. |
-| **Source busy** / retrying | The first read has not finished 15 seconds after reading started. Choose **Check again** in the settings panel. |
+| **Source busy** / check again | The first read has not finished 15 seconds after reading started. Choose **Check again** in the settings panel. |
 | **No sensor data** / copy report | Every source answered, but no reading is current. Choose **Check again**; if it stays, choose **Copy support report** under **Advanced**, **Support**. |
 | **Needs macOS** / check requirements | The Node runtime is not macOS on arm64 or x86_64. See [Installation and requirements](installation.html). |
-| **Bridge failed** / reinstall | The native reader could not load. Quit and reopen Stream Deck. If it persists, see [Keys show Bridge failed](troubleshooting.html#keys-show-bridge-failed). |
+| **Bridge failed** / reopen Stream Deck | The native reader could not load. Quit and reopen Stream Deck. If it persists, see [Keys show Bridge failed](troubleshooting.html#keys-show-bridge-failed). |
 | **Tahoma needed** / Open Font Book | A fixed image, drawn without Tahoma. Install Tahoma Bold in Font Book, then choose **Check again**. |
 | **Source error** / copy report | A read failed in a way no other screen covers. Choose **Check again**; if it stays, choose **Copy support report** under **Advanced**, **Support**. |
 

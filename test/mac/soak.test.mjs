@@ -17,11 +17,12 @@ test('resource observer measures real CPU time and precise process identity',asy
 	}finally{child.kill('SIGTERM');await new Promise(resolve=>child.once('exit',resolve));}
 });
 test('dead and malformed PIDs never produce invented zero metrics',()=>{assert.throws(()=>sampleHost(-1));const result=spawnSync('build/observer/process-observer',['2147483647'],{encoding:'utf8'});assert.notEqual(result.status,0);assert.equal(JSON.parse(result.stdout).ok,false);});
-test('freshness requires both genuine sources and expires their own acquisition times',t=>{
+test('freshness requires every traced source, health and computed included, and expires their own acquisition times',t=>{
 	const dir=fs.mkdtempSync(path.join(os.tmpdir(),'mac-freshness-'));t.after(()=>fs.rmSync(dir,{recursive:true,force:true}));const file=path.join(dir,'trace.jsonl');
 	const write=sources=>fs.writeFileSync(file,JSON.stringify({event:'sourceObservation',wall:100,note:JSON.stringify({sources})})+'\n');
-	const sources=['system','smc'].map(source=>({source,rows:2,observation:4,acquired:1000}));write(sources);assert.equal(readFreshness(file,1500).valid,true);assert.equal(readFreshness(file,16001).valid,false);assert.equal(readFreshness(file,900).valid,false);
-	write([sources[0],{...sources[1],rows:0,acquired:null}]);assert.equal(readFreshness(file,1500).valid,false);
+	const sources=['system','smc','health','computed'].map(source=>({source,rows:2,observation:4,acquired:1000}));write(sources);assert.equal(readFreshness(file,1500).valid,true);assert.equal(readFreshness(file,16001).valid,false);assert.equal(readFreshness(file,900).valid,false);
+	for(let index=0;index<sources.length;index++){write(sources.map((source,at)=>at===index?{...source,rows:0,acquired:null}:source));assert.equal(readFreshness(file,1500).valid,false,sources[index].source);}
+	write(sources.slice(0,2));assert.equal(readFreshness(file,1500).valid,false,'a trace without health and computed rows is not a fresh Mac17,9 read');assert.equal(readFreshness(file,1500,{required:['system','smc']}).valid,true);
 });
 test('soak slopes use elapsed time and a short or incomplete window cannot pass',()=>{
 	const metrics=[0,1,2].map(index=>({continuousMs:index*1_800_000,rssBytes:(100+index*.5)*1048576,footprintBytes:30*1048576,fileDescriptors:20,cpuUserNs:index*1e9,cpuSystemNs:0}));assert.equal(slopeMiBPer30Minutes(metrics),.5);assert.equal(slopeMiBPer30Minutes(metrics.slice(0,2)),null);

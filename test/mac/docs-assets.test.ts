@@ -4,9 +4,49 @@ import path from 'node:path';
 import {createHash} from 'node:crypto';
 import {test} from 'node:test';
 import sharp from 'sharp';
-import {composeScenes,sampleReadings,sampleSnapshot,sampleGroups,PROVIDER_GROUPS,boardDefinitions,boardFooter} from '../../scripts/lib/mac-scenes';
+import {composeScenes,composeStripScenes,stripDefinitions,STRIP_LOOKS,currentSnapshot,NAMED_NOW,sampleReadings,sampleSnapshot,sampleGroups,PROVIDER_GROUPS,boardDefinitions,boardFooter} from '../../scripts/lib/mac-scenes';
+import {GLASS_OPACITY,TINT_OPACITY} from '../../src/ui/glass';
 import {DETAIL_PROFILES} from '../../src/detail/managed-profiles';
+import {statusScreen} from '../../src/mac/state-screens';
+import {renderStatusKey} from '../../src/ui/key-renderer';
+import type {PollerStatus} from '../../src/poller';
 const hash=(bytes:Buffer|string)=>createHash('sha256').update(bytes).digest('hex');
+/**
+ * Status faces whose second line changed in 1.1 after the boards were drawn, with the line the status board shows. The boards cannot be
+ * redrawn until the private Qt adapter is measured again for the current app (the scene hashes pin what was drawn), and
+ * docs/status-screens.md says which lines the image shows. Empty again once the boards are redrawn.
+ */
+const DRAWN_SECOND_LINE:Record<string,string>={'status-busy':'retrying','status-bridge-failed':'reinstall'};
+type StripProvenance={renderer:{version:string};picture:{file:string;sha256:string;credit:string;license:string};alphaMeasuredAt:number[];scenes:{id:string;look:string;view:string;svgSha256:string;alpha:{clear:number;solid:number;panelAlpha:number|null;panelShare:number}}[];assets:{file:string;sha256:string;sceneIds:string[]}[]};
+const ALPHA_OPAQUE=255;
+test('the touch strip examples are today\'s faces, and each Background look is as see-through in the app\'s renderer as its name says',()=>{
+	const provenance=JSON.parse(fs.readFileSync('docs/assets/img/strip-images.provenance.json','utf8')) as StripProvenance,scenes=composeStripScenes();
+	// Six segments a strip: the five looks in panel order, then Tint on the three-row overview.
+	assert.equal(scenes.length,stripDefinitions.length*(STRIP_LOOKS.length+1));
+	assert.deepEqual(scenes.filter(scene=>scene.strip===stripDefinitions[0].id).map(scene=>[scene.look,scene.view]),[...STRIP_LOOKS.map(look=>[look,'single']),['tint','overview']]);
+	assert.deepEqual(provenance.scenes.map(scene=>[scene.id,scene.svgSha256]),scenes.map(scene=>[scene.id,hash(scene.svg)]),'redraw with npm run docs:assets -- docs/assets/img strips');
+	assert.deepEqual(provenance.alphaMeasuredAt,[200,100],'measured at the size of one dial segment');
+	for(const {id,look,alpha} of provenance.scenes) {
+		// Measured through QtSvg, so these are what the app composites over the strip picture, not what the SVG asks for.
+		if(look==='theme')assert.deepEqual(alpha,{clear:0,solid:1,panelAlpha:null,panelShare:0},id+': Theme hides the picture everywhere');
+		else if(look==='glass'||look==='tint'){
+			assert.equal(alpha.panelAlpha,Math.round((look==='glass'?GLASS_OPACITY:TINT_OPACITY)*ALPHA_OPAQUE),id+': the panel has the opacity the source names');
+			assert.equal(alpha.clear,0,id+': a panel covers the whole segment');assert.ok(alpha.panelShare>.5&&alpha.solid<.5,id+': most of the segment is panel, not ink');
+		}else{assert.equal(alpha.panelAlpha,null,id+': no panel');assert.ok(alpha.clear>.6,id+': most of the segment shows the picture untouched');}
+	}
+	// Outline adds an edge to what Clear draws, so it covers more.
+	const clearShare=(look:string)=>provenance.scenes.find(scene=>scene.look===look&&scene.view==='single')!.alpha.clear;
+	assert.ok(clearShare('outline')<clearShare('clear'));
+	const [asset]=provenance.assets;assert.equal(provenance.assets.length,1);
+	assert.equal(hash(fs.readFileSync(path.join('docs/assets/img',asset!.file))),asset!.sha256);assert.deepEqual(asset!.sceneIds,scenes.map(scene=>scene.id));
+	assert.equal(hash(fs.readFileSync(path.join('docs/assets/img',provenance.picture.file))),provenance.picture.sha256);
+	// The picture is someone else's work under CC BY 4.0: the page that shows it must carry the credit the provenance records.
+	const page=fs.readFileSync('docs/sensor-dial.md','utf8');
+	assert.ok(page.includes('assets/img/'+asset!.file)&&page.includes(provenance.picture.credit)&&page.includes(provenance.picture.license),'credit and licence beside the image');
+	// The page quotes the measured shares: they must be the recorded ones.
+	const percent=(look:string)=>(clearShare(look)*100).toFixed(1)+'%';
+	assert.ok(page.includes(`Outline leaves ${percent('outline')} of the segment fully clear, and Clear ${percent('clear')}.`));
+});
 const pngsIn=(dir:string)=>fs.readdirSync(dir).filter(file=>file.endsWith('.png')).sort();
 test('documentation boards recompose from production code and fixed public sample inputs',()=>{
 	const provenance=JSON.parse(fs.readFileSync('docs/assets/img/renderer-images.provenance.json','utf8')) as {version:string;readings:unknown;scenes:{id:string;svgSha256:string}[];assets:{file:string;sha256:string;sceneIds:string[]}[]};
@@ -14,7 +54,14 @@ test('documentation boards recompose from production code and fixed public sampl
 	// so a version bump alone needs no redraw; the measured Qt adapter is private and tied to one app build.
 	assert.match(provenance.version,/^\d+\.\d+\.\d+$/);assert.deepEqual(JSON.parse(JSON.stringify(sampleReadings)),provenance.readings);
 	const scenes=composeScenes();assert.equal(scenes.length,provenance.scenes.length);
-	for(const scene of scenes)assert.equal(hash(scene.svg),provenance.scenes.find(row=>row.id===scene.id)?.svgSha256,scene.id);
+	for(const scene of scenes){
+		const recorded=provenance.scenes.find(row=>row.id===scene.id)?.svgSha256,drawn=DRAWN_SECOND_LINE[scene.id];
+		if(drawn===undefined){assert.equal(hash(scene.svg),recorded,scene.id);continue;}
+		// A face whose second line changed after its board was drawn: today's face is the same face with only that line changed.
+		const face=statusScreen({state:'unavailable',reason:scene.id.replace('status-',''),message:''} as PollerStatus)!;
+		assert.equal(scene.svg,renderStatusKey(face),scene.id);assert.notEqual(face.lines[1],drawn,`${scene.id} matches its board again: drop it from DRAWN_SECOND_LINE`);
+		assert.equal(hash(renderStatusKey({...face,lines:[face.lines[0]!,drawn]})),recorded,scene.id);
+	}
 	for(const asset of provenance.assets){assert.equal(hash(fs.readFileSync(path.join('docs/assets/img',asset.file))),asset.sha256,asset.file);assert.deepEqual(asset.sceneIds,boardDefinitions.find(board=>board.id+'.png'===asset.file)?.scenes);assert.equal(hash(fs.readFileSync(path.join('.github/readme',asset.file))),asset.sha256);}
 	// Every board has a pinned image, and the README folder carries no image the provenance does not pin.
 	assert.deepEqual(provenance.assets.map(asset=>asset.file).sort(),boardDefinitions.map(board=>board.id+'.png').sort());
@@ -73,17 +120,22 @@ test('sample readings sit in the groups the shipped Mac provider reports, in its
  const groups=Object.fromEntries((literal??'').split(',').map(entry=>entry.split(':')).map(([name,id])=>[name!,Number(id)]));
  assert.deepEqual(Object.keys(groups).sort((a,b)=>groups[a]!-groups[b]!),[...PROVIDER_GROUPS]);
  const catalog=(JSON.parse(fs.readFileSync('native/hwmac/catalog.json','utf8')) as {rows:{key:string;label:string;group:string;variants?:string[]}[]}).rows,collectors=fs.readFileSync('native/hwmac/collectors.c','utf8');
+ // A sample reading keeps the name its board shows (NAMED_NOW in scripts/lib/mac-scenes.ts maps it to today's name).
  for(const reading of sampleReadings){
-  const group=sampleGroups[reading.key]!,smc=/^mac:v1:smc:[^:]+:([0-9a-f]{8}):/.exec(reading.key);
+  const group=sampleGroups[reading.key]!,smc=/^mac:v1:smc:[^:]+:([0-9a-f]{8}):/.exec(reading.key),label=NAMED_NOW[reading.label]??reading.label;
   // One key can carry another name on another chip; the sample readings are the measured M5 Pro's.
-  if(smc){const row=catalog.find(entry=>entry.key===Buffer.from(smc[1]!,'hex').toString('ascii')&&(entry.variants===undefined||entry.variants.includes('pro')));assert.equal(row?.label,reading.label);assert.equal(row?.group,group,reading.label);}
-  else{const name=reading.key.replace('mac:v1:system:','');assert.ok(collectors.includes(`"${name}", "${reading.label}", "${group}"`)||provider.includes(`'${name}','${reading.label}','${group}'`),reading.label+' in '+group);}
+  if(smc){const row=catalog.find(entry=>entry.key===Buffer.from(smc[1]!,'hex').toString('ascii')&&(entry.variants===undefined||entry.variants.includes('pro')));assert.equal(row?.label,label);assert.equal(row?.group,group,label);}
+  else{const name=reading.key.replace('mac:v1:system:','');assert.ok(collectors.includes(`"${name}", "${label}", "${group}"`)||provider.includes(`'${name}','${label}','${group}'`),label+' in '+group);}
  }
- // MacProvider.rebuild(): one sensor per present group in GROUPS order, id from GROUPS, reading ids 0, readings by sensor then key.
+ // MacProvider.rebuild(): one sensor per present group in GROUPS order, id from GROUPS, reading ids 0, readings by sensor, then system
+ // counters before SMC rows inside a group (test/mac/provider.test.ts pins the provider's own order).
  const snapshot=sampleSnapshot(),present=PROVIDER_GROUPS.filter(name=>Object.values(sampleGroups).includes(name));
  assert.deepEqual(snapshot.sensors,present.map((name,index)=>({index,id:groups[name],instance:0,name})));
  for(const reading of snapshot.readings){assert.equal(reading.id,0);assert.equal(snapshot.sensors[reading.sensorIndex]?.name,sampleGroups[reading.key]);}
- assert.deepEqual(snapshot.readings.map(row=>row.key),[...snapshot.readings].sort((a,b)=>a.sensorIndex-b.sensorIndex||a.key.localeCompare(b.key)).map(row=>row.key));
+ assert.deepEqual(snapshot.readings.map(row=>row.key.replace(/^mac:v1:(?:system:|smc:Mac17%2C9:)/,'')),['cpu-total','54703034:temp.v1','54673055:temp.v1','memory-active','disk-root-available','network-receive','46304163:rpm.v1','50535452:power.v1']);
+ // The panel captures show the same snapshot under today's names: only labels differ, and each one is a name the provider gives.
+ const current=currentSnapshot();assert.deepEqual(current.readings.map(row=>[row.key,row.value,row.sensorIndex]),snapshot.readings.map(row=>[row.key,row.value,row.sensorIndex]));
+ for(const row of current.readings)assert.equal(row.label,NAMED_NOW[snapshot.byKey.get(row.key)!.label]??snapshot.byKey.get(row.key)!.label);
 });
 
 test('every 1920 by 960 listing image is fully opaque',async()=>{

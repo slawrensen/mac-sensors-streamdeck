@@ -99,7 +99,7 @@ description: Temperatures, fan speeds, power, CPU usage, memory, storage and net
       <p class="deck-where"><strong>Where it goes:</strong> Any key, pedal or Multi Action step</p>
     </li>
   </ul>
-  <p>Which readings appear depends on the Mac and its macOS version. The measured M5 Pro reports 89: 14 from system counters, 67 from the SMC, 5 computed from SMC readings (CPU average, CPU hottest core, Fan average, Computer average and Hottest sensor), and battery cycles, battery health and the internal SSD temperature (<a href="{{ '/hardware.html#readings-measured-on-the-m5-pro' | relative_url }}">Readings measured on the M5 Pro</a>). Other Apple silicon Mac computers read per-core CPU and GPU temperatures from a table for their chip family, M1 to M6, which I have not measured on that hardware. CPU and GPU clock speeds and GPU usage are not offered.</p>
+  <p>Which readings appear depends on the Mac and its macOS version. The measured M5 Pro reports 91: 14 from system counters, 68 from the SMC, 6 computed from SMC readings (CPU average, Hottest core, Fan average, Battery hottest, Mac average and Hottest sensor), and Battery cycles, Battery health and SSD SMART, the internal SSD's own temperature (<a href="{{ '/hardware.html#readings-measured-on-the-m5-pro' | relative_url }}">Readings measured on the M5 Pro</a>). Other Apple silicon Mac computers read per-core CPU and GPU temperatures from a table for their chip family, M1 to M6, which I have not measured on that hardware. CPU and GPU clock speeds and GPU usage are not offered.</p>
 </section>
 
 ## What it does not do

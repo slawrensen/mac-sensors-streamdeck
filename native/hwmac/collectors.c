@@ -28,7 +28,9 @@
 
 _Static_assert(sizeof(HWMAC_CATALOG) / sizeof(HWMAC_CATALOG[0]) <= HWMAC_MAX_CATALOG, "catalog rows");
 size_t hwmac_catalog_count(void) { return sizeof(HWMAC_CATALOG) / sizeof(HWMAC_CATALOG[0]); }
+#if defined(HWMAC_TEST_BUILD) && HWMAC_TEST_BUILD
 const sensor_spec *hwmac_catalog_row(size_t index) { return index < hwmac_catalog_count() ? &HWMAC_CATALOG[index] : NULL; }
+#endif
 /* Chip variant bits: the brand string is the family's brand alone, or the brand followed by one of these names. */
 static unsigned brand_variant(const char *cpu, const char *brand) {
 	size_t length = strlen(brand);
@@ -37,11 +39,18 @@ static unsigned brand_variant(const char *cpu, const char *brand) {
 	return rest[0] == 0 ? 1u : strcmp(rest, " Pro") == 0 ? 2u : strcmp(rest, " Max") == 0 ? 4u : strcmp(rest, " Ultra") == 0 ? 8u : 0;
 }
 void hwmac_resolve_platform(source_packet *packet) {
-	packet->family = 0; packet->model_table = 0; packet->variant = 0; packet->table[0] = 0;
+	packet->family = 0; packet->model_table = 0; packet->variant = 0; packet->table[0] = 0; packet->model_measured = false;
 	if (packet->apple_silicon != 1) return;
-	/* A measured model names its own family, so it keeps its table when the brand string is not the chip's (a translated process reads another). */
+	/* A model table names its own family, so it keeps its table when the brand string is not the chip's (a translated process reads another).
+	 * One model and chip can ship with fewer cores (Apple sells a 15-core M5 Pro in Mac17,9), so the table counts as measured only on the
+	 * core layout it was measured on; on another its rows still apply, so saved keys keep working, but nothing treats it as measured. */
 	for (size_t i = 0; i < sizeof(HWMAC_MODELS) / sizeof(HWMAC_MODELS[0]); i++) {
-		if (strcmp(packet->model, HWMAC_MODELS[i].model) == 0 && strcmp(packet->chip, HWMAC_MODELS[i].chip) == 0) { packet->model_table = (unsigned)i + 1; packet->family = HWMAC_MODELS[i].family + 1; packet->variant = HWMAC_MODELS[i].variant; break; }
+		if (strcmp(packet->model, HWMAC_MODELS[i].model) == 0 && strcmp(packet->chip, HWMAC_MODELS[i].chip) == 0) {
+			packet->model_table = (unsigned)i + 1; packet->family = HWMAC_MODELS[i].family + 1; packet->variant = HWMAC_MODELS[i].variant;
+			bool layout = packet->perf_levels == HWMAC_MODELS[i].levels;
+			for (unsigned level = 0; layout && level < packet->perf_levels; level++) layout = packet->perf_cores[level] == HWMAC_MODELS[i].cores[level];
+			packet->model_measured = layout; break;
+		}
 	}
 	/* Otherwise the whole string must be a listed brand and variant: "Apple M1 (Virtual)" or a later chip matches none. */
 	for (size_t i = 0; packet->family == 0 && i < sizeof(HWMAC_FAMILIES) / sizeof(HWMAC_FAMILIES[0]); i++) {
@@ -98,6 +107,17 @@ void hwmac_facts(source_packet *packet) {
 	length = sizeof(packet->cpu);
 	if (sysctlbyname("machdep.cpu.brand_string", packet->cpu, &length, NULL, 0) != 0 || length == 0 || length > sizeof(packet->cpu)) packet->cpu[0] = 0;
 	packet->cpu[sizeof(packet->cpu) - 1] = 0;
+	/* Every level or none: a layout with a level missing matches no measured model. */
+	int levels = 0; packet->perf_levels = 0;
+	if (sys_number("hw.nperflevels", &levels, sizeof(levels)) && levels > 0 && levels <= HWMAC_MAX_PERF_LEVELS) {
+		unsigned read = 0;
+		for (int level = 0; level < levels; level++) {
+			char name[40]; int cores = 0; snprintf(name, sizeof(name), "hw.perflevel%d.physicalcpu", level);
+			if (!sys_number(name, &cores, sizeof(cores)) || cores <= 0) break;
+			packet->perf_cores[level] = (unsigned)cores; read++;
+		}
+		if (read == (unsigned)levels) packet->perf_levels = read;
+	}
 	hwmac_resolve_platform(packet);
 }
 static const char *unit_for(const char *kind) {
@@ -125,6 +145,12 @@ static void observed(sensor_row *row, double value) {
 	row->valid = isfinite(value) && isfinite(row->continuous_ms) && isfinite(row->wall_seconds);
 	row->value = row->valid ? value : NAN;
 }
+/* A row read by one API call is as old as the start of that call. */
+static void observed_at(sensor_row *row, double value, double acquired, double acquired_wall) {
+	observed(row, value);
+	if (row->valid) { row->continuous_ms = acquired; row->wall_seconds = acquired_wall; row->valid = isfinite(acquired) && isfinite(acquired_wall); }
+	if (!row->valid) row->value = NAN;
+}
 static void system_value(source_packet *packet, const char *key, const char *label, const char *group, double value) {
 	observed(new_row(packet, key, label, group, "other", "B"), value);
 }
@@ -147,7 +173,7 @@ void hwmac_collect_smc(smc_context *context, source_packet *packet) {
 }
 void hwmac_read_smc_rows(smc_context *context, source_packet *packet, smc_transport transport) {
 	bool broken = false;
-	for (size_t i = 0; i < sizeof(HWMAC_CATALOG) / sizeof(HWMAC_CATALOG[0]); i++) {
+	for (size_t i = 0; i < hwmac_catalog_count(); i++) {
 		const sensor_spec *spec = &HWMAC_CATALOG[i];
 		if (!hwmac_row_applies(spec, packet)) continue;
 		sensor_row *row = new_row(packet, spec->key, spec->label, spec->group, spec->kind, unit_for(spec->kind));
@@ -178,11 +204,10 @@ void hwmac_read_smc_rows(smc_context *context, source_packet *packet, smc_transp
 			continue;
 		}
 		double value, minimum = spec->minimum, maximum = spec->maximum;
-		if (spec->scope == 2 && packet->model_table == 0) { minimum = HWMAC_FAMILY_MINIMUM_C; maximum = HWMAC_FAMILY_MAXIMUM_C; }
+		if (spec->scope == 2 && !packet->model_measured) { minimum = HWMAC_FAMILY_MINIMUM_C; maximum = HWMAC_FAMILY_MAXIMUM_C; }
 		if (!smc_decode(context->types[i], context->sizes[i], reply + 48, &value) || value < minimum || value > maximum) { row->error = 13; continue; }
-		observed(row, value);
 		/* Age from the start of the actual read, never from a delayed return. */
-		row->continuous_ms = acquired; row->wall_seconds = acquired_wall;
+		observed_at(row, value, acquired, acquired_wall);
 	}
 	if (broken) hwmac_close_smc(context);
 }
@@ -276,22 +301,22 @@ void hwmac_collect_public(source_packet *packet) {
 		vm_deallocate(mach_task_self(), (vm_address_t)info, (vm_size_t)length * sizeof(integer_t));
 	}
 	uint64_t total = 0;
-	if (sys_number("hw.memsize", &total, sizeof(total))) system_value(packet, "memory-total", "Memory total", "Memory", (double)total);
+	if (sys_number("hw.memsize", &total, sizeof(total))) system_value(packet, "memory-total", "RAM total", "Memory", (double)total);
 	vm_size_t page_size = 0; vm_statistics64_data_t vm; mach_msg_type_number_t vm_count = HOST_VM_INFO64_COUNT;
 	if (host_page_size(host, &page_size) == KERN_SUCCESS && host_statistics64(host, HOST_VM_INFO64, (host_info64_t)&vm, &vm_count) == KERN_SUCCESS && vm_count == HOST_VM_INFO64_COUNT) {
-		system_value(packet, "memory-free", "Memory free", "Memory", (double)vm.free_count * page_size);
-		system_value(packet, "memory-active", "Memory active", "Memory", (double)vm.active_count * page_size);
-		system_value(packet, "memory-inactive", "Memory inactive", "Memory", (double)vm.inactive_count * page_size);
-		system_value(packet, "memory-wired", "Memory wired", "Memory", (double)vm.wire_count * page_size);
-		system_value(packet, "memory-compressed", "Memory compressed", "Memory", (double)vm.compressor_page_count * page_size);
+		system_value(packet, "memory-free", "RAM free", "Memory", (double)vm.free_count * page_size);
+		system_value(packet, "memory-active", "RAM active", "Memory", (double)vm.active_count * page_size);
+		system_value(packet, "memory-inactive", "RAM inactive", "Memory", (double)vm.inactive_count * page_size);
+		system_value(packet, "memory-wired", "RAM wired", "Memory", (double)vm.wire_count * page_size);
+		system_value(packet, "memory-compressed", "RAM compr.", "Memory", (double)vm.compressor_page_count * page_size);
 	}
 	mach_port_deallocate(mach_task_self(), host);
 	struct xsw_usage swap;
 	if (sys_number("vm.swapusage", &swap, sizeof(swap))) system_value(packet, "swap-used", "Swap used", "Memory", (double)swap.xsu_used);
 	struct statfs disk;
 	if (statfs("/", &disk) == 0 && disk.f_bsize > 0) {
-		system_value(packet, "disk-root-total", "Startup volume total", "Storage", (double)disk.f_blocks * disk.f_bsize);
-		system_value(packet, "disk-root-available", "Startup volume available", "Storage", (double)disk.f_bavail * disk.f_bsize);
+		system_value(packet, "disk-root-total", "Disk total", "Storage", (double)disk.f_blocks * disk.f_bsize);
+		system_value(packet, "disk-root-available", "Disk available", "Storage", (double)disk.f_bavail * disk.f_bsize);
 	}
 	network(packet); storage(packet);
 	packet->duration_ms = hwmac_continuous_ms() - start;
@@ -300,12 +325,6 @@ void hwmac_collect_public(source_packet *packet) {
 }
 /* NVMe reports the composite temperature in whole kelvin; this is the SI offset, which the Linux NVMe hwmon driver also uses. */
 #define HWMAC_KELVIN_OFFSET 273.15
-/* A row read by one API call is as old as the start of that call. */
-static void observed_at(sensor_row *row, double value, double acquired, double acquired_wall) {
-	observed(row, value);
-	if (row->valid) { row->continuous_ms = acquired; row->wall_seconds = acquired_wall; row->valid = isfinite(acquired) && isfinite(acquired_wall); }
-	if (!row->valid) row->value = NAN;
-}
 /* 1 when IOPowerSources lists a present internal battery, 0 when it lists none (a desktop), -1 when it cannot answer. */
 static int internal_battery(void) {
 	CFTypeRef info = IOPSCopyPowerSourcesInfo(); if (info == NULL) return -1;
@@ -373,7 +392,7 @@ static void drive(source_packet *packet) {
 	}
 	IOObjectRelease(iterator);
 	if (drives == 0) return;
-	sensor_row *row = new_row(packet, "ssd-temperature", "Internal SSD", "Storage", "temperature", "°C");
+	sensor_row *row = new_row(packet, "ssd-temperature", "SSD SMART", "Storage", "temperature", "°C");
 	if (row == NULL) packet->error = 12;
 	/* One key cannot name two internal drives, so a Mac with more than one gets no value instead of an arbitrary one. */
 	else if (drives > 1) row->error = 13;

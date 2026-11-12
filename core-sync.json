@@ -2,7 +2,7 @@
   "schema": 1,
   "upstream": {
     "repository": "slawrensen/hwinfo-streamdeck",
-    "commit": "11b9645b78395f157493648d873a3066673ba493"
+    "commit": "bb4aedecbce499e199df8af63793a1490c0fb6ed"
   },
   "rewrites": [
     [
@@ -165,28 +165,28 @@
     {
       "source": "com.lawrensen.hwinfo.sdPlugin/ui/control.html",
       "destination": "com.lawrensen.mac.sdPlugin/ui/control.html",
-      "sourceSha256": "245bf0cb037286ee253bbd303a70df0dac6fcce87fd888c41b04c12895719047",
+      "sourceSha256": "ee1948da788cbf4b94d2b59040567efe825efa19c258f1a23516a16f8c80ebf2",
       "rewriteCounts": [
         0,
         0,
         0
       ],
-      "rewrittenSha256": "245bf0cb037286ee253bbd303a70df0dac6fcce87fd888c41b04c12895719047",
+      "rewrittenSha256": "ee1948da788cbf4b94d2b59040567efe825efa19c258f1a23516a16f8c80ebf2",
       "patch": null,
-      "postPatchSha256": "245bf0cb037286ee253bbd303a70df0dac6fcce87fd888c41b04c12895719047"
+      "postPatchSha256": "ee1948da788cbf4b94d2b59040567efe825efa19c258f1a23516a16f8c80ebf2"
     },
     {
       "source": "com.lawrensen.hwinfo.sdPlugin/ui/detail-slot.html",
       "destination": "com.lawrensen.mac.sdPlugin/ui/detail-slot.html",
-      "sourceSha256": "f50b50a42e1fa89794805fbfd65064c1bf462b7a94240afc3acdf18f6115345a",
+      "sourceSha256": "1fb3c079a0c74d2573a75b7ea39a67e5869862d220436d19815115984d7ec11e",
       "rewriteCounts": [
         0,
         0,
         0
       ],
-      "rewrittenSha256": "f50b50a42e1fa89794805fbfd65064c1bf462b7a94240afc3acdf18f6115345a",
+      "rewrittenSha256": "1fb3c079a0c74d2573a75b7ea39a67e5869862d220436d19815115984d7ec11e",
       "patch": null,
-      "postPatchSha256": "f50b50a42e1fa89794805fbfd65064c1bf462b7a94240afc3acdf18f6115345a"
+      "postPatchSha256": "1fb3c079a0c74d2573a75b7ea39a67e5869862d220436d19815115984d7ec11e"
     },
     {
       "source": "com.lawrensen.hwinfo.sdPlugin/ui/pi-command.js",
@@ -204,15 +204,15 @@
     {
       "source": "com.lawrensen.hwinfo.sdPlugin/ui/pi-common.js",
       "destination": "com.lawrensen.mac.sdPlugin/ui/pi-common.js",
-      "sourceSha256": "c94e892a18849b8a7acc3a1aac4248cae62fbf6e09fcef35895cf2a5d99324ad",
+      "sourceSha256": "bcbe3d7d920a707be7355bef7fdeba381ebd1d77499632d9ace3de5f033cb3c6",
       "rewriteCounts": [
         0,
         0,
         0
       ],
-      "rewrittenSha256": "c94e892a18849b8a7acc3a1aac4248cae62fbf6e09fcef35895cf2a5d99324ad",
+      "rewrittenSha256": "bcbe3d7d920a707be7355bef7fdeba381ebd1d77499632d9ace3de5f033cb3c6",
       "patch": null,
-      "postPatchSha256": "c94e892a18849b8a7acc3a1aac4248cae62fbf6e09fcef35895cf2a5d99324ad"
+      "postPatchSha256": "bcbe3d7d920a707be7355bef7fdeba381ebd1d77499632d9ace3de5f033cb3c6"
     },
     {
       "source": "com.lawrensen.hwinfo.sdPlugin/ui/pi-control.js",
@@ -230,28 +230,28 @@
     {
       "source": "com.lawrensen.hwinfo.sdPlugin/ui/pi-model.js",
       "destination": "com.lawrensen.mac.sdPlugin/ui/pi-model.js",
-      "sourceSha256": "ac94d3075a394e16de6142410d63603aab51c3fd4548444551d625b6c0e82156",
+      "sourceSha256": "266123a16c8c90c1924c2c38f55b13bd0056264ad106cc6e2bd9e8c4e41fbd0e",
       "rewriteCounts": [
         0,
         0,
         0
       ],
-      "rewrittenSha256": "ac94d3075a394e16de6142410d63603aab51c3fd4548444551d625b6c0e82156",
+      "rewrittenSha256": "266123a16c8c90c1924c2c38f55b13bd0056264ad106cc6e2bd9e8c4e41fbd0e",
       "patch": null,
-      "postPatchSha256": "ac94d3075a394e16de6142410d63603aab51c3fd4548444551d625b6c0e82156"
+      "postPatchSha256": "266123a16c8c90c1924c2c38f55b13bd0056264ad106cc6e2bd9e8c4e41fbd0e"
     },
     {
       "source": "com.lawrensen.hwinfo.sdPlugin/ui/pi-shell.js",
       "destination": "com.lawrensen.mac.sdPlugin/ui/pi-shell.js",
-      "sourceSha256": "1cdbd26576a0ec8f2b677779753f4578106e8f05efb9b962e9184aba51078c50",
+      "sourceSha256": "e0a0a64523a5d2fbbf72d988064289cf30754d577de42a5e5ad027bec1d24ffd",
       "rewriteCounts": [
         0,
         0,
         0
       ],
-      "rewrittenSha256": "1cdbd26576a0ec8f2b677779753f4578106e8f05efb9b962e9184aba51078c50",
+      "rewrittenSha256": "e0a0a64523a5d2fbbf72d988064289cf30754d577de42a5e5ad027bec1d24ffd",
       "patch": null,
-      "postPatchSha256": "1cdbd26576a0ec8f2b677779753f4578106e8f05efb9b962e9184aba51078c50"
+      "postPatchSha256": "e0a0a64523a5d2fbbf72d988064289cf30754d577de42a5e5ad027bec1d24ffd"
     },
     {
       "source": "com.lawrensen.hwinfo.sdPlugin/ui/pi-slot.js",
@@ -269,15 +269,15 @@
     {
       "source": "com.lawrensen.hwinfo.sdPlugin/ui/pi.css",
       "destination": "com.lawrensen.mac.sdPlugin/ui/pi.css",
-      "sourceSha256": "2e47df1ec6f8ec8a1bc61f4f118a4bcdd2b25e0754ac155fd6030c5dad3c9246",
+      "sourceSha256": "05cb553b0b7f12ebfe3666b3976519962be1b826203fd339a99da03ccfa0572c",
       "rewriteCounts": [
         0,
         0,
         0
       ],
-      "rewrittenSha256": "2e47df1ec6f8ec8a1bc61f4f118a4bcdd2b25e0754ac155fd6030c5dad3c9246",
+      "rewrittenSha256": "05cb553b0b7f12ebfe3666b3976519962be1b826203fd339a99da03ccfa0572c",
       "patch": null,
-      "postPatchSha256": "2e47df1ec6f8ec8a1bc61f4f118a4bcdd2b25e0754ac155fd6030c5dad3c9246"
+      "postPatchSha256": "05cb553b0b7f12ebfe3666b3976519962be1b826203fd339a99da03ccfa0572c"
     },
     {
       "source": "com.lawrensen.hwinfo.sdPlugin/ui/sdpi-components.js",
@@ -295,28 +295,28 @@
     {
       "source": "com.lawrensen.hwinfo.sdPlugin/ui/sensor-dial.html",
       "destination": "com.lawrensen.mac.sdPlugin/ui/sensor-dial.html",
-      "sourceSha256": "b2f3f85c65c9644a2082da9460c5a5f86275b078ef9250db031e3be5df88878c",
+      "sourceSha256": "02c78658f555a7425682ffea28ab3c5b0d47c459c889d8fbe0630cd725fe827b",
       "rewriteCounts": [
         0,
         0,
         0
       ],
-      "rewrittenSha256": "b2f3f85c65c9644a2082da9460c5a5f86275b078ef9250db031e3be5df88878c",
+      "rewrittenSha256": "02c78658f555a7425682ffea28ab3c5b0d47c459c889d8fbe0630cd725fe827b",
       "patch": null,
-      "postPatchSha256": "b2f3f85c65c9644a2082da9460c5a5f86275b078ef9250db031e3be5df88878c"
+      "postPatchSha256": "02c78658f555a7425682ffea28ab3c5b0d47c459c889d8fbe0630cd725fe827b"
     },
     {
       "source": "com.lawrensen.hwinfo.sdPlugin/ui/sensor-reading.html",
       "destination": "com.lawrensen.mac.sdPlugin/ui/sensor-reading.html",
-      "sourceSha256": "273a38b392c650d40320eda849610dcbd38e1c9f69e1ab6521cd95b0d87124c2",
+      "sourceSha256": "de349627f12445b7d860305576e4e042f8d9df84b567b2aad10c904e974573bf",
       "rewriteCounts": [
         0,
         0,
         0
       ],
-      "rewrittenSha256": "273a38b392c650d40320eda849610dcbd38e1c9f69e1ab6521cd95b0d87124c2",
+      "rewrittenSha256": "de349627f12445b7d860305576e4e042f8d9df84b567b2aad10c904e974573bf",
       "patch": null,
-      "postPatchSha256": "273a38b392c650d40320eda849610dcbd38e1c9f69e1ab6521cd95b0d87124c2"
+      "postPatchSha256": "de349627f12445b7d860305576e4e042f8d9df84b567b2aad10c904e974573bf"
     },
     {
       "source": "scripts/back-face-sheet.ts",
@@ -469,38 +469,38 @@
     {
       "source": "src/actions/sensor-dial.ts",
       "destination": "src/actions/sensor-dial.ts",
-      "sourceSha256": "14912572318a25a89b7c20075890df254dcd1ae149534450dc4bf1787895a805",
+      "sourceSha256": "f68ed07aed9874d89d72fc20910b5fecb5ed87b0771559d26836d92574e5e142",
       "rewriteCounts": [
         0,
         1,
         0
       ],
-      "rewrittenSha256": "58d73bb0b8485f0e787ccd8e39ba67aa1254439759a5e8275a16f2f54e292d49",
+      "rewrittenSha256": "0bab3d4f8e1ec4325099523749f36c8cbefeee1f78d9b9cd649e42d58bef9eb4",
       "patch": {
         "path": "core-patches/src__actions__sensor-dial.ts.patch",
-        "sha256": "7d6a082c5510c57018fbe6f9d5f698bdd10eaa5b086c68770c00ee707e7acf48",
+        "sha256": "237f3479b25498b1872c7373fa01e63f3d0b2faca48c824d4f16362254c8c30c",
         "seam": "S1/S2/S5",
         "reason": "Select Mac poller/status copy, empty-dial title and fixed setup pixels."
       },
-      "postPatchSha256": "adcaa6b1e48c8af43f386d499526984cec0017f72575bbb3666992eeb393ebe6"
+      "postPatchSha256": "ce03c09cfce5355b302dcb718a8a4f9961b57307dd453a0dcb7441896d2bccf8"
     },
     {
       "source": "src/actions/sensor-reading.ts",
       "destination": "src/actions/sensor-reading.ts",
-      "sourceSha256": "6490a1855f747887032053aa5b3ac339bdb44313ae4b389017133ed7d3565454",
+      "sourceSha256": "b4a463c706f1989dfcad41bc20378fefae49170cec74048523d44a3d66a3ea8f",
       "rewriteCounts": [
         0,
         1,
         0
       ],
-      "rewrittenSha256": "a9030ca8874f62c853eaabb6bb3ff934e15bcc64ba1f22c3e22720957da48f46",
+      "rewrittenSha256": "50a18af85048c9c22811b4f361f867c5050a0e0b43b35778cd73e6650fa0bd08",
       "patch": {
         "path": "core-patches/src__actions__sensor-reading.ts.patch",
-        "sha256": "629ffb3207becbd0ce5aa6e58d4222e54a6cb51343029a784fad3d445e5bc5e3",
+        "sha256": "09cf530fa1c43949997394e21a5b9035d6917653f44bf2601eed6f4f7a77d6b6",
         "seam": "S1/S2",
         "reason": "Resolve the poller and platform status copy through checked aliases."
       },
-      "postPatchSha256": "a6104b235d6917383ad642d40264776b612316a77cd33f4adf3dee8773a42e54"
+      "postPatchSha256": "cebf0710857337404e663e139e8ea9511b4757d155b623f1275c0ddc590962d5"
     },
     {
       "source": "src/clock.ts",
@@ -580,28 +580,28 @@
     {
       "source": "src/detail/detail-group.ts",
       "destination": "src/detail/detail-group.ts",
-      "sourceSha256": "b93561138bd5251430c03f70cfa0a5f36545f3a23d91010e9542068f0f0a4fd5",
+      "sourceSha256": "d66a8c440691ba9e455e71dd13ffded1a3bf5a524b9b0656b22e9de779617883",
       "rewriteCounts": [
         0,
         0,
         0
       ],
-      "rewrittenSha256": "b93561138bd5251430c03f70cfa0a5f36545f3a23d91010e9542068f0f0a4fd5",
+      "rewrittenSha256": "d66a8c440691ba9e455e71dd13ffded1a3bf5a524b9b0656b22e9de779617883",
       "patch": null,
-      "postPatchSha256": "b93561138bd5251430c03f70cfa0a5f36545f3a23d91010e9542068f0f0a4fd5"
+      "postPatchSha256": "d66a8c440691ba9e455e71dd13ffded1a3bf5a524b9b0656b22e9de779617883"
     },
     {
       "source": "src/detail/detail-settings.ts",
       "destination": "src/detail/detail-settings.ts",
-      "sourceSha256": "3134dae7476161f4826e43d420c9153ffdbff02562813722bcbd5c1e5c126063",
+      "sourceSha256": "82ba5684816d8ab55a1c58c15bc6cdafdb196ae5160ac3d30448a808baa33e94",
       "rewriteCounts": [
         0,
         0,
         0
       ],
-      "rewrittenSha256": "3134dae7476161f4826e43d420c9153ffdbff02562813722bcbd5c1e5c126063",
+      "rewrittenSha256": "82ba5684816d8ab55a1c58c15bc6cdafdb196ae5160ac3d30448a808baa33e94",
       "patch": null,
-      "postPatchSha256": "3134dae7476161f4826e43d420c9153ffdbff02562813722bcbd5c1e5c126063"
+      "postPatchSha256": "82ba5684816d8ab55a1c58c15bc6cdafdb196ae5160ac3d30448a808baa33e94"
     },
     {
       "source": "src/detail/managed-profiles.ts",
@@ -619,15 +619,15 @@
     {
       "source": "src/detail/navigation.ts",
       "destination": "src/detail/navigation.ts",
-      "sourceSha256": "03ebe307ac3effc6d5be228da3db1b327b3d082ab8179d7760207684c8eb91da",
+      "sourceSha256": "769a269e4583a8fc5b7fa180816ccb288e54b1a5f1b5308938bd1c57ac4d6309",
       "rewriteCounts": [
         0,
         0,
         0
       ],
-      "rewrittenSha256": "03ebe307ac3effc6d5be228da3db1b327b3d082ab8179d7760207684c8eb91da",
+      "rewrittenSha256": "769a269e4583a8fc5b7fa180816ccb288e54b1a5f1b5308938bd1c57ac4d6309",
       "patch": null,
-      "postPatchSha256": "03ebe307ac3effc6d5be228da3db1b327b3d082ab8179d7760207684c8eb91da"
+      "postPatchSha256": "769a269e4583a8fc5b7fa180816ccb288e54b1a5f1b5308938bd1c57ac4d6309"
     },
     {
       "source": "src/detail/press-engine.ts",
@@ -1059,15 +1059,15 @@
     {
       "source": "src/ui/dial-renderer.ts",
       "destination": "src/ui/dial-renderer.ts",
-      "sourceSha256": "6a722bda2e9514eb444298c6268638bec151b3a668ad4e7f630e839a68dbfda0",
+      "sourceSha256": "9f6baa7f99fb1cf519ac58a063dfdfd7e075500e18ceab89d73c20fb8b872553",
       "rewriteCounts": [
         0,
         0,
         0
       ],
-      "rewrittenSha256": "6a722bda2e9514eb444298c6268638bec151b3a668ad4e7f630e839a68dbfda0",
+      "rewrittenSha256": "9f6baa7f99fb1cf519ac58a063dfdfd7e075500e18ceab89d73c20fb8b872553",
       "patch": null,
-      "postPatchSha256": "6a722bda2e9514eb444298c6268638bec151b3a668ad4e7f630e839a68dbfda0"
+      "postPatchSha256": "9f6baa7f99fb1cf519ac58a063dfdfd7e075500e18ceab89d73c20fb8b872553"
     },
     {
       "source": "src/ui/face-font.ts",
@@ -1090,15 +1090,15 @@
     {
       "source": "src/ui/format.ts",
       "destination": "src/ui/format.ts",
-      "sourceSha256": "bb06da1704179a7d4116bb04df156c84c2c896f27602445002f034c96abe1578",
+      "sourceSha256": "e546e556db89c4023615211eef9e3faa72cf9b9f422bab1f10db78df19fe04ae",
       "rewriteCounts": [
         0,
         0,
         0
       ],
-      "rewrittenSha256": "bb06da1704179a7d4116bb04df156c84c2c896f27602445002f034c96abe1578",
+      "rewrittenSha256": "e546e556db89c4023615211eef9e3faa72cf9b9f422bab1f10db78df19fe04ae",
       "patch": null,
-      "postPatchSha256": "bb06da1704179a7d4116bb04df156c84c2c896f27602445002f034c96abe1578"
+      "postPatchSha256": "e546e556db89c4023615211eef9e3faa72cf9b9f422bab1f10db78df19fe04ae"
     },
     {
       "source": "src/ui/gauge.ts",
@@ -1129,20 +1129,20 @@
     {
       "source": "src/ui/key-renderer.ts",
       "destination": "src/ui/key-renderer.ts",
-      "sourceSha256": "bc102770946a97cc0dddadfae89dc2126100f8af31bcaaf8e31c5c4c70cec855",
+      "sourceSha256": "9ad86386532217598c9eda6178484a9cc825c39395498d6fb6ba18c46f3f2726",
       "rewriteCounts": [
         0,
         0,
         0
       ],
-      "rewrittenSha256": "bc102770946a97cc0dddadfae89dc2126100f8af31bcaaf8e31c5c4c70cec855",
+      "rewrittenSha256": "9ad86386532217598c9eda6178484a9cc825c39395498d6fb6ba18c46f3f2726",
       "patch": {
         "path": "core-patches/src__ui__key-renderer.ts.patch",
-        "sha256": "d2e6e5341a00080f2fdb670cb02b7d13c820da599d7e35903bec7c6888b80f81",
+        "sha256": "2b5029af1a8d86c66b49a7870d43a6508ec79d06a98aa0a9e1b209e0ea4bd101",
         "seam": "S5",
         "reason": "Use measured Mac ink bounds for labels and quad values, with clearance above quad micro-labels"
       },
-      "postPatchSha256": "e4d0421dbd3c68f907cb6491f04bcdf155815121d079119b991834358a952da6"
+      "postPatchSha256": "6ebb6d40eb97f01360d8c28a1f6e3f900b32326ce44e6bf862f986b92db07e85"
     },
     {
       "source": "src/ui/measure.ts",
@@ -1204,15 +1204,15 @@
     {
       "source": "src/ui/text-colors.ts",
       "destination": "src/ui/text-colors.ts",
-      "sourceSha256": "6c25c1cdbd3436709c98275f9cee4f60593c402c4e5cc1238be562bd44088d06",
+      "sourceSha256": "61dc5901b0c4e5532a75c15e1b72467e5072923461461836a85310b735b3b87a",
       "rewriteCounts": [
         0,
         0,
         0
       ],
-      "rewrittenSha256": "6c25c1cdbd3436709c98275f9cee4f60593c402c4e5cc1238be562bd44088d06",
+      "rewrittenSha256": "61dc5901b0c4e5532a75c15e1b72467e5072923461461836a85310b735b3b87a",
       "patch": null,
-      "postPatchSha256": "6c25c1cdbd3436709c98275f9cee4f60593c402c4e5cc1238be562bd44088d06"
+      "postPatchSha256": "61dc5901b0c4e5532a75c15e1b72467e5072923461461836a85310b735b3b87a"
     },
     {
       "source": "src/ui/theme-store.ts",
@@ -1334,28 +1334,28 @@
     {
       "source": "test/detail-group.test.ts",
       "destination": "test/detail-group.test.ts",
-      "sourceSha256": "1eac0cfd4837cc264a2408755e2168256a95bc2ca935b639c75bc3e7a59ab781",
+      "sourceSha256": "57dffa312cdbd54da3150345f6265c5ecbe43516a9dda36aab108d2234d4fe18",
       "rewriteCounts": [
         0,
         0,
         0
       ],
-      "rewrittenSha256": "1eac0cfd4837cc264a2408755e2168256a95bc2ca935b639c75bc3e7a59ab781",
+      "rewrittenSha256": "57dffa312cdbd54da3150345f6265c5ecbe43516a9dda36aab108d2234d4fe18",
       "patch": null,
-      "postPatchSha256": "1eac0cfd4837cc264a2408755e2168256a95bc2ca935b639c75bc3e7a59ab781"
+      "postPatchSha256": "57dffa312cdbd54da3150345f6265c5ecbe43516a9dda36aab108d2234d4fe18"
     },
     {
       "source": "test/detail-navigation.test.ts",
       "destination": "test/detail-navigation.test.ts",
-      "sourceSha256": "313daf4dd5ee4f82e220205ab9ec6f899f1b0111cffc8efdb459337bd2160663",
+      "sourceSha256": "a9799541d1e023ca4e2f2ff8c05e4c96809d0f7bafae23efaf28c38672856d27",
       "rewriteCounts": [
         0,
         0,
         0
       ],
-      "rewrittenSha256": "313daf4dd5ee4f82e220205ab9ec6f899f1b0111cffc8efdb459337bd2160663",
+      "rewrittenSha256": "a9799541d1e023ca4e2f2ff8c05e4c96809d0f7bafae23efaf28c38672856d27",
       "patch": null,
-      "postPatchSha256": "313daf4dd5ee4f82e220205ab9ec6f899f1b0111cffc8efdb459337bd2160663"
+      "postPatchSha256": "a9799541d1e023ca4e2f2ff8c05e4c96809d0f7bafae23efaf28c38672856d27"
     },
     {
       "source": "test/detail-role.test.ts",
@@ -1620,15 +1620,15 @@
     {
       "source": "test/pi-alias-contract.test.ts",
       "destination": "test/pi-alias-contract.test.ts",
-      "sourceSha256": "8f34acd627439af1dc3ab82ca3d8fb2050efb913d4a5815811b3825be99d0422",
+      "sourceSha256": "a06068fdf098df9ea0a25afee6ec4797a727f9332f0ea990cbf7737341e42936",
       "rewriteCounts": [
         2,
         0,
         0
       ],
-      "rewrittenSha256": "69d0327671df0ffc81654af2bfee6118fa7549552ca1cf8494f6728cfc3d1f3f",
+      "rewrittenSha256": "4a76be22b7a37db63bfadce8f72ee53141219a80e78b3d5ce3b2674a547e7bc1",
       "patch": null,
-      "postPatchSha256": "69d0327671df0ffc81654af2bfee6118fa7549552ca1cf8494f6728cfc3d1f3f"
+      "postPatchSha256": "4a76be22b7a37db63bfadce8f72ee53141219a80e78b3d5ce3b2674a547e7bc1"
     },
     {
       "source": "test/pi-build-token.test.ts",
@@ -1659,41 +1659,41 @@
     {
       "source": "test/pi-detail-cells.test.mjs",
       "destination": "test/pi-detail-cells.test.mjs",
-      "sourceSha256": "91c9dd8e8d4c22bd369904c1f07bb50ea0d6efd395d417253ebe0f1e3898b5b4",
+      "sourceSha256": "4082c71533c1200c524e96d2af4967f372e10607e59c6bd3a29810563258fdbb",
       "rewriteCounts": [
         1,
         0,
         0
       ],
-      "rewrittenSha256": "896a1de7f2969381982eed99c422496b0339ebf17813dc0033eaf5cc84181ca5",
+      "rewrittenSha256": "02a16aab2f21437cca47815faafabf4118007cfcb79ecbb7f0eff90693645293",
       "patch": null,
-      "postPatchSha256": "896a1de7f2969381982eed99c422496b0339ebf17813dc0033eaf5cc84181ca5"
+      "postPatchSha256": "02a16aab2f21437cca47815faafabf4118007cfcb79ecbb7f0eff90693645293"
     },
     {
       "source": "test/pi-markup.test.ts",
       "destination": "test/pi-markup.test.ts",
-      "sourceSha256": "253e91eeaac103f868249e9e4bc0b35332010839a772b4bb6464b06c9df52020",
+      "sourceSha256": "d27ccb205a28c9a3bb86652093989740adde1b22b97f7f30232ccac49dc4c836",
       "rewriteCounts": [
         1,
         0,
         0
       ],
-      "rewrittenSha256": "ef8cb27e0e0a307063f094258650f8df85f351e55d315e921743a035db848338",
+      "rewrittenSha256": "de882bd6f4a64b6486b85e2d173f2ec8014d87ce6f9acf9ad88be99ff9df8384",
       "patch": null,
-      "postPatchSha256": "ef8cb27e0e0a307063f094258650f8df85f351e55d315e921743a035db848338"
+      "postPatchSha256": "de882bd6f4a64b6486b85e2d173f2ec8014d87ce6f9acf9ad88be99ff9df8384"
     },
     {
       "source": "test/pi-model.test.ts",
       "destination": "test/pi-model.test.ts",
-      "sourceSha256": "d3825879089b6254381dc63b56c23d3de3be4ae6a7ea1d3e96780fba19a47f8c",
+      "sourceSha256": "a33c9720cd2687bc70160c0153fcdb912af4169eb7bbaee07727085b059321d1",
       "rewriteCounts": [
         3,
         0,
         0
       ],
-      "rewrittenSha256": "00d77e55598cca2e71addf2e11e2e6e860603583326337d72a93d2dee2162fbe",
+      "rewrittenSha256": "64ae4735297b9b569f0d147c288aa3f6975707d33238accb7e5a06acb4cc3bfa",
       "patch": null,
-      "postPatchSha256": "00d77e55598cca2e71addf2e11e2e6e860603583326337d72a93d2dee2162fbe"
+      "postPatchSha256": "64ae4735297b9b569f0d147c288aa3f6975707d33238accb7e5a06acb4cc3bfa"
     },
     {
       "source": "test/pi-preview.test.ts",
@@ -2084,6 +2084,58 @@
       "rewrittenSha256": "3b325a5102c5ddb2bd3b270372ece77957732593219198cb48c97a239bb103e0",
       "patch": null,
       "postPatchSha256": "3b325a5102c5ddb2bd3b270372ece77957732593219198cb48c97a239bb103e0"
+    },
+    {
+      "source": "src/ui/dial-background.ts",
+      "destination": "src/ui/dial-background.ts",
+      "sourceSha256": "f8895d1ab524f23275f78f11c8d817c1ed0afb4d4453b6814cd8c788b1265048",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "f8895d1ab524f23275f78f11c8d817c1ed0afb4d4453b6814cd8c788b1265048",
+      "patch": null,
+      "postPatchSha256": "f8895d1ab524f23275f78f11c8d817c1ed0afb4d4453b6814cd8c788b1265048"
+    },
+    {
+      "source": "src/ui/glass.ts",
+      "destination": "src/ui/glass.ts",
+      "sourceSha256": "dbfc0e52fd84c764686081de6020da6b3a941193f0f95b2187c72702b33e37da",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "dbfc0e52fd84c764686081de6020da6b3a941193f0f95b2187c72702b33e37da",
+      "patch": null,
+      "postPatchSha256": "dbfc0e52fd84c764686081de6020da6b3a941193f0f95b2187c72702b33e37da"
+    },
+    {
+      "source": "test/dial-background.test.ts",
+      "destination": "test/dial-background.test.ts",
+      "sourceSha256": "d63de9b06097f4920d491c1643a1e104765265373dcd88afabbc924ea699be63",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "d63de9b06097f4920d491c1643a1e104765265373dcd88afabbc924ea699be63",
+      "patch": null,
+      "postPatchSha256": "d63de9b06097f4920d491c1643a1e104765265373dcd88afabbc924ea699be63"
+    },
+    {
+      "source": "test/golden/dial-backgrounds.json",
+      "destination": "test/golden/dial-backgrounds.json",
+      "sourceSha256": "029bd9e132caf60d7b3b66e2e6e5da796dc4e5874caaa502a6b51c9ac7b80fd0",
+      "rewriteCounts": [
+        0,
+        0,
+        0
+      ],
+      "rewrittenSha256": "029bd9e132caf60d7b3b66e2e6e5da796dc4e5874caaa502a6b51c9ac7b80fd0",
+      "patch": null,
+      "postPatchSha256": "029bd9e132caf60d7b3b66e2e6e5da796dc4e5874caaa502a6b51c9ac7b80fd0"
     }
   ],
   "copiedTests": [
@@ -2130,7 +2182,8 @@
     "test/state-screens.test.ts",
     "test/stats.test.ts",
     "test/text-colors.test.ts",
-    "test/themes.test.ts"
+    "test/themes.test.ts",
+    "test/dial-background.test.ts"
   ],
   "ports": [
     {
@@ -2174,10 +2227,10 @@
     },
     {
       "source": "scripts/capture-pi-reading-colors.mjs",
-      "upstreamSha256": "5f80be86091185ee7423684b499327de153c7077e2f8a5a9c86dcbf9e2145a4e",
-      "reviewedThroughSha256": "5f80be86091185ee7423684b499327de153c7077e2f8a5a9c86dcbf9e2145a4e",
+      "upstreamSha256": "a4eaa48b9801d542bf8a413029af9cc5c0e9a98c33a20a7c4aea2d14eaf9e6f9",
+      "reviewedThroughSha256": "a4eaa48b9801d542bf8a413029af9cc5c0e9a98c33a20a7c4aea2d14eaf9e6f9",
       "disposition": "implemented",
-      "reason": "Mac-specific documentation/reporting counterparts replace the Windows paths and fixtures. Production SVG provenance, explicit simulated-host capture scope, image hashes and observable failure checks are retained; physical media is owner-only.",
+      "reason": "Mac-specific documentation/reporting counterparts replace the Windows paths and fixtures. Production SVG provenance, explicit simulated-host capture scope, image hashes and observable failure checks are retained; physical media is owner-only. Reviewed through v1.7.1: the upstream change ties its build assertion to the manifest Version; the Mac capture records the panel token, which the build derives from the version, so nothing changes here.",
       "destinations": [
         "scripts/capture-mac-panels.mjs",
         "scripts/docs-assets.mjs",
@@ -2206,10 +2259,10 @@
     },
     {
       "source": "scripts/contact-sheet.mjs",
-      "upstreamSha256": "aa16d3c009470606c579ed30532862ac405e3e3383a58f6ba8e737107ea0c316",
-      "reviewedThroughSha256": "aa16d3c009470606c579ed30532862ac405e3e3383a58f6ba8e737107ea0c316",
+      "upstreamSha256": "a4540241c923a493d4b31dc50c983d8439ac675e700c3b270d008fa01d8d97e1",
+      "reviewedThroughSha256": "a4540241c923a493d4b31dc50c983d8439ac675e700c3b270d008fa01d8d97e1",
       "disposition": "implemented",
-      "reason": "Mac-specific documentation/reporting counterparts replace the Windows paths and fixtures. Production SVG provenance, explicit simulated-host capture scope, image hashes and observable failure checks are retained; physical media is owner-only.",
+      "reason": "Mac-specific documentation/reporting counterparts replace the Windows paths and fixtures. Production SVG provenance, explicit simulated-host capture scope, image hashes and observable failure checks are retained; physical media is owner-only. Reviewed through v1.7.1: the upstream change draws gauge zones through drawnZones in its theme fixtures; the Mac contact sheet only tiles PNG inputs and draws no gauges.",
       "destinations": [
         "scripts/contact-sheet.mjs"
       ],
@@ -2384,10 +2437,10 @@
     },
     {
       "source": "scripts/e2e-pi-persistence.mjs",
-      "upstreamSha256": "4bf38b68d78b7cdd1df491c518ed61a8f5d6c578c88a54491e73702611dfc15f",
-      "reviewedThroughSha256": "4bf38b68d78b7cdd1df491c518ed61a8f5d6c578c88a54491e73702611dfc15f",
+      "upstreamSha256": "b09b9da95de8d8c4e788b5ca0fa0ad43ab41aa6a0e948e6a512996b50ef81abd",
+      "reviewedThroughSha256": "b09b9da95de8d8c4e788b5ca0fa0ad43ab41aa6a0e948e6a512996b50ef81abd",
       "disposition": "implemented",
-      "reason": "Mac-specific runtime, staged-panel, package and process-identity counterparts preserve this capability. Windows-only source controls are replaced by saved-setting preservation and absence checks; synthetic alias fixtures remain compatibility tests.",
+      "reason": "Mac-specific runtime, staged-panel, package and process-identity counterparts preserve this capability. Windows-only source controls are replaced by saved-setting preservation and absence checks; synthetic alias fixtures remain compatibility tests. Reviewed through v1.7.1: the expectations for version 2 detail plans (issue 50) are applied here unchanged.",
       "destinations": [
         "scripts/e2e-pi-persistence.mjs"
       ],
@@ -2483,10 +2536,10 @@
     },
     {
       "source": "scripts/gen-docs-shots.mjs",
-      "upstreamSha256": "aefa59257c0cd31c748311c5abb5638dc19f408d43471805755956b17e57a04e",
-      "reviewedThroughSha256": "aefa59257c0cd31c748311c5abb5638dc19f408d43471805755956b17e57a04e",
+      "upstreamSha256": "fe0df1eb6a1c8b246255478541011fef51d9d8e06d43a645380ac5c54fa1131d",
+      "reviewedThroughSha256": "fe0df1eb6a1c8b246255478541011fef51d9d8e06d43a645380ac5c54fa1131d",
       "disposition": "implemented",
-      "reason": "Mac-specific documentation/reporting counterparts replace the Windows paths and fixtures. Production SVG provenance, explicit simulated-host capture scope, image hashes and observable failure checks are retained; physical media is owner-only.",
+      "reason": "Mac-specific documentation/reporting counterparts replace the Windows paths and fixtures. Production SVG provenance, explicit simulated-host capture scope, image hashes and observable failure checks are retained; physical media is owner-only. Reviewed through v1.7.1: the upstream change shortens long sensor names in its fixtures; the Mac scenes already use short public sample labels.",
       "destinations": [
         "scripts/docs-assets.mjs",
         "scripts/marketplace-shots.mjs",
@@ -2610,10 +2663,10 @@
     },
     {
       "source": "scripts/lib/pack-validation.mjs",
-      "upstreamSha256": "2fca8c191c705d9b4b6afecf923bcbbc04bc5da566b638d99ea8a92832f84a70",
-      "reviewedThroughSha256": "2fca8c191c705d9b4b6afecf923bcbbc04bc5da566b638d99ea8a92832f84a70",
+      "upstreamSha256": "e8f99865fbcca2e641e6d71679e5da48ec1f432085e84d30f652e5596dbaf6dc",
+      "reviewedThroughSha256": "e8f99865fbcca2e641e6d71679e5da48ec1f432085e84d30f652e5596dbaf6dc",
       "disposition": "implemented",
-      "reason": "Mac-owned capability and regression coverage replace the platform-bound origin; see the mapped commands.",
+      "reason": "Mac-owned capability and regression coverage replace the platform-bound origin; see the mapped commands. Reviewed through v1.7.1: the upstream change admits a fourth-segment hotfix preview; Mac Sensors has no preview band, so the exact X.Y.Z.0 check stays.",
       "destinations": [
         "scripts/lib/pack-validation.mjs"
       ],
@@ -2710,10 +2763,10 @@
     },
     {
       "source": "scripts/marketplace-shots.mjs",
-      "upstreamSha256": "2743ec46e13de8fdf3345cbc59b91db4961ecb2da22ea703cfcd9a4b2600a38e",
-      "reviewedThroughSha256": "2743ec46e13de8fdf3345cbc59b91db4961ecb2da22ea703cfcd9a4b2600a38e",
+      "upstreamSha256": "ec657e5e498e9bd73444d8c13fbdc28d616ebd9c6973638ff47ad42cca8eefb6",
+      "reviewedThroughSha256": "ec657e5e498e9bd73444d8c13fbdc28d616ebd9c6973638ff47ad42cca8eefb6",
       "disposition": "implemented",
-      "reason": "Mac-specific documentation/reporting counterparts replace the Windows paths and fixtures. Production SVG provenance, explicit simulated-host capture scope, image hashes and observable failure checks are retained; physical media is owner-only.",
+      "reason": "Mac-specific documentation/reporting counterparts replace the Windows paths and fixtures. Production SVG provenance, explicit simulated-host capture scope, image hashes and observable failure checks are retained; physical media is owner-only. Reviewed through v1.7.1: the upstream change is headline copy on its own artwork; Mac listing artwork changes only through the owner.",
       "destinations": [
         "scripts/docs-assets.mjs",
         "scripts/marketplace-shots.mjs",
@@ -2859,10 +2912,10 @@
     },
     {
       "source": "scripts/readme-boards.mjs",
-      "upstreamSha256": "17d2ec03b4a7d2fac56581d58985d561269fa956b64f8eba339ec739cb5b8537",
-      "reviewedThroughSha256": "17d2ec03b4a7d2fac56581d58985d561269fa956b64f8eba339ec739cb5b8537",
+      "upstreamSha256": "51ae1a586042aa765f90b5e71f33fa7c79a5078cd6601c508a26d153e29f2709",
+      "reviewedThroughSha256": "51ae1a586042aa765f90b5e71f33fa7c79a5078cd6601c508a26d153e29f2709",
       "disposition": "implemented",
-      "reason": "Mac-specific documentation/reporting counterparts replace the Windows paths and fixtures. Production SVG provenance, explicit simulated-host capture scope, image hashes and observable failure checks are retained; physical media is owner-only.",
+      "reason": "Mac-specific documentation/reporting counterparts replace the Windows paths and fixtures. Production SVG provenance, explicit simulated-host capture scope, image hashes and observable failure checks are retained; physical media is owner-only. Reviewed through v1.7.1: the upstream change mutes board gauge zones and changes its sample label; the Mac boards are pinned by scene hash and redraw only with the private Qt adapter (D111), so this waits for the next board redraw.",
       "destinations": [
         "scripts/docs-assets.mjs",
         "scripts/marketplace-shots.mjs",
@@ -2937,10 +2990,10 @@
     },
     {
       "source": "scripts/validate-release-copy.mjs",
-      "upstreamSha256": "b322d3d7989560929bc93b6685e719fd21a39ab415e1b16e8abc8386887ca56d",
-      "reviewedThroughSha256": "b322d3d7989560929bc93b6685e719fd21a39ab415e1b16e8abc8386887ca56d",
+      "upstreamSha256": "ce72b74aeb3c143e077175347dabb92bda05f3321627202027f7886776b5eb1c",
+      "reviewedThroughSha256": "ce72b74aeb3c143e077175347dabb92bda05f3321627202027f7886776b5eb1c",
       "disposition": "implemented",
-      "reason": "Mac-owned capability and regression coverage replace the platform-bound origin; see the mapped commands.",
+      "reason": "Mac-owned capability and regression coverage replace the platform-bound origin; see the mapped commands. Reviewed through v1.7.1: the upstream change admits a fourth-segment hotfix preview; the exact X.Y.Z.0 check stays.",
       "destinations": [
         "scripts/validate-release-copy.mjs"
       ],
@@ -2950,10 +3003,10 @@
     },
     {
       "source": "scripts/verify-pack-version.mjs",
-      "upstreamSha256": "e3ccaf54761ab39cdd9f29eda2edcb1a1eb8043f1a6bbea3ce87914cefac831f",
-      "reviewedThroughSha256": "e3ccaf54761ab39cdd9f29eda2edcb1a1eb8043f1a6bbea3ce87914cefac831f",
+      "upstreamSha256": "cf293747f82d2c263306e8ca47e1becff7a5832bacb836aea5f7fa277217eac6",
+      "reviewedThroughSha256": "cf293747f82d2c263306e8ca47e1becff7a5832bacb836aea5f7fa277217eac6",
       "disposition": "implemented",
-      "reason": "Mac-owned capability and regression coverage replace the platform-bound origin; see the mapped commands.",
+      "reason": "Mac-owned capability and regression coverage replace the platform-bound origin; see the mapped commands. Reviewed through v1.7.1: only the failure message changed, about the hotfix preview band Mac Sensors does not have.",
       "destinations": [
         "scripts/lib/pack-validation.mjs",
         "scripts/validate-release-copy.mjs"
@@ -3259,10 +3312,10 @@
     },
     {
       "source": "test/validate-pack.test.mjs",
-      "upstreamSha256": "07b045604df1b4c07eb8f2dc0362e47279d1314d94ceb51bc9fdbb02d8c146ef",
-      "reviewedThroughSha256": "07b045604df1b4c07eb8f2dc0362e47279d1314d94ceb51bc9fdbb02d8c146ef",
+      "upstreamSha256": "3e2559047382e8a82aaa668b5ee8aef9086dc9aa92b10eac766cb47b21103ede",
+      "reviewedThroughSha256": "3e2559047382e8a82aaa668b5ee8aef9086dc9aa92b10eac766cb47b21103ede",
       "disposition": "implemented",
-      "reason": "Mac-owned capability and regression coverage replace the platform-bound origin; see the mapped commands.",
+      "reason": "Mac-owned capability and regression coverage replace the platform-bound origin; see the mapped commands. Reviewed through v1.7.1: the upstream expectation follows its hotfix preview change, which is not taken.",
       "destinations": [
         "test/mac/pack.test.mjs"
       ],

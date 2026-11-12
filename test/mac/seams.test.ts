@@ -59,7 +59,7 @@ test('a source that stops completing expires at the 15 s TTL while reads continu
 	try {
 		const reads:Record<NativeSource,number[]>={public:[],smc:[],health:[]};
 		const row=(source:NativeSource,at:number):NativeRow=>({key:source==='smc'?'TB1T':'memory-total',label:source,group:source==='smc'?'Battery':'Memory',kind:source==='smc'?'temperature':'other',unit:source==='smc'?'°C':'B',value:source==='smc'?30:1024,valid:true,continuousMs:at,wallSeconds:1.7e9+at/1000,error:0,systemCode:0});
-		const packet=(source:NativeSource,at:number):NativePacket=>({source,rows:[row(source,at)],continuousMs:at,awakeMs:at,wallSeconds:1.7e9+at/1000,durationMs:1,error:0,systemCode:0,operation:'fixture',model:'Mac17,9',chip:'t6050',cpu:'Apple M5 Pro',table:'m5',tableMeasured:true,appleSilicon:1,translated:0,translationError:0,fontAvailable:true,cpuValid:false,cpuTicks:[[0,0,0,0]],networkValid:false,networkIn:'0',networkOut:'0',networkMembers:'1',storageValid:false,storageRead:'0',storageWrite:'0',storageMembers:'1'});
+		const packet=(source:NativeSource,at:number):NativePacket=>({source,rows:[row(source,at)],continuousMs:at,awakeMs:at,wallSeconds:1.7e9+at/1000,durationMs:1,error:0,code:'HWMAC_OK',systemCode:0,operation:'fixture',model:'Mac17,9',chip:'t6050',cpu:'Apple M5 Pro',table:'m5',tableMeasured:true,appleSilicon:1,translated:0,translationError:0,fontAvailable:true,cpuValid:false,cpuTicks:[[0,0,0,0]],networkValid:false,networkIn:'0',networkOut:'0',networkMembers:'1',storageValid:false,storageRead:'0',storageWrite:'0',storageMembers:'1'});
 		// Public completes its first read and the provider's counter rebaseline read at 250 ms, then never again; SMC and health always complete.
 		const native:NativeBridge={getBuildInfo:()=>({protocol:1,napi:8,version:'t',sourceId:'t',arch:process.arch,platform:'darwin',testHooks:true}),now:()=>Date.now(),open:()=>({read:(source)=>{const at=Date.now();reads[source].push(at);return new Promise(resolve=>{if(source!=='public'||reads.public.length<=2)setTimeout(()=>resolve(packet(source,at)),5);});},close:()=>{}})};
 		const subject=poller0((ready)=>new MacProvider(native,ready));
@@ -95,11 +95,14 @@ test('a read checks the snapshot and arms expiry once, and a read that throws st
 	const denied=new HwinfoError('access-denied','Denied');
 	assert.deepEqual(reasons(poller0(()=>({read:()=>{throw denied;},current:()=>{throw denied;},untilExpiry:()=>null,age:()=>null,close:()=>{}}))),['access-denied']);
 	assert.deepEqual(reasons(poller0(()=>{throw new HwinfoError('bridge-failed','No bridge');})),['bridge-failed']);
+	// The support report names what failed: the diagnostics carry the failure's own sentence, which the panel never shows.
+	const failed=poller0(()=>{throw new HwinfoError('bridge-failed','The native reader file\'s SHA-256 does not match native-artifacts.json.');});failed.retain();
+	assert.deepEqual([failed.diagnostics().reason,failed.diagnostics().detail],['bridge-failed','The native reader file\'s SHA-256 does not match native-artifacts.json.']);failed.release();
 });
 test('readings that lapse before SMC ever completes are not kept live, whether public then fails, stalls or every source had completed',async()=>{
 	const memory='mac:v1:system:memory-total';
 	const row=(source:NativeSource,at:number):NativeRow=>({key:source==='smc'?'TB1T':'memory-total',label:source,group:source==='smc'?'Battery':'Memory',kind:source==='smc'?'temperature':'other',unit:source==='smc'?'°C':'B',value:source==='smc'?30:1024,valid:true,continuousMs:at,wallSeconds:1.7e9+at/1000,error:0,systemCode:0});
-	const packet=(source:NativeSource,at:number):NativePacket=>({source,rows:[row(source,at)],continuousMs:at,awakeMs:at,wallSeconds:1.7e9+at/1000,durationMs:1,error:0,systemCode:0,operation:'fixture',model:'Mac17,9',chip:'t6050',cpu:'Apple M5 Pro',table:'m5',tableMeasured:true,appleSilicon:1,translated:0,translationError:0,fontAvailable:true,cpuValid:false,cpuTicks:[[0,0,0,0]],networkValid:false,networkIn:'0',networkOut:'0',networkMembers:'1',storageValid:false,storageRead:'0',storageWrite:'0',storageMembers:'1'});
+	const packet=(source:NativeSource,at:number):NativePacket=>({source,rows:[row(source,at)],continuousMs:at,awakeMs:at,wallSeconds:1.7e9+at/1000,durationMs:1,error:0,code:'HWMAC_OK',systemCode:0,operation:'fixture',model:'Mac17,9',chip:'t6050',cpu:'Apple M5 Pro',table:'m5',tableMeasured:true,appleSilicon:1,translated:0,translationError:0,fontAvailable:true,cpuValid:false,cpuTicks:[[0,0,0,0]],networkValid:false,networkIn:'0',networkOut:'0',networkMembers:'1',storageValid:false,storageRead:'0',storageWrite:'0',storageMembers:'1'});
 	const settle=():Promise<void>=>new Promise(resolve=>setImmediate(resolve));
 	for(const variant of ['public rejects','public stalls','every source had completed'] as const) {
 		const clock={now:100};const out=new Map<NativeSource,{resolve:(p:NativePacket)=>void;reject:(e:unknown)=>void}>();

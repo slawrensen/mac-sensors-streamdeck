@@ -39,10 +39,23 @@ const sampleRows:{key:string;label:string;unit:string;value:number;min:number;ma
 const sampleSensorNames=PROVIDER_GROUPS.filter(group=>sampleRows.some(row=>row.group===group));
 /** The scenes' authoring order; sampleSnapshot() publishes them in the provider's order. Reading ids are 0, as the provider sets them. */
 export const sampleReadings:Reading[]=sampleRows.map(({group,min,max,avg,...row},index)=>{sampleGroups[row.key]=group;return {...row,id:0,sensorIndex:sampleSensorNames.indexOf(group),valueMin:min,valueMax:max,valueAvg:avg,statistics:'producer' as const,observationTime:1000,observationRevision:index+1};});
-/** A snapshot shaped as MacProvider.rebuild() shapes one: sensors per present group, readings sorted by sensor then key. */
+/**
+ * The renderer boards were drawn with the 1.0.1 names, and their pinned scene hashes keep them as drawn until the private Qt adapter
+ * is measured again for the current app. Each sample reading keeps the name its board shows; this maps it to the name the provider
+ * gives that reading today, which the settings-panel captures show.
+ */
+export const NAMED_NOW:Readonly<Record<string,string>>={'CPU super core 1':'Super core 1','System Total':'System total','Memory active':'RAM active','Network receive':'Network in','Startup volume available':'Disk available'};
+/** The sample snapshot under today's names, for the settings-panel captures. Keys, values and order are the same. */
+export function currentSnapshot():SensorSnapshot {
+	const snapshot=sampleSnapshot(),readings=snapshot.readings.map(row=>({...row,label:NAMED_NOW[row.label]??row.label}));
+	return {...snapshot,readings,byKey:new Map(readings.map(row=>[row.key,row]))};
+}
+/** Inside a group MacProvider lists system counters, then computed readings, then SMC rows in catalog order, then battery and drive health. */
+const sourceRank=(key:string)=>key.startsWith('mac:v1:system:')?0:key.startsWith('mac:v1:computed:')?1:key.startsWith('mac:v1:smc:')?2:3;
+/** A snapshot shaped as MacProvider.rebuild() shapes one: sensors per present group, readings by sensor, then source. No group holds two sample rows of one source. */
 export function sampleSnapshot():SensorSnapshot {
 	const sensors=sampleSensorNames.map((name,index)=>({index,id:PROVIDER_GROUPS.indexOf(name)+1,instance:0,name}));
-	const readings=sampleReadings.map(row=>({...row})).sort((a,b)=>a.sensorIndex-b.sensorIndex||a.key.localeCompare(b.key));
+	const readings=sampleReadings.map(row=>({...row})).sort((a,b)=>a.sensorIndex-b.sensorIndex||sourceRank(a.key)-sourceRank(b.key));
 	return {catalogRevision:1,pollTime:1,valueRevision:1,freshnessRevision:0,version:1,revision:1,sensors,readings,byKey:new Map(readings.map(row=>[row.key,row]))};
 }
 // Shared settings for every scene. Accents are off so faces compare across boards; the accents board alone turns on the shipped default.
@@ -122,6 +135,34 @@ export function composeScenes():Scene[] {
 		key('stat-dual-'+statMode,{...primary,keyLayout:'dual',quadLabels:true,statMode},'Dual layout, '+statMode);
 	}
 	return scenes;
+}
+/** The Background looks in the order the settings panel lists them (src/ui/dial-background.ts). */
+export const STRIP_LOOKS=['theme','glass','tint','outline','clear'] as const;
+export type StripLook=typeof STRIP_LOOKS[number];
+export type StripView='single'|'tworow'|'overview';
+/**
+ * One Sensor Dial face for a touch strip example, with its Background look. Unlike a board face it is drawn to be laid over a
+ * picture: every look but Theme leaves part of its 200 by 100 segment see-through. Same sample readings and history as the boards.
+ */
+export function composeLookScene(theme:string,look:StripLook,view:StripView,accentWords:boolean):string {
+	applyGlobalThemeSettings(docsGlobals);
+	const status={state:'ok',snapshot:sampleSnapshot(),source:'mac'} as const,stats=new SessionStatsStore(),histories=new Map<string,number[]>();
+	for(const [index,row] of sampleReadings.entries()){const history=sampleHistory(row.value,index);histories.set(row.key,history);for(const value of history)stats.sample(row.key,value);}
+	const settings:DialSettings={readingKey:sampleReadings[0]!.key,label:'CPU super 1',rotationKeys:sampleReadings.slice(0,3).map(row=>row.key),dialView:view,overviewLabels:'full',theme,dialBackground:look,...(accentWords?{dialAccentWords:true}:{}),...(view==='single'?{warnValue:'75',critValue:'90'}:{})};
+	return composeDialSvg({settings,stats,statMode:'current',overlay:null,pinned:false,cyclePaused:false},status,key=>histories.get(key)??[]);
+}
+/**
+ * The touch strip examples on the Sensor Dial page. Each strip is six dial segments over one picture: the five looks on the
+ * one-reading view, then Tint on the three-row overview. Paper sits on a light picture, as its Clear look needs.
+ */
+export const stripDefinitions=[
+	{id:'midnight',theme:'midnight',accentWords:false,picture:'cosmic-cliffs'},
+	{id:'ultraviolet-accent-words',theme:'ultraviolet',accentWords:true,picture:'cosmic-cliffs'},
+	{id:'paper',theme:'paper',accentWords:false,picture:'light'}
+] as const;
+export type StripScene={id:string;strip:string;theme:string;look:StripLook;view:StripView;accentWords:boolean;svg:string};
+export function composeStripScenes():StripScene[] {
+	return stripDefinitions.flatMap(strip=>[...STRIP_LOOKS.map(look=>({look,view:'single' as StripView})),{look:'tint' as StripLook,view:'overview' as StripView}].map(({look,view})=>({id:`strip-${strip.id}-${look}-${view}`,strip:strip.id,theme:strip.theme,look,view,accentWords:strip.accentWords,svg:composeLookScene(strip.theme,look,view,strip.accentWords)})));
 }
 /** The footer under a board: it says custom labels are shown when any face on the board draws one. */
 export function boardFooter(board:{scenes:string[]},scenes:Scene[]):string {

@@ -33,7 +33,7 @@ Click **Reading**, type part of a reading or group name such as `cpu super` or `
 
 Arrow keys browse, Return picks, and Tab or a click elsewhere closes the list without changing anything. The button beside the box, **Reload the sensor list**, asks the plugin for the list again. Opening the panel saves nothing.
 
-![The Sensor Reading settings panel with cpu typed in the Reading search and the results open under the CPU group: CPU super core 1, 62.4 °C, highlighted, and CPU usage, 37.5 %](assets/img/settings-picker.png)
+![The Sensor Reading settings panel with cpu typed in the Reading search and the results open under the CPU group: CPU usage, 37.5 %, and Super core 1, 62.4 °C, highlighted](assets/img/settings-picker.png)
 
 *Settings-panel capture of the shipped 1.0.1.0 panel on a simulated host with sample readings and **Accent colors** set to **Theme accent everywhere**. It is not the Stream Deck app's own window.*
 

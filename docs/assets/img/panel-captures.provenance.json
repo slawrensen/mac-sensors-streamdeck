@@ -5,14 +5,14 @@
     "ui/control.html": "f7107ecc84f089d00be11498c9fe755a7cd106c7480d51360effe2b00a015d9f",
     "ui/detail-slot.html": "6d5481b6245e3285cd6ccb186880287c3a4ab6ceda26a5bf43b75d8d11ba316e",
     "ui/pi-command.js": "a672b467fa4d6950bbae85ea59006c0a0185f6b2c9b366ad6e29340c19d6b62a",
-    "ui/pi-common.js": "1b8be3eac037179606e70f4178f38f87c3c09a8962a5d5ee65c12c235aebfb59",
+    "ui/pi-common.js": "d355e1f7a531e831e450934e0aa92478db653822150c9582c852eacf46ad556e",
     "ui/pi-control.js": "2a83b53d7c0f4cf6aca9216c5f0fc4001327f05b05e3c2b4282a0ad7083df18a",
-    "ui/pi-model.js": "c9732cb2d91c9cfef8f6552eaecc0a72f4efff9fd6e25e2922b18f3decb39632",
-    "ui/pi-shell.js": "6427c97286c2a39463a5138af22d188b180940dfb6c04fa096ab24200d1e77d3",
+    "ui/pi-model.js": "68a4952df13024dddf2795be6d91888fd4bb644eb9e0ea3752ccbe0b5ccd5c20",
+    "ui/pi-shell.js": "271ce935f28157164bc2d4224b9e7b07857651e5b963d2d3047e50a03ee5765b",
     "ui/pi-slot.js": "c07cd26a8d46a824c5440bb487d731bef0426f14d76ccea034b0669cab931337",
-    "ui/pi.css": "51f44aeed25c6c0b56940a2079da5692547b48212f0d60efb820e885eb80d165",
+    "ui/pi.css": "25abaa9676023ccc9a53444a9840bb1dce4154233ae04bddb9de0a26d47ffc0c",
     "ui/sdpi-components.js": "f6c0dfd2ed68e18084b9952842b86e3850cf837d674704700c2a0718e0a24f6b",
-    "ui/sensor-dial.html": "61d2727e071aee6fe4f002b6c2462fcfe167b52db63c43c980cb1c2570651177",
+    "ui/sensor-dial.html": "c3b2e2c8cb74271e22b9a11951bcd7654570e328fa7ab2eb2e086857755121da",
     "ui/sensor-reading.html": "8c85f61a0bc42de8d8c2b2cad1d310346dcce5cfe825a0c55fe5c5c578016467"
   },
   "captures": [
@@ -36,7 +36,7 @@
     {
       "file": "settings-dial.png",
       "kind": "settings-panel capture, simulated host, sample data",
-      "sha256": "6014f4d5e090bc20736776c31a830ac6d39697b0666599ae9a2cf744ba603dbc",
+      "sha256": "ec9f2ef6e99c5c87976b7222313dd0b445792350fbcf8115888b353a0f767593",
       "settings": {
         "readingKey": "mac:v1:smc:Mac17%2C9:54703034:temp.v1",
         "label": "CPU super 1",
@@ -56,7 +56,7 @@
     {
       "file": "settings-reading-colors.png",
       "kind": "settings-panel capture, simulated host, sample data",
-      "sha256": "934a92a8e76aef27dc04fa792d06d21fe377e417e82e43f29b69159ca5775e6a",
+      "sha256": "73f12b265c61f6a6e85c117da84ff07023a72e8f46281595043ef025c7f2a5f5",
       "settings": {
         "readingKey": "mac:v1:smc:Mac17%2C9:54703034:temp.v1",
         "label": "CPU super 1",
@@ -81,7 +81,7 @@
     {
       "file": "settings-picker.png",
       "kind": "settings-panel capture, simulated host, sample data",
-      "sha256": "438ac8359737b9fc1a7eba3169e5e86523dee7984b1f950d0aef21ad286e6cd2",
+      "sha256": "d52a4b0107b18b7ec893183c64cea41f8d75999f840e6b736c02fe28f2c8438b",
       "settings": {
         "readingKey": "mac:v1:smc:Mac17%2C9:54703034:temp.v1",
         "label": "CPU super 1",
@@ -99,7 +99,7 @@
     {
       "file": "settings-dial-controls.png",
       "kind": "settings-panel capture, simulated host, sample data",
-      "sha256": "82ce83188045194db104ed7c7843c294ecfa4f083c781ac2519ac0577ca568f4",
+      "sha256": "591feb55c8072bca913eb7065a8b2def0821726e03c0c6a83050bd24e783cb8e",
       "settings": {
         "readingKey": "mac:v1:smc:Mac17%2C9:54703034:temp.v1",
         "label": "CPU super 1",

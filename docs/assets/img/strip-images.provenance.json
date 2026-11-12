@@ -1,0 +1,325 @@
+{
+  "schema": 1,
+  "version": "1.0.2",
+  "command": "npm run docs:assets -- docs/assets/img strips",
+  "renderer": {
+    "name": "Installed app QtSvg through a measured local adapter",
+    "version": "6.11.1",
+    "deviceEquivalence": "INFERRED until physical photograph calibration"
+  },
+  "font": "fc1863ab504b9c160abaa12b92296363db72f5b759311982510a85fe2aa9ff4f",
+  "sampleData": true,
+  "picture": {
+    "file": "sources/cosmic-cliffs-strip.jpg",
+    "sha256": "a219107b9c966bda1fe03074650fee052a8c22d83f6b5b914ad0cf8ea19c6f07",
+    "credit": "NASA, ESA, CSA, and STScI",
+    "source": "https://esawebb.org/images/weic2205a/",
+    "license": "CC BY 4.0",
+    "change": "Cropped and scaled to a 12 to 1 strip"
+  },
+  "alphaMeasuredAt": [
+    200,
+    100
+  ],
+  "scenes": [
+    {
+      "id": "strip-midnight-theme-single",
+      "strip": "midnight",
+      "theme": "midnight",
+      "look": "theme",
+      "view": "single",
+      "accentWords": false,
+      "svgSha256": "5a1d99adf2a56151be157a6689e86cec85b7bab8a7da007e9e0d5c16e5e1271c",
+      "alpha": {
+        "clear": 0,
+        "solid": 1,
+        "panelAlpha": null,
+        "panelShare": 0
+      }
+    },
+    {
+      "id": "strip-midnight-glass-single",
+      "strip": "midnight",
+      "theme": "midnight",
+      "look": "glass",
+      "view": "single",
+      "accentWords": false,
+      "svgSha256": "198419de622dbb5ae6f05b8e0da9911b558f865cce0f4b886d38222175eb4e55",
+      "alpha": {
+        "clear": 0,
+        "solid": 0.1246,
+        "panelAlpha": 204,
+        "panelShare": 0.7879
+      }
+    },
+    {
+      "id": "strip-midnight-tint-single",
+      "strip": "midnight",
+      "theme": "midnight",
+      "look": "tint",
+      "view": "single",
+      "accentWords": false,
+      "svgSha256": "b774eb3cb9cfb7fb1877199bba6bdefe5923d4fc4717f2672bacf1c721258f6a",
+      "alpha": {
+        "clear": 0,
+        "solid": 0.2637,
+        "panelAlpha": 128,
+        "panelShare": 0.698
+      }
+    },
+    {
+      "id": "strip-midnight-outline-single",
+      "strip": "midnight",
+      "theme": "midnight",
+      "look": "outline",
+      "view": "single",
+      "accentWords": false,
+      "svgSha256": "3d7dd6c2e87cfbf91f0ea9d9dc78b5d25616d648a79e382cfefc17bf66577488",
+      "alpha": {
+        "clear": 0.698,
+        "solid": 0.2605,
+        "panelAlpha": null,
+        "panelShare": 0
+      }
+    },
+    {
+      "id": "strip-midnight-clear-single",
+      "strip": "midnight",
+      "theme": "midnight",
+      "look": "clear",
+      "view": "single",
+      "accentWords": false,
+      "svgSha256": "77459c5524d90df1f3c2be782c9fa6b08dc7bed7ea722fd0d1a02203b042dd71",
+      "alpha": {
+        "clear": 0.7678,
+        "solid": 0.1537,
+        "panelAlpha": null,
+        "panelShare": 0
+      }
+    },
+    {
+      "id": "strip-midnight-tint-overview",
+      "strip": "midnight",
+      "theme": "midnight",
+      "look": "tint",
+      "view": "overview",
+      "accentWords": false,
+      "svgSha256": "5cd19b860111eb4bc3f85e8d931c6a2bdb277127b4b8e16ef4eda8dee4fd1a9e",
+      "alpha": {
+        "clear": 0,
+        "solid": 0.2922,
+        "panelAlpha": 128,
+        "panelShare": 0.6533
+      }
+    },
+    {
+      "id": "strip-ultraviolet-accent-words-theme-single",
+      "strip": "ultraviolet-accent-words",
+      "theme": "ultraviolet",
+      "look": "theme",
+      "view": "single",
+      "accentWords": true,
+      "svgSha256": "b0f75cc6c6eab819336d57892a4eeec0666cf562ab263477e6ec955e43a5e03a",
+      "alpha": {
+        "clear": 0,
+        "solid": 1,
+        "panelAlpha": null,
+        "panelShare": 0
+      }
+    },
+    {
+      "id": "strip-ultraviolet-accent-words-glass-single",
+      "strip": "ultraviolet-accent-words",
+      "theme": "ultraviolet",
+      "look": "glass",
+      "view": "single",
+      "accentWords": true,
+      "svgSha256": "8ac624b40840026bf77aed8e1577b428992176fb5e6f611d36ae7b6a391d26a7",
+      "alpha": {
+        "clear": 0,
+        "solid": 0.1246,
+        "panelAlpha": 204,
+        "panelShare": 0.7879
+      }
+    },
+    {
+      "id": "strip-ultraviolet-accent-words-tint-single",
+      "strip": "ultraviolet-accent-words",
+      "theme": "ultraviolet",
+      "look": "tint",
+      "view": "single",
+      "accentWords": true,
+      "svgSha256": "2bec8cbeaf7c7c4949a944e98d063838bfeef3d3f68e51a184d8d964604498b5",
+      "alpha": {
+        "clear": 0,
+        "solid": 0.2637,
+        "panelAlpha": 128,
+        "panelShare": 0.698
+      }
+    },
+    {
+      "id": "strip-ultraviolet-accent-words-outline-single",
+      "strip": "ultraviolet-accent-words",
+      "theme": "ultraviolet",
+      "look": "outline",
+      "view": "single",
+      "accentWords": true,
+      "svgSha256": "b118ae7493ce7b9c1c49f4621b4accf1851ee6d0f90c630c70dc875e2a3373f5",
+      "alpha": {
+        "clear": 0.698,
+        "solid": 0.2605,
+        "panelAlpha": null,
+        "panelShare": 0
+      }
+    },
+    {
+      "id": "strip-ultraviolet-accent-words-clear-single",
+      "strip": "ultraviolet-accent-words",
+      "theme": "ultraviolet",
+      "look": "clear",
+      "view": "single",
+      "accentWords": true,
+      "svgSha256": "4fd0dff91b2a5f9a8845391f216ecce050be30c321198d15dfb4d9e41e55a27e",
+      "alpha": {
+        "clear": 0.7678,
+        "solid": 0.1537,
+        "panelAlpha": null,
+        "panelShare": 0
+      }
+    },
+    {
+      "id": "strip-ultraviolet-accent-words-tint-overview",
+      "strip": "ultraviolet-accent-words",
+      "theme": "ultraviolet",
+      "look": "tint",
+      "view": "overview",
+      "accentWords": true,
+      "svgSha256": "987bd71caff38dbdc7e84ccbc29ff927a583d824f8d994b4ba0ffc4e60c4dc55",
+      "alpha": {
+        "clear": 0,
+        "solid": 0.2922,
+        "panelAlpha": 128,
+        "panelShare": 0.6533
+      }
+    },
+    {
+      "id": "strip-paper-theme-single",
+      "strip": "paper",
+      "theme": "paper",
+      "look": "theme",
+      "view": "single",
+      "accentWords": false,
+      "svgSha256": "68d516a4a0420cdc2ddf81bd436c612124633dc5af78b7dfae4b18412720419c",
+      "alpha": {
+        "clear": 0,
+        "solid": 1,
+        "panelAlpha": null,
+        "panelShare": 0
+      }
+    },
+    {
+      "id": "strip-paper-glass-single",
+      "strip": "paper",
+      "theme": "paper",
+      "look": "glass",
+      "view": "single",
+      "accentWords": false,
+      "svgSha256": "aa2a5ea155bc131c3c93f4a2ce8ba93fda79304e6f42a5c4d7256c9c23d6e2e5",
+      "alpha": {
+        "clear": 0,
+        "solid": 0.1246,
+        "panelAlpha": 204,
+        "panelShare": 0.7879
+      }
+    },
+    {
+      "id": "strip-paper-tint-single",
+      "strip": "paper",
+      "theme": "paper",
+      "look": "tint",
+      "view": "single",
+      "accentWords": false,
+      "svgSha256": "31b990f0ec0499d850e1d664dcd1c38c95ed798cc36dc10535f08048245fa5fe",
+      "alpha": {
+        "clear": 0,
+        "solid": 0.2637,
+        "panelAlpha": 128,
+        "panelShare": 0.698
+      }
+    },
+    {
+      "id": "strip-paper-outline-single",
+      "strip": "paper",
+      "theme": "paper",
+      "look": "outline",
+      "view": "single",
+      "accentWords": false,
+      "svgSha256": "8ca29476158c208deeb76992c07e8fbb1ba8823f8bd9ec41d35a4088fbd1f199",
+      "alpha": {
+        "clear": 0.698,
+        "solid": 0.2605,
+        "panelAlpha": null,
+        "panelShare": 0
+      }
+    },
+    {
+      "id": "strip-paper-clear-single",
+      "strip": "paper",
+      "theme": "paper",
+      "look": "clear",
+      "view": "single",
+      "accentWords": false,
+      "svgSha256": "837bbf02e497ae1f5f0b20ea58b4ff50988f6633b4725d627a0b60124721779c",
+      "alpha": {
+        "clear": 0.7678,
+        "solid": 0.1537,
+        "panelAlpha": null,
+        "panelShare": 0
+      }
+    },
+    {
+      "id": "strip-paper-tint-overview",
+      "strip": "paper",
+      "theme": "paper",
+      "look": "tint",
+      "view": "overview",
+      "accentWords": false,
+      "svgSha256": "9bdc349348ef36cdf136310470bad0e863892e382b185f5332ba7a3529b46294",
+      "alpha": {
+        "clear": 0,
+        "solid": 0.2922,
+        "panelAlpha": 128,
+        "panelShare": 0.6533
+      }
+    }
+  ],
+  "assets": [
+    {
+      "file": "dial-backgrounds-looks.jpg",
+      "width": 2560,
+      "height": 856,
+      "sha256": "76d5f61d97a460da21e6e7d9bebd3bf2869ee279324afca9606c43610dfb1b10",
+      "sceneIds": [
+        "strip-midnight-theme-single",
+        "strip-midnight-glass-single",
+        "strip-midnight-tint-single",
+        "strip-midnight-outline-single",
+        "strip-midnight-clear-single",
+        "strip-midnight-tint-overview",
+        "strip-ultraviolet-accent-words-theme-single",
+        "strip-ultraviolet-accent-words-glass-single",
+        "strip-ultraviolet-accent-words-tint-single",
+        "strip-ultraviolet-accent-words-outline-single",
+        "strip-ultraviolet-accent-words-clear-single",
+        "strip-ultraviolet-accent-words-tint-overview",
+        "strip-paper-theme-single",
+        "strip-paper-glass-single",
+        "strip-paper-tint-single",
+        "strip-paper-outline-single",
+        "strip-paper-clear-single",
+        "strip-paper-tint-overview"
+      ],
+      "kind": "production-rendered sample data over a picture"
+    }
+  ]
+}

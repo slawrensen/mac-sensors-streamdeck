@@ -28,6 +28,28 @@ if(mode==='core')await withHost(async host=>{
 	await until(()=>[1,2,3,4,5].every(index=>hasValue(host.svg('dial'+index),30)));
 	const before=host.messages.filter(message=>message.event==='setSettings').length;host.event('dial3','dialRotate',{ticks:1,pressed:false});await until(()=>host.messages.filter(message=>message.event==='setSettings').length>before);
 	assert.ok(host.messages.filter(message=>message.event==='setSettings').slice(before).every(message=>message.context==='dial3'));
+	// One dial per Background look, as neighbours on a touch strip. These frames are what the app lays over the strip picture, so
+	// each look must leave the segment as see-through as its name says: a solid fill, a panel at its opacity, or nothing behind the words.
+	const looks=['theme','glass','tint','outline','clear'],lookFrame=look=>host.svg('look-'+look),lookSettings=look=>({readingKey:temperature,theme:'midnight',...(look==='theme'?{}:{dialBackground:look})});
+	looks.forEach((look,index)=>host.appear('look-'+look,'dial',lookSettings(look),index));
+	await until(()=>looks.every(look=>hasValue(lookFrame(look),30)));
+	const solidFace=/<rect width="200" height="100" fill="#[0-9A-Fa-f]{6}"\/>/,panelFace=id=>new RegExp(`<rect width="200" height="100" fill="url\\(#${id}\\)"/>`),anyFace=/<rect width="200" height="100"/;
+	const panelOpacities=(svg,id)=>[...(new RegExp(`<linearGradient id="${id}"[^>]*>(.*?)</linearGradient>`).exec(svg)?.[1]??'').matchAll(/stop-opacity="([0-9.]+)"/g)].map(match=>Number(match[1]));
+	assert.match(lookFrame('theme'),solidFace,'Theme fills its segment');assert.doesNotMatch(lookFrame('theme'),/<filter|stop-opacity/);
+	assert.match(lookFrame('glass'),panelFace('p'));assert.deepEqual(panelOpacities(lookFrame('glass'),'p'),[.8,.8],'Glass is a panel at 80 %');assert.doesNotMatch(lookFrame('glass'),/<filter/);
+	assert.match(lookFrame('tint'),panelFace('t'));assert.deepEqual(panelOpacities(lookFrame('tint'),'t'),[.5,.5],'Tint is a panel at 50 %');assert.match(lookFrame('tint'),/<filter id="h"/,'Tint outlines its words');
+	assert.doesNotMatch(lookFrame('outline'),anyFace,'Outline draws nothing behind the words');assert.match(lookFrame('outline'),/<filter id="h"/);
+	assert.doesNotMatch(lookFrame('clear'),anyFace,'Clear draws nothing behind the words');assert.doesNotMatch(lookFrame('clear'),/<filter|<defs/);
+	// A stored value the reader does not know draws Theme, so a rollback or a hand edit cannot leave a dial see-through by accident.
+	host.appear('look-unknown','dial',{readingKey:temperature,theme:'midnight',dialBackground:'Glass '},5);await until(()=>hasValue(lookFrame('unknown'),30));assert.match(lookFrame('unknown'),solidFace);
+	// A live dial changes look from its settings alone, and Words in the accent color recolors a title only where the look takes it.
+	const titleFill=svg=>/<text x="12" y="24"[^>]*fill="([^"]+)"/.exec(svg)?.[1];
+	host.settings('look-theme',lookSettings('clear'));await until(()=>!anyFace.test(lookFrame('theme')));
+	const plainTitle=titleFill(lookFrame('glass'));host.settings('look-glass',{...lookSettings('glass'),dialAccentWords:true});await until(()=>titleFill(lookFrame('glass'))!==plainTitle);
+	const clearTitle=titleFill(lookFrame('clear'));host.settings('look-clear',{...lookSettings('clear'),dialAccentWords:true});await sleep(300);assert.equal(titleFill(lookFrame('clear')),clearTitle,'Clear keeps its one ink');
+	assert.equal(host.messages.filter(message=>message.event==='setSettings'&&String(message.context).startsWith('look-')).length,0,'drawing a look writes no settings');
+	// The frames as sent, kept so they can be drawn through the app's own renderer. Theme is the unknown-value dial: look-theme was switched to Clear above.
+	fs.mkdirSync('build',{recursive:true});fs.writeFileSync('build/e2e-dial-looks.json',JSON.stringify(Object.fromEntries(['tint','outline','unknown'].map(look=>[look==='unknown'?'theme':look,lookFrame(look)]).concat([['glass',lookFrame('glass')],['clear',lookFrame('clear')]])),null,1)+'\n');
 	host.appear('control','control',{command:'resetStats',target:''});await sleep(100);host.event('control','keyDown');host.event('control','keyUp');await until(()=>host.svg('control')?.includes('cx="59"'));
 	const keyWritesBefore=host.messages.filter(message=>message.event==='setSettings'&&message.context==='key').length;host.settings('key',{readingKey:'old:windows:key',future:{keep:true}});await until(()=>host.svg('key')?.includes('Sensor missing'));assert.equal(host.messages.filter(message=>message.event==='setSettings'&&message.context==='key').length,keyWritesBefore);
 	host.request('key',{event:'getSupportReport',requestId:'report'});await until(()=>host.messages.some(message=>message.payload?.event==='supportReport'));
