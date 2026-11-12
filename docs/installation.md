@@ -14,8 +14,8 @@ The declared floor is what the package asks for. **Actually run** lists what ran
 | Requirement | Declared floor | Actually run |
 | --- | --- | --- |
 | **macOS** | 13.5 or later | 27.0.1 on an Apple silicon M5 Pro. Hosted CI virtual machines ran the test suite and the native readers on macOS 26.6.2 (Apple silicon) and 26.6.1 (Intel). |
-| **Stream Deck app** | 7.1 or later | 7.5.0 and 7.6.0 |
-| **Node runtime** | Node 24, supplied by the Stream Deck app. You install nothing. | 24.13.1 with app 7.5.0 and 24.22.1 with app 7.6.0, the runtimes the app chose. |
+| **Stream Deck app** | 7.1 or later | 7.5.0, 7.6.0 and 7.6.1 |
+| **Node runtime** | Node 24, supplied by the Stream Deck app. You install nothing. | 24.13.1 with app 7.5.0 and 24.22.1 with apps 7.6.0 and 7.6.1, the runtimes the app chose. |
 | **Tahoma Bold** | Installed. It ships with macOS. | Present on the measured Mac |
 | **Processor** | The package carries an arm64 reader for Apple silicon and an x86_64 reader for Intel | Apple silicon measured. Intel ran only on hosted virtual machines; physical Intel validation has not been done ([Mac](hardware.html#mac)). |
 | **A deck** | **Sensor Reading** goes on a display key. **Sensor Dial** goes on a dial of a Stream Deck + or + XL. **Sensor Control** can go on any key, including a Stream Deck Pedal or Corsair G-Keys (not checked on hardware), and steers dials on another deck ([Stream Deck models](hardware.html#stream-deck-models)). | The 8 by 4 Virtual Stream Deck, and a Stream Deck MK.2 for keys, presses and opening details. Other physical checks and Stream Deck + dial gestures have not run ([Stream Deck models](hardware.html#stream-deck-models)). |

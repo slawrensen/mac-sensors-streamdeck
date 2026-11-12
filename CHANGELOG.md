@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.2.0 - 2026-11-10
+## 1.0.2.0 - 2026-11-12
 
 - A Mac with an Apple M1 to M6 or A18 Pro chip gets per-core CPU temperatures and GPU temperatures from a table for its chip family, and CPU average and CPU hottest core computed from the cores that answer. Before, only the M5 Pro had per-core temperatures. The tables are adapted from the Stats project, except the M5 Pro and M5 Max core rows, which follow the measured M5 Pro. Only the M5 Pro has been measured.
 - Battery cycles, Battery health and the Internal SSD temperature are new readings on a Mac that reports them. They come from public macOS battery and drive interfaces, asked at most every 1.5 seconds.
