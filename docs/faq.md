@@ -19,7 +19,7 @@ No. Mac Sensors runs only on macOS. Its manifest declares macOS as the only plat
 - Stream Deck app 7.1 or later, with the Node 24 runtime the app supplies
 - Tahoma Bold, which ships with macOS ([Tahoma Bold prerequisite](installation.html#tahoma-bold-prerequisite)).
 
-These are declared floors. Measured: Apple silicon M5 Pro, macOS 27.0.1, Stream Deck app 7.5.0 and 7.6.0 on the Virtual Stream Deck. On a Stream Deck MK.2, keys, presses and opening details were checked; [Hardware compatibility](hardware.html#stream-deck-models) lists the physical checks not done yet, including Stream Deck + dial gestures. See also [Installation](installation.html).
+These are declared floors. Measured: Apple silicon M5 Pro, macOS 27.0.1, Stream Deck app 7.5.0, 7.6.0 and 7.6.1 on the Virtual Stream Deck. On a Stream Deck MK.2, keys, presses and opening details were checked; [Hardware compatibility](hardware.html#stream-deck-models) lists the physical checks not done yet, including Stream Deck + dial gestures. See also [Installation](installation.html).
 
 **Sensor Reading** goes on keys. **Sensor Dial** needs a deck with dials, such as Stream Deck + or Stream Deck + XL.
 
@@ -103,6 +103,8 @@ Switching **°F** on or off does not clear it: samples are stored in the reading
 | 250 ms | 2.478% | 95.9 and 94.6 MiB |
 
 A 24-hour observation of the published 1.0.1.0, run as a development copy in the Stream Deck app 7.6.0 with 32 single-reading keys at 1 second, used 0.704% of one core, peaked at 92.55 MiB of RSS and closed at 50.41 MiB while the Mac was under memory pressure. It kept 12 threads and 49 to 50 file descriptors and logged no warnings or errors.
+
+In four 10-minute runs as development copies in the Stream Deck app 7.6.0, with 32 single-reading keys at 1 second, the 1.0.2.0 package used 0.844% of one core against 0.690% for the published 1.0.1.0 (PERF.md). On the M5 Pro it reads 67 SMC and 3 battery and drive health readings where 1.0.1.0 read 38 SMC readings. A 24-hour observation of 1.0.2.0, run the same way in the Stream Deck app 7.6.1, used 0.790% of one core, peaked at 98.41 MiB of RSS and closed at 69.41 MiB. It kept 12 threads and 53 file descriptors and logged no warnings or errors.
 
 Limits: one build's CPU differed by 35% between two sessions in the same harness, other development work ran during the measurements, and dials, detail views and keys that mix system and SMC readings were not measured in the app. These are recorded results on one Mac, not a promise for another.
 

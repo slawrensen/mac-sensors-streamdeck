@@ -35,6 +35,38 @@ The repository mock host (`scripts/lib/mock-host.mjs`) ran the 1.0.1 candidate b
 
 This supports the panel help line that shorter intervals use more processor time. It is mock-host evidence with the real read-only native reader, not the Stream Deck app: the app's rasterization and device transfer cost is not included. Background development activity was present.
 
+### 2026-11-11 to 2026-11-12: Published 1.0.2.0, 24-hour observation
+
+Command: `npm run soak -- --plugin <frozen dev directory> --out <evidence directory> --hours 24 --interval-ms 60000`. Package SHA-256: 0f744837fcb4d8e192792fa1fc7401a1cf94d1b9768b1f34cb64df420974133d (333461 bytes). Development bundle SHA-256: b7c651ce6fb0d721335ba33f7fd9927c7f44871b42c7201b4cfc6f5a49b63612.
+
+| Measure | Result |
+| --- | --- |
+| Window | 2026-11-11T03:33:00.321Z to 2026-11-12T03:34:01.297Z; 24.017 hours, 1442 samples |
+| Maximum measured RSS slope | -0.413 MiB per 30 minutes |
+| RSS start / close | 84.27 MiB / 69.41 MiB |
+| Maximum RSS | 98.41 MiB |
+| Maximum footprint | 40.60 MiB |
+| File descriptors start / close / maximum | 53 / 53 / 53 |
+| Maximum threads | 12 |
+| CPU time across measured process segments | 683.06 seconds |
+| Observed process identity changes | 0 |
+| WARN / ERROR lines | 0 / 0 |
+| Sampling gaps / freshness flags | 0 / 0 |
+| Unexplained flags | 0 |
+| Resource/freshness gate | NOT PASSED |
+
+Each observed process segment is kept, including warm-up. A segment shorter than 30 minutes has no fitted slope.
+
+| Segment | Samples | Hours | RSS start / close | MiB per 30 minutes |
+| --- | --- | --- | --- | --- |
+| 1 | 1442 | 24.017 | 84.27 MiB / 69.41 MiB | -0.413 |
+
+Scope: actual app development identity. Physical gestures, Intel hardware and owner-only events require separate evidence. Event records: 0; their presence alone does not verify recovery. New diagnostic reports: 37; scan errors: 0; review: REVIEW REQUIRED. The observer completed its requested window.
+
+The gate line reads NOT PASSED for one reason: the observer scans every process for new crash reports, and it found 37. Thirty-six came from iOS Simulator services and a Safari text service; the last is a widget of another app in the iOS Simulator that crashed on 2026-11-08, before this run began, and whose report file was rewritten during it. None came from Stream Deck, Node or Mac Sensors, and every plugin measure above stayed within its limit, so 1.0.2.0 was released on that review. File descriptors stayed at 53 from start to close. Two earlier runs of the same bytes held 53 to 53 and 49 to 49, so the level differs between runs, not within one. The plugin used 0.790% of one core over the window.
+
+Host: Mac17,9, M5 Pro, macOS 27.0.1, Stream Deck 7.6.1.23033, app Node 24.22.1, 32 single-reading keys on the 8 by 4 Virtual Stream Deck at the default 1 second interval. The development bundle is the 068f0c5 freeze with the development identity; the published package's 37 members equal that freeze.
+
 ### 2026-11-10 UTC: 1.0.2 candidate, native benchmark and actual app against 1.0.1
 
 Both measurements used the arm64 package that hosted CI built for payload commit 068f0c5, SHA-256 e2f58b7823d1ebea0f5f4f79c8f10bad1b673df9916f4cd4efe50c44b2c8261f, 333,461 bytes, 37 members, on Mac17,9 with an M5 Pro and macOS 27.0.1. The hosted Intel runner's package has the same 37 member hashes. The control is the published 1.0.1 reader, arm64 SHA-256 3968022b3f9146fb979202c7e8ab5ebf27a3405070c700bfa1d33c5cd2175bcd.
